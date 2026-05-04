@@ -1,13 +1,17 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const PORT = 3000;
+// Render는 process.env.PORT를 통해 포트를 할당합니다.
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// 실제 브라우저와 거의 동일한 헤더 설정 (차단 방지)
+// [해결책 1] 정적 파일 제공 경로를 현재 폴더(__dirname)로 확실히 고정
+app.use(express.static(path.join(__dirname)));
+
 const commonHeaders = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     'Accept': 'application/json, text/plain, */*',
@@ -15,58 +19,55 @@ const commonHeaders = {
     'Referer': 'https://finance.yahoo.com/'
 };
 
-/**
- * 1. 차트 데이터 API
- */
+// API 요청 함수
+async function fetchYahoo(url, params) {
+    try {
+        return await axios.get(url, { 
+            params, 
+            headers: commonHeaders, 
+            timeout: 10000 
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
+// 1. 주가 데이터 API
 app.get('/api/stock/:ticker', async (req, res) => {
     const { ticker } = req.params;
     let { interval = '1d', range = '1y' } = req.query;
-
-    // 잘못된 조합 방어 로직 (야후 API 제약 조건 대응)
-    if (range === 'max' && interval === '1d') interval = '1mo'; 
-
     try {
-        console.log(`[CHART] ${ticker} 요청: ${interval} / ${range}`);
-        const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}`, {
-            params: { interval, range },
-            headers: commonHeaders,
-            timeout: 5000
-        });
-
-        if (response.data && response.data.chart.result) {
-            res.json(response.data);
-        } else {
-            throw new Error("No chart result");
-        }
+        const response = await fetchYahoo(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}`, { interval, range });
+        res.json(response.data);
     } catch (error) {
-        console.error(`[ERR-CHART] ${ticker}:`, error.message);
-        res.status(500).json({ error: "주가 데이터를 불러올 수 없습니다." });
+        res.status(500).json({ error: "Chart data load failed" });
     }
 });
 
-/**
- * 2. 펀더멘털 데이터 API (404 발생 시에도 빈 응답을 주어 앱 중단 방지)
- */
+// 2. 펀더멘털 데이터 API
 app.get('/api/fundamentals/:ticker', async (req, res) => {
     const { ticker } = req.params;
     try {
-        console.log(`[FUND] ${ticker} 상세 정보 수집 중...`);
-        const response = await axios.get(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}`, {
-            params: { modules: 'defaultKeyStatistics,summaryDetail,assetProfile,fundProfile,topHoldings' },
-            headers: commonHeaders,
-            timeout: 5000
+        const response = await fetchYahoo(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}`, {
+            modules: 'defaultKeyStatistics,summaryDetail,assetProfile,fundProfile,topHoldings'
         });
         res.json(response.data);
     } catch (error) {
-        console.warn(`[WARN-FUND] ${ticker} 상세 정보 차단됨:`, error.message);
-        // 에러 시에도 형식을 맞춰서 보냄 (중요: 앱이 0.00으로 굳지 않게 함)
-        res.status(200).json({ quoteSummary: { result: [null], error: "Blocked" } });
+        res.json({ quoteSummary: { result: [null], error: "Limited" } });
     }
 });
 
+// [해결책 2] 사용자가 "/" (루트)로 접속하면 무조건 index.html을 보내주도록 설정
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// [해결책 3] 그 외 모든 잘못된 경로 접속 시에도 index.html로 리다이렉트 (SPA 방식)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.listen(PORT, () => {
-    console.log(`\n====================================================`);
-    console.log(`✅ Trading Proxy Server 가동 완료! (포트: ${PORT})`);
-    console.log(`🚀 이제 화면에서 0.00이 사라지고 데이터가 정상 표기됩니다.`);
-    console.log(`====================================================\n`);
+    console.log(`✅ Server is running on port ${PORT}`);
+    console.log(`📂 Serving files from: ${__dirname}`);
 });
