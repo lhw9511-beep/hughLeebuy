@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BUY or BYE | AI Triple-Perspective Analysis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>BUY or BYE | AI Precision Analysis</title>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <script>
         tailwind.config = {
             theme: { 
@@ -24,7 +24,7 @@
             }
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="[https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js](https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js)"></script>
     <style>
         /* 동적 테마 설정 */
         :root, .theme-default {
@@ -41,7 +41,7 @@
             --modal-bg: #ffffff;
             --text-main: #111827;
             --text-muted: #4b5563;
-            --border-color: rgba(0, 0, 0, 0.1);
+            --border-color: rgba(0, 0, 0, 0.15);
         }
         .theme-navy {
             --bg-color: #0f172a;
@@ -68,84 +68,87 @@
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
+        /* STRONG 신호 시각적 효과 */
+        .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.8); }
+        .status-BUY { color: #34D399; }
+        .status-HOLD { color: var(--text-muted); }
+        .status-BYE { color: #F87171; }
+        .status-STRONG-BYE { color: #EF4444; text-shadow: 0 0 12px rgba(239, 68, 68, 0.8); }
+
         /* 기본 전역 스타일 */
         html { font-size: 16px; transition: font-size 0.2s ease; }
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); transition: background 0.3s ease, border-color 0.3s ease; }
         
         .chart-container { height: 400px; width: 100%; }
-        @media (min-width: 1024px) { .chart-container { height: 550px; } }
+        @media (min-width: 1024px) { .chart-container { height: 500px; } }
         
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 10px; }
         
-        .ma-btn, .range-btn { transition: all 0.2s; font-size: 0.75rem; font-weight: bold; border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); white-space: nowrap; }
-        .ma-btn:hover:not(:disabled), .range-btn:hover:not(:disabled) { border-color: #3B82F6; color: var(--text-main); }
-        .ma-btn.active { background-color: #3B82F6; border-color: #3B82F6; color: white; }
-        .range-btn.active { background-color: #6366F1; border-color: #6366F1; color: white; }
+        .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 10px; }
+        
+        /* 칩(Chip) 스타일 버튼 */
+        .chip-btn { padding: 0.25rem 0.6rem; font-size: 0.7rem; font-weight: 800; border-radius: 0.5rem; background: rgba(0,0,0,0.1); color: var(--text-muted); border: 1px solid var(--border-color); transition: all 0.2s; white-space: nowrap; cursor: pointer; }
+        .chip-btn:hover { border-color: #3B82F6; color: var(--text-main); }
+        .chip-btn.active { background-color: #3B82F6; border-color: #3B82F6; color: white; }
 
-        #loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 24px; }
+        #loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 1.5rem; flex-direction: column; }
         
         .signal-badge { font-weight: 900; font-size: 0.65rem; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
         .signal-up { background-color: rgba(38, 166, 154, 0.2); color: #26A69A; }
         .signal-down { background-color: rgba(239, 83, 80, 0.2); color: #EF5350; }
+        .signal-neutral { background-color: rgba(107, 114, 128, 0.2); color: #9CA3AF; }
+
+        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem; display: flex; flex-direction: column; justify-content: space-between; }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 900; display: flex; align-items: center; gap: 4px; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 900; margin-top: 6px; }
         
-        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.5rem; text-align: center; }
-        .stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; }
-        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 900; margin-top: 2px; }
-        
-        .decision-header { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.1em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-bottom: 6px; }
-        
-        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.5rem; border: 1px solid transparent; }
+        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.75rem; border: 1px solid transparent; text-align: center; }
         .perspective-col:hover { background: rgba(0,0,0,0.05); border-color: var(--border-color); transform: translateY(-2px); }
 
-        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 1rem; }
-        .modal-content { max-width: 550px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; transition: background 0.3s ease; }
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { max-width: 550px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
         
-        .theme-btn { width: 36px; height: 36px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .theme-btn:hover { transform: scale(1.1); }
-        .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+        .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; }
+        .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
 
-        .setting-btn { border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); padding: 0.4rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: bold; transition: all 0.2s; flex: 1; }
+        .setting-btn { border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); padding: 0.4rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: bold; flex: 1; text-align: center; cursor: pointer; }
         .setting-btn.active { background: #3B82F6; color: white; border-color: #3B82F6; }
 
-        /* SVG 아이콘 공통 스타일 */
-        .icon { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        /* SVG Tooltip */
+        .info-tip { cursor: help; display: inline-flex; align-items: center; position: relative; }
+        .info-tip:hover { color: var(--text-main); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-2 md:p-4 xl:p-8">
+<body class="min-h-screen flex flex-col p-3 md:p-6 lg:p-8">
 
-    <!-- 설정 모달 -->
+    <!-- 환경 설정 모달 (톱니바퀴 안으로 모두 통합) -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
-                <h3 class="text-xl font-black text-themeText flex items-center">
-                    <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    환경 설정
+                <h3 class="text-lg font-black text-themeText flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    앱 환경 설정
                 </h3>
-                <button onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-                </button>
+                <button onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             
             <div class="space-y-6">
-                <!-- 테마 -->
                 <div>
-                    <p class="text-xs text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
+                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
                     <div class="flex flex-wrap gap-4">
-                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
-                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
-                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
-                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
-                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
+                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
+                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6; border-color:#ccc;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
+                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
+                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
+                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
                     </div>
                 </div>
 
-                <!-- 폰트 크기 -->
                 <div class="border-t border-themeBorder pt-4">
-                    <p class="text-xs text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 (Font Size)</p>
+                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 조절</p>
                     <div class="flex gap-2">
                         <button onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
                         <button onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
@@ -153,9 +156,8 @@
                     </div>
                 </div>
 
-                <!-- 선 굵기 -->
                 <div class="border-t border-themeBorder pt-4">
-                    <p class="text-xs text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기 (Line Width)</p>
+                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기</p>
                     <div class="flex gap-2">
                         <button onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
                         <button onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
@@ -163,176 +165,177 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="mt-8 pt-4 border-t border-themeBorder flex justify-end">
-                <button onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2 rounded-xl text-xs font-black hover:bg-blue-600 transition">확인</button>
+            <div class="mt-8 flex justify-end">
+                <button onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black hover:bg-blue-600 w-full md:w-auto">적용 및 닫기</button>
             </div>
         </div>
     </div>
 
-    <!-- 디테일 모달 -->
+    <!-- 디테일 팝업 모달 -->
     <div id="detail-modal" class="modal-overlay" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start mb-6">
+            <div class="flex justify-between items-start mb-4">
                 <div>
-                    <h3 id="modal-title" class="text-xl md:text-2xl font-black text-themeText uppercase italic">Perspective Detail</h3>
-                    <p id="modal-period" class="text-[0.65rem] md:text-[0.7rem] text-accent font-black tracking-widest uppercase mt-1">Target Period: ---</p>
+                    <h3 id="modal-title" class="text-xl font-black text-themeText uppercase italic">Detail</h3>
+                    <p id="modal-period" class="text-[0.7rem] text-accent font-black tracking-widest uppercase mt-1">---</p>
                 </div>
-                <button onclick="closeModal()" class="text-themeMuted hover:text-accent transition p-2">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-                </button>
+                <button onclick="closeModal()" class="text-themeMuted hover:text-accent p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            <div id="modal-body" class="space-y-4 md:space-y-6 text-sm text-themeText leading-relaxed"></div>
-            <div class="mt-6 md:mt-8 pt-4 border-t border-themeBorder flex justify-end">
-                <button onclick="closeModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-blue-600 transition">분석 종료</button>
+            <div id="modal-body" class="space-y-4 text-sm text-themeText"></div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 border border-white/5">창 닫기</button>
             </div>
         </div>
     </div>
 
-    <div class="max-w-[1600px] mx-auto w-full flex-grow flex flex-col space-y-4 md:space-y-6">
-        <!-- 헤더 -->
-        <header class="flex flex-col md:flex-row justify-between items-center glass p-4 md:p-6 rounded-3xl gap-4">
-            <div class="flex w-full md:w-auto justify-between items-center">
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="resetDashboard()">
-                    <div class="p-2 bg-accent rounded-xl">
-                        <svg class="icon text-white" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
+    <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-4 relative">
+        
+        <!-- 통합 헤더 (레이아웃 파괴 방지) -->
+        <header class="glass p-4 rounded-2xl flex flex-col gap-4 shadow-sm">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
+                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                     </div>
-                    <h1 class="text-xl md:text-2xl font-black tracking-tighter uppercase italic text-themeText">BUY <span class="text-accent">or BYE</span></h1>
+                    <h1 class="text-2xl font-black italic text-themeText tracking-tighter">BUY <span class="text-accent">or BYE</span></h1>
                 </div>
-                <!-- 톱니바퀴 버튼 (모바일) -->
-                <button onclick="openSettingsModal()" class="md:hidden p-2 text-themeMuted hover:text-themeText transition">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <!-- 오직 하나뿐인 톱니바퀴 버튼 -->
+                <button onclick="openSettingsModal()" class="p-2 bg-themeModal border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
             </div>
             
-            <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
-                <form id="search-form" class="flex w-full sm:w-auto">
-                    <input type="text" id="ticker-input" class="bg-themeModal border border-themeBorder text-themeText rounded-l-2xl px-4 py-2 w-full sm:w-40 md:w-48 uppercase outline-none focus:ring-2 focus:ring-accent transition-all text-sm md:text-base font-bold" value="SPY" placeholder="종목 심볼">
-                    <button type="submit" id="search-btn" class="bg-accent text-white px-4 md:px-6 py-2 rounded-r-2xl font-black hover:bg-blue-600 transition text-sm md:text-base">분석</button>
+            <div class="flex flex-col sm:flex-row gap-3 items-center w-full">
+                <form id="search-form" class="flex w-full sm:flex-grow">
+                    <input type="text" id="ticker-input" class="w-full bg-themeModal border border-themeBorder text-themeText rounded-l-xl px-4 py-2.5 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="종목 검색 (예: TSLA)">
+                    <button type="submit" class="bg-accent text-white px-5 py-2.5 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button>
                 </form>
-                <div class="flex items-center space-x-3 self-end sm:self-auto">
-                    <div id="status-text" class="text-[0.6rem] font-bold flex items-center">
-                        <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500 mr-1.5"></span>
-                        <span id="conn-label" class="text-themeMuted uppercase tracking-widest">WAITING</span>
-                    </div>
-                    <!-- 톱니바퀴 버튼 (데스크톱) -->
-                    <button onclick="openSettingsModal()" class="hidden md:flex p-2 bg-themeBorder rounded-lg text-themeMuted hover:text-themeText transition">
-                        <svg class="icon w-4 h-4" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
+                <div id="status-text" class="flex items-center gap-1.5 shrink-0 w-full sm:w-auto justify-end">
+                    <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                    <span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest">WAITING</span>
                 </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-4 md:gap-6 flex-grow">
-            <!-- Left: 차트 영역 -->
-            <div class="xl:col-span-3 space-y-4 md:space-y-6 flex flex-col">
-                <div class="glass rounded-3xl p-4 md:p-6 relative overflow-hidden shadow-xl flex-grow flex flex-col">
-                    <div id="loading-overlay" class="flex flex-col space-y-4">
-                        <div class="animate-spin rounded-full h-8 w-8 md:h-10 md:w-10 border-t-2 border-b-2 border-accent"></div>
-                        <p id="loading-text" class="text-[0.6rem] md:text-xs font-bold text-accent uppercase tracking-widest text-center">Data Processing...</p>
+        <!-- 차트 영역 -->
+        <div class="glass rounded-2xl p-4 flex flex-col shadow-xl relative min-h-[500px]">
+            <div id="loading-overlay">
+                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
+                <p id="loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">Processing Market Data...</p>
+            </div>
+            
+            <!-- 주가 타이틀 영역 -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 border-b border-themeBorder pb-4 gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <h2 id="display-ticker" class="text-4xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none">---</h2>
                     </div>
-                    
-                    <div class="flex flex-col lg:flex-row justify-between items-start mb-4 border-b border-themeBorder pb-4 gap-4">
-                        <div class="flex-grow w-full">
-                            <div class="flex items-center space-x-3">
-                                <h2 id="display-ticker" class="text-4xl md:text-6xl font-black text-themeText uppercase tracking-tighter leading-none">---</h2>
-                                <span id="asset-type-badge" class="px-2 py-0.5 rounded-md text-[0.55rem] md:text-[0.65rem] border border-themeBorder font-black uppercase tracking-widest text-themeMuted">Wait</span>
-                            </div>
-                            <div class="mt-2 md:mt-4">
-                                <div id="live-price" class="text-3xl md:text-5xl font-mono font-black text-themeText">---</div>
-                                <p id="ticker-desc-line" class="text-xs md:text-sm text-themeMuted font-medium mt-2 md:mt-3 border-l-2 border-accent pl-2 md:pl-3">데이터 대기 중입니다.</p>
-                            </div>
-                        </div>
-
-                        <!-- 컨트롤 패널 -->
-                        <div class="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-3 shrink-0 p-3 bg-themeModal rounded-2xl w-full lg:w-auto border border-themeBorder">
-                            <div class="flex flex-col items-start lg:items-end gap-1.5 w-full">
-                                <span class="text-[0.55rem] md:text-[0.6rem] font-black text-themeMuted uppercase tracking-widest">Timeframe</span>
-                                <!-- flex-wrap 유지 (연봉, MAX 모두 표기) -->
-                                <div id="range-toggles" class="flex flex-wrap gap-1 w-full justify-start lg:justify-end">
-                                    <button onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="range-btn px-2 md:px-3 py-1 rounded-md active">일봉</button>
-                                    <button onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="range-btn px-2 md:px-3 py-1 rounded-md">주봉</button>
-                                    <button onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="range-btn px-2 md:px-3 py-1 rounded-md">월봉</button>
-                                    <button onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="range-btn px-2 md:px-3 py-1 rounded-md">연봉</button>
-                                    <button onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="range-btn px-2 md:px-3 py-1 rounded-md">MAX</button>
-                                </div>
-                            </div>
-                            <div class="w-full h-px lg:w-full lg:h-px bg-themeBorder shrink-0"></div>
-                            <div class="flex flex-col items-start lg:items-end gap-1.5 w-full">
-                                <span class="text-[0.55rem] md:text-[0.6rem] font-black text-themeMuted uppercase tracking-widest">MA Config</span>
-                                <div id="ma-toggles" class="flex flex-wrap gap-1 justify-start lg:justify-end">
-                                    <button onclick="toggleMA(20)" id="btn-ma-20" class="ma-btn px-2 md:px-2.5 py-1 rounded-md">20</button>
-                                    <button onclick="toggleMA(60)" id="btn-ma-60" class="ma-btn px-2 md:px-2.5 py-1 rounded-md">60</button>
-                                    <button onclick="toggleMA(120)" id="btn-ma-120" class="ma-btn px-2 md:px-2.5 py-1 rounded-md active">120</button>
-                                </div>
-                            </div>
+                    <div id="live-price" class="text-2xl md:text-3xl font-mono font-black text-themeText">---</div>
+                </div>
+                
+                <!-- 차트 컨트롤 칩 -->
+                <div class="flex flex-col gap-2 w-full md:w-auto">
+                    <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                        <span class="text-[0.6rem] font-black text-themeMuted shrink-0">PERIOD</span>
+                        <div class="flex gap-1">
+                            <button onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn active">일봉</button>
+                            <button onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn">주봉</button>
+                            <button onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn">월봉</button>
+                            <button onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn">연봉</button>
+                            <button onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="chip-btn">MAX</button>
                         </div>
                     </div>
-
-                    <div id="chart-main" class="chart-container flex-grow"></div>
+                    <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                        <span class="text-[0.6rem] font-black text-themeMuted shrink-0">MA LNS</span>
+                        <div class="flex gap-1">
+                            <button onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">20</button>
+                            <button onclick="toggleMA(50)" id="btn-ma-50" class="chip-btn active">50</button>
+                            <button onclick="toggleMA(60)" id="btn-ma-60" class="chip-btn">60</button>
+                            <button onclick="toggleMA(120)" id="btn-ma-120" class="chip-btn active">120</button>
+                            <button onclick="toggleMA(200)" id="btn-ma-200" class="chip-btn active">200</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Right: 분석 및 결정 패널 -->
-            <div class="flex flex-col space-y-4 md:space-y-6">
-                
-                <!-- Master Intelligence (사인만 남김) -->
-                <div class="glass rounded-3xl p-4 md:p-6 border-t-8 border-gray-700 shadow-xl" id="master-decision-panel">
-                    <div class="flex justify-between items-center mb-4 md:mb-6">
-                        <div class="flex items-center space-x-2">
-                            <svg class="icon w-3.5 h-3.5 md:w-4 md:h-4 text-accent" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
-                            <p class="text-themeMuted text-[0.6rem] font-black uppercase tracking-widest">Master Intelligence</p>
-                        </div>
-                        <span id="master-status-badge" class="text-[0.55rem] font-black px-2 py-0.5 rounded bg-gray-500/20 text-gray-500 uppercase">Wait</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-3 gap-1 md:gap-2">
-                        <div class="perspective-col text-center border-r border-themeBorder" onclick="showDetail('short')">
-                            <p class="decision-header">SHORT</p>
-                            <div id="st-signal-text" class="text-sm md:text-base font-black italic text-gray-500">WAIT</div>
-                            <p class="text-[0.4rem] md:text-[0.45rem] text-themeMuted font-bold mt-1 uppercase">1-20 Days</p>
-                        </div>
-                        <div class="perspective-col text-center border-r border-themeBorder" onclick="showDetail('mid')">
-                            <p class="decision-header">MID</p>
-                            <div id="mt-signal-text" class="text-sm md:text-base font-black italic text-gray-500">WAIT</div>
-                            <p class="text-[0.4rem] md:text-[0.45rem] text-themeMuted font-bold mt-1 uppercase">20-60 Days</p>
-                        </div>
-                        <div class="perspective-col text-center" onclick="showDetail('long')">
-                            <p class="decision-header">LONG</p>
-                            <div id="lt-signal-text" class="text-sm md:text-base font-black italic text-gray-500">WAIT</div>
-                            <p class="text-[0.4rem] md:text-[0.45rem] text-themeMuted font-bold mt-1 uppercase">60+ Days</p>
-                        </div>
+            <div id="chart-main" class="chart-container flex-grow"></div>
+        </div>
+
+        <!-- 트리플 판단 및 5대 지표 패널 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            
+            <!-- 왼쪽: 마스터 판단 -->
+            <div class="glass rounded-2xl p-4 lg:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <p class="text-themeMuted text-[0.65rem] font-black uppercase tracking-widest">Master Intelligence</p>
                     </div>
                 </div>
-
-                <!-- 통합 분석 레포트 (수치 정보 이동) -->
-                <div class="glass rounded-3xl p-4 md:p-6 flex-grow flex flex-col shadow-xl overflow-hidden min-h-[400px]">
-                    <h4 class="font-black text-themeText uppercase text-[0.65rem] border-b border-themeBorder pb-2 md:pb-3 mb-3 md:mb-4 tracking-widest flex items-center">
-                        <svg class="icon w-3.5 h-3.5 mr-2 text-emerald-500" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        통합 분석 레포트
-                    </h4>
-                    
-                    <div class="grid grid-cols-3 gap-2 mb-4 pb-4 border-b border-themeBorder">
-                        <div class="stat-box"><p class="stat-label">120일선 이격</p><p id="val-ma-dist" class="stat-value text-themeText">---</p></div>
-                        <div class="stat-box"><p class="stat-label">RSI (14)</p><p id="val-rsi-main" class="stat-value text-themeText">---</p></div>
-                        <div class="stat-box"><p class="stat-label">MACD 흐름</p><p id="val-macd-main" class="stat-value text-themeText">---</p></div>
+                
+                <div class="grid grid-cols-3 gap-2 flex-grow">
+                    <div class="perspective-col border border-themeBorder bg-[var(--modal-bg)] flex flex-col justify-center" onclick="showDetail('short')">
+                        <p class="text-[0.55rem] font-black text-themeMuted mb-1 tracking-widest border-b border-themeBorder pb-1">SHORT</p>
+                        <div id="st-signal-text" class="text-base font-black italic text-themeMuted">WAIT</div>
                     </div>
+                    <div class="perspective-col border border-themeBorder bg-[var(--modal-bg)] flex flex-col justify-center" onclick="showDetail('mid')">
+                        <p class="text-[0.55rem] font-black text-themeMuted mb-1 tracking-widest border-b border-themeBorder pb-1">MID</p>
+                        <div id="mt-signal-text" class="text-base font-black italic text-themeMuted">WAIT</div>
+                    </div>
+                    <div class="perspective-col border border-themeBorder bg-[var(--modal-bg)] flex flex-col justify-center" onclick="showDetail('long')">
+                        <p class="text-[0.55rem] font-black text-themeMuted mb-1 tracking-widest border-b border-themeBorder pb-1">LONG</p>
+                        <div id="lt-signal-text" class="text-base font-black italic text-themeMuted">WAIT</div>
+                    </div>
+                </div>
+                <p class="text-[0.6rem] text-themeMuted text-center mt-3">박스를 클릭하면 상세 전략을 볼 수 있습니다.</p>
+            </div>
 
-                    <div id="reasoning-container" class="space-y-2.5 overflow-y-auto pr-1 custom-scroll flex-grow">
-                        <p class="text-xs text-themeMuted text-center py-10 md:py-20">데이터를 동기화하고 있습니다...</p>
+            <!-- 오른쪽: 5대 핵심 지표 요약 -->
+            <div class="glass rounded-2xl p-4 lg:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
+                <div class="flex items-center gap-1.5 mb-4 border-b border-themeBorder pb-3">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    <p class="text-themeText text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 팩트체크</p>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 h-full">
+                    <div class="stat-box">
+                        <p class="stat-label">이격도 <span class="info-tip" title="현재가와 120일선 간의 거리(%)입니다. 장기 추세 방향의 뼈대입니다."><svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></span></p>
+                        <p id="val-ma-dist" class="stat-value text-themeText">---</p>
+                    </div>
+                    <div class="stat-box">
+                        <p class="stat-label">RSI(14) <span class="info-tip" title="상대강도지수. 30 이하는 과매도(저점 근접), 70 이상은 과매수(고점 근접)를 의미합니다."><svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></span></p>
+                        <p id="val-rsi-main" class="stat-value text-themeText">---</p>
+                    </div>
+                    <div class="stat-box">
+                        <p class="stat-label">MACD <span class="info-tip" title="단기/장기 이평선의 수렴과 발산을 보여줍니다. 양수는 상승, 음수는 하락을 뜻합니다."><svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></span></p>
+                        <p id="val-macd-main" class="stat-value text-themeText">---</p>
+                    </div>
+                    <div class="stat-box">
+                        <p class="stat-label">BB밴드 <span class="info-tip" title="볼린저 밴드. 가격의 95%가 밴드 내에 존재합니다. 상단을 뚫으면 단기 과열을 암시합니다."><svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></span></p>
+                        <p id="val-bb-main" class="stat-value text-themeText">---</p>
+                    </div>
+                    <div class="stat-box">
+                        <p class="stat-label">Stoch <span class="info-tip" title="스토캐스틱 %K. 20이하는 바닥권 침체, 80이상은 천장권 과열을 뜻합니다."><svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></span></p>
+                        <p id="val-stoch-main" class="stat-value text-themeText">---</p>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <div class="text-center mt-2 pb-4">
+            <a href="[https://finance.yahoo.com](https://finance.yahoo.com)" target="_blank" class="text-[0.6rem] text-themeMuted hover:text-themeText transition underline">Data Provider: Yahoo Finance API</a>
+        </div>
     </div>
 
     <script>
-        let myChart = echarts.init(document.getElementById('chart-main'));
-        
-        // 배포 URL 설정
-        const API_BASE_URL = window.location.origin;
+        // 전역 안전 장치 (충돌 방지)
+        function safeStorageGet(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
+        function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
-        let maSettings = { 20: false, 60: false, 120: true };
+        let myChart = null;
+        const API_BASE_URL = ''; // Render 내장 서빙 시 상대경로 사용이 가장 안전합니다.
+
+        let maSettings = { 10: false, 20: true, 50: true, 60: false, 120: true, 200: true };
         let currentInterval = '1d';
         let currentRange = '1y';
         let globalChartData = null;
@@ -341,50 +344,42 @@
         let analysisDetails = { short: {}, mid: {}, long: {} };
 
         // 설정 로드
-        const savedTheme = localStorage.getItem('dashboardTheme') || 'theme-default';
-        const savedFontSize = localStorage.getItem('dashboardFontSize') || 'md';
-        let chartLineWidth = localStorage.getItem('dashboardLineWidth') || '2';
+        const savedTheme = safeStorageGet('dashboardTheme', 'theme-default');
+        const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
+        let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
         
-        setTheme(savedTheme);
-        setFontSize(savedFontSize);
-        
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
-            const btn = document.getElementById(`btn-line-${chartLineWidth}`);
-            if(btn) btn.classList.add('active');
-        });
-
-        // 설정 컨트롤
+        // --- 함수 선언부 ---
         function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
         function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
         
         function setTheme(themeName) {
             document.documentElement.className = themeName;
-            localStorage.setItem('dashboardTheme', themeName);
+            safeStorageSet('dashboardTheme', themeName);
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
             const btn = document.getElementById(`btn-${themeName}`);
             if(btn) btn.classList.add('active');
-            if (globalChartData) renderDashboard(globalTicker, globalChartData);
+            if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
         }
 
         function setFontSize(size) {
             const sizeMap = { 'sm': '14px', 'md': '16px', 'lg': '18px' };
             document.documentElement.style.fontSize = sizeMap[size];
-            localStorage.setItem('dashboardFontSize', size);
+            safeStorageSet('dashboardFontSize', size);
             document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-font-${size}`).classList.add('active');
+            const btn = document.getElementById(`btn-font-${size}`);
+            if(btn) btn.classList.add('active');
             if(myChart) myChart.resize();
         }
 
         function setLineWidth(width) {
             chartLineWidth = width;
-            localStorage.setItem('dashboardLineWidth', width);
+            safeStorageSet('dashboardLineWidth', width);
             document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-line-${width}`).classList.add('active');
-            if(globalChartData) renderDashboard(globalTicker, globalChartData);
+            const btn = document.getElementById(`btn-line-${width}`);
+            if(btn) btn.classList.add('active');
+            if(globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
         }
 
-        // 데이터 페칭
         async function fetchWithRetry(url, options = {}, maxRetries = 3) {
             let delay = 1000;
             for (let i = 0; i < maxRetries; i++) {
@@ -401,7 +396,27 @@
             sma: (d, p) => d.map((_, i) => { if (i < p - 1) return null; const slice = d.slice(i - p + 1, i + 1).filter(v => v !== null); return slice.length === p ? slice.reduce((a, b) => a + b) / p : null; }),
             ema: (d, p) => { let r = Array(d.length).fill(null), k = 2 / (p + 1); let s = d.findIndex(v => v !== null); if (s === -1) return r; let e = d[s]; r[s] = e; for (let i = s + 1; i < d.length; i++) { if (d[i] !== null) { e = (d[i] * k) + (e * (1 - k)); r[i] = e; } } return r; },
             macd: (d, s, l, sig) => { const se = Indicator.ema(d, s), le = Indicator.ema(d, l); const line = se.map((v, i) => (v === null || le[i] === null) ? null : v - le[i]); const signal = Indicator.ema(line, sig); return { line, signal, hist: line.map((v, i) => (v === null || signal[i] === null) ? null : v - signal[i]) }; },
-            rsi: (d, p) => { let r = Array(d.length).fill(null), g = 0, l = 0; for (let i = 1; i < d.length; i++) { let diff = d[i] - d[i - 1]; let cg = diff > 0 ? diff : 0, cl = diff < 0 ? -diff : 0; g = ((g * (p - 1)) + cg) / p; l = ((l * (p - 1)) + cl) / p; if (i >= p) r[i] = (l === 0) ? 100 : 100 - (100 / (1 + g / l)); } return r; }
+            rsi: (d, p) => { let r = Array(d.length).fill(null), g = 0, l = 0; for (let i = 1; i < d.length; i++) { let diff = d[i] - d[i - 1]; let cg = diff > 0 ? diff : 0, cl = diff < 0 ? -diff : 0; g = ((g * (p - 1)) + cg) / p; l = ((l * (p - 1)) + cl) / p; if (i >= p) r[i] = (l === 0) ? 100 : 100 - (100 / (1 + g / l)); } return r; },
+            bollinger: (d, p, mult) => { 
+                const sma = Indicator.sma(d, p); const up = Array(d.length).fill(null); const low = Array(d.length).fill(null); 
+                for(let i=p-1; i<d.length; i++){ 
+                    if(sma[i]===null) continue;
+                    const slice = d.slice(i-p+1, i+1).filter(v=>v!==null); 
+                    const variance = slice.reduce((acc, val)=>acc+Math.pow(val-sma[i],2),0)/p; 
+                    const std = Math.sqrt(variance); 
+                    up[i] = sma[i]+(mult*std); low[i] = sma[i]-(mult*std); 
+                } 
+                return { upper: up, lower: low }; 
+            },
+            stochastic: (kData, p, smooth) => { 
+                let r = Array(kData.length).fill(null); 
+                for(let i=p-1; i<kData.length; i++){ 
+                    const slice = kData.slice(i-p+1, i+1); 
+                    const high = Math.max(...slice.map(d=>d[3])); const low = Math.min(...slice.map(d=>d[2])); 
+                    if(high !== low) r[i] = ((kData[i][1] - low) / (high - low)) * 100; else r[i] = 50; 
+                } 
+                return { k: r, d: Indicator.sma(r, smooth) }; 
+            }
         };
 
         function resetDashboard() { location.reload(); }
@@ -417,24 +432,16 @@
             document.getElementById('modal-title').innerText = `${p.toUpperCase()} View`;
             document.getElementById('modal-period').innerText = p==='short'?'분석 범위: 1-20일 (단기 모멘텀)':(p==='mid'?'분석 범위: 20-60일 (중기 추세 스윙)':'분석 범위: 60일 이상 (장기 펀더멘털)');
             
-            let statusColor = d.status.includes('BUY') ? 'text-up' : (d.status.includes('BYE') ? 'text-down' : 'text-themeMuted');
+            let statusClass = `status-${d.status.replace(' ', '-')}`;
             
             document.getElementById('modal-body').innerHTML = `
-                <div class="bg-themeBorder p-4 rounded-xl text-center shadow-inner opacity-80">
-                    <span class="text-3xl md:text-4xl font-black italic ${statusColor}">${d.status}</span>
+                <div class="bg-themeBorder p-4 rounded-xl text-center shadow-inner opacity-80 border border-themeBorder">
+                    <span class="text-4xl font-black italic uppercase ${statusClass}">${d.status}</span>
                     <p class="text-xs text-themeText mt-2">${d.summary}</p>
                 </div>
                 <div class="grid grid-cols-1 gap-3 mt-4">
-                    <div class="p-4 bg-themeBorder rounded-xl opacity-80">
-                        <p class="text-[11px] font-black text-accent uppercase mb-2">실시간 데이터 근거</p>
-                        <div class="space-y-2 text-xs text-themeText">
-                            <div class="flex justify-between border-b border-themeBorder pb-1"><span>120일선 이격도</span><b class="${d.maDist>0?'text-up':'text-down'}">${d.maDist>0?'+':''}${d.maDist}%</b></div>
-                            <div class="flex justify-between border-b border-themeBorder pb-1"><span>RSI 모멘텀 (14)</span><b>${d.rsi}</b></div>
-                            <div class="flex justify-between"><span>MACD 에너지</span><b class="${d.macd>0?'text-up':'text-down'}">${d.macd>0?'+':''}${d.macd}</b></div>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-themeModal rounded-xl border border-themeBorder">
-                        <p class="text-[11px] font-black text-emerald-500 uppercase mb-1">AI 전략적 조언</p>
+                    <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder">
+                        <p class="text-[11px] font-black text-emerald-500 uppercase mb-2">AI 전략적 조언</p>
                         <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
                     </div>
                 </div>
@@ -443,51 +450,74 @@
         function closeModal() { document.getElementById('detail-modal').style.display = 'none'; }
 
         async function calculateTriplePerspectiveDecision(ticker) {
-            const b = document.getElementById('master-status-badge');
-            b.innerText = "Engine On";
             try {
+                // 병렬 페칭 (에러 처리 포함)
                 const [dRes, wRes] = await Promise.all([
-                    fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=1d&range=2y`),
-                    fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=1wk&range=max`)
+                    fetchWithRetry(`/api/stock/${ticker}?interval=1d&range=2y`),
+                    fetchWithRetry(`/api/stock/${ticker}?interval=1wk&range=max`)
                 ]);
                 const dD = (await dRes.json()).chart.result[0];
                 const wD = (await wRes.json()).chart.result[0];
                 
                 const analyze = (data, weight) => {
+                    if(!data || !data.indicators.quote[0].close) return { status:"LACK", maDist:"0.00", rsi:"50.0", macd:"0.000", stoch:"50.0", bbStr:"-" };
                     const c = data.indicators.quote[0].close.filter(v => v !== null);
+                    if(c.length < 120) return { status:"LACK", maDist:"0.00", rsi:"50.0", macd:"0.000", stoch:"50.0", bbStr:"-" };
+                    
+                    const o = data.indicators.quote[0].open; const h = data.indicators.quote[0].high; const l = data.indicators.quote[0].low;
+                    let kData = [];
+                    for(let i=0; i<c.length; i++){ if(c[i]!==null && o[i]!==null) kData.push([o[i], c[i], l[i], h[i]]); else kData.push([0,0,0,0]); }
+                    
                     const last = c.length - 1;
                     const rsi = Indicator.rsi(c, 14)[last] || 50;
                     const macd = Indicator.macd(c, 12, 26, 9).hist[last] || 0;
                     const sma = Indicator.sma(c, 120)[last] || c[last];
+                    const stoch = Indicator.stochastic(kData, 14, 3).k[last] || 50;
+                    const bb = Indicator.bollinger(c, 20, 2);
                     const dist = ((c[last] - sma) / sma) * 100;
+                    
                     let buy = 0, sell = 0;
                     if (c[last] > sma) buy += weight.ma; else sell += weight.ma;
                     if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
                     if (macd > 0) buy += weight.macd; else sell += weight.macd;
-                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.2) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.2) st = "STRONG BYE";
-                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3) };
+                    if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
+                    
+                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
+                    
+                    let bbStr = "밴드 내";
+                    if(bb.upper[last] && c[last] > bb.upper[last]) bbStr = "과열(돌파)";
+                    if(bb.lower[last] && c[last] < bb.lower[last]) bbStr = "침체(이탈)";
+
+                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1), bbStr: bbStr };
                 };
 
-                const st = analyze(dD, { ma: 0.7, rsi: 1.8, macd: 1.5 });
-                const mt = analyze(dD, { ma: 1.5, rsi: 1.0, macd: 1.5 });
+                const st = analyze(dD, { ma: 0.5, rsi: 1.8, macd: 1.5 });
+                const mt = analyze(dD, { ma: 1.5, rsi: 1.0, macd: 1.2 });
                 const lt = analyze(wD, { ma: 3.0, rsi: 0.5, macd: 0.5 });
                 
                 analysisDetails = { 
-                    short: {...st, summary: "RSI와 MACD의 단기 방향성을 추적한 결과입니다.", advice: "단기 매매의 경우 기술적 반등을 이용한 스캘핑이나 단기 스윙 관점의 접근이 필요합니다." }, 
-                    mid: {...mt, summary: "20-60일 이평선의 정배열 상태와 수급을 파악한 결과입니다.", advice: "중기적으로 추세가 형성되고 있는지 일봉과 주봉의 일치 여부를 꼭 확인하세요." }, 
-                    long: {...lt, summary: "120일선의 지지력과 시장 사이클을 종합한 결과입니다.", advice: "일시적인 하락 노이즈에 흔들리지 말고 본연의 장기 가치 추세를 믿고 홀딩할 구간인지 파악하세요." } 
+                    short: {...st, summary: "RSI와 MACD의 단기 방향성을 추적한 결과입니다.", advice: "단기 변동성을 고려하여 목표가를 짧게 잡는 스윙/단기 매매가 유리합니다." }, 
+                    mid: {...mt, summary: "중기 이평선과 볼린저밴드의 흐름을 파악한 결과입니다.", advice: "일봉과 주봉의 방향이 일치할 때 공격적인 진입을 고려하세요." }, 
+                    long: {...lt, summary: "120일선의 지지력과 시장 사이클을 종합한 결과입니다.", advice: "장기 추세가 우상향이라면 단기 하락 노이즈는 훌륭한 매수 기회입니다." } 
                 };
                 
-                const up = (id, r) => { document.getElementById(id).innerText = r.status; document.getElementById(id).className = `text-sm md:text-base font-black italic ${r.status.includes('BUY')?'text-up':(r.status.includes('BYE')?'text-down':'text-themeMuted')} uppercase`; };
+                const up = (id, r) => { 
+                    const el = document.getElementById(id);
+                    el.innerText = r.status; 
+                    el.className = `text-sm md:text-lg font-black italic status-${r.status.replace(' ', '-')} uppercase`; 
+                };
                 up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
                 
                 document.getElementById('val-ma-dist').innerText = `${st.maDist > 0 ? '+' : ''}${st.maDist}%`;
                 document.getElementById('val-ma-dist').style.color = st.maDist > 0 ? '#26A69A' : '#EF5350';
                 document.getElementById('val-rsi-main').innerText = st.rsi;
                 document.getElementById('val-macd-main').innerText = st.macd;
+                document.getElementById('val-bb-main').innerText = st.bbStr;
+                document.getElementById('val-bb-main').style.color = st.bbStr.includes('과열') ? '#EF5350' : (st.bbStr.includes('침체') ? '#26A69A' : 'var(--text-main)');
+                document.getElementById('val-stoch-main').innerText = st.stoch;
+                document.getElementById('val-stoch-main').style.color = st.stoch > 80 ? '#EF5350' : (st.stoch < 20 ? '#26A69A' : 'var(--text-main)');
                 
-                b.innerText = "Synced"; b.className = "text-[0.55rem] font-black px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 uppercase";
-            } catch (e) { b.innerText = "Error"; }
+            } catch (e) { console.error("Error calculating multi-timeframe:", e); }
         }
 
         async function loadData(ticker, interval = currentInterval, range = currentRange) {
@@ -497,63 +527,60 @@
             document.getElementById('loading-overlay').style.display = 'flex';
             try {
                 const reqInterval = interval === '1y' ? '1mo' : interval;
-                const cRes = await fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=${reqInterval}&range=${range}`, { signal });
+                const cRes = await fetchWithRetry(`/api/stock/${ticker}?interval=${reqInterval}&range=${range}`, { signal });
                 const cJson = await cRes.json();
                 const d = cJson.chart.result[0];
                 updateStatus("LIVE", "bg-emerald-500");
                 globalChartData = d; globalTicker = ticker;
-                calculateTriplePerspectiveDecision(ticker);
-                fetch(`${API_BASE_URL}/api/fundamentals/${ticker}`).then(r => r.json()).then(f => renderInfo(ticker, f.quoteSummary.result[0]));
+                
+                calculateTriplePerspectiveDecision(ticker); // 병렬 처리
                 renderDashboard(ticker, d);
-            } catch (e) { if (e.name !== 'AbortError') updateStatus("LIMIT", "bg-rose-500"); } finally { document.getElementById('loading-overlay').style.display = 'none'; }
+            } catch (e) { 
+                if (e.name !== 'AbortError') updateStatus("LIMIT", "bg-rose-500"); 
+            } finally { 
+                document.getElementById('loading-overlay').style.display = 'none'; 
+            }
         }
 
-        function updateStatus(t, c) { document.getElementById('conn-label').innerText = t; document.getElementById('status-dot').className = `w-2 h-2 rounded-full ${c} mr-1.5`; }
-
-        function renderInfo(ticker, data) {
-            const desc = document.getElementById('ticker-desc-line');
-            const badge = document.getElementById('asset-type-badge');
-            if (!data || data.error) { desc.innerText = "기술 지표 중심 분석 모드"; badge.innerText = "ASSET"; return; }
-            const sum = data.summaryProfile?.longBusinessSummary || data.fundProfile?.longBusinessSummary || "No description.";
-            desc.innerText = sum.split('.')[0] + ".";
-            badge.innerText = (data.defaultKeyStatistics?.quoteType === 'ETF' || ticker === 'SPY' || ticker === 'QQQ') ? "ETF" : "Stock";
+        function updateStatus(t, c) { 
+            document.getElementById('conn-label').innerText = t; 
+            document.getElementById('status-dot').className = `w-2 h-2 rounded-full ${c}`; 
         }
 
+        // 연봉 정확한 산출 (시가, 고가, 저가, 종가 합산)
         function aggregateToYearly(dates, kData, closes) {
             let yearly = {};
             dates.forEach((date, i) => {
                 const year = date.split('-')[0];
-                if (!yearly[year]) yearly[year] = { date: year, open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] };
-                else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); }
+                if (!yearly[year]) {
+                    yearly[year] = { date: year, open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] };
+                } else {
+                    yearly[year].close = kData[i][1]; 
+                    yearly[year].high = Math.max(yearly[year].high, kData[i][3]); 
+                    yearly[year].low = Math.min(yearly[year].low, kData[i][2]); 
+                }
             });
             const sorted = Object.keys(yearly).sort();
             return { dates: sorted, kData: sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]), closes: sorted.map(y => yearly[y].close) };
         }
 
         function renderDashboard(ticker, data) {
+            if(!myChart) return;
             const q = data.indicators.quote[0], ts = data.timestamp;
+            if(!q || !ts) return;
+            
             let dates = [], kData = [], closes = [];
             ts.forEach((t, i) => { if (q.close[i]) { dates.push(new Date(t * 1000).toISOString().split('T')[0]); kData.push([q.open[i], q.close[i], q.low[i], q.high[i]]); closes.push(q.close[i]); }});
             document.getElementById('display-ticker').innerText = ticker;
             const price = data.meta.regularMarketPrice || closes[closes.length - 1];
             document.getElementById('live-price').innerText = price?.toLocaleString(undefined, {minimumFractionDigits: 2});
             
-            const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9);
-            const last = closes.length - 1;
-            
-            let reasoning = [];
-            if(ma120[last]) {
-                const maPct = (((closes[last] - ma120[last]) / ma120[last]) * 100).toFixed(2);
-                reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120MA 추세 분석', d:`선택한 기준선 대비 ${maPct}% 위치에 있습니다.`, s:85});
+            if (currentInterval === '1y') {
+                const agg = aggregateToYearly(dates, kData, closes);
+                dates = agg.dates; kData = agg.kData; closes = agg.closes;
             }
-            if(rsi[last] < 35) reasoning.push({type: 'up', t:'RSI 단기 수급', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 반등 구간입니다.`, s: 78});
-            else if(rsi[last] > 65) reasoning.push({type: 'down', t:'RSI 단기 수급', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 조정 구간입니다.`, s: 78});
-            else reasoning.push({type: 'neutral', t:'RSI 단기 수급', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 밸런스 유지 중입니다.`, s: 78});
 
-            if(macd.hist[last] > 0) reasoning.push({type: 'up', t:'MACD 에너지', d:`양의 방향으로 상승 흐름 발산 중입니다.`, s: 82});
-            else reasoning.push({type: 'down', t:'MACD 에너지', d:`음의 방향으로 하락 흐름이 나타납니다.`, s: 82});
-
-            document.getElementById('reasoning-container').innerHTML = reasoning.map(i => `<div class="p-3 md:p-4 glass rounded-xl md:rounded-2xl flex flex-col space-y-1.5 border border-themeBorder"><div class="flex items-center space-x-2.5"><span class="signal-badge ${i.type==='up'?'signal-up':(i.type==='down'?'signal-down':'signal-neutral')}">${i.type==='up'?'BUY':(i.type==='down'?'SELL':'HOLD')}</span><p class="text-[0.65rem] md:text-xs font-black text-themeText uppercase">${i.t}</p></div><p class="text-[0.6rem] md:text-[0.7rem] text-themeMuted pl-12">${i.d}</p></div>`).join('');
+            const bb = Indicator.bollinger(closes, 20, 2);
             
             // ECharts 테마 적용
             const styleColor = getComputedStyle(document.documentElement);
@@ -562,30 +589,58 @@
             const tooltipBg = styleColor.getPropertyValue('--modal-bg').trim() || '#151921';
             const tooltipText = styleColor.getPropertyValue('--text-main').trim() || '#E5E7EB';
 
-            const maCols = { 20: '#F97316', 60: '#3B82F6', 120: '#10B981' };
-            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' } }];
+            const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
+            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
             
             const widthNum = parseFloat(chartLineWidth);
-            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 } }); });
+            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
             
-            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
+            // 볼린저 밴드 라인 (투명하게 추가)
+            series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
+            series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
 
             myChart.setOption({
                 backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, backgroundColor: tooltipBg, borderColor: chartSplitColor, textStyle: { color: tooltipText, fontSize: 11 } },
-                grid: [ { left: '3%', right: '3%', top: '15%', height: '55%', containLabel: true }, { left: '3%', right: '3%', top: '75%', height: '15%', containLabel: true } ],
-                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
-                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
+                tooltip: { 
+                    trigger: 'axis', 
+                    axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, 
+                    backgroundColor: tooltipBg, borderColor: chartSplitColor, textStyle: { color: tooltipText, fontSize: 11 },
+                    // 직전 캔들 대비 % 변동만 노출 (요청사항 반영)
+                    formatter: (ps) => {
+                        const idx = ps[0].dataIndex;
+                        const curr = closes[idx];
+                        const prev = idx > 0 ? closes[idx - 1] : null;
+                        let r = `<div style="font-weight:900; margin-bottom:6px; border-bottom:1px solid ${chartSplitColor}; padding-bottom:4px;">${dates[idx]}</div>`;
+                        if (prev !== null && curr !== null) {
+                            const diff = curr - prev, pct = (diff / prev) * 100, color = diff >= 0 ? '#26A69A' : '#EF5350', sign = diff > 0 ? '+' : '';
+                            r += `<div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+                                    <span style="color:${chartTextColor}; font-size:10px;">전 캔들 대비 변동:</span>
+                                    <b style="color:${color}; font-family:monospace; font-size:13px;">${sign}${pct.toFixed(2)}%</b>
+                                  </div>`;
+                        } else { r += `<span style="color:${chartTextColor};">데이터 없음</span>`; }
+                        return r;
+                    }
+                },
+                grid: { left: '2%', right: '2%', top: '5%', bottom: '15%', containLabel: true },
+                xAxis: { type: 'category', data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } },
+                yAxis: { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } },
+                dataZoom: [{ type: 'inside', start: 70, end: 100 }],
                 series: series
             }, true);
         }
 
-        document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); };
-        
-        // 렌더링 안정화 딜레이
-        setTimeout(() => { myChart.resize(); loadData('SPY'); }, 100);
-        window.onresize = () => { myChart.resize(); };
+        // 앱 초기화 구문 (DOM 로드 후 안전하게 실행)
+        document.addEventListener("DOMContentLoaded", () => {
+            myChart = echarts.init(document.getElementById('chart-main'));
+            document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); };
+            
+            setTheme(savedTheme);
+            setFontSize(savedFontSize);
+            updateMAButtons();
+            
+            setTimeout(() => { if(myChart) myChart.resize(); loadData('SPY'); }, 100);
+            window.addEventListener('resize', () => { if(myChart) myChart.resize(); });
+        });
     </script>
 </body>
 </html>
