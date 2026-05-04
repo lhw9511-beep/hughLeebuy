@@ -1,19 +1,21 @@
-```html
 <!DOCTYPE html>
-<html lang="ko" class="dark theme-default">
+<html lang="ko" class="theme-default">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BUY or BYE | AI Triple-Perspective Analysis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: { 
                 extend: { 
                     colors: { 
-                        darkbg: 'var(--bg-color)', 
-                        panel: 'var(--modal-bg)', 
+                        themeBg: 'var(--bg-color)', 
+                        themePanel: 'var(--panel-color)', 
+                        themeModal: 'var(--modal-bg)',
+                        themeText: 'var(--text-main)',
+                        themeMuted: 'var(--text-muted)',
+                        themeBorder: 'var(--border-color)',
                         accent: '#3B82F6', 
                         up: '#26A69A', 
                         down: '#EF5350' 
@@ -22,53 +24,72 @@
             }
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="[https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js](https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js)"></script>
+    <script src="[https://unpkg.com/lucide@latest](https://unpkg.com/lucide@latest)"></script>
     <style>
-        /* 테마 설정 (CSS 변수) */
-        :root {
+        /* 동적 테마 설정 */
+        :root, .theme-default {
             --bg-color: #0B0E11;
             --panel-color: rgba(21, 25, 33, 0.8);
             --modal-bg: #151921;
+            --text-main: #ffffff;
+            --text-muted: #9CA3AF;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        .theme-light {
+            --bg-color: #f3f4f6;
+            --panel-color: rgba(255, 255, 255, 0.95);
+            --modal-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --border-color: rgba(0, 0, 0, 0.1);
         }
         .theme-navy {
             --bg-color: #0f172a;
             --panel-color: rgba(30, 41, 59, 0.8);
             --modal-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
         }
         .theme-purple {
             --bg-color: #171026;
             --panel-color: rgba(37, 26, 58, 0.8);
             --modal-bg: #251a3a;
+            --text-main: #f3e8ff;
+            --text-muted: #a855f7;
+            --border-color: rgba(255, 255, 255, 0.1);
         }
         .theme-green {
             --bg-color: #022c22;
             --panel-color: rgba(6, 78, 59, 0.8);
             --modal-bg: #064e3b;
+            --text-main: #ecfdf5;
+            --text-muted: #34d399;
+            --border-color: rgba(255, 255, 255, 0.1);
         }
 
-        body { background-color: var(--bg-color); color: #E5E7EB; font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease; }
-        .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.3s ease; }
+        /* 기본 전역 스타일 */
+        html { font-size: 16px; transition: font-size 0.2s ease; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
+        .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); transition: background 0.3s ease, border-color 0.3s ease; }
         
-        /* 모바일 최적화 반응형 차트 높이 */
         .chart-container { height: 400px; width: 100%; }
-        @media (min-width: 1024px) { .chart-container { height: 600px; } }
+        @media (min-width: 1024px) { .chart-container { height: 550px; } }
         
-        .pie-container { height: 300px; width: 100%; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 10px; }
         
-        .ma-btn, .range-btn { transition: all 0.2s; font-size: 10px; font-weight: bold; border: 1px solid #374151; background: rgba(0,0,0,0.3); color: #6B7280; white-space: nowrap; }
-        .ma-btn:hover:not(:disabled), .range-btn:hover:not(:disabled) { border-color: #3B82F6; color: #E5E7EB; }
+        .ma-btn, .range-btn { transition: all 0.2s; font-size: 0.75rem; font-weight: bold; border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); white-space: nowrap; }
+        .ma-btn:hover:not(:disabled), .range-btn:hover:not(:disabled) { border-color: #3B82F6; color: var(--text-main); }
         .ma-btn.active { background-color: #3B82F6; border-color: #3B82F6; color: white; }
         .range-btn.active { background-color: #6366F1; border-color: #6366F1; color: white; }
 
-        #loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); z-index: 50; align-items: center; justify-content: center; border-radius: 24px; }
+        #loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 24px; }
         
-        .signal-badge { font-weight: 900; font-size: 10px; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: -0.5px; }
+        .signal-badge { font-weight: 900; font-size: 0.65rem; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
         .signal-up { background-color: rgba(38, 166, 154, 0.2); color: #26A69A; }
         .signal-down { background-color: rgba(239, 83, 80, 0.2); color: #EF5350; }
         .signal-neutral { background-color: rgba(107, 114, 128, 0.2); color: #9CA3AF; }
@@ -76,144 +97,157 @@
         .logo-clickable { cursor: pointer; transition: transform 0.2s; }
         .logo-clickable:active { transform: scale(0.95); }
 
-        .stat-box { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 8px 6px; }
-        .stat-label { font-size: 8px; color: #6B7280; text-transform: uppercase; font-weight: 800; }
-        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; margin-top: 2px; }
+        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.5rem; text-align: center; }
+        .stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 900; margin-top: 2px; }
         
-        .decision-header { font-size: 9px; font-weight: 900; letter-spacing: 0.1em; color: #6B7280; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; margin-bottom: 6px; }
+        .decision-header { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.1em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-bottom: 6px; }
         
-        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 8px; border: 1px solid transparent; }
-        .perspective-col:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.5rem; border: 1px solid transparent; }
+        .perspective-col:hover { background: rgba(0,0,0,0.05); border-color: var(--border-color); transform: translateY(-2px); }
 
-        /* Modal Styles */
-        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem; }
-        .modal-content { max-width: 550px; width: 100%; background: var(--modal-bg); border: 1px solid #374151; border-radius: 24px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); max-height: 90vh; overflow-y: auto; transition: background 0.3s ease; }
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { max-width: 550px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; transition: background 0.3s ease; }
         
-        /* 테마 선택 버튼 */
-        .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.2s; }
+        .theme-btn { width: 36px; height: 36px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .theme-btn:hover { transform: scale(1.1); }
-        .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+
+        .setting-btn { border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); padding: 0.4rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: bold; transition: all 0.2s; }
+        .setting-btn.active { background: #3B82F6; color: white; border-color: #3B82F6; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 xl:p-8">
 
-    <!-- Theme Settings Modal -->
+    <!-- 설정(Settings) 모달 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
-                <h3 class="text-xl font-black text-white flex items-center"><i data-lucide="palette" class="w-5 h-5 mr-2 text-accent"></i> 화면 테마 설정</h3>
-                <button onclick="closeSettingsModal()" class="text-gray-500 hover:text-white transition"><i data-lucide="x"></i></button>
+            <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
+                <h3 class="text-xl font-black text-themeText flex items-center"><i data-lucide="settings" class="w-5 h-5 mr-2 text-accent"></i> 환경 설정</h3>
+                <button onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition"><i data-lucide="x"></i></button>
             </div>
-            <div class="space-y-4">
-                <p class="text-xs text-gray-400 font-bold mb-3 uppercase tracking-widest">배경색 (Background Colors)</p>
-                <div class="flex flex-wrap gap-4">
-                    <div class="flex flex-col items-center gap-2">
-                        <button onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button>
-                        <span class="text-[10px] text-gray-500 font-bold">Deep Black</span>
+            
+            <div class="space-y-6">
+                <!-- 테마 설정 -->
+                <div>
+                    <p class="text-xs text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
+                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
+                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
+                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
+                        <div class="flex flex-col items-center gap-2"><button onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
                     </div>
-                    <div class="flex flex-col items-center gap-2">
-                        <button onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button>
-                        <span class="text-[10px] text-gray-500 font-bold">Navy Blue</span>
+                </div>
+
+                <!-- 글자 크기 설정 -->
+                <div class="border-t border-themeBorder pt-4">
+                    <p class="text-xs text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 (Font Size)</p>
+                    <div class="flex gap-2">
+                        <button onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
+                        <button onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
+                        <button onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
                     </div>
-                    <div class="flex flex-col items-center gap-2">
-                        <button onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button>
-                        <span class="text-[10px] text-gray-500 font-bold">Royal Purple</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-2">
-                        <button onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button>
-                        <span class="text-[10px] text-gray-500 font-bold">Forest Green</span>
+                </div>
+
+                <!-- 차트 선 굵기 설정 -->
+                <div class="border-t border-themeBorder pt-4">
+                    <p class="text-xs text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기 (Line Width)</p>
+                    <div class="flex gap-2">
+                        <button onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
+                        <button onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
+                        <button onclick="setLineWidth('3')" id="btn-line-3" class="setting-btn">두껍게</button>
                     </div>
                 </div>
             </div>
-            <div class="mt-8 pt-4 border-t border-gray-800 flex justify-end">
-                <button onclick="closeSettingsModal()" class="bg-gray-800 text-white px-6 py-2 rounded-xl text-xs font-black hover:bg-gray-700 transition">닫기</button>
+            
+            <div class="mt-8 pt-4 border-t border-themeBorder flex justify-end">
+                <button onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2 rounded-xl text-xs font-black hover:bg-blue-600 transition">적용 및 닫기</button>
             </div>
         </div>
     </div>
 
-    <!-- Detail Modal -->
+    <!-- 디테일 모달 -->
     <div id="detail-modal" class="modal-overlay" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-6">
                 <div>
-                    <h3 id="modal-title" class="text-xl md:text-2xl font-black text-white uppercase italic">Perspective Detail</h3>
-                    <p id="modal-period" class="text-[10px] md:text-[11px] text-accent font-black tracking-widest uppercase mt-1">Target Period: ---</p>
+                    <h3 id="modal-title" class="text-xl md:text-2xl font-black text-themeText uppercase italic">Perspective Detail</h3>
+                    <p id="modal-period" class="text-[0.65rem] md:text-[0.7rem] text-accent font-black tracking-widest uppercase mt-1">Target Period: ---</p>
                 </div>
-                <button onclick="closeModal()" class="text-gray-500 hover:text-white transition p-2"><i data-lucide="x"></i></button>
+                <button onclick="closeModal()" class="text-themeMuted hover:text-accent transition p-2"><i data-lucide="x"></i></button>
             </div>
-            <div id="modal-body" class="space-y-4 md:space-y-6 text-sm text-gray-300 leading-relaxed">
-                <!-- Content injected via JS -->
-            </div>
-            <div class="mt-6 md:mt-8 pt-4 border-t border-gray-800 flex justify-end">
-                <button onclick="closeModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-blue-600 transition shadow-lg shadow-accent/20">분석 종료</button>
+            <div id="modal-body" class="space-y-4 md:space-y-6 text-sm text-themeText leading-relaxed"></div>
+            <div class="mt-6 md:mt-8 pt-4 border-t border-themeBorder flex justify-end">
+                <button onclick="closeModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-blue-600 transition shadow-lg shadow-accent/20">확인</button>
             </div>
         </div>
     </div>
 
     <div class="max-w-[1600px] mx-auto w-full flex-grow flex flex-col space-y-4 md:space-y-6">
-        <!-- Header (Mobile Optimized) -->
+        <!-- 헤더 -->
         <header class="flex flex-col md:flex-row justify-between items-center glass p-4 md:p-6 rounded-3xl gap-4">
             <div class="flex w-full md:w-auto justify-between items-center">
                 <div class="flex items-center space-x-3 logo-clickable" onclick="resetDashboard()">
                     <div class="p-2 bg-accent rounded-xl"><i data-lucide="trending-up" class="text-white w-5 h-5 md:w-6 md:h-6"></i></div>
-                    <h1 class="text-xl md:text-2xl font-black tracking-tighter uppercase italic text-white">BUY <span class="text-accent">or BYE</span></h1>
+                    <h1 class="text-xl md:text-2xl font-black tracking-tighter uppercase italic text-themeText">BUY <span class="text-accent">or BYE</span></h1>
                 </div>
-                <!-- 모바일에서만 보이는 설정 버튼 -->
-                <button onclick="openSettingsModal()" class="md:hidden p-2 text-gray-400 hover:text-white"><i data-lucide="settings" class="w-5 h-5"></i></button>
+                <button onclick="openSettingsModal()" class="md:hidden p-2 text-themeMuted hover:text-accent"><i data-lucide="settings" class="w-5 h-5"></i></button>
             </div>
             
             <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
                 <form id="search-form" class="flex w-full sm:w-auto">
-                    <input type="text" id="ticker-input" class="bg-gray-900 border border-gray-700 text-white rounded-l-2xl px-4 py-2 md:py-2.5 w-full sm:w-40 md:w-48 uppercase outline-none focus:ring-2 focus:ring-accent transition-all text-sm md:text-base" value="SPY" placeholder="심볼 입력">
-                    <button type="submit" id="search-btn" class="bg-accent px-4 md:px-6 py-2 md:py-2.5 rounded-r-2xl font-black hover:bg-blue-600 transition text-sm md:text-base">분석</button>
+                    <input type="text" id="ticker-input" class="bg-themeModal border border-themeBorder text-themeText rounded-l-2xl px-4 py-2 md:py-2.5 w-full sm:w-40 md:w-48 uppercase outline-none focus:ring-2 focus:ring-accent transition-all text-sm md:text-base font-bold" value="SPY" placeholder="종목 심볼">
+                    <button type="submit" id="search-btn" class="bg-accent text-white px-4 md:px-6 py-2 md:py-2.5 rounded-r-2xl font-black hover:bg-blue-600 transition text-sm md:text-base">분석</button>
                 </form>
                 <div class="flex items-center space-x-3 self-end sm:self-auto">
-                    <div id="status-text" class="text-[10px] font-bold flex items-center">
-                        <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-600 mr-1.5"></span>
-                        <span id="conn-label" class="text-gray-500 uppercase tracking-widest text-[9px]">WAITING</span>
+                    <div id="status-text" class="text-[0.6rem] font-bold flex items-center">
+                        <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500 mr-1.5"></span>
+                        <span id="conn-label" class="text-themeMuted uppercase tracking-widest">WAITING</span>
                     </div>
-                    <!-- 데스크톱에서만 보이는 설정 버튼 -->
-                    <button onclick="openSettingsModal()" class="hidden md:flex p-1.5 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition"><i data-lucide="settings" class="w-4 h-4"></i></button>
+                    <button onclick="openSettingsModal()" class="hidden md:flex p-1.5 bg-themeBorder rounded-lg text-themeMuted hover:text-themeText transition"><i data-lucide="settings" class="w-4 h-4"></i></button>
                 </div>
             </div>
         </header>
 
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-4 md:gap-6 flex-grow">
-            <!-- Left: Market Chart -->
-            <div class="xl:col-span-3 space-y-4 md:space-y-6">
-                <div class="glass rounded-3xl p-4 md:p-6 relative overflow-hidden shadow-2xl min-h-[500px] lg:min-h-[720px] flex flex-col">
+            <!-- Left: 차트 영역 -->
+            <div class="xl:col-span-3 space-y-4 md:space-y-6 flex flex-col">
+                <div class="glass rounded-3xl p-4 md:p-6 relative overflow-hidden shadow-xl flex-grow flex flex-col">
                     <div id="loading-overlay" class="flex flex-col space-y-4">
                         <div class="animate-spin rounded-full h-8 w-8 md:h-10 md:w-10 border-t-2 border-b-2 border-accent"></div>
-                        <p id="loading-text" class="text-[10px] md:text-xs font-bold text-accent uppercase tracking-widest text-center">Engine Verifying...</p>
+                        <p id="loading-text" class="text-[0.6rem] md:text-xs font-bold text-accent uppercase tracking-widest text-center">Data Processing...</p>
                     </div>
                     
-                    <div class="flex flex-col lg:flex-row justify-between items-start mb-4 md:mb-6 border-b border-gray-800/50 pb-4 md:pb-6 gap-4">
+                    <div class="flex flex-col lg:flex-row justify-between items-start mb-4 border-b border-themeBorder pb-4 gap-4">
                         <div class="flex-grow w-full">
                             <div class="flex items-center space-x-3">
-                                <h2 id="display-ticker" class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">---</h2>
-                                <span id="asset-type-badge" class="px-2 py-0.5 md:px-2.5 md:py-1 rounded-md text-[9px] md:text-[10px] border border-gray-800 font-black uppercase tracking-widest">Wait</span>
+                                <h2 id="display-ticker" class="text-4xl md:text-6xl font-black text-themeText uppercase tracking-tighter leading-none">---</h2>
+                                <span id="asset-type-badge" class="px-2 py-0.5 md:px-2.5 md:py-1 rounded-md text-[0.55rem] md:text-[0.65rem] border border-themeBorder font-black uppercase tracking-widest text-themeMuted">Wait</span>
                             </div>
                             <div class="mt-2 md:mt-4">
-                                <div id="live-price" class="text-3xl md:text-5xl font-mono font-black text-white">---</div>
-                                <p id="ticker-desc-line" class="text-xs md:text-sm text-gray-400 font-medium mt-2 md:mt-3 border-l-2 border-accent pl-2 md:pl-3 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">경제적 분석 근거를 산출 중입니다.</p>
+                                <div id="live-price" class="text-3xl md:text-5xl font-mono font-black text-themeText">---</div>
+                                <p id="ticker-desc-line" class="text-xs md:text-sm text-themeMuted font-medium mt-2 md:mt-3 border-l-2 border-accent pl-2 md:pl-3 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">경제적 분석 근거를 산출 중입니다.</p>
                             </div>
                         </div>
 
-                        <!-- 컨트롤 패널 (모바일 최적화) -->
-                        <div class="flex flex-row lg:flex-col items-center lg:items-end gap-3 shrink-0 bg-black/20 p-3 rounded-2xl w-full lg:w-auto justify-between lg:justify-start overflow-x-auto custom-scroll">
-                            <div class="flex flex-col items-start lg:items-end gap-1.5 shrink-0">
-                                <span class="text-[8px] md:text-[9px] font-black text-gray-500 uppercase tracking-widest">Timeframe</span>
-                                <div id="range-toggles" class="flex gap-1">
+                        <!-- 컨트롤 패널 -->
+                        <div class="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-3 shrink-0 p-3 bg-themeModal rounded-2xl w-full lg:w-auto border border-themeBorder">
+                            <div class="flex flex-col items-start lg:items-end gap-1.5 w-full">
+                                <span class="text-[0.55rem] md:text-[0.6rem] font-black text-themeMuted uppercase tracking-widest">Timeframe</span>
+                                <!-- flex-wrap을 적용하여 모바일에서 연봉, MAX가 안잘리게 함 -->
+                                <div id="range-toggles" class="flex flex-wrap gap-1 w-full justify-start lg:justify-end">
                                     <button onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="range-btn px-2 md:px-3 py-1 rounded-md active">일봉</button>
                                     <button onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="range-btn px-2 md:px-3 py-1 rounded-md">주봉</button>
                                     <button onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="range-btn px-2 md:px-3 py-1 rounded-md">월봉</button>
-                                    <button onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="range-btn px-2 md:px-3 py-1 rounded-md hidden sm:block">연봉</button>
+                                    <button onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="range-btn px-2 md:px-3 py-1 rounded-md">연봉</button>
+                                    <button onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="range-btn px-2 md:px-3 py-1 rounded-md">MAX</button>
                                 </div>
                             </div>
-                            <div class="hidden sm:block w-px h-8 lg:w-full lg:h-px bg-gray-800 shrink-0 lg:my-1"></div>
-                            <div class="flex flex-col items-start lg:items-end gap-1.5 shrink-0">
-                                <span class="text-[8px] md:text-[9px] font-black text-gray-500 uppercase tracking-widest">MA Config</span>
-                                <div id="ma-toggles" class="flex gap-1">
+                            <div class="w-full h-px lg:w-full lg:h-px bg-themeBorder shrink-0"></div>
+                            <div class="flex flex-col items-start lg:items-end gap-1.5 w-full">
+                                <span class="text-[0.55rem] md:text-[0.6rem] font-black text-themeMuted uppercase tracking-widest">MA Config</span>
+                                <div id="ma-toggles" class="flex gap-1 justify-start lg:justify-end">
                                     <button onclick="toggleMA(20)" id="btn-ma-20" class="ma-btn px-2 md:px-2.5 py-1 rounded-md">20</button>
                                     <button onclick="toggleMA(60)" id="btn-ma-60" class="ma-btn px-2 md:px-2.5 py-1 rounded-md">60</button>
                                     <button onclick="toggleMA(120)" id="btn-ma-120" class="ma-btn px-2 md:px-2.5 py-1 rounded-md active">120</button>
@@ -226,49 +260,50 @@
                 </div>
             </div>
 
-            <!-- Right Panel -->
+            <!-- Right: 분석 및 결정 패널 -->
             <div class="flex flex-col space-y-4 md:space-y-6">
-                <!-- Triple Perspective Decision Card -->
+                
+                <!-- Master Intelligence (매수/매도 사인만 남김) -->
                 <div class="glass rounded-3xl p-4 md:p-6 border-t-8 border-gray-700 shadow-xl" id="master-decision-panel">
                     <div class="flex justify-between items-center mb-4 md:mb-6">
-                        <div class="flex items-center space-x-2"><i data-lucide="layers" class="w-3.5 h-3.5 md:w-4 md:h-4 text-accent"></i><p class="text-gray-400 text-[9px] md:text-[10px] font-black uppercase tracking-widest">Master Intelligence</p></div>
-                        <span id="master-status-badge" class="text-[8px] md:text-[9px] font-black px-2 py-0.5 rounded bg-gray-800 text-gray-400 uppercase">Wait</span>
+                        <div class="flex items-center space-x-2"><i data-lucide="cpu" class="w-3.5 h-3.5 md:w-4 md:h-4 text-accent"></i><p class="text-themeMuted text-[0.6rem] font-black uppercase tracking-widest">Master Intelligence</p></div>
+                        <span id="master-status-badge" class="text-[0.55rem] font-black px-2 py-0.5 rounded bg-gray-500/20 text-gray-500 uppercase">Wait</span>
                     </div>
                     
-                    <div class="grid grid-cols-3 gap-1 md:gap-2 mb-4 md:mb-6">
-                        <div class="perspective-col text-center border-r border-gray-800/50" onclick="showDetail('short')">
+                    <div class="grid grid-cols-3 gap-1 md:gap-2">
+                        <div class="perspective-col text-center border-r border-themeBorder" onclick="showDetail('short')">
                             <p class="decision-header">SHORT</p>
                             <div id="st-signal-text" class="text-sm md:text-base font-black italic text-gray-500">WAIT</div>
-                            <p class="text-[6px] md:text-[7px] text-gray-600 font-bold mt-1 uppercase">1-20 Days</p>
+                            <p class="text-[0.4rem] md:text-[0.45rem] text-themeMuted font-bold mt-1 uppercase">1-20 Days</p>
                         </div>
-                        <div class="perspective-col text-center border-r border-gray-800/50" onclick="showDetail('mid')">
+                        <div class="perspective-col text-center border-r border-themeBorder" onclick="showDetail('mid')">
                             <p class="decision-header">MID</p>
                             <div id="mt-signal-text" class="text-sm md:text-base font-black italic text-gray-500">WAIT</div>
-                            <p class="text-[6px] md:text-[7px] text-gray-600 font-bold mt-1 uppercase">20-60 Days</p>
+                            <p class="text-[0.4rem] md:text-[0.45rem] text-themeMuted font-bold mt-1 uppercase">20-60 Days</p>
                         </div>
                         <div class="perspective-col text-center" onclick="showDetail('long')">
                             <p class="decision-header">LONG</p>
                             <div id="lt-signal-text" class="text-sm md:text-base font-black italic text-gray-500">WAIT</div>
-                            <p class="text-[6px] md:text-[7px] text-gray-600 font-bold mt-1 uppercase">60+ Days</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 pt-3 border-t border-gray-800/50">
-                        <div class="grid grid-cols-3 gap-1.5 md:gap-2">
-                            <div class="stat-box flex flex-col justify-center items-center"><p class="stat-label">120MA%</p><p id="val-ma-dist" class="stat-value">---</p></div>
-                            <div class="stat-box flex flex-col justify-center items-center"><p class="stat-label">RSI-14</p><p id="val-rsi-main" class="stat-value">---</p></div>
-                            <div class="stat-box flex flex-col justify-center items-center"><p class="stat-label">MACD-H</p><p id="val-macd-main" class="stat-value">---</p></div>
+                            <p class="text-[0.4rem] md:text-[0.45rem] text-themeMuted font-bold mt-1 uppercase">60+ Days</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Analysis Report -->
-                <div class="glass rounded-3xl p-4 md:p-6 flex-grow flex flex-col shadow-lg overflow-hidden min-h-[300px] md:min-h-[400px]">
-                    <h4 class="font-black text-white uppercase text-[9px] md:text-[10px] border-b border-gray-800 pb-2 md:pb-3 mb-3 md:mb-4 tracking-widest flex items-center">
-                        <i data-lucide="file-text" class="w-3 h-3 md:w-3.5 md:h-3.5 mr-2 text-emerald-500"></i> 통합 분석 레포트
+                <!-- 통합 분석 레포트 (수치 정보 이동됨) -->
+                <div class="glass rounded-3xl p-4 md:p-6 flex-grow flex flex-col shadow-xl overflow-hidden min-h-[400px]">
+                    <h4 class="font-black text-themeText uppercase text-[0.65rem] border-b border-themeBorder pb-2 md:pb-3 mb-3 md:mb-4 tracking-widest flex items-center">
+                        <i data-lucide="file-bar-chart-2" class="w-3.5 h-3.5 mr-2 text-emerald-500"></i> 통합 분석 레포트
                     </h4>
+                    
+                    <!-- 수치 지표를 레포트 상단으로 이동 -->
+                    <div class="grid grid-cols-3 gap-2 mb-4 pb-4 border-b border-themeBorder">
+                        <div class="stat-box"><p class="stat-label">120일선 이격</p><p id="val-ma-dist" class="stat-value text-themeText">---</p></div>
+                        <div class="stat-box"><p class="stat-label">RSI (14)</p><p id="val-rsi-main" class="stat-value text-themeText">---</p></div>
+                        <div class="stat-box"><p class="stat-label">MACD 흐름</p><p id="val-macd-main" class="stat-value text-themeText">---</p></div>
+                    </div>
+
                     <div id="reasoning-container" class="space-y-2.5 overflow-y-auto pr-1 custom-scroll flex-grow">
-                        <p class="text-[10px] text-gray-500 text-center py-10 md:py-20">Verifying market perspectives...</p>
+                        <p class="text-xs text-themeMuted text-center py-10 md:py-20">데이터를 동기화하고 있습니다...</p>
                     </div>
                 </div>
             </div>
@@ -277,12 +312,12 @@
 
     <script>
         lucide.createIcons();
-        const myChart = echarts.init(document.getElementById('chart-main'));
+        let myChart = echarts.init(document.getElementById('chart-main'));
         
-        // 배포 환경과 로컬 환경 자동 대응
+        // 배포 URL 설정
         const API_BASE_URL = window.location.origin;
 
-        let maSettings = { 10: false, 20: false, 50: false, 60: false, 120: true, 200: false };
+        let maSettings = { 20: false, 60: false, 120: true };
         let currentInterval = '1d';
         let currentRange = '1y';
         let globalChartData = null;
@@ -290,24 +325,54 @@
         let abortController = null;
         let analysisDetails = { short: {}, mid: {}, long: {} };
 
-        // --- 테마 설정 로직 ---
+        // --- 초기 설정(테마, 글꼴, 선) 로드 ---
+        const savedTheme = localStorage.getItem('dashboardTheme') || 'theme-default';
+        const savedFontSize = localStorage.getItem('dashboardFontSize') || 'md';
+        let chartLineWidth = localStorage.getItem('dashboardLineWidth') || '2';
+        
+        setTheme(savedTheme);
+        setFontSize(savedFontSize);
+        
+        // UI 버튼 초기화 (선 굵기)
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('.line-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById(`btn-line-${chartLineWidth}`);
+            if(btn) btn.classList.add('active');
+        });
+
+        // --- 설정 컨트롤 함수 ---
         function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
         function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
         
         function setTheme(themeName) {
-            document.documentElement.className = `dark ${themeName}`;
+            document.documentElement.className = themeName;
             localStorage.setItem('dashboardTheme', themeName);
-            
-            // 버튼 활성화 UI 업데이트
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-${themeName}`).classList.add('active');
+            const btn = document.getElementById(`btn-${themeName}`);
+            if(btn) btn.classList.add('active');
+            
+            // 차트 색상 업데이트
+            if (globalChartData) renderDashboard(globalTicker, globalChartData);
         }
 
-        // 초기 테마 로드
-        const savedTheme = localStorage.getItem('dashboardTheme') || 'theme-default';
-        setTheme(savedTheme);
+        function setFontSize(size) {
+            const sizeMap = { 'sm': '14px', 'md': '16px', 'lg': '18px' };
+            document.documentElement.style.fontSize = sizeMap[size];
+            localStorage.setItem('dashboardFontSize', size);
+            document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-font-${size}`).classList.add('active');
+            if(myChart) myChart.resize();
+        }
 
-        // --- API 요청 로직 ---
+        function setLineWidth(width) {
+            chartLineWidth = width;
+            localStorage.setItem('dashboardLineWidth', width);
+            document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-line-${width}`).classList.add('active');
+            if(globalChartData) renderDashboard(globalTicker, globalChartData);
+        }
+
+        // --- API 및 분석 로직 ---
         async function fetchWithRetry(url, options = {}, maxRetries = 3) {
             let delay = 1000;
             for (let i = 0; i < maxRetries; i++) {
@@ -343,22 +408,22 @@
             let statusColor = d.status.includes('BUY') ? 'text-up' : (d.status.includes('BYE') ? 'text-down' : 'text-gray-400');
             
             document.getElementById('modal-body').innerHTML = `
-                <div class="bg-white/5 p-4 rounded-xl text-center border border-white/10 shadow-inner">
-                    <span class="text-3xl md:text-4xl font-black italic ${statusColor}">${d.status}</span>
-                    <p class="text-[11px] md:text-xs text-gray-300 mt-2">${d.summary}</p>
+                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center shadow-inner">
+                    <span class="text-4xl font-black italic ${statusColor}">${d.status}</span>
+                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
                 </div>
-                <div class="grid grid-cols-1 gap-3">
-                    <div class="p-3 md:p-4 bg-white/5 rounded-xl border border-white/5">
-                        <p class="text-[10px] md:text-[11px] font-black text-accent uppercase mb-2">실시간 데이터 근거</p>
-                        <div class="space-y-2 text-[11px] md:text-xs text-gray-400">
-                            <div class="flex justify-between border-b border-gray-800 pb-1"><span>120일선 이격도</span><b class="${d.maDist>0?'text-up':'text-down'}">${d.maDist>0?'+':''}${d.maDist}%</b></div>
-                            <div class="flex justify-between border-b border-gray-800 pb-1"><span>RSI 모멘텀 (14)</span><b class="text-white">${d.rsi}</b></div>
+                <div class="grid grid-cols-1 gap-3 mt-4">
+                    <div class="p-4 bg-[var(--border-color)] rounded-xl opacity-80">
+                        <p class="text-[11px] font-black text-accent uppercase mb-2">실시간 데이터 근거</p>
+                        <div class="space-y-2 text-xs text-themeMuted">
+                            <div class="flex justify-between border-b border-themeBorder pb-1"><span>120일선 이격도</span><b class="${d.maDist>0?'text-up':'text-down'}">${d.maDist>0?'+':''}${d.maDist}%</b></div>
+                            <div class="flex justify-between border-b border-themeBorder pb-1"><span>RSI 모멘텀 (14)</span><b class="text-themeText">${d.rsi}</b></div>
                             <div class="flex justify-between"><span>MACD 에너지</span><b class="${d.macd>0?'text-up':'text-down'}">${d.macd>0?'+':''}${d.macd}</b></div>
                         </div>
                     </div>
-                    <div class="p-3 md:p-4 bg-black/20 rounded-xl border border-gray-800">
-                        <p class="text-[10px] md:text-[11px] font-black text-emerald-500 uppercase mb-1">AI 전략적 조언</p>
-                        <p class="text-[11px] md:text-xs text-gray-400 leading-relaxed">${d.advice}</p>
+                    <div class="p-4 bg-themeModal rounded-xl border border-themeBorder">
+                        <p class="text-[11px] font-black text-emerald-500 uppercase mb-1">AI 전략적 조언</p>
+                        <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
                     </div>
                 </div>
             `;
@@ -371,7 +436,7 @@
             b.innerText = "Engine On";
             try {
                 const [dRes, wRes] = await Promise.all([
-                    fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=1d&range=1y`),
+                    fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=1d&range=2y`),
                     fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=1wk&range=max`)
                 ]);
                 const dD = (await dRes.json()).chart.result[0];
@@ -402,15 +467,16 @@
                     long: {...lt, summary: "120일선의 지지력과 거시적 경제 사이클을 종합한 결과입니다.", advice: "일시적인 하락 노이즈에 흔들리지 말고 본연의 장기 가치 추세를 믿고 홀딩/매집할 구간인지 파악하세요." } 
                 };
                 
-                const up = (id, r) => { document.getElementById(id).innerText = r.status; document.getElementById(id).className = `text-sm md:text-base font-black italic ${r.status.includes('BUY')?'text-up':(r.status.includes('BYE')?'text-down':'text-gray-500')}`; };
+                const up = (id, r) => { document.getElementById(id).innerText = r.status; document.getElementById(id).className = `text-sm md:text-base font-black italic ${r.status.includes('BUY')?'text-up':(r.status.includes('BYE')?'text-down':'text-gray-500')} uppercase`; };
                 up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
                 
+                // 레포트 상단 스탯 박스 업데이트
                 document.getElementById('val-ma-dist').innerText = `${st.maDist > 0 ? '+' : ''}${st.maDist}%`;
                 document.getElementById('val-ma-dist').style.color = st.maDist > 0 ? '#26A69A' : '#EF5350';
                 document.getElementById('val-rsi-main').innerText = st.rsi;
                 document.getElementById('val-macd-main').innerText = st.macd;
                 
-                b.innerText = "Synced"; b.className = "text-[8px] md:text-[9px] font-black px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 uppercase";
+                b.innerText = "Synced"; b.className = "text-[0.55rem] font-black px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 uppercase";
             } catch (e) { b.innerText = "Error"; }
         }
 
@@ -443,6 +509,17 @@
             badge.innerText = (data.defaultKeyStatistics?.quoteType === 'ETF' || ticker === 'SPY' || ticker === 'QQQ') ? "ETF" : "Stock";
         }
 
+        function aggregateToYearly(dates, kData, closes) {
+            let yearly = {};
+            dates.forEach((date, i) => {
+                const year = date.split('-')[0];
+                if (!yearly[year]) yearly[year] = { date: year, open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] };
+                else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); }
+            });
+            const sorted = Object.keys(yearly).sort();
+            return { dates: sorted, kData: sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]), closes: sorted.map(y => yearly[y].close) };
+        }
+
         function renderDashboard(ticker, data) {
             const q = data.indicators.quote[0], ts = data.timestamp;
             let dates = [], kData = [], closes = [];
@@ -450,40 +527,54 @@
             document.getElementById('display-ticker').innerText = ticker;
             const price = data.meta.regularMarketPrice || closes[closes.length - 1];
             document.getElementById('live-price').innerText = price?.toLocaleString(undefined, {minimumFractionDigits: 2});
-            const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120);
+            
+            const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9);
             const last = closes.length - 1;
             
             let reasoning = [];
             if(ma120[last]) {
                 const maPct = (((closes[last] - ma120[last]) / ma120[last]) * 100).toFixed(2);
-                reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120MA 추세 분석', d:`장기 추세 기준선 대비 ${maPct}% 위치에 있습니다.`, s:85});
+                reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120MA 추세', d:`장기 추세 대비 ${maPct}% 위치`, s:85});
             }
-            if(rsi[last] < 35) reasoning.push({type: 'up', t:'RSI 단기 수급', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 과매도(반등) 구간입니다.`, s: 78});
-            else if(rsi[last] > 65) reasoning.push({type: 'down', t:'RSI 단기 수급', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 과매수(조정) 구간입니다.`, s: 78});
+            if(rsi[last] < 35) reasoning.push({type: 'up', t:'RSI 단기 과매도', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 반등이 예상됩니다.`, s: 78});
+            else if(rsi[last] > 65) reasoning.push({type: 'down', t:'RSI 단기 과매수', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 조정이 예상됩니다.`, s: 78});
 
-            document.getElementById('reasoning-container').innerHTML = reasoning.map(i => `<div class="p-3 md:p-4 glass rounded-xl md:rounded-2xl flex flex-col space-y-1.5 md:space-y-2 border border-white/5"><div class="flex items-center space-x-2.5"><span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'BUY':'SELL'}</span><p class="text-[10px] md:text-[11px] font-black text-white uppercase">${i.t}</p></div><p class="text-[9px] md:text-[10px] text-gray-400 pl-10 md:pl-12">${i.d}</p></div>`).join('');
+            document.getElementById('reasoning-container').innerHTML = reasoning.map(i => `<div class="p-3 md:p-4 glass rounded-xl flex flex-col space-y-1.5 border border-themeBorder"><div class="flex items-center space-x-2.5"><span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'BUY':'SELL'}</span><p class="text-[0.65rem] md:text-xs font-black text-themeText uppercase">${i.t}</p></div><p class="text-[0.6rem] md:text-[0.7rem] text-themeMuted pl-12">${i.d}</p></div>`).join('');
             
+            // ECharts 테마 반영 색상
+            const styleColor = getComputedStyle(document.documentElement);
+            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+            const tooltipBg = styleColor.getPropertyValue('--modal-bg').trim() || '#151921';
+            const tooltipText = styleColor.getPropertyValue('--text-main').trim() || '#E5E7EB';
+
             const maCols = { 20: '#F97316', 60: '#3B82F6', 120: '#10B981' };
             let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' } }];
-            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], opacity: 0.8 } }); });
             
+            // 사용자가 선택한 선 굵기 적용
+            const widthNum = parseFloat(chartLineWidth);
+            
+            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 } }); });
+            
+            // MACD 바 그리기
+            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
+
             myChart.setOption({
                 backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', axisPointer: { type: 'cross' }, backgroundColor: '#151921', borderColor: '#374151', textStyle: { color: '#E5E7EB', fontSize: 11 } },
-                grid: { left: '3%', right: '3%', top: '15%', bottom: '15%', containLabel: true },
-                xAxis: { type: 'category', data: dates, axisLabel: { color: '#6B7280', fontSize: 10 } },
-                yAxis: { scale: true, splitLine: { lineStyle: { color: '#1F2937' } } },
-                dataZoom: [{ type: 'inside', start: 70, end: 100 }],
+                tooltip: { trigger: 'axis', axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, backgroundColor: tooltipBg, borderColor: chartSplitColor, textStyle: { color: tooltipText, fontSize: 11 } },
+                grid: [ { left: '3%', right: '3%', top: '15%', height: '55%', containLabel: true }, { left: '3%', right: '3%', top: '75%', height: '15%', containLabel: true } ],
+                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
+                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
+                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
                 series: series
             }, true);
         }
 
         document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); };
-        loadData('SPY'); 
+        
+        // Echarts 리사이즈 버그 방지를 위해 딜레이 로드
+        setTimeout(() => { myChart.resize(); loadData('SPY'); }, 100);
         window.onresize = () => { myChart.resize(); };
     </script>
 </body>
 </html>
-
-
-```
