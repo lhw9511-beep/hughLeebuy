@@ -255,6 +255,7 @@
             <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
                 <div>
                     <h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
+                    <p id="pf-modal-subtitle" class="text-[0.7rem] md:text-[0.8rem] text-themeMuted mt-1 font-bold">설명</p>
                 </div>
                 <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
@@ -299,7 +300,6 @@
                         </label>
                     </div>
                     
-                    <!-- 12개월 실시간 운용 성과 요약 결과 -->
                     <div id="pf-live-summary" class="flex-col m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl" style="display: none;">
                         <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2 mb-3">
                             <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest">실시간 운용 성과 (최근 12개월)</p>
@@ -1091,7 +1091,6 @@
             setTimeout(() => pfChart.resize(), 100);
         }
 
-        // 모달 띄우기 및 정보 세팅 (설명 렌더링 수정 포함)
         function showPfDetail(pfKey) {
             currentPfKey = pfKey; const data = pfDetails[pfKey];
             if(!data) return;
@@ -1107,7 +1106,6 @@
             document.getElementById('pf-modal-cagr').innerText = data.cagr;
             document.getElementById('pf-modal-mdd').innerText = data.mdd;
             
-            // Flexbox에서 텍스트 줄바꿈 충돌 방지를 위해 div.flex-1로 감싸줌
             document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1 text-[0.7rem] md:text-[0.75rem] leading-relaxed">${r}</div></li>`).join('');
             document.getElementById('pf-compare-input').value = '';
             
@@ -1228,16 +1226,15 @@
 
             try {
                 let tickers = [];
-                let colCount = 6;
-                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'AGG']; colCount = 6; } // Month, 3xScores, Return, Asset
-                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY']; colCount = 7; } // Month, 4xScores, Return, Asset
-                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY']; colCount = 6; } // Month, 2xScores, Risk, Return, Asset
-                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 5; } // Month, MinScore, Risk, Return, Asset
+                let colCount = 7;
+                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'QQQ']; colCount = 7; } 
+                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY', 'QQQ']; colCount = 8; } 
+                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
+                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
 
                 const dataMap = {};
                 let unifiedMonths = new Set();
                 
-                // 직렬 다운로드로 API 과부하 100% 차단
                 for(let i=0; i<tickers.length; i++) {
                     const t = tickers[i];
                     document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t} 데이터`;
@@ -1262,15 +1259,13 @@
                 else if(pfKey === 'vaa') html += `<th>SPY 점수</th><th>VEA 점수</th><th>VWO 점수</th><th>AGG 점수</th>`;
                 else if(pfKey === 'daa') html += `<th>VWO 점수</th><th>BND 점수</th><th>위험?</th>`;
                 else if(pfKey === 'baa') html += `<th>최저 카나리아</th><th>안전 대피?</th>`;
-                html += `<th>월간 수익률</th><th class="text-right">투자 비중</th></tr></thead><tbody>`;
+                html += `<th>전략 수익률</th><th>SPY / QQQ</th><th class="text-right">투자 비중</th></tr></thead><tbody>`;
 
-                // 시뮬레이션을 위해 각 시점별 시그널(계산 결과)을 한 번씩 구해서 저장
                 const getSignal = (idx) => {
                     if(idx - 12 < 0) return null;
                     let result = { assets: [], text: '', proofs: [], color: '' };
                     const currYM = sortedMonths[idx];
                     
-                    // 내부 헬퍼 함수
                     const calcScore = (t) => {
                         const m1YM = sortedMonths[idx-1], m3YM = sortedMonths[idx-3], m6YM = sortedMonths[idx-6], m12YM = sortedMonths[idx-12];
                         const P0 = dataMap[t][currYM], P1 = m1YM ? dataMap[t][m1YM] : null, P3 = m3YM ? dataMap[t][m3YM] : null, P6 = m6YM ? dataMap[t][m6YM] : null, P12 = m12YM ? dataMap[t][m12YM] : null;
@@ -1360,7 +1355,6 @@
                     return result;
                 };
 
-                // 최근 12개월 테이블 생성
                 const len = sortedMonths.length;
                 for(let i = len - 1; i >= len - 12; i--) {
                     if(i - 12 < 0) break;
@@ -1393,9 +1387,11 @@
                         row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
                     }
 
-                    // 월간 실제 수익률 계산 (안전대피와 투자비중 사이)
+                    // 월간 실제 수익률 및 SPY/QQQ 벤치마크 계산
                     let actualRetHtml = '<td class="text-gray-400">--</td>';
-                    if (i < len - 1) { // 다음 달 종가가 존재해야 수익률 계산 가능
+                    let benchRetHtml = '<td class="text-gray-400 bg-black/10">-- / --</td>';
+                    
+                    if (i < len - 1) { 
                         let monRet = 0;
                         let hasData = true;
                         for(let asset of sig.assets) {
@@ -1408,11 +1404,30 @@
                             const retPct = monRet * 100;
                             actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
                         }
+
+                        // SPY / QQQ 벤치마크 계산
+                        const spy0 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i]] : null;
+                        const spy1 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i+1]] : null;
+                        const qqq0 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i]] : null;
+                        const qqq1 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i+1]] : null;
+                        
+                        let spyStr = '--', qqqStr = '--';
+                        if(spy0 && spy1) {
+                            const spyPct = (spy1/spy0 - 1) * 100;
+                            spyStr = `<span class="${spyPct > 0 ? 'text-up' : (spyPct < 0 ? 'text-down' : 'text-themeMuted')}">${spyPct > 0 ? '+' : ''}${spyPct.toFixed(2)}%</span>`;
+                        }
+                        if(qqq0 && qqq1) {
+                            const qqqPct = (qqq1/qqq0 - 1) * 100;
+                            qqqStr = `<span class="${qqqPct > 0 ? 'text-up' : (qqqPct < 0 ? 'text-down' : 'text-themeMuted')}">${qqqPct > 0 ? '+' : ''}${qqqPct.toFixed(2)}%</span>`;
+                        }
+                        benchRetHtml = `<td class="text-[0.65rem] font-bold whitespace-nowrap bg-black/10">S: ${spyStr} / Q: ${qqqStr}</td>`;
+
                     } else {
                         actualRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold">진행중</td>';
+                        benchRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold bg-black/10">진행중</td>';
                     }
 
-                    row += actualRetHtml;
+                    row += actualRetHtml + benchRetHtml;
                     row += `<td class="text-right font-black ${sig.color}">${sig.text}</td></tr>`;
                     
                     const proofHtml = sig.proofs.map(p => `<div>${p}</div>`).join('');
@@ -1423,7 +1438,6 @@
                 html += `</tbody>`;
                 tbody.innerHTML = html;
 
-                // 12개월 실시간 운용 성과 요약 결과 계산
                 let portValue = 100;
                 let peak = 100;
                 let mdd = 0;
