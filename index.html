@@ -255,7 +255,6 @@
             <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
                 <div>
                     <h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
-                    <p id="pf-modal-subtitle" class="text-[0.7rem] md:text-[0.8rem] text-themeMuted mt-1 font-bold">설명</p>
                 </div>
                 <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
@@ -300,32 +299,19 @@
                         </label>
                     </div>
                     
-                    <!-- 기간 선택형 라이브 백테스트 요약 결과 -->
+                    <!-- 12개월 실시간 운용 성과 요약 결과 -->
                     <div id="pf-live-summary" class="flex-col m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl" style="display: none;">
                         <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2 mb-3">
-                            <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest">실시간 운용 성과 시뮬레이션</p>
-                            <select id="pf-live-period-select" class="bg-black/40 border border-themeBorder text-themeText text-[0.65rem] md:text-xs rounded px-2 py-1 outline-none font-bold cursor-pointer transition focus:border-accent" onchange="if(window.updateLiveSummary) window.updateLiveSummary(parseInt(this.value))">
-                                <option value="1">최근 1개월</option>
-                                <option value="2">최근 2개월</option>
-                                <option value="3">최근 3개월</option>
-                                <option value="4">최근 4개월</option>
-                                <option value="5">최근 5개월</option>
-                                <option value="6">최근 6개월</option>
-                                <option value="7">최근 7개월</option>
-                                <option value="8">최근 8개월</option>
-                                <option value="9">최근 9개월</option>
-                                <option value="10">최근 10개월</option>
-                                <option value="11">최근 11개월</option>
-                                <option value="12" selected>최근 12개월</option>
-                            </select>
+                            <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest">실시간 운용 성과 (최근 12개월)</p>
+                            <span class="bg-black/40 border border-themeBorder text-themeText text-[0.65rem] rounded px-2 py-1 font-bold">API 실시간</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-[0.65rem] md:text-xs text-themeMuted">선택 기간 실제 누적 수익률</p>
+                                <p class="text-[0.65rem] md:text-xs text-themeMuted">최근 12개월 누적 수익률</p>
                             </div>
                             <div class="text-right">
                                 <p id="pf-live-summary-cagr" class="text-2xl md:text-3xl font-black text-themeText">--</p>
-                                <p class="text-[0.65rem] md:text-xs font-bold text-themeMuted mt-1">기간 내 MDD: <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
+                                <p class="text-[0.65rem] md:text-xs font-bold text-themeMuted mt-1">기간 내 최대낙폭(MDD): <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
                             </div>
                         </div>
                     </div>
@@ -531,7 +517,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('allweather')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 리스크 패리티 전략</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 사계절 대응 전략</p>
                         <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">7.8%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-14.2%</span></span>
@@ -660,8 +646,8 @@
                 title: '60/40 포트폴리오', cagr: '8.3%', mdd: '-29.0%', type: 'static', 
                 desc: '가장 고전적이고 검증된 패시브 전략입니다. 경제 성장기에는 주식이, 침체기에는 채권이 방어하여 꾸준한 우상향을 그립니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.</div>'
+                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%', 
+                    '<span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.'
                 ], 
                 allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] 
             },
@@ -669,8 +655,8 @@
                 title: '영구 포트폴리오 (Permanent)', cagr: '6.5%', mdd: '-13.5%', type: 'static', 
                 desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절(성장, 침체, 인플레이션, 디플레이션) 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%</div>',
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.</div>'
+                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%',
+                    '<span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.'
                 ], 
                 allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] 
             },
@@ -678,8 +664,8 @@
                 title: '올웨더 포트폴리오 (All-Weather)', cagr: '7.8%', mdd: '-14.2%', type: 'static', 
                 desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 포트폴리오 전체에 미치는 변동성(리스크)을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%</div>',
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.</div>'
+                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%',
+                    '<span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.'
                 ], 
                 allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] 
             },
@@ -687,39 +673,39 @@
                 title: '오리지널 듀얼 모멘텀', cagr: '12.5%', mdd: '-17.8%', type: 'dynamic', 
                 desc: 'Gary Antonacci가 발표한 동적 자산배분의 고전입니다. 자산이 과거 대비 상승장인지 파악하는 <b>절대 모멘텀</b>과, 여러 자산 중 어느 것이 더 강한지 파악하는 <b>상대 모멘텀</b>을 결합하여 하락장을 피하고 상승장에 올라탑니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수정종가 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.</div>'
+                    '<span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span>',
+                    '<span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수정종가 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.', 
+                    '<span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.'
                 ] 
             },
             'vaa': { 
                 title: 'VAA (Vigilant Asset Allocation)', cagr: '15.2%', mdd: '-16.1%', type: 'dynamic', 
                 desc: 'Wouter Keller 박사가 개발한 극강의 방어형 모멘텀 전략입니다. 시장이 꺾이는 순간을 귀신같이 포착하기 위해 과거 1개월 단기 수익률에 무려 12배의 압도적인 가중치를 두어 <b>번개처럼 빠른 스위칭</b>을 목표로 합니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 스코어를 계산합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 스코어가 <b>모두 0 이상</b>이면, 스코어가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드:</span> 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 스코어 1위 자산으로 <strong>100% 전액 대피</strong>합니다.</div>'
+                    '<span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span>',
+                    '<span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span>',
+                    '<span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 스코어를 계산합니다.', 
+                    '<span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 스코어가 <b>모두 0 이상</b>이면, 스코어가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.', 
+                    '<span class="rule-highlight">수비 모드:</span> 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 스코어 1위 자산으로 <strong>100% 전액 대피</strong>합니다.'
                 ] 
             },
             'daa': { 
                 title: 'DAA (Defensive Asset Allocation)', cagr: '13.5%', mdd: '-12.0%', type: 'dynamic', 
                 desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기에 가장 먼저 타격을 받는 <b>탄광 속 카나리아(Canary) 자산</b>을 도입하여, 평소엔 주식 비중을 유지하면서 위험 시점에만 효과적으로 도망갑니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)</div>',
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 스코어(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.</div>',
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.</div>'
+                    '<span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span>',
+                    '<span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)',
+                    '<span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 스코어(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.',
+                    '<span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.'
                 ] 
             },
             'baa': { 
                 title: 'BAA (Bold Asset Allocation)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic', 
                 desc: '현존하는 최고 수준의 최신 동적 자산배분 모델. 2022년 금리 인상기 주식/채권 동반 폭락장에서도 훌륭한 방어력을 증명했습니다. 방어력을 한층 더 끌어올리고, 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화합니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.</div>',
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 스코어(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 금리 인상으로 인한 채권 시장 붕괴 리스크까지 완벽히 차단합니다.</div>'
+                    '<span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.',
+                    '<span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 스코어(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.', 
+                    '<span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 금리 인상으로 인한 채권 시장 붕괴 리스크까지 완벽히 차단합니다.'
                 ] 
             }
         };
@@ -1122,7 +1108,7 @@
             document.getElementById('pf-modal-mdd').innerText = data.mdd;
             
             // Flexbox에서 텍스트 줄바꿈 충돌 방지를 위해 div.flex-1로 감싸줌
-            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1">${r}</div></li>`).join('');
+            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1 text-[0.7rem] md:text-[0.75rem] leading-relaxed">${r}</div></li>`).join('');
             document.getElementById('pf-compare-input').value = '';
             
             const pieArea = document.getElementById('pf-modal-pie-area');
@@ -1242,11 +1228,11 @@
 
             try {
                 let tickers = [];
-                let colCount = 5;
-                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'AGG']; colCount = 5; } // AGG added for backtest
-                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY']; colCount = 6; }
-                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY']; colCount = 5; } // SHY added for defense
-                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 4; }
+                let colCount = 6;
+                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'AGG']; colCount = 6; } // Month, 3xScores, Return, Asset
+                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY']; colCount = 7; } // Month, 4xScores, Return, Asset
+                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY']; colCount = 6; } // Month, 2xScores, Risk, Return, Asset
+                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 5; } // Month, MinScore, Risk, Return, Asset
 
                 const dataMap = {};
                 let unifiedMonths = new Set();
@@ -1271,12 +1257,12 @@
                 }
 
                 const sortedMonths = Array.from(unifiedMonths).sort();
-                let html = '<thead><tr><th class="text-left">Month</th>';
+                let html = '<thead><tr><th class="text-left">투자 월</th>';
                 if(pfKey === 'dual') html += `<th>SPY 12M수익</th><th>VEA 12M수익</th><th>BIL 12M수익</th>`;
                 else if(pfKey === 'vaa') html += `<th>SPY 점수</th><th>VEA 점수</th><th>VWO 점수</th><th>AGG 점수</th>`;
                 else if(pfKey === 'daa') html += `<th>VWO 점수</th><th>BND 점수</th><th>위험?</th>`;
                 else if(pfKey === 'baa') html += `<th>최저 카나리아</th><th>안전 대피?</th>`;
-                html += `<th class="text-right">투자 비중</th></tr></thead><tbody>`;
+                html += `<th>월간 수익률</th><th class="text-right">투자 비중</th></tr></thead><tbody>`;
 
                 // 시뮬레이션을 위해 각 시점별 시그널(계산 결과)을 한 번씩 구해서 저장
                 const getSignal = (idx) => {
@@ -1376,63 +1362,16 @@
 
                 // 최근 12개월 테이블 생성
                 const len = sortedMonths.length;
-                
-                // summary를 그리기 위한 데이터를 클로저로 저장
-                window.updateLiveSummary = function(monthsCount) {
-                    let portValue = 100;
-                    let peak = 100;
-                    let mdd = 0;
-                    let monthsCalculated = 0;
-
-                    const endIdx = len - 2; 
-                    const startIdx = endIdx - monthsCount;
-
-                    for (let i = startIdx; i < endIdx; i++) {
-                        if(i < 12) continue;
-
-                        const sig = getSignal(i); 
-                        if(!sig) continue;
-
-                        let monRet = 0;
-                        let hasData = true;
-                        for(let asset of sig.assets) {
-                            const p0 = dataMap[asset.t][sortedMonths[i]];
-                            const p1 = dataMap[asset.t][sortedMonths[i+1]]; 
-                            if(p0 && p1) {
-                                monRet += asset.w * (p1 / p0 - 1);
-                            } else {
-                                hasData = false;
-                            }
-                        }
-
-                        if(hasData) {
-                            portValue *= (1 + monRet);
-                            if(portValue > peak) peak = portValue;
-                            let dd = (portValue - peak) / peak;
-                            if(dd < mdd) mdd = dd;
-                            monthsCalculated++;
-                        }
-                    }
-
-                    if(monthsCalculated > 0) {
-                        const finalRet = ((portValue / 100) - 1) * 100;
-                        summaryCagr.innerText = `${finalRet > 0 ? '+' : ''}${finalRet.toFixed(2)}%`;
-                        summaryCagr.className = `text-2xl md:text-3xl font-black ${finalRet > 0 ? 'text-up' : 'text-down'}`;
-                        summaryMdd.innerText = `${(mdd * 100).toFixed(2)}%`;
-                        summaryMdd.className = `text-sm font-bold ml-1 ${mdd < -0.05 ? 'text-down' : 'text-themeMuted'}`;
-                    } else {
-                        summaryCagr.innerText = `--`;
-                        summaryMdd.innerText = `--`;
-                    }
-                };
-
                 for(let i = len - 1; i >= len - 12; i--) {
                     if(i - 12 < 0) break;
                     
                     const sig = getSignal(i);
                     if(!sig) continue;
 
-                    let row = `<tr><td class="text-left font-bold text-accent">${sortedMonths[i]}</td>`;
+                    const [yy, mm] = sortedMonths[i].split('-');
+                    const ymLabel = `${yy.substring(2)}년 ${parseInt(mm)}월`;
+                    
+                    let row = `<tr><td class="text-left font-bold text-accent whitespace-nowrap">${ymLabel}</td>`;
                     
                     if(pfKey === 'dual') {
                         const { s, v, b } = sig.raw;
@@ -1454,7 +1393,28 @@
                         row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
                     }
 
+                    // 월간 실제 수익률 계산 (안전대피와 투자비중 사이)
+                    let actualRetHtml = '<td class="text-gray-400">--</td>';
+                    if (i < len - 1) { // 다음 달 종가가 존재해야 수익률 계산 가능
+                        let monRet = 0;
+                        let hasData = true;
+                        for(let asset of sig.assets) {
+                            const p0 = dataMap[asset.t][sortedMonths[i]];
+                            const p1 = dataMap[asset.t][sortedMonths[i+1]]; 
+                            if(p0 && p1) { monRet += asset.w * (p1 / p0 - 1); } 
+                            else { hasData = false; }
+                        }
+                        if(hasData) {
+                            const retPct = monRet * 100;
+                            actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
+                        }
+                    } else {
+                        actualRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold">진행중</td>';
+                    }
+
+                    row += actualRetHtml;
                     row += `<td class="text-right font-black ${sig.color}">${sig.text}</td></tr>`;
+                    
                     const proofHtml = sig.proofs.map(p => `<div>${p}</div>`).join('');
                     row += `<tr class="proof-row"><td colspan="${colCount}" class="proof-cell"><div class="proof-box">${proofHtml}</div></td></tr>`;
                     html += row;
@@ -1463,10 +1423,48 @@
                 html += `</tbody>`;
                 tbody.innerHTML = html;
 
-                // 초기 서머리 12개월로 설정 및 표시
-                const selectEl = document.getElementById('pf-live-period-select');
-                if(selectEl) selectEl.value = "12";
-                window.updateLiveSummary(12);
+                // 12개월 실시간 운용 성과 요약 결과 계산
+                let portValue = 100;
+                let peak = 100;
+                let mdd = 0;
+                let monthsCalculated = 0;
+
+                const endIdx = len - 1; 
+                const startIdx = Math.max(12, endIdx - 12); 
+
+                for (let i = startIdx; i < endIdx; i++) {
+                    const sig = getSignal(i); 
+                    if(!sig) continue;
+
+                    let monRet = 0;
+                    let hasData = true;
+                    for(let asset of sig.assets) {
+                        const p0 = dataMap[asset.t][sortedMonths[i]];
+                        const p1 = dataMap[asset.t][sortedMonths[i+1]]; 
+                        if(p0 && p1) { monRet += asset.w * (p1 / p0 - 1); } 
+                        else { hasData = false; }
+                    }
+
+                    if(hasData) {
+                        portValue *= (1 + monRet);
+                        if(portValue > peak) peak = portValue;
+                        let dd = (portValue - peak) / peak;
+                        if(dd < mdd) mdd = dd;
+                        monthsCalculated++;
+                    }
+                }
+
+                if(monthsCalculated > 0) {
+                    const finalRet = ((portValue / 100) - 1) * 100;
+                    summaryCagr.innerText = `${finalRet > 0 ? '+' : ''}${finalRet.toFixed(2)}%`;
+                    summaryCagr.className = `text-2xl md:text-3xl font-black ${finalRet > 0 ? 'text-up' : 'text-down'}`;
+                    summaryMdd.innerText = `${(mdd * 100).toFixed(2)}%`;
+                    summaryMdd.className = `text-sm font-bold ml-1 ${mdd < -0.05 ? 'text-down' : 'text-themeMuted'}`;
+                } else {
+                    summaryCagr.innerText = `--`;
+                    summaryMdd.innerText = `--`;
+                }
+
                 if(summaryBox) summaryBox.style.display = 'flex';
 
                 loading.style.display = 'none';
