@@ -111,32 +111,6 @@
         .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.75rem; border: 1px solid transparent; text-align: center; background: rgba(0,0,0,0.1); }
         .perspective-col:hover { background: rgba(0,0,0,0.2); transform: translateY(-2px); border-color: #3B82F6; }
 
-        .signal-badge { font-weight: 900; font-size: 0.6rem; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; white-space: nowrap; }
-        .signal-up { background-color: rgba(38, 166, 154, 0.2); color: #26A69A; }
-        .signal-down { background-color: rgba(239, 83, 80, 0.2); color: #EF5350; }
-
-        .icon-sm { width: 14px !important; height: 14px !important; min-width: 14px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
-        .icon-md { width: 20px !important; height: 20px !important; min-width: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
-        .icon-lg { width: 24px !important; height: 24px !important; min-width: 24px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
-        
-        .main-tab-btn { padding: 0.6rem 1rem; font-weight: 900; font-size: 0.85rem; color: var(--text-muted); border-bottom: 2px solid transparent; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
-        .main-tab-btn.active { color: var(--text-main); border-bottom-color: #3B82F6; }
-        .main-tab-btn:hover { color: var(--text-main); }
-
-        .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column;}
-        .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(59,130,246,0.3); }
-        
-        .calc-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        .calc-table th { font-size: 0.6rem; color: var(--text-muted); text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
-        .calc-table td { font-size: 0.75rem; color: var(--text-main); font-family: monospace; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
-        .calc-table tr:last-child td { border-bottom: none; }
-        
-        .proof-row { display: none; background: rgba(0,0,0,0.2); }
-        .proof-row.show { display: table-row; }
-        .proof-cell { padding: 8px !important; border-bottom: 1px solid var(--border-color) !important; }
-        .proof-box { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 6px; font-family: monospace; font-size: 0.65rem; color: var(--text-muted); overflow-x: auto; line-height: 1.6; }
-        .proof-hl { color: #3B82F6; font-weight: bold; }
-        
         .rule-list { list-style-type: none; padding-left: 0; margin-top: 10px; }
         .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: flex-start; line-height: 1.5; }
         .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 1px; font-size: 0.8rem; }
@@ -147,119 +121,15 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
-    <!-- 1. 설정 모달 -->
-    <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
-                <h3 class="text-lg font-black text-themeText flex items-center">
-                    <svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    앱 환경 설정
-                </h3>
-                <button type="button" onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
-            </div>
-            
-            <div class="space-y-6">
-                <div>
-                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
-                    <div class="flex flex-wrap gap-4">
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6; border-color:#ccc;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn active" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
-                    </div>
-                </div>
-
-                <div class="border-t border-themeBorder pt-4">
-                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 조절</p>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
-                        <button type="button" onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
-                        <button type="button" onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
-                    </div>
-                </div>
-
-                <div class="border-t border-themeBorder pt-4">
-                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기</p>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
-                        <button type="button" onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
-                        <button type="button" onclick="setLineWidth('3')" id="btn-line-3" class="setting-btn">두껍게</button>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-8 flex justify-end">
-                <button type="button" onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto transition">적용 및 닫기</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. 에러 로그 모달 -->
-    <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start mb-4 border-b border-rose-500/30 pb-3">
-                <h3 class="text-lg font-black text-rose-500 flex items-center">
-                    <svg class="icon-md mr-2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    에러 로그 (Debug)
-                </h3>
-                <button type="button" onclick="closeErrorModal()" class="text-themeMuted hover:text-rose-500 p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
-            </div>
-            <textarea id="error-log-text" class="w-full h-32 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.65rem] font-mono p-2 rounded-lg outline-none resize-none" readonly></textarea>
-            <div class="mt-4 flex gap-2 justify-end">
-                <button type="button" onclick="copyErrorLog()" id="btn-copy-error" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black hover:bg-rose-700 transition">복사하기</button>
-                <button type="button" onclick="closeErrorModal()" class="bg-themeBorder text-themeText px-4 py-2 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. 정보 설명 모달 -->
-    <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
-                <h3 id="info-title" class="text-lg font-black text-themeText flex items-center">
-                    <svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
-                    지표 설명
-                </h3>
-                <button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
-            </div>
-            <p id="info-body" class="text-sm text-themeMuted leading-relaxed py-2"></p>
-            <div class="mt-6 flex justify-end">
-                <button type="button" onclick="closeInfoModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 w-full md:w-auto transition border border-white/5">확인</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. 종목 분석 모달 -->
-    <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
-                <div>
-                    <h3 id="modal-title" class="text-xl font-black text-themeText uppercase italic">Detail View</h3>
-                    <p id="modal-period" class="text-[0.7rem] text-accent font-black tracking-widest uppercase mt-1">---</p>
-                </div>
-                <button type="button" onclick="closeDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
-            </div>
-            <div id="modal-body" class="space-y-4 text-sm text-themeText py-2"></div>
-            <div class="mt-6 flex justify-end">
-                <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. 포트폴리오 상세 및 라이브 계산기 모달 -->
+    <!-- 포트폴리오 상세 모달 -->
     <div id="pf-detail-modal" class="modal-overlay" onclick="closePfDetailModal()">
         <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
-                <div>
-                    <h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
-                </div>
+                <div><h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3></div>
                 <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
-            
             <div class="py-2">
-                <!-- 자산배분 설명 영역 -->
                 <div id="pf-modal-desc" class="text-[0.75rem] md:text-[0.8rem] text-themeMuted mb-4 leading-relaxed bg-themeBorder/10 p-4 md:p-5 rounded-xl border border-themeBorder shadow-inner"></div>
-
                 <div class="flex flex-row gap-2 md:gap-4 mb-4">
                     <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
                         <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">CAGR(연평균)</p>
@@ -270,20 +140,10 @@
                         <p id="pf-modal-mdd" class="text-lg md:text-xl font-black text-down">0%</p>
                     </div>
                 </div>
-
-                <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
-                    <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-3 py-2 uppercase outline-none text-xs md:text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교할 주식 심볼 (예: QQQ)">
-                    <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="bg-accent text-white px-4 py-2 rounded-lg font-black text-xs md:text-sm hover:bg-blue-600 transition shrink-0 shadow-lg shadow-accent/30">차트 비교</button>
-                </div>
-
                 <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
-
                 <div id="pf-modal-pie-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-themeBorder mb-4 hidden relative overflow-hidden">
-                    <div class="absolute top-2 left-3 text-[0.65rem] font-black text-themeMuted tracking-widest z-10">자산 배분 비율</div>
                     <div id="pf-pie-chart" class="pie-container"></div>
                 </div>
-
-                <!-- 라이브 엔진 영역 -->
                 <div id="pf-modal-live-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
                     <div class="p-3 border-b border-themeBorder flex flex-col md:flex-row md:justify-between md:items-center bg-black/20 gap-3">
                         <div class="flex items-center gap-2">
@@ -295,36 +155,13 @@
                             <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 및 원데이터 증명 보기</span>
                         </label>
                     </div>
-                    
-                    <div id="pf-live-summary" class="flex-col m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl" style="display: none;">
-                        <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2 mb-3">
-                            <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest">실시간 운용 성과 시뮬레이션</p>
-                            <select id="pf-live-period-select" class="bg-black/40 border border-themeBorder text-themeText text-[0.65rem] md:text-xs rounded px-2 py-1 outline-none font-bold cursor-pointer transition focus:border-accent" onchange="if(window.updateLiveSummary) window.updateLiveSummary(parseInt(this.value))">
-                                <option value="1">최근 1개월</option>
-                                <option value="2">최근 2개월</option>
-                                <option value="3">최근 3개월</option>
-                                <option value="4">최근 4개월</option>
-                                <option value="5">최근 5개월</option>
-                                <option value="6">최근 6개월</option>
-                                <option value="7">최근 7개월</option>
-                                <option value="8">최근 8개월</option>
-                                <option value="9">최근 9개월</option>
-                                <option value="10">최근 10개월</option>
-                                <option value="11">최근 11개월</option>
-                                <option value="12" selected>최근 12개월</option>
-                            </select>
-                        </div>
+                    <div id="pf-live-summary" class="flex-col m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex" style="display: none;">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-[0.65rem] md:text-xs text-themeMuted">선택 기간 실제 누적 수익률</p>
-                            </div>
-                            <div class="text-right">
-                                <p id="pf-live-summary-cagr" class="text-2xl md:text-3xl font-black text-themeText">--</p>
-                                <p class="text-[0.65rem] md:text-xs font-bold text-themeMuted mt-1">기간 내 MDD: <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
-                            </div>
+                            <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest">실시간 운용 성과 (최근 12개월)</p>
+                            <p id="pf-live-summary-cagr" class="text-2xl font-black text-themeText">--</p>
                         </div>
+                        <p class="text-[0.65rem] font-bold text-themeMuted text-right mt-1">기간 내 최대낙폭(MDD): <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
                     </div>
-
                     <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
                         <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
                         <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
@@ -333,453 +170,107 @@
                         <table class="calc-table" id="pf-live-table"></table>
                     </div>
                 </div>
-
                 <div class="bg-[var(--modal-bg)] p-4 md:p-5 rounded-xl border border-themeBorder">
-                    <p class="text-[0.8rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-3">
-                        <svg class="icon-md mr-1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                        운용 알고리즘 및 규칙
-                    </p>
+                    <p class="text-[0.8rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-3">알고리즘 및 규칙</p>
                     <ul id="pf-modal-rules" class="rule-list"></ul>
                 </div>
             </div>
             <div class="mt-4 flex justify-end">
-                <button type="button" onclick="closePfDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 transition border border-white/5">닫기</button>
+                <button type="button" onclick="closePfDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
             </div>
         </div>
     </div>
 
-    <!-- ============================================== -->
+    <!-- 기타 모달들 -->
+    <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()"><div class="modal-content" onclick="event.stopPropagation()"><div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3"><h3 id="info-title" class="text-lg font-black text-themeText">지표 설명</h3><button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button></div><p id="info-body" class="text-sm text-themeMuted leading-relaxed py-2"></p></div></div>
+    <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()"><div class="modal-content" onclick="event.stopPropagation()"><div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3"><div><h3 id="modal-title" class="text-xl font-black text-themeText uppercase italic">Detail View</h3></div><button type="button" onclick="closeDetailModal()" class="text-themeMuted p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button></div><div id="modal-body" class="space-y-4 text-sm text-themeText py-2"></div></div></div>
+    <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()"><div class="modal-content" onclick="event.stopPropagation()"><div class="flex justify-between items-start mb-4 border-b border-rose-500 pb-3"><h3 class="text-lg font-black text-rose-500">Error Log</h3><button type="button" onclick="closeErrorModal()" class="text-themeMuted p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button></div><textarea id="error-log-text" class="w-full h-32 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.65rem] font-mono p-2 rounded-lg outline-none resize-none" readonly></textarea><div class="mt-4 flex gap-2 justify-end"><button type="button" onclick="copyErrorLog()" id="btn-copy-error" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black">복사</button><button type="button" onclick="closeErrorModal()" class="bg-themeBorder text-themeText px-4 py-2 rounded-xl text-sm font-black transition border border-white/5">닫기</button></div></div></div>
+
     <!-- 메인 대시보드 래퍼 -->
-    <!-- ============================================== -->
     <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
-        
         <header class="glass rounded-2xl shadow-sm overflow-hidden">
             <div class="flex justify-between items-center p-3 md:p-4">
                 <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
-                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40 flex items-center justify-center">
-                        <svg class="icon-lg text-white" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
-                    </div>
+                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40 flex items-center justify-center"><svg class="icon-lg text-white" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg></div>
                     <h1 class="text-xl md:text-2xl font-black italic text-themeText tracking-tighter ml-1">BUY <span class="text-accent">or BYE</span></h1>
                 </div>
-                
                 <div class="flex items-center gap-2 md:gap-4">
-                    <button type="button" id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-[var(--modal-bg)] border border-accent/40 rounded-xl text-themeText font-black text-sm hover:bg-accent hover:text-white transition shadow-sm shadow-accent/20 w-20 text-center">
-                        USD
-                    </button>
-
+                    <button type="button" id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-[var(--modal-bg)] border border-accent/40 rounded-xl text-themeText font-black text-sm hover:bg-accent hover:text-white transition shadow-sm shadow-accent/20 w-20 text-center">USD</button>
                     <div class="hidden md:flex items-center">
                         <button type="button" onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">종목 AI 분석</button>
                         <button type="button" onclick="switchMainTab('crypto')" id="tab-btn-crypto" class="main-tab-btn">크립토 분석</button>
-                        <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
+                        <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오</button>
                     </div>
-                    
-                    <button type="button" onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 border border-rose-500/50 rounded-xl text-rose-500 hover:bg-rose-500 hover:text-white transition shadow-sm">
-                        <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    </button>
-
-                    <button type="button" onclick="openSettingsModal()" class="p-2 bg-[var(--modal-bg)] border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
-                        <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
+                    <button type="button" onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 border border-rose-500/50 rounded-xl text-rose-500"><svg class="icon-md" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></button>
+                    <button type="button" onclick="openSettingsModal()" class="p-2 bg-[var(--modal-bg)] border border-themeBorder rounded-xl text-themeMuted hover:text-accent"><svg class="icon-md" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg></button>
                 </div>
             </div>
             <div class="md:hidden flex border-t border-themeBorder bg-black/10">
-                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 active text-center text-sm py-2">주식</button>
-                <button type="button" onclick="switchMainTab('crypto')" id="mob-tab-btn-crypto" class="main-tab-btn flex-1 text-center text-sm py-2">크립토</button>
-                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 text-center text-sm py-2">포트폴리오</button>
+                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 active text-sm py-2">주식</button>
+                <button type="button" onclick="switchMainTab('crypto')" id="mob-tab-btn-crypto" class="main-tab-btn flex-1 text-sm py-2">크립토</button>
+                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 text-sm py-2">포트</button>
             </div>
         </header>
 
-        <!-- VIEW 1: 주식 종목 분석 대시보드 -->
         <div id="view-dashboard" class="flex flex-col space-y-3 md:space-y-4">
             <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
-                <form id="search-form" class="flex w-full sm:flex-grow">
-                    <input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="주식 심볼 (예: QQQ)">
-                    <button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button>
-                </form>
-                <div id="status-text" class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2">
-                    <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
-                    <span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span>
-                </div>
+                <form id="search-form" class="flex w-full sm:flex-grow"><input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="주식 심볼"><button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button></form>
+                <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2"><span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span><span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span></div>
             </div>
-
-            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]">
-                <div id="loading-overlay">
-                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
-                    <p id="loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">Loading Data...</p>
-                </div>
-                
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-3 md:pb-4 gap-3">
-                    <div>
-                        <h2 id="display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
-                        <div id="live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
-                    </div>
-                    
-                    <div class="flex flex-col w-full lg:w-auto gap-2">
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
-                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">기간</span>
-                            <div class="flex gap-1">
-                                <button type="button" onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉</button>
-                                <button type="button" onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn range-btn">주봉</button>
-                                <button type="button" onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn range-btn">월봉</button>
-                                <button type="button" onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">연봉</button>
-                                <button type="button" onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="chip-btn range-btn">MAX</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
-                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">지표</span>
-                            <div class="flex gap-1">
-                                <button type="button" onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">MA 20</button>
-                                <button type="button" onclick="toggleMA(50)" id="btn-ma-50" class="chip-btn active">MA 50</button>
-                                <button type="button" onclick="toggleMA(120)" id="btn-ma-120" class="chip-btn active">MA 120</button>
-                                <button type="button" onclick="toggleMA(200)" id="btn-ma-200" class="chip-btn active">MA 200</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="chart-main" class="chart-container flex-grow"></div>
-            </div>
-
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
-                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
-                    <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
-                        <div class="flex items-center gap-2">
-                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            <p class="text-themeMuted text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">Master Intelligence</p>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-3 gap-2 flex-grow mb-2">
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('short')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span>
-                            <div id="st-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
-                        </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('mid')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span>
-                            <div id="mt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
-                        </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('long')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span>
-                            <div id="lt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
-                        </div>
-                    </div>
-                    <p class="text-[0.55rem] text-themeMuted text-center">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
-                </div>
-
-                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
-                    <div class="flex items-center gap-2 mb-3 border-b border-themeBorder pb-2">
-                        <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                        <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-full mb-3">
-                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 기준 이동평균선 간의 거리(%)입니다. 양수(+)면 긍정, 음수(-)면 역배열입니다.')">
-                            <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="val-ma-dist" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '30 이하는 과매도(저점), 70 이상은 과매수(고점)로 해석합니다.')">
-                            <p class="stat-label">RSI <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="val-rsi-main" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산. 히스토그램이 양수(+)면 상승, 음수(-)면 하락 에너지입니다.')">
-                            <p class="stat-label">MACD <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="val-macd-main" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')">
-                            <p class="stat-label">BB밴드 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="val-bb-main" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '최근 기간 중 현재 위치. 20 이하는 바닥, 80 이상은 과열을 뜻합니다.')">
-                            <p class="stat-label">Stoch <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="val-stoch-main" class="stat-value text-themeText">---</p>
-                        </div>
-                    </div>
-                    <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[150px] md:max-h-[200px]">
-                        <p class="text-xs text-themeMuted text-center py-6">데이터 대기 중...</p>
-                    </div>
-                </div>
-            </div>
+            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]"><div id="loading-overlay"><div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div></div><div class="flex flex-col lg:flex-row justify-between mb-4 border-b border-themeBorder pb-3 gap-3"><div><h2 id="display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter">---</h2><div id="live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div></div></div><div id="chart-main" class="chart-container flex-grow"></div></div>
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4"><div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl border-t-4 border-t-accent"><div class="grid grid-cols-3 gap-2 flex-grow mb-2"><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('short')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span><div id="st-signal-text" class="text-sm font-black italic">WAIT</div></div><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('mid')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span><div id="mt-signal-text" class="text-sm font-black italic">WAIT</div></div><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('long')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span><div id="lt-signal-text" class="text-sm font-black italic">WAIT</div></div></div></div><div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col"><div class="grid grid-cols-5 gap-2 h-full mb-3"><div class="stat-box"><p class="stat-label">이격도</p><p id="val-ma-dist" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">RSI</p><p id="val-rsi-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">MACD</p><p id="val-macd-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">BB밴드</p><p id="val-bb-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">Stoch</p><p id="val-stoch-main" class="stat-value text-themeText">---</p></div></div><div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[120px]"></div></div></div>
         </div>
 
-        <!-- VIEW 3: 크립토 분석 대시보드 -->
         <div id="view-crypto" class="hidden flex-col space-y-3 md:space-y-4">
-            <div class="flex gap-2 mb-1 overflow-x-auto custom-scroll pb-1">
-                <button type="button" onclick="loadCryptoData('BTC-USD')" class="chip-btn bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/30">Bitcoin (BTC)</button>
-                <button type="button" onclick="loadCryptoData('ETH-USD')" class="chip-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border-indigo-500/30">Ethereum (ETH)</button>
-                <button type="button" onclick="loadCryptoData('SOL-USD')" class="chip-btn bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 border-teal-500/30">Solana (SOL)</button>
-                <button type="button" onclick="loadCryptoData('XRP-USD')" class="chip-btn bg-gray-500/10 hover:bg-gray-500/20 text-gray-400 border-gray-500/30">Ripple (XRP)</button>
-            </div>
-            
-            <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
-                <form id="crypto-search-form" class="flex w-full sm:flex-grow">
-                    <input type="text" id="crypto-ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="BTC-USD" placeholder="크립토 심볼 (예: ETH-USD)">
-                    <button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button>
-                </form>
-                <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2">
-                    <span id="crypto-status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
-                    <span id="crypto-conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span>
-                </div>
-            </div>
-
-            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]">
-                <div id="crypto-loading-overlay">
-                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
-                    <p id="crypto-loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">Loading Crypto Data...</p>
-                </div>
-                
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-3 md:pb-4 gap-3">
-                    <div>
-                        <h2 id="crypto-display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
-                        <div id="crypto-live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
-                    </div>
-                    
-                    <div class="flex flex-col w-full lg:w-auto gap-2">
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
-                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">기간</span>
-                            <div class="flex gap-1">
-                                <button type="button" onclick="changeCryptoInterval('1d', '1y', 'D')" id="crypto-range-D" class="chip-btn range-btn active">일봉</button>
-                                <button type="button" onclick="changeCryptoInterval('1wk', '2y', 'W')" id="crypto-range-W" class="chip-btn range-btn">주봉</button>
-                                <button type="button" onclick="changeCryptoInterval('1mo', '5y', 'M')" id="crypto-range-M" class="chip-btn range-btn">월봉</button>
-                                <button type="button" onclick="changeCryptoInterval('1y', 'max', 'Y')" id="crypto-range-Y" class="chip-btn range-btn">연봉</button>
-                                <button type="button" onclick="changeCryptoInterval('1mo', 'max', 'MAX')" id="crypto-range-MAX" class="chip-btn range-btn">MAX</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
-                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">지표</span>
-                            <div class="flex gap-1">
-                                <button type="button" onclick="toggleCryptoMA(20)" id="crypto-btn-ma-20" class="chip-btn active">MA 20</button>
-                                <button type="button" onclick="toggleCryptoMA(50)" id="crypto-btn-ma-50" class="chip-btn active">MA 50</button>
-                                <button type="button" onclick="toggleCryptoMA(120)" id="crypto-btn-ma-120" class="chip-btn active">MA 120</button>
-                                <button type="button" onclick="toggleCryptoMA(200)" id="crypto-btn-ma-200" class="chip-btn active">MA 200</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="crypto-chart-main" class="chart-container flex-grow"></div>
-            </div>
-
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
-                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
-                    <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
-                        <div class="flex items-center gap-2">
-                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            <p class="text-themeMuted text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">Crypto Intelligence</p>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-3 gap-2 flex-grow mb-2">
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('short')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span>
-                            <div id="crypto-st-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
-                        </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('mid')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span>
-                            <div id="crypto-mt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
-                        </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('long')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span>
-                            <div id="crypto-lt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
-                        </div>
-                    </div>
-                    <p class="text-[0.55rem] text-themeMuted text-center">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
-                </div>
-
-                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
-                    <div class="flex items-center gap-2 mb-3 border-b border-themeBorder pb-2">
-                        <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                        <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-full mb-3">
-                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 기준 이동평균선 간의 거리(%)입니다. 양수(+)면 긍정, 음수(-)면 역배열입니다.')">
-                            <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '30 이하는 과매도(저점), 70 이상은 과매수(고점)로 해석합니다.')">
-                            <p class="stat-label">RSI <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산. 히스토그램이 양수(+)면 상승, 음수(-)면 하락 에너지입니다.')">
-                            <p class="stat-label">MACD <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="crypto-val-macd-main" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')">
-                            <p class="stat-label">BB밴드 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="crypto-val-bb-main" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '최근 기간 중 현재 위치. 20 이하는 바닥, 80 이상은 과열을 뜻합니다.')">
-                            <p class="stat-label">Stoch <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
-                            <p id="crypto-val-stoch-main" class="stat-value text-themeText">---</p>
-                        </div>
-                    </div>
-                    <div id="crypto-reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[150px] md:max-h-[200px]">
-                        <p class="text-xs text-themeMuted text-center py-6">데이터 대기 중...</p>
-                    </div>
-                </div>
-            </div>
+            <!-- Crypto View (Same Structure) -->
+            <div class="flex gap-2 mb-1 overflow-x-auto custom-scroll pb-1"><button type="button" onclick="loadCryptoData('BTC-USD')" class="chip-btn bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/30">Bitcoin (BTC)</button><button type="button" onclick="loadCryptoData('ETH-USD')" class="chip-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border-indigo-500/30">Ethereum (ETH)</button></div>
+            <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full"><form id="crypto-search-form" class="flex w-full sm:flex-grow"><input type="text" id="crypto-ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="BTC-USD"><button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button></form><div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2"><span id="crypto-status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span><span id="crypto-conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span></div></div>
+            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]"><div id="crypto-loading-overlay"><div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div></div><div class="flex flex-col lg:flex-row justify-between mb-4 border-b border-themeBorder pb-3 gap-3"><div><h2 id="crypto-display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter">---</h2><div id="crypto-live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div></div></div><div id="crypto-chart-main" class="chart-container flex-grow"></div></div>
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4"><div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl border-t-4 border-t-accent"><div class="grid grid-cols-3 gap-2 flex-grow mb-2"><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('short')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span><div id="crypto-st-signal-text" class="text-sm font-black italic">WAIT</div></div><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('mid')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span><div id="crypto-mt-signal-text" class="text-sm font-black italic">WAIT</div></div><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('long')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span><div id="crypto-lt-signal-text" class="text-sm font-black italic">WAIT</div></div></div></div><div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col"><div class="grid grid-cols-5 gap-2 h-full mb-3"><div class="stat-box"><p class="stat-label">이격도</p><p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">RSI</p><p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">MACD</p><p id="crypto-val-macd-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">BB밴드</p><p id="crypto-val-bb-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">Stoch</p><p id="crypto-val-stoch-main" class="stat-value text-themeText">---</p></div></div><div id="crypto-reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[120px]"></div></div></div>
         </div>
 
-        <!-- VIEW 4: 포트폴리오 백테스트 화면 -->
         <div id="view-portfolio" class="hidden flex-col space-y-4">
-            
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
-                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
-                    <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
-                        <svg class="icon-md text-emerald-500" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                        정적 자산배분 (Static)
-                    </h2>
-                </div>
-                
+                <h2 class="text-base md:text-lg font-black text-themeText mb-3 border-b border-themeBorder pb-2">정적 자산배분 (Static)</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div class="pf-card" onclick="showPfDetail('6040')">
-                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">60/40 Portfolio <span class="text-[0.55rem] bg-gray-500/20 text-gray-400 px-2 py-1 rounded">Basic</span></h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식 60%, 채권 40%</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
-                            <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-6040" class="text-up ml-1">--%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-6040" class="text-down ml-1">--%</span></span>
-                        </div>
-                    </div>
-                    <div class="pf-card" onclick="showPfDetail('permanent')">
-                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">Permanent <span class="text-[0.55rem] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">Safe</span></h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식/장기채/금/현금 분산</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
-                            <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-permanent" class="text-up ml-1">--%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-permanent" class="text-down ml-1">--%</span></span>
-                        </div>
-                    </div>
-                    <div class="pf-card" onclick="showPfDetail('allweather')">
-                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 사계절 대응 전략</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
-                            <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-allweather" class="text-up ml-1">--%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-allweather" class="text-down ml-1">--%</span></span>
-                        </div>
-                    </div>
+                    <div class="pf-card" onclick="showPfDetail('6040')"><h3 class="font-black text-themeText text-sm mb-1">60/40 Portfolio</h3><p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">미국 주식 60% + 중기채 40%</p><div class="flex justify-between border-t border-themeBorder pt-2 mt-auto"><span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-6040" class="text-up ml-1">--%</span></span><span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-6040" class="text-down ml-1">--%</span></span></div></div>
+                    <div class="pf-card" onclick="showPfDetail('permanent')"><h3 class="font-black text-themeText text-sm mb-1">Permanent</h3><p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식/장기채/금/현금 25%</p><div class="flex justify-between border-t border-themeBorder pt-2 mt-auto"><span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-permanent" class="text-up ml-1">--%</span></span><span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-permanent" class="text-down ml-1">--%</span></span></div></div>
+                    <div class="pf-card" onclick="showPfDetail('allweather')"><h3 class="font-black text-themeText text-sm mb-1">All-Weather</h3><p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">사계절 대응 전략</p><div class="flex justify-between border-t border-themeBorder pt-2 mt-auto"><span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-allweather" class="text-up ml-1">--%</span></span><span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-allweather" class="text-down ml-1">--%</span></span></div></div>
                 </div>
             </div>
-
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-accent">
-                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
-                    <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
-                        <svg class="icon-md text-accent" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-                        동적 자산배분 (Dynamic)
-                    </h2>
-                </div>
-                
+                <h2 class="text-base md:text-lg font-black text-themeText mb-3 border-b border-themeBorder pb-2">동적 자산배분 (Dynamic)</h2>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div class="pf-card" onclick="showPfDetail('dual')">
-                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">Dual Momentum</h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">절대/상대 모멘텀을 혼합해 1등 자산에 투자합니다.</p>
-                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
-                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-dual" class="text-up ml-1">--%</span></span>
-                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-dual" class="text-down ml-1">--%</span></span>
-                        </div>
-                    </div>
-                    <div class="pf-card" onclick="showPfDetail('vaa')">
-                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">수익률 가중치로 가장 빠르고 강력한 자산을 찾습니다.</p>
-                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
-                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-vaa" class="text-up ml-1">--%</span></span>
-                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-vaa" class="text-down ml-1">--%</span></span>
-                        </div>
-                    </div>
-                    <div class="pf-card" onclick="showPfDetail('daa')">
-                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">카나리아 자산이 하락하면 즉시 안전 자산으로 도망갑니다.</p>
-                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
-                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-daa" class="text-up ml-1">--%</span></span>
-                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-daa" class="text-down ml-1">--%</span></span>
-                        </div>
-                    </div>
-                    <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
-                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">방어와 공격적 스위칭을 구사하는 최신 배분 전략.</p>
-                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
-                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-baa" class="text-up ml-1">--%</span></span>
-                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-baa" class="text-down ml-1">--%</span></span>
-                        </div>
-                    </div>
+                    <div class="pf-card" onclick="showPfDetail('dual')"><h3 class="font-black text-themeText text-xs md:text-sm mb-1">Dual Momentum</h3><div class="mt-auto pt-2 border-t border-themeBorder flex flex-col"><span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-dual" class="text-up ml-1">--%</span></span><span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-dual" class="text-down ml-1">--%</span></span></div></div>
+                    <div class="pf-card" onclick="showPfDetail('vaa')"><h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3><div class="mt-auto pt-2 border-t border-themeBorder flex flex-col"><span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-vaa" class="text-up ml-1">--%</span></span><span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-vaa" class="text-down ml-1">--%</span></span></div></div>
+                    <div class="pf-card" onclick="showPfDetail('daa')"><h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3><div class="mt-auto pt-2 border-t border-themeBorder flex flex-col"><span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-daa" class="text-up ml-1">--%</span></span><span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-daa" class="text-down ml-1">--%</span></span></div></div>
+                    <div class="pf-card" onclick="showPfDetail('baa')"><h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3><div class="mt-auto pt-2 border-t border-themeBorder flex flex-col"><span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-baa" class="text-up ml-1">--%</span></span><span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-baa" class="text-down ml-1">--%</span></span></div></div>
                 </div>
             </div>
-
-            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
-                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 시뮬레이션 (Base 100)</h3>
-                <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
-            </div>
-        </div>
-
-        <div class="text-center mt-2 pb-6">
-            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data (Base 100)</p>
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full"><h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 시뮬레이션</h3><div id="chart-portfolio" class="portfolio-chart-container w-full"></div></div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // 🛠️ 전역 안전 장치 및 디버그
-        // ==========================================
-        function resetDashboard() { location.reload(); }
-
+        // --- ⚙️ 전역 설정 ---
+        const API_BASE_URL = 'https://buy-or-bye.onrender.com';
         let errorLogs = [];
-        function logError(msg, err) {
-            console.error(msg, err);
-            const time = new Date().toLocaleTimeString();
-            let errStr = (err && err.message) ? err.message : String(err);
-            if(err && err.stack) errStr += `\n${err.stack}`;
-            errorLogs.unshift(`[${time}] ${msg}\n${errStr}\n`);
-            if(errorLogs.length > 10) errorLogs.pop(); 
-            const btn = document.getElementById('btn-show-error');
-            if(btn) btn.classList.remove('hidden'); 
-        }
-
-        function openErrorModal() {
-            document.getElementById('error-log-text').value = errorLogs.join('\n-------------------\n') || '에러 로그가 없습니다.';
-            document.getElementById('error-modal').style.display = 'flex';
-        }
-        function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
         
-        function copyErrorLog() {
-            const textArea = document.getElementById('error-log-text');
-            textArea.select(); document.execCommand('copy');
-            const btn = document.getElementById('btn-copy-error');
-            btn.innerText = '복사 완료!'; setTimeout(() => btn.innerText = '복사하기', 2000);
-        }
-
-        window.onerror = function(message, source, lineno, colno, error) { logError("Global JS Error", error || message); updateStatus("ERROR", "bg-rose-500"); updateCryptoStatus("ERROR", "bg-rose-500"); };
-        window.addEventListener("unhandledrejection", function(event) { logError("Promise Rejection", event.reason); updateStatus("API ERROR", "bg-rose-500"); updateCryptoStatus("API ERROR", "bg-rose-500"); });
-
         function safeStorageGet(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
         function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
-        // ==========================================
-        // 📊 글로벌 변수 및 공통 설정
-        // ==========================================
-        let myChart = null, cryptoChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
-        
-        const API_BASE_URL = 'https://buy-or-bye.onrender.com'; 
-
-        // 환율 모드 글로벌 변수 ('USD' | 'KRW')
         let currentCurrency = safeStorageGet('dashboardCurrency', 'USD');
-        let fxCache = {};
-
         const savedTheme = safeStorageGet('dashboardTheme', 'theme-green');
         const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
         let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
-
-        // 주식 변수
-        let maSettings = { 20: true, 50: true, 120: true, 200: true };
-        let currentInterval = '1d', currentRange = '1y';
-        let globalChartData = null, globalTicker = "SPY", abortController = null;
-        let analysisDetails = { short: {}, mid: {}, long: {} };
         
-        // 크립토 변수
-        let cryptoMaSettings = { 20: true, 50: true, 120: true, 200: true };
-        let currentCryptoInterval = '1d', currentCryptoRange = '1y';
-        let globalCryptoChartData = null, globalCryptoTicker = "BTC-USD", cryptoAbortController = null;
-        let cryptoAnalysisDetails = { short: {}, mid: {}, long: {} };
+        let myChart = null, cryptoChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
+        let globalChartData = null, globalTicker = "SPY", globalCryptoChartData = null, globalCryptoTicker = "BTC-USD";
+        let maSettings = { 20: true, 50: true, 120: true, 200: true }, cryptoMaSettings = { 20: true, 50: true, 120: true, 200: true };
+        let fxCache = {}, analysisDetails = { short: {}, mid: {}, long: {} }, cryptoAnalysisDetails = { short: {}, mid: {}, long: {} };
+        let currentPfKey = '', abortController = null, cryptoAbortController = null;
 
-        let currentPfKey = '';
-
+        // --- 📊 데이터 상수 ---
         const pfSimData = {
             years: ["2000","2002","2004","2006","2008","2010","2012","2014","2016","2018","2020","2022","2024", "2025", "2026"],
             'spy': [100, 88, 68, 87, 96, 100, 115, 121, 75, 93, 107, 109, 126, 166, 185],
@@ -792,867 +283,173 @@
             'baa': [100, 110, 118, 122, 140, 155, 180, 195, 195, 230, 270, 285, 310, 370, 400]
         };
         const fxSimData = [1130, 1290, 1186, 1192, 1145, 1013, 929, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1330, 1400, 1450];
-        const pfSimYears = Array.from({length: 27}, (_, i) => String(2000 + i));
+        const pfSimYears = [...pfSimData.years];
 
         const pfDetails = {
-            '6040': { 
-                title: '60/40 포트폴리오', cagr: '8.3', mdd: '-29.0', type: 'static', 
-                desc: '가장 고전적이고 검증된 패시브 전략입니다. 경제 성장기에는 주식이, 침체기에는 채권이 방어하여 꾸준한 우상향을 그립니다.',
-                rules: [
-                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%', 
-                    '<span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.'
-                ], 
-                allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] 
-            },
-            'permanent': { 
-                title: '영구 포트폴리오 (Permanent)', cagr: '6.5', mdd: '-13.5', type: 'static', 
-                desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절(성장, 침체, 인플레이션, 디플레이션) 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
-                rules: [
-                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%',
-                    '<span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.'
-                ], 
-                allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] 
-            },
-            'allweather': { 
-                title: '올웨더 포트폴리오 (All-Weather)', cagr: '7.8', mdd: '-14.2', type: 'static', 
-                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 포트폴리오 전체에 미치는 변동성(리스크)을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.',
-                rules: [
-                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%',
-                    '<span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.'
-                ], 
-                allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] 
-            },
-            'dual': { 
-                title: '오리지널 듀얼 모멘텀', cagr: '12.5', mdd: '-17.8', type: 'dynamic', 
-                desc: 'Gary Antonacci가 발표한 동적 자산배분의 고전입니다. 자산이 과거 대비 상승장인지 파악하는 <b>절대 모멘텀</b>과, 여러 자산 중 어느 것이 더 강한지 파악하는 <b>상대 모멘텀</b>을 결합하여 하락장을 피하고 상승장에 올라탑니다.',
-                rules: [
-                    '<span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span>',
-                    '<span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수정종가 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.', 
-                    '<span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.'
-                ] 
-            },
-            'vaa': { 
-                title: 'VAA (Vigilant Asset Allocation)', cagr: '15.2', mdd: '-16.1', type: 'dynamic', 
-                desc: 'Wouter Keller 박사가 개발한 극강의 방어형 모멘텀 전략입니다. 시장이 꺾이는 순간을 귀신같이 포착하기 위해 과거 1개월 단기 수익률에 무려 12배의 압도적인 가중치를 두어 <b>번개처럼 빠른 스위칭</b>을 목표로 합니다.',
-                rules: [
-                    '<span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span>',
-                    '<span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span>',
-                    '<span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 스코어를 계산합니다.', 
-                    '<span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 스코어가 <b>모두 0 이상</b>이면, 스코어가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.', 
-                    '<span class="rule-highlight">수비 모드:</span> 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 스코어 1위 자산으로 <strong>100% 전액 대피</strong>합니다.'
-                ] 
-            },
-            'daa': { 
-                title: 'DAA (Defensive Asset Allocation)', cagr: '13.5', mdd: '-12.0', type: 'dynamic', 
-                desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기에 가장 먼저 타격을 받는 <b>탄광 속 카나리아(Canary) 자산</b>을 도입하여, 평소엔 주식 비중을 유지하면서 위험 시점에만 효과적으로 도망갑니다.',
-                rules: [
-                    '<span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span>',
-                    '<span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)',
-                    '<span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 스코어(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.',
-                    '<span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.'
-                ] 
-            },
-            'baa': { 
-                title: 'BAA (Bold Asset Allocation)', cagr: '16.5', mdd: '-11.2', type: 'dynamic', 
-                desc: '현존하는 최고 수준의 최신 동적 자산배분 모델. 2022년 금리 인상기 주식/채권 동반 폭락장에서도 훌륭한 방어력을 증명했습니다. 방어력을 한층 더 끌어올리고, 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화합니다.',
-                rules: [
-                    '<span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.',
-                    '<span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 스코어(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.', 
-                    '<span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 금리 인상으로 인한 채권 시장 붕괴 리스크까지 완벽히 차단합니다.'
-                ] 
-            }
+            '6040': { title: '60/40 Portfolio', type: 'static', rules: ['주식 60% + 채권 40%', '연 1회 리밸런싱'], allocation: [{value:60, name:'SPY'},{value:40, name:'IEF'}] },
+            'permanent': { title: '영구 포트폴리오', type: 'static', rules: ['주식 25%/장기채 25%/금 25%/현금 25%'], allocation: [{value:25, name:'SPY'},{value:25, name:'TLT'},{value:25, name:'GLD'},{value:25, name:'BIL'}] },
+            'allweather': { title: 'All-Weather', type: 'static', rules: ['레이 달리오 리스크 패리티'], allocation: [{value:30, name:'SPY'},{value:40, name:'TLT'},{value:15, name:'IEF'},{value:7.5, name:'GLD'},{value:7.5, name:'DBC'}] },
+            'dual': { title: '듀얼 모멘텀', type: 'dynamic', rules: ['12개월 모멘텀', '상대+절대'] },
+            'vaa': { title: 'VAA', type: 'dynamic', rules: ['공격/수비 13612 가중치'] },
+            'daa': { title: 'DAA', type: 'dynamic', rules: ['카나리아 2개(VWO, BND)'] },
+            'baa': { title: 'BAA', type: 'dynamic', rules: ['카나리아 4개(SPY, VEA, VWO, BND)'] }
         };
 
-        const calcMDDArray = (arr) => {
-            let mdd = []; let peak = arr[0];
-            for(let i=0; i<arr.length; i++) {
-                if(arr[i] > peak) peak = arr[i];
-                mdd.push(parseFloat(((arr[i] - peak) / peak * 100).toFixed(2)));
-            }
-            return mdd;
-        };
-
-        const updatePfCardMetrics = () => {
-            Object.keys(pfDetails).forEach(key => {
-                const cagrEl = document.getElementById(`card-cagr-${key}`);
-                const mddEl = document.getElementById(`card-mdd-${key}`);
-                if(!cagrEl || !mddEl) return;
-
-                const dataArr = getAdjustedSimData(key);
-                const baseVal = dataArr[0], finalVal = dataArr[dataArr.length - 1];
-                const years = dataArr.length - 1;
-                
-                let cagr = (((finalVal / baseVal) ** (1 / years)) - 1) * 100;
-                let mdds = calcMDDArray(dataArr);
-                let minMdd = Math.min(...mdds);
-
-                cagrEl.innerText = `${cagr.toFixed(1)}%`;
-                cagrEl.className = cagr > 0 ? "text-up ml-1" : "text-down ml-1";
-                
-                mddEl.innerText = `${minMdd.toFixed(1)}%`;
-                mddEl.className = minMdd < -5 ? "text-down ml-1" : "text-up ml-1";
-            });
-        };
-
-        // ==========================================
-        // 🔄 핵심 UI 조작 함수
-        // ==========================================
-        function toggleCurrency() {
-            currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
-            safeStorageSet('dashboardCurrency', currentCurrency);
-            
-            const btn = document.getElementById('currency-toggle');
-            if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
-
-            const viewDash = document.getElementById('view-dashboard');
-            const viewCrypto = document.getElementById('view-crypto');
-            
-            updatePfCardMetrics();
-
-            if(viewDash && viewDash.style.display !== 'none') { loadData(globalTicker); } 
-            else if (viewCrypto && viewCrypto.style.display !== 'none') { loadCryptoData(globalCryptoTicker); } 
-            else { if(currentPfKey) showPfDetail(currentPfKey); renderPortfolioChart(); }
-        }
-
+        // --- 🛠️ 헬퍼 ---
+        function logError(msg, err) { const time = new Date().toLocaleTimeString(); let e = err?.message || String(err); errorLogs.unshift(`[${time}] ${msg}\n${e}\n`); document.getElementById('btn-show-error')?.classList.remove('hidden'); }
         function getCurrSymbol() { return currentCurrency === 'USD' ? '$' : '₩'; }
-        function formatPriceStr(price) {
-            if (price === null || price === undefined || isNaN(price)) return '--';
-            if (currentCurrency === 'KRW') return Math.round(price).toLocaleString('ko-KR');
-            const digits = price < 1 ? 4 : 2;
-            return price.toLocaleString('en-US', {minimumFractionDigits: digits, maximumFractionDigits: digits});
-        }
+        function calcMDDArray(arr) { let mdd = []; let peak = arr[0]; for(let v of arr) { if(v > peak) peak = v; mdd.push(parseFloat(((v - peak) / peak * 100).toFixed(2))); } return mdd; }
+        const getAdjustedSimData = (k) => { let d = pfSimData[k]; if (currentCurrency === 'USD') return d; let fx0 = fxSimData[0]; return d.map((v, i) => v * (fxSimData[i] / fx0)); };
 
-        function setTheme(t) {
-            document.documentElement.className = t; safeStorageSet('dashboardTheme', t);
-            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active')); document.getElementById(`btn-${t}`)?.classList.add('active');
-            requestAnimationFrame(() => { if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData); if (globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData); if (pfChart) renderPortfolioChart(); });
-        }
-
-        function setFontSize(s) {
-            document.documentElement.style.fontSize = {sm:'14px',md:'16px',lg:'18px'}[s]; safeStorageSet('dashboardFontSize', s);
-            document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active')); document.getElementById(`btn-font-${s}`)?.classList.add('active');
-            requestAnimationFrame(() => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize(); });
-        }
-
-        function setLineWidth(w) {
-            chartLineWidth = w; safeStorageSet('dashboardLineWidth', w);
-            document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active')); document.getElementById(`btn-line-${w}`)?.classList.add('active');
-            requestAnimationFrame(() => { if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData); if (globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData); });
-        }
-
-        function toggleProofs(show) { document.querySelectorAll('.proof-row').forEach(row => { if(show) row.classList.add('show'); else row.classList.remove('show'); }); }
-
-        function switchMainTab(tab) {
-            document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-btn-${tab}`)?.classList.add('active'); document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
-            document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
-            document.getElementById('view-crypto').style.display = tab==='crypto' ? 'flex' : 'none';
-            document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
-            setTimeout(() => {
-                if(tab === 'dashboard' && myChart) { myChart.resize(); } 
-                else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData('BTC-USD'); } cryptoChart.resize(); }
-                else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart.resize(); updatePfCardMetrics(); }
-            }, 50);
-        }
-
-        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
-        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
-        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
-        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
-        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
-
-        function showInfo(title, text) {
-            document.getElementById('info-title').innerHTML = `<svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg> ${title}`;
-            document.getElementById('info-body').innerText = text;
-            document.getElementById('info-modal').style.display = 'flex';
-        }
-
-        // ==========================================
-        // 📡 API 통신 및 데이터 정제
-        // ==========================================
-        async function fetchWithRetry(url, options = {}, maxRetries = 2) {
-            let delay = 1500;
-            for (let i = 0; i <= maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) return response;
-                    if (response.status === 429) {
-                        logError(`API 429 Limit: ${url}`);
-                        await new Promise(res => setTimeout(res, delay)); delay *= 1.5; continue;
-                    }
-                    throw new Error(`HTTP ${response.status}`);
-                } catch (err) { 
-                    if (err.name === 'AbortError') throw err; if (i === maxRetries) throw err; 
-                    await new Promise(res => setTimeout(res, delay)); 
-                }
-            }
-            throw new Error(`Fetch failed: ${url}`);
-        }
-
-        async function getFxMap(interval, range) {
-            const key = `${interval}_${range}`;
-            if(fxCache[key]) return fxCache[key];
-            try {
-                const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/KRW=X?interval=${interval}&range=${range}`);
-                const json = await res.json();
-                const data = json.chart.result[0];
-                let map = {};
-                const q = data.indicators.quote[0], ts = data.timestamp;
-                let lastValid = 1300; 
-                if (ts && q && q.close) {
-                    for(let i=0; i<ts.length; i++) {
-                        if(q.close[i]) lastValid = q.close[i];
-                        const dStr = new Date(ts[i]*1000).toISOString().split('T')[0];
-                        map[dStr] = lastValid; map[dStr.substring(0, 7)] = lastValid; 
-                    }
-                }
-                fxCache[key] = map; return map;
-            } catch(e) { console.error('FX Fetch Error:', e); return null; }
-        }
-
-        function applyFxToData(data, fxMap) {
-            if(!fxMap || !data || !data.indicators) return data;
-            const q = data.indicators.quote[0], ts = data.timestamp;
-            let lastFx = 1300;
-            for(let i=0; i<ts.length; i++) {
-                const dStr = new Date(ts[i]*1000).toISOString().split('T')[0];
-                if(fxMap[dStr]) lastFx = fxMap[dStr]; else if(fxMap[dStr.substring(0, 7)]) lastFx = fxMap[dStr.substring(0, 7)];
-                if(q.close[i] != null) {
-                    q.close[i] *= lastFx;
-                    if(q.open && q.open[i] != null) q.open[i] *= lastFx;
-                    if(q.high && q.high[i] != null) q.high[i] *= lastFx;
-                    if(q.low && q.low[i] != null) q.low[i] *= lastFx;
-                }
-            }
-            return data;
-        }
-
-        async function fetchStockData(ticker, interval, range, isCrypto = false) {
-            const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=${interval}&range=${range}`);
-            const json = await res.json();
-            if(!json.chart || !json.chart.result) throw new Error("API Data Format Error");
-            const data = json.chart.result[0];
-            if (currentCurrency === 'KRW' && ticker !== 'KRW=X') {
-                const fxMap = await getFxMap(interval, range);
-                applyFxToData(data, fxMap);
-            }
-            return data;
-        }
-
-        function extractCleanData(data) {
-            if(!data || !data.indicators || !data.indicators.quote || !data.indicators.quote[0]) return { dates:[], kData:[], closes:[] };
-            const q = data.indicators.quote[0], ts = data.timestamp || [];
-            let dates = [], kData = [], closes = [];
-            for(let i=0; i<ts.length; i++) {
-                if (q.close && q.close[i] !== null && q.close[i] !== undefined) {
-                    dates.push(new Date(ts[i] * 1000).toISOString().split('T')[0]); 
-                    kData.push([q.open[i]||q.close[i], q.close[i], q.low[i]||q.close[i], q.high[i]||q.close[i]]); 
-                    closes.push(q.close[i]);
-                }
-            }
-            return { dates, kData, closes };
-        }
-
-        const Indicator = {
-            sma: (d, p) => d.map((_, i) => { if (i < p - 1) return null; const slice = d.slice(i - p + 1, i + 1).filter(v => v !== null); return slice.length === p ? slice.reduce((a, b) => a + b) / p : null; }),
-            ema: (d, p) => { let r=Array(d.length).fill(null), k=2/(p+1), s=d.findIndex(v=>v!==null); if(s===-1)return r; r[s]=d[s]; for(let i=s+1;i<d.length;i++) r[i]=d[i]*k+r[i-1]*(1-k); return r; },
-            macd: (d, s, l, sig) => { const se=Indicator.ema(d,s), le=Indicator.ema(d,l), line=se.map((v,i)=>v===null||le[i]===null?null:v-le[i]); return { hist: line.map((v,i)=>v===null||Indicator.ema(line,sig)[i]===null?null:v-Indicator.ema(line,sig)[i]) }; },
-            rsi: (d, p) => { let r=Array(d.length).fill(null), g=0, l=0; for(let i=1;i<d.length;i++){ let df=d[i]-d[i-1], cg=df>0?df:0, cl=df<0?-df:0; g=(g*(p-1)+cg)/p; l=(l*(p-1)+cl)/p; if(i>=p)r[i]=100-(100/(1+g/l)); } return r; },
-            bollinger: (d, p, m) => { const sma=Indicator.sma(d,p), up=Array(d.length).fill(null), low=Array(d.length).fill(null); for(let i=p-1;i<d.length;i++){ if(sma[i]===null)continue; const sl=d.slice(i-p+1,i+1); const v=sl.reduce((a,val)=>a+Math.pow(val-sma[i],2),0)/p; const sd=Math.sqrt(v); up[i]=sma[i]+(m*sd); low[i]=sma[i]-(m*sd); } return { upper: up, lower: low }; },
-            stochastic: (k, p, s) => { let r=Array(k.length).fill(null); for(let i=p-1;i<k.length;i++){ const sl=k.slice(i-p+1,i+1); const h=Math.max(...sl.map(d=>d[3])), l=Math.min(...sl.map(d=>d[2])); r[i]=(h!==l)?((k[i][1]-l)/(h-l))*100:50; } return { k: r, d: Indicator.sma(r, s) }; }
-        };
-
-        // 주식 차트 관련 함수
-        function toggleMA(p) { maSettings[p] = !maSettings[p]; updateMAButtons(); if (globalChartData) renderDashboard(globalTicker, globalChartData); }
-        function updateMAButtons() { Object.keys(maSettings).forEach(p => { const b = document.getElementById(`btn-ma-${p}`); if(b) { if(maSettings[p]) b.classList.add('active'); else b.classList.remove('active'); }}); }
-        function changeInterval(i, r, l) { 
-            currentInterval = i; currentRange = r; 
-            document.querySelectorAll('#view-dashboard .range-btn').forEach(b => b.classList.remove('active')); 
-            document.getElementById(`range-${l}`)?.classList.add('active'); 
-            loadData(globalTicker, i, r); 
-        }
-
-        // 크립토 차트 관련 함수
-        function toggleCryptoMA(p) { cryptoMaSettings[p] = !cryptoMaSettings[p]; updateCryptoMAButtons(); if (globalCryptoChartData) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData); }
-        function updateCryptoMAButtons() { Object.keys(cryptoMaSettings).forEach(p => { const b = document.getElementById(`crypto-btn-ma-${p}`); if(b) { if(cryptoMaSettings[p]) b.classList.add('active'); else b.classList.remove('active'); }}); }
-        function changeCryptoInterval(i, r, l) { 
-            currentCryptoInterval = i; currentCryptoRange = r; 
-            document.querySelectorAll('#view-crypto .range-btn').forEach(b => b.classList.remove('active')); 
-            document.getElementById(`crypto-range-${l}`)?.classList.add('active'); 
-            loadCryptoData(globalCryptoTicker, i, r); 
-        }
-
-        // ==========================================
-        // 뷰 1: 주식 종목 분석 차트 
-        // ==========================================
-        async function loadData(ticker, interval = currentInterval, range = currentRange) {
-            if (abortController) abortController.abort(); abortController = new AbortController();
-            const loadingOverlay = document.getElementById('loading-overlay'); if(loadingOverlay) loadingOverlay.style.display = 'flex';
-            try {
-                const reqInterval = interval === '1y' ? '1mo' : interval;
-                const d = await fetchStockData(ticker, reqInterval, range);
-                globalChartData = d; globalTicker = ticker;
-                updateStatus("LIVE DATA", "bg-emerald-500"); renderDashboard(ticker, d);
-                calculateTriplePerspectiveDecision(ticker).catch(e => logError("Triple Calc Error", e));
-            } catch (e) { 
-                if (e.name !== 'AbortError') { logError(`loadData failed for ${ticker}`, e); updateStatus("API LMT (에러)", "bg-rose-500"); if(myChart) myChart.clear(); document.getElementById('display-ticker').innerText = "ERROR"; document.getElementById('live-price').innerText = "---"; document.getElementById('reasoning-container').innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br>우측 상단 [!] 버튼을 눌러 에러 로그를 확인하세요.</p>'; }
-            } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
-        }
-
-        function updateStatus(t, c) { const label = document.getElementById('conn-label'), dot = document.getElementById('status-dot'); if(label) label.innerText = t; if(dot) dot.className = `w-2 h-2 rounded-full ${c}`; }
-
+        // --- 📈 차트 엔진 ---
         function renderDashboard(ticker, data) {
             if(!myChart || !data) return;
-            let { dates, kData, closes } = extractCleanData(data); if(closes.length === 0) return;
-
-            document.getElementById('display-ticker').innerText = ticker;
-            const price = closes[closes.length - 1];
-            document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(price)}`;
-            
-            if (currentInterval === '1y') {
-                let yearly = {}; dates.forEach((date, i) => { const year = date.split('-')[0]; if (!yearly[year]) { yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] }; } else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); } });
-                const sorted = Object.keys(yearly).sort(); dates = sorted; kData = sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]); closes = sorted.map(y => yearly[y].close);
-            }
-
-            const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9), stoch = Indicator.stochastic(kData, 14, 3), bb = Indicator.bollinger(closes, 20, 2), last = closes.length - 1;
-            let reasoning = [];
-            if(ma120[last]) reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${(((closes[last] - ma120[last]) / ma120[last]) * 100).toFixed(2)}% 위치`});
-            if(rsi[last] < 30) reasoning.push({type: 'up', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 과매도 상태.`}); else if(rsi[last] > 70) reasoning.push({type: 'down', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 과매수 상태.`});
-            if(macd.hist[last] > 0) reasoning.push({type: 'up', t:'MACD', d:`상승 에너지 발산 중`}); else reasoning.push({type: 'down', t:'MACD', d:`하락 에너지 진행 중`});
-            
-            document.getElementById('reasoning-container').innerHTML = reasoning.length > 0 ? reasoning.map(i => `<div class="p-3 glass rounded-xl flex items-center justify-between border border-themeBorder mb-2"><div class="flex items-center gap-2"><span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'BUY':'SELL'}</span><p class="text-[0.65rem] font-black text-themeText">${i.t}</p></div><p class="text-[0.6rem] text-themeMuted">${i.d}</p></div>`).join('') : '<p class="text-xs text-themeMuted text-center py-10">특이 지표가 없습니다.</p>';
-            
-            const styleColor = getComputedStyle(document.documentElement);
-            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF', chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-            const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
-            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
-            
-            const widthNum = parseFloat(chartLineWidth);
-            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
-            series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
-
+            let { dates, kData, closes } = extractCleanData(data);
+            const style = getComputedStyle(document.documentElement), textMuted = style.getPropertyValue('--text-muted').trim();
+            const macd = Indicator.macd(closes, 12, 26, 9);
             myChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 },
-                    formatter: function (params) {
-                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
-                        params.forEach(p => {
-                            if (p.seriesType === 'candlestick') { let open = formatPriceStr(p.data[1]); let close = formatPriceStr(p.data[2]); result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`; } 
-                            else { let val = p.value !== undefined ? p.value : p.data; if (val === null || val === undefined || isNaN(val)) return; result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`; }
-                        }); return result;
-                    }
-                },
-                grid: [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
-                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
-                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
-                series: series
+                backgroundColor:'transparent', tooltip:{trigger:'axis', formatter: (p) => { 
+                    let r = `<b>${p[0].axisValue}</b><br/>`;
+                    p.forEach(x => { 
+                        let v = x.value !== undefined ? (x.value.value !== undefined ? x.value.value : x.value) : x.data;
+                        if(x.seriesType==='candlestick') r += `${x.marker} 종가: ${getCurrSymbol()}${formatPriceStr(x.data[2])}<br/>`;
+                        else r += `${x.marker} ${x.seriesName}: ${isNaN(v) ? '--' : Number(v).toFixed(2)}<br/>`;
+                    }); return r; 
+                }},
+                grid:[{left:'5%',right:'5%',top:'5%',height:'60%'},{left:'5%',right:'5%',top:'75%',height:'15%'}],
+                xAxis:[{type:'category',data:dates,axisLabel:{show:false}},{type:'category',gridIndex:1,data:dates,axisLabel:{color:textMuted,fontSize:10}}],
+                yAxis:[{scale:true},{gridIndex:1,show:false}],
+                series:[
+                    {name:'Price',type:'candlestick',data:kData,itemStyle:{color:'#26A69A',color0:'#EF5350'}},
+                    {name:'MACD',type:'bar',xAxisIndex:1,yAxisIndex:1,data:macd.hist.map(v=>({value:v,itemStyle:{color:v>0?'#26A69A':'#EF5350'}}))}
+                ]
             }, true);
-            requestAnimationFrame(() => myChart.resize());
-        }
-
-        async function calculateTriplePerspectiveDecision(ticker) {
-            try {
-                const [dData, wData] = await Promise.all([fetchStockData(ticker, '1d', '2y'), fetchStockData(ticker, '1wk', 'max')]);
-                const analyze = (data, weight, periods) => {
-                    let { kData, closes } = extractCleanData(data);
-                    if(closes.length < periods.ma) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
-                    const last = closes.length - 1, rsi = Indicator.rsi(closes, periods.rsi)[last] || 50, macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0, sma = Indicator.sma(closes, periods.ma)[last] || closes[last], stoch = Indicator.stochastic(kData, periods.stoch, 3).k[last] || 50, bb = Indicator.bollinger(closes, periods.ma, 2), dist = ((closes[last] - sma) / sma) * 100;
-                    let buy = 0, sell = 0;
-                    if (closes[last] > sma) buy += weight.ma; else sell += weight.ma; if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi; if (macd > 0) buy += weight.macd; else sell += weight.macd; if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
-                    let bbStr = "MID"; if(bb.upper[last] !== null && closes[last] >= bb.upper[last] * 0.98) { bbStr = "UPPER"; sell += 0.5; } else if(bb.lower[last] !== null && closes[last] <= bb.lower[last] * 1.02) { bbStr = "LOWER"; buy += 0.5; }
-                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
-                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1), bbStr: bbStr };
-                };
-                const st = analyze(dData, { ma: 0.5, rsi: 1.8, macd: 1.5 }, { ma: 20, rsi: 9, stoch: 10 }), mt = analyze(dData, { ma: 1.5, rsi: 1.0, macd: 1.2 }, { ma: 60, rsi: 14, stoch: 14 }), lt = analyze(wData, { ma: 3.0, rsi: 0.5, macd: 0.5 }, { ma: 40, rsi: 14, stoch: 14 });
-                analysisDetails = { short: {...st, summary: "20일선 및 단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 스윙 포지션에 적합합니다." }, mid: {...mt, summary: "60일 중기 이평선과 추세를 분석한 결과입니다.", advice: "일봉과 주봉의 방향 일치 여부를 파악하세요." }, long: {...lt, summary: "주봉 40주선 기반의 장기 사이클입니다.", advice: "장기 우상향 시 하락 노이즈는 매수 기회입니다." } };
-                const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm md:text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
-                up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
-                const uiUpdate = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } }
-                const dailyClean = extractCleanData(dData); const mainSma120 = Indicator.sma(dailyClean.closes, 120); const lastCl = dailyClean.closes[dailyClean.closes.length-1]; const dist120 = mainSma120[mainSma120.length-1] ? ((lastCl - mainSma120[mainSma120.length-1]) / mainSma120[mainSma120.length-1] * 100).toFixed(2) : 0;
-                uiUpdate('val-ma-dist', `${dist120>0?'+':''}${dist120}%`, dist120>0?'#26A69A':'#EF5350'); uiUpdate('val-rsi-main', mt.rsi); uiUpdate('val-macd-main', mt.macd); uiUpdate('val-stoch-main', mt.stoch); uiUpdate('val-bb-main', mt.bbStr, mt.bbStr === 'UPPER' ? '#EF5350' : (mt.bbStr === 'LOWER' ? '#26A69A' : 'var(--text-main)'));
-            } catch (e) {
-                logError("Calculate Signals Error", e);
-                ['st-signal-text', 'mt-signal-text', 'lt-signal-text'].forEach(id => { const el = document.getElementById(id); if(el) { el.innerText = "ERROR"; el.className = "text-sm font-black italic text-down uppercase"; }});
-            }
-        }
-
-        // ==========================================
-        // 뷰 3: 크립토 종목 분석 차트 
-        // ==========================================
-        function updateCryptoStatus(t, c) { const label = document.getElementById('crypto-conn-label'), dot = document.getElementById('crypto-status-dot'); if(label) label.innerText = t; if(dot) dot.className = `w-2 h-2 rounded-full ${c}`; }
-
-        async function loadCryptoData(ticker, interval = currentCryptoInterval, range = currentCryptoRange) {
-            if (cryptoAbortController) cryptoAbortController.abort(); cryptoAbortController = new AbortController();
-            const loadingOverlay = document.getElementById('crypto-loading-overlay'); if(loadingOverlay) loadingOverlay.style.display = 'flex';
-            const searchInput = document.getElementById('crypto-ticker-input'); if(searchInput) searchInput.value = ticker;
-
-            try {
-                const reqInterval = interval === '1y' ? '1mo' : interval;
-                const d = await fetchStockData(ticker, reqInterval, range, true);
-                globalCryptoChartData = d; globalCryptoTicker = ticker;
-                updateCryptoStatus("LIVE DATA", "bg-emerald-500"); renderCryptoDashboard(ticker, d);
-                calculateCryptoTriplePerspectiveDecision(ticker).catch(e => logError("Crypto Triple Calc Error", e));
-            } catch (e) { 
-                if (e.name !== 'AbortError') { logError(`loadCryptoData failed for ${ticker}`, e); updateCryptoStatus("API LMT (에러)", "bg-rose-500"); if(cryptoChart) cryptoChart.clear(); document.getElementById('crypto-display-ticker').innerText = "ERROR"; document.getElementById('crypto-live-price').innerText = "---"; document.getElementById('crypto-reasoning-container').innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br>우측 상단 [!] 버튼을 눌러 에러 로그를 확인하세요.</p>'; }
-            } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
         }
 
         function renderCryptoDashboard(ticker, data) {
             if(!cryptoChart || !data) return;
-            let { dates, kData, closes } = extractCleanData(data); if(closes.length === 0) return;
-            document.getElementById('crypto-display-ticker').innerText = ticker.replace('-USD', '');
-            const price = closes[closes.length - 1]; let minDigits = price < 1 ? 4 : 2;
-            document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(price)}`;
-            
-            if (currentCryptoInterval === '1y') {
-                let yearly = {}; dates.forEach((date, i) => { const year = date.split('-')[0]; if (!yearly[year]) { yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] }; } else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); } });
-                const sorted = Object.keys(yearly).sort(); dates = sorted; kData = sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]); closes = sorted.map(y => yearly[y].close);
-            }
-
-            const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9), stoch = Indicator.stochastic(kData, 14, 3), bb = Indicator.bollinger(closes, 20, 2), last = closes.length - 1;
-            let reasoning = [];
-            if(ma120[last]) reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${(((closes[last] - ma120[last]) / ma120[last]) * 100).toFixed(2)}% 위치`});
-            if(rsi[last] < 30) reasoning.push({type: 'up', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 과매도 상태.`}); else if(rsi[last] > 70) reasoning.push({type: 'down', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 과매수 상태.`});
-            if(macd.hist[last] > 0) reasoning.push({type: 'up', t:'MACD', d:`상승 에너지 발산 중`}); else reasoning.push({type: 'down', t:'MACD', d:`하락 에너지 진행 중`});
-            
-            document.getElementById('crypto-reasoning-container').innerHTML = reasoning.length > 0 ? reasoning.map(i => `<div class="p-3 glass rounded-xl flex items-center justify-between border border-themeBorder mb-2"><div class="flex items-center gap-2"><span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'BUY':'SELL'}</span><p class="text-[0.65rem] font-black text-themeText">${i.t}</p></div><p class="text-[0.6rem] text-themeMuted">${i.d}</p></div>`).join('') : '<p class="text-xs text-themeMuted text-center py-10">특이 지표가 없습니다.</p>';
-            
-            const styleColor = getComputedStyle(document.documentElement);
-            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF', chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-            const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
-            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
-            
-            const widthNum = parseFloat(chartLineWidth);
-            Object.keys(cryptoMaSettings).forEach(p => { if (cryptoMaSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
-            series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
-
+            let { dates, kData, closes } = extractCleanData(data);
+            const macd = Indicator.macd(closes, 12, 26, 9);
             cryptoChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 },
-                    formatter: function (params) {
-                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
-                        params.forEach(p => {
-                            if (p.seriesType === 'candlestick') { let open = formatPriceStr(p.data[1]); let close = formatPriceStr(p.data[2]); result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`; } 
-                            else { let val = p.value !== undefined ? p.value : p.data; if (val === null || val === undefined || isNaN(val)) return; result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`; }
-                        }); return result;
-                    }
-                },
-                grid: [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
-                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
-                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
-                series: series
+                backgroundColor:'transparent', tooltip:{trigger:'axis'},
+                grid:[{left:'5%',right:'5%',top:'5%',height:'60%'},{left:'5%',right:'5%',top:'75%',height:'15%'}],
+                xAxis:[{type:'category',data:dates,axisLabel:{show:false}},{type:'category',gridIndex:1,data:dates}],
+                yAxis:[{scale:true},{gridIndex:1,show:false}],
+                series:[
+                    {name:'Price',type:'candlestick',data:kData},
+                    {name:'MACD',type:'bar',xAxisIndex:1,yAxisIndex:1,data:macd.hist.map(v=>({value:v,itemStyle:{color:v>0?'#26A69A':'#EF5350'}}))}
+                ]
             }, true);
-            requestAnimationFrame(() => cryptoChart.resize());
         }
-
-        async function calculateCryptoTriplePerspectiveDecision(ticker) {
-            try {
-                const [dData, wData] = await Promise.all([fetchStockData(ticker, '1d', '2y', true), fetchStockData(ticker, '1wk', 'max', true)]);
-                const analyze = (data, weight, periods) => {
-                    let { kData, closes } = extractCleanData(data);
-                    if(closes.length < periods.ma) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
-                    const last = closes.length - 1, rsi = Indicator.rsi(closes, periods.rsi)[last] || 50, macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0, sma = Indicator.sma(closes, periods.ma)[last] || closes[last], stoch = Indicator.stochastic(kData, periods.stoch, 3).k[last] || 50, bb = Indicator.bollinger(closes, periods.ma, 2), dist = ((closes[last] - sma) / sma) * 100;
-                    let buy = 0, sell = 0;
-                    if (closes[last] > sma) buy += weight.ma; else sell += weight.ma; if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi; if (macd > 0) buy += weight.macd; else sell += weight.macd; if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
-                    let bbStr = "MID"; if(bb.upper[last] !== null && closes[last] >= bb.upper[last] * 0.98) { bbStr = "UPPER"; sell += 0.5; } else if(bb.lower[last] !== null && closes[last] <= bb.lower[last] * 1.02) { bbStr = "LOWER"; buy += 0.5; }
-                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
-                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1), bbStr: bbStr };
-                };
-                const st = analyze(dData, { ma: 0.5, rsi: 1.8, macd: 1.5 }, { ma: 20, rsi: 9, stoch: 10 }), mt = analyze(dData, { ma: 1.5, rsi: 1.0, macd: 1.2 }, { ma: 60, rsi: 14, stoch: 14 }), lt = analyze(wData, { ma: 3.0, rsi: 0.5, macd: 0.5 }, { ma: 40, rsi: 14, stoch: 14 });
-                cryptoAnalysisDetails = { short: {...st, summary: "20일선 및 단기 모멘텀 지표를 분석한 결과입니다.", advice: "코인 시장 특유의 급격한 단기 변동성에 주의하세요." }, mid: {...mt, summary: "60일 중기 이평선과 추세를 분석한 결과입니다.", advice: "일봉 추세와 주봉 추세가 일치할 때 진입하는 것이 안전합니다." }, long: {...lt, summary: "주봉 40주선 기반의 장기 사이클입니다.", advice: "장기 추세가 무너진 상태라면 섣부른 매수(물타기)를 자제하세요." } };
-                const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm md:text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
-                up('crypto-st-signal-text', st); up('crypto-mt-signal-text', mt); up('crypto-lt-signal-text', lt);
-                const uiUpdate = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } }
-                const dailyClean = extractCleanData(dData); const mainSma120 = Indicator.sma(dailyClean.closes, 120); const lastCl = dailyClean.closes[dailyClean.closes.length-1]; const dist120 = mainSma120[mainSma120.length-1] ? ((lastCl - mainSma120[mainSma120.length-1]) / mainSma120[mainSma120.length-1] * 100).toFixed(2) : 0;
-                uiUpdate('crypto-val-ma-dist', `${dist120>0?'+':''}${dist120}%`, dist120>0?'#26A69A':'#EF5350'); uiUpdate('crypto-val-rsi-main', mt.rsi); uiUpdate('crypto-val-macd-main', mt.macd); uiUpdate('crypto-val-stoch-main', mt.stoch); uiUpdate('crypto-val-bb-main', mt.bbStr, mt.bbStr === 'UPPER' ? '#EF5350' : (mt.bbStr === 'LOWER' ? '#26A69A' : 'var(--text-main)'));
-            } catch (e) { logError("Crypto Calculate Signals Error", e); ['crypto-st-signal-text', 'crypto-mt-signal-text', 'crypto-lt-signal-text'].forEach(id => { const el = document.getElementById(id); if(el) { el.innerText = "ERROR"; el.className = "text-sm font-black italic text-down uppercase"; }}); }
-        }
-
-        function showDetail(p) {
-            const m = document.getElementById('detail-modal'); 
-            const d = document.getElementById('view-crypto').style.display !== 'none' ? cryptoAnalysisDetails[p] : analysisDetails[p];
-            if (!d || !d.status) return;
-            const titlePrefix = document.getElementById('view-crypto').style.display !== 'none' ? 'CRYPTO ' : '';
-            document.getElementById('modal-title').innerText = `${titlePrefix}${p.toUpperCase()} View`;
-            document.getElementById('modal-body').innerHTML = `<div class="bg-[var(--border-color)] p-4 rounded-xl text-center"><span class="text-3xl font-black italic status-${d.status.replace(/ /g, '-')} uppercase">${d.status}</span><p class="text-xs text-themeMuted mt-2">${d.summary}</p></div><div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder mt-4"><p class="text-[11px] font-black text-emerald-500 mb-2">전략적 조언</p><p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p></div>`;
-            m.style.display = 'flex';
-        }
-        
-        function showCryptoDetail(p) { showDetail(p); }
-
-        // ==========================================
-        // 뷰 4: 포트폴리오 차트 및 라이브 엔진
-        // ==========================================
-        const getAdjustedSimData = (key) => {
-            const data = pfSimData[key];
-            if (currentCurrency === 'USD') return data;
-            const fxBase = fxSimData[0]; 
-            return data.map((val, idx) => { const fxRatio = fxSimData[idx] ? (fxSimData[idx] / fxBase) : 1; return val * fxRatio; });
-        };
-
-        function initPortfolioChart() { if(!document.getElementById('chart-portfolio')) return; pfChart = echarts.init(document.getElementById('chart-portfolio')); renderPortfolioChart(); }
 
         function renderPortfolioChart() {
             if(!pfChart) return;
-            const styleColor = getComputedStyle(document.documentElement);
-            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-
+            const style = getComputedStyle(document.documentElement), textMuted = style.getPropertyValue('--text-muted').trim();
+            const spyData = getAdjustedSimData('spy'), baaData = getAdjustedSimData('baa');
             pfChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 },
-                    formatter: function (params) {
-                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}년</div>`;
-                        params.forEach(p => {
-                            let val = p.value !== undefined ? p.value : p.data;
-                            if (val === null || val === undefined || isNaN(val)) return;
-                            let unit = p.seriesName.includes('MDD') ? '%' : '';
-                            result += `${p.marker} ${p.seriesName}: <b>${Number(val).toFixed(2)}${unit}</b><br/>`;
-                        });
-                        return result;
-                    }
-                },
-                legend: { data: ['S&P 500 (SPY)', 'All-Weather', 'BAA (Bold)', 'MDD (BAA)'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
-                grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
-                xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
-                yAxis: [ { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } }, { type: 'value', min: -60, max: 0, position: 'right', splitLine: { show: false }, axisLabel: { formatter: '{value}%', color: chartTextColor, fontSize: 9 } } ],
-                series: [
-                    { name: 'MDD (BAA)', type: 'bar', data: calcMDDArray(getAdjustedSimData('baa')), yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
-                    { name: 'S&P 500 (SPY)', type: 'line', data: getAdjustedSimData('spy'), smooth: true, lineStyle: { color: '#EF5350', width: 2 }, showSymbol: false },
-                    { name: 'All-Weather', type: 'line', data: getAdjustedSimData('allweather'), smooth: true, lineStyle: { color: '#3B82F6', width: 2 }, showSymbol: false },
-                    { name: 'BAA (Bold)', type: 'line', data: getAdjustedSimData('baa'), smooth: true, lineStyle: { color: '#10B981', width: 3 }, showSymbol: false, z: 10 }
+                backgroundColor:'transparent', tooltip:{trigger:'axis'},
+                legend:{data:['SPY','BAA','MDD(BAA)'], textStyle:{color:textMuted}},
+                xAxis:{type:'category',data:pfSimYears,axisLabel:{color:textMuted}},
+                yAxis:[{type:'value'},{type:'value',min:-60,max:0,position:'right'}],
+                series:[
+                    {name:'SPY',type:'line',data:spyData,smooth:true,lineStyle:{color:'#EF5350'}},
+                    {name:'BAA',type:'line',data:baaData,smooth:true,lineStyle:{color:'#10B981',width:3}},
+                    {name:'MDD(BAA)',type:'bar',data:calcMDDArray(baaData),yAxisIndex:1,itemStyle:{color:'rgba(239,83,80,0.2)'}}
                 ]
             }, true);
-            setTimeout(() => pfChart.resize(), 100);
         }
 
-        function showPfDetail(pfKey) {
-            currentPfKey = pfKey; const data = pfDetails[pfKey]; if(!data) return;
-            document.getElementById('pf-modal-title').innerText = data.title;
-            const descEl = document.getElementById('pf-modal-desc');
-            if (descEl) { if (data.desc) { descEl.innerHTML = data.desc; descEl.style.display = 'block'; } else { descEl.style.display = 'none'; } }
-            
-            const cagrEl = document.getElementById(`card-cagr-${pfKey}`);
-            const mddEl = document.getElementById(`card-mdd-${pfKey}`);
-            document.getElementById('pf-modal-cagr').innerText = cagrEl ? cagrEl.innerText : '--%';
-            document.getElementById('pf-modal-mdd').innerText = mddEl ? mddEl.innerText : '--%';
-            
-            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1 text-[0.7rem] md:text-[0.75rem] leading-relaxed">${r}</div></li>`).join('');
-            document.getElementById('pf-compare-input').value = '';
-            
-            const pieArea = document.getElementById('pf-modal-pie-area'), liveArea = document.getElementById('pf-modal-live-area');
-            document.getElementById('pf-detail-modal').style.display = 'flex';
+        // --- ⚙️ 기능 로직 ---
+        async function fetchStockData(t, i, r) {
+            try {
+                const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/${t}?interval=${i}&range=${r}`);
+                const j = await res.json(); const d = j.chart.result[0];
+                if (currentCurrency === 'KRW' && t !== 'KRW=X') { const fx = await getFxMap(i, r); if(fx) applyFxToData(d, fx); }
+                return d;
+            } catch(e) { throw e; }
+        }
 
-            if(data.type === 'dynamic') { pieArea.style.display = 'none'; liveArea.style.display = 'block'; runLiveCalc(pfKey); } 
-            else { liveArea.style.display = 'none'; }
-
-            requestAnimationFrame(() => {
-                if(!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart')); pfModalChart.clear();
-                const styleColor = getComputedStyle(document.documentElement), chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF', chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-                pfModalChart.setOption({
-                    backgroundColor: 'transparent',
-                    tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 11 },
-                        formatter: function (params) {
-                            let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}년</div>`;
-                            params.forEach(p => { let val = p.value !== undefined ? p.value : p.data; if (val === null || val === undefined || isNaN(val)) return; let unit = p.seriesName.includes('MDD') ? '%' : ''; result += `${p.marker} ${p.seriesName}: <b>${Number(val).toFixed(2)}${unit}</b><br/>`; }); return result;
-                        }
-                    },
-                    legend: { data: [data.title, 'MDD'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
-                    grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
-                    xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
-                    yAxis: [ { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } }, { type: 'value', min: -60, max: 0, position: 'right', splitLine: { show: false }, axisLabel: { formatter: '{value}%', color: chartTextColor, fontSize: 9 } } ],
-                    series: [
-                        { name: `MDD`, type: 'bar', data: calcMDDArray(getAdjustedSimData(pfKey)), yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
-                        { name: data.title, type: 'line', data: getAdjustedSimData(pfKey), smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 }
-                    ]
-                }, true);
-                pfModalChart.resize();
-
-                if(data.type === 'static' && data.allocation) {
-                    pieArea.style.display = 'block';
-                    if(!pfPieChart) pfPieChart = echarts.init(document.getElementById('pf-pie-chart'));
-                    const textColor = styleColor.getPropertyValue('--text-main').trim() || '#fff';
-                    pfPieChart.setOption({
-                        backgroundColor: 'transparent', tooltip: { trigger: 'item', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 12 }, formatter: '{b}: <b>{c}%</b>' },
-                        color: ['#EF5350', '#3B82F6', '#EAB308', '#9CA3AF', '#A855F7'],
-                        series: [{ type: 'pie', radius: ['40%', '75%'], avoidLabelOverlap: true, center: ['50%', '55%'], itemStyle: { borderRadius: 4, borderColor: 'var(--bg-color)', borderWidth: 2 }, label: { show: true, color: textColor, fontSize: 10, formatter: '{b}\n{c}%' }, data: data.allocation }]
-                    }, true);
-                    pfPieChart.resize();
-                }
+        function updatePfCardMetrics() {
+            Object.keys(pfDetails).forEach(k => {
+                const cagrEl = document.getElementById(`card-cagr-${k}`), mddEl = document.getElementById(`card-mdd-${k}`);
+                if(!cagrEl) return;
+                const d = getAdjustedSimData(k);
+                const final = d[d.length-1], init = d[0], count = d.length - 1;
+                const cagr = (((final / init) ** (1 / count)) - 1) * 100;
+                const mdd = Math.min(...calcMDDArray(d));
+                cagrEl.innerText = `${cagr.toFixed(1)}%`; mddEl.innerText = `${mdd.toFixed(1)}%`;
             });
         }
 
-        async function comparePortfolioStock() {
-            const ticker = document.getElementById('pf-compare-input').value.trim().toUpperCase(); const btn = document.getElementById('pf-compare-btn');
-            if(!ticker || !currentPfKey || !pfModalChart) return;
-            btn.innerText = '검색중...';
-            try {
-                const d = await fetchStockData(ticker, '1mo', 'max');
-                let { dates, closes } = extractCleanData(d);
-                let yearlyData = {}; for(let i=0; i<dates.length; i++){ if(closes[i] != null) yearlyData[dates[i].substring(0, 4)] = closes[i]; }
-                let compData = [], basePrice = null; 
-                pfSimYears.forEach(yr => { if(yearlyData[yr]) { if(basePrice === null) basePrice = yearlyData[yr]; compData.push((yearlyData[yr] / basePrice) * 100); } else compData.push(null); });
-                const styleColor = getComputedStyle(document.documentElement), chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-                pfModalChart.setOption({
-                    legend: { data: [pfDetails[currentPfKey].title, ticker, 'MDD'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
-                    series: [
-                        { name: `MDD`, type: 'bar', data: calcMDDArray(getAdjustedSimData(currentPfKey)), yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
-                        { name: pfDetails[currentPfKey].title, type: 'line', data: getAdjustedSimData(currentPfKey), smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 },
-                        { name: ticker, type: 'line', data: compData, smooth: true, lineStyle: { color: '#EAB308', width: 2, type: 'dashed' }, connectNulls: true, showSymbol: false, z: 5 }
-                    ]
-                });
-                btn.innerText = '완료'; setTimeout(() => btn.innerText = '비교', 2000);
-            } catch(e) { logError(`Compare Failed for ${ticker}`, e); btn.innerText = '오류'; btn.classList.add('bg-rose-500'); setTimeout(() => { btn.innerText = '비교'; btn.classList.remove('bg-rose-500'); }, 2000); }
+        async function loadData(t) {
+            document.getElementById('loading-overlay').style.display = 'flex';
+            try { const d = await fetchStockData(t, '1d', '1y'); globalChartData = d; globalTicker = t; updateStatus("LIVE","bg-emerald-500"); renderDashboard(t,d); } 
+            catch(e) { logError("Load Error", e); } finally { document.getElementById('loading-overlay').style.display = 'none'; }
         }
 
-        async function runLiveCalc(pfKey) {
-            const area = document.getElementById('pf-modal-live-area'), loading = document.getElementById('pf-live-loading'), content = document.getElementById('pf-live-content'), tbody = document.getElementById('pf-live-table'), toggleBox = document.getElementById('toggle-proof');
-            if(!area) return; area.style.display = 'block'; loading.style.display = 'flex'; content.style.display = 'none'; tbody.innerHTML = ''; if(toggleBox) toggleBox.checked = false;
-
-            try {
-                let tickers = [], colCount = 7;
-                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'QQQ']; colCount = 7; } 
-                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY', 'QQQ']; colCount = 8; } 
-                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
-                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
-
-                const dataMap = {}; let unifiedMonths = new Set();
-                
-                for(let i=0; i<tickers.length; i++) {
-                    const t = tickers[i];
-                    document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t} 데이터`;
-                    if(i > 0) await new Promise(r => setTimeout(r, 1000));
-                    
-                    const d = await fetchStockData(t, '1mo', '2y');
-                    let { dates, closes } = extractCleanData(d);
-                    
-                    dataMap[t] = {};
-                    for(let j=0; j<dates.length; j++) { const dStr = dates[j].substring(0, 7); dataMap[t][dStr] = closes[j]; unifiedMonths.add(dStr); }
-                }
-
-                const sortedMonths = Array.from(unifiedMonths).sort();
-                let html = '<thead><tr><th class="text-left">투자 월</th>';
-                if(pfKey === 'dual') html += `<th>SPY 12M수익</th><th>VEA 12M수익</th><th>BIL 12M수익</th>`;
-                else if(pfKey === 'vaa') html += `<th>SPY 점수</th><th>VEA 점수</th><th>VWO 점수</th><th>AGG 점수</th>`;
-                else if(pfKey === 'daa') html += `<th>VWO 점수</th><th>BND 점수</th><th>위험?</th>`;
-                else if(pfKey === 'baa') html += `<th>최저 카나리아</th><th>안전 대피?</th>`;
-                html += `<th>월간 수익률</th><th>SPY / QQQ</th><th class="text-right">투자 비중</th></tr></thead><tbody>`;
-
-                const getSignal = (idx) => {
-                    if(idx - 12 < 0) return null;
-                    let result = { assets: [], text: '', proofs: [], color: '' };
-                    const currYM = sortedMonths[idx];
-                    
-                    const calcScore = (t) => {
-                        const m1YM = sortedMonths[idx-1], m3YM = sortedMonths[idx-3], m6YM = sortedMonths[idx-6], m12YM = sortedMonths[idx-12];
-                        const P0 = dataMap[t][currYM], P1 = m1YM ? dataMap[t][m1YM] : null, P3 = m3YM ? dataMap[t][m3YM] : null, P6 = m6YM ? dataMap[t][m6YM] : null, P12 = m12YM ? dataMap[t][m12YM] : null;
-                        if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `<span class="text-rose-400">[${t}] 과거 12개월 데이터 부족</span>` };
-                        const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
-                        const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
-                        const proof = `<div class="mb-2 pb-2 border-b border-themeBorder/50"><span class="text-accent font-bold">[${t}] 모멘텀 계산:</span><br><span class="text-[0.6rem] leading-relaxed">• 1M 수익: ${(r1*100).toFixed(2)}% × 12 = ${(r1*12*100).toFixed(2)}<br>• 3M 수익: ${(r3*100).toFixed(2)}% × 4 = ${(r3*4*100).toFixed(2)}<br>• 6M 수익: ${(r6*100).toFixed(2)}% × 2 = ${(r6*2*100).toFixed(2)}<br>• 12M 수익: ${(r12*100).toFixed(2)}% × 1 = ${(r12*100).toFixed(2)}</span><br><span class="text-white font-bold">👉 가중 합산 스코어: ${score.toFixed(2)}</span></div>`;
-                        return { score, proof };
-                    };
-
-                    const calcRet = (t) => {
-                        const m12YM = sortedMonths[idx-12];
-                        const P0 = dataMap[t][currYM], P12 = m12YM ? dataMap[t][m12YM] : null;
-                        if(!P0 || !P12) return { ret: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
-                        const ret = (P0/P12 - 1) * 100;
-                        const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) ${getCurrSymbol()}${formatPriceStr(P0)} / 과거(${m12YM}) ${getCurrSymbol()}${formatPriceStr(P12)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
-                        return { ret, proof };
-                    };
-
-                    if(pfKey === 'dual') {
-                        const s = calcRet('SPY'), v = calcRet('VEA'), b = calcRet('BIL');
-                        result.proofs.push(s.proof, v.proof, b.proof); result.raw = { s, v, b };
-                        if(s.ret === -999 || v.ret === -999 || b.ret === -999) return null;
-                        if(s.ret < b.ret && v.ret < b.ret) { result.assets=[{t:'AGG', w:1}]; result.text='AGG 100%'; result.color='text-gray-400'; }
-                        else if(s.ret > v.ret) { result.assets=[{t:'SPY', w:1}]; result.text='SPY 100%'; result.color='text-up'; }
-                        else { result.assets=[{t:'VEA', w:1}]; result.text='VEA 100%'; result.color='text-accent'; }
-                    }
-                    else if(pfKey === 'vaa') {
-                        const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), as=calcScore('AGG');
-                        result.proofs.push(ss.proof, vs.proof, vws.proof, as.proof); result.raw = { ss, vs, vws, as };
-                        if(ss.score===-999) return null;
-                        if(ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) {
-                            const m = Math.max(ss.score, vs.score, vws.score, as.score);
-                            const t = ss.score===m?'SPY':(vs.score===m?'VEA':(vws.score===m?'VWO':'AGG'));
-                            result.assets=[{t, w:1}]; result.text=`${t} 100% (공격)`; result.color='text-up';
-                        } else {
-                            const lq=calcScore('LQD'), ie=calcScore('IEF'), sh=calcScore('SHY');
-                            result.proofs.push(lq.proof, ie.proof, sh.proof);
-                            const m = Math.max(lq.score, ie.score, sh.score);
-                            const t = lq.score===m?'LQD':(ie.score===m?'IEF':'SHY');
-                            result.assets=[{t, w:1}]; result.text=`${t} 100% (방어)`; result.color='text-gray-400';
-                        }
-                    }
-                    else if(pfKey === 'daa') {
-                        const vws=calcScore('VWO'), bns=calcScore('BND');
-                        result.proofs.push(vws.proof, bns.proof); result.raw = { vws, bns };
-                        if(vws.score===-999) return null;
-                        if(vws.score>0 && bns.score>0) { result.assets=[{t:'SPY', w:0.5}, {t:'VEA', w:0.5}]; result.text='SPY 50%, VEA 50%'; result.color='text-up'; } 
-                        else { result.assets=[{t:'SHY', w:1}]; result.text='SHY 100% (방어)'; result.color='text-gray-400'; }
-                    }
-                    else if(pfKey === 'baa') {
-                        const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), bns=calcScore('BND');
-                        result.proofs.push(ss.proof, vs.proof, vws.proof, bns.proof); result.raw = { ss, vs, vws, bns };
-                        if(ss.score===-999) return null;
-                        const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
-                        if(minS > 0) { result.assets=[{t:'QQQ', w:1}]; result.text='QQQ 100% (공격)'; result.color='text-up'; } 
-                        else { result.assets=[{t:'BIL', w:0.333}, {t:'IEF', w:0.333}, {t:'TLT', w:0.333}]; result.text='BIL 33%, IEF 33%, TLT 33%'; result.color='text-gray-400'; }
-                    }
-                    return result;
-                };
-
-                const len = sortedMonths.length;
-                for(let i = len - 1; i >= len - 12; i--) {
-                    if(i - 12 < 0) break;
-                    
-                    const sig = getSignal(i);
-                    if(!sig) continue;
-
-                    const [yy, mm] = sortedMonths[i].split('-');
-                    const ymLabel = `${yy.substring(2)}년 ${parseInt(mm)}월`;
-                    
-                    let row = `<tr><td class="text-left font-bold text-accent whitespace-nowrap">${ymLabel}</td>`;
-                    
-                    if(pfKey === 'dual') {
-                        const { s, v, b } = sig.raw;
-                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td><td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td><td class="text-gray-400">+${b.ret.toFixed(2)}%</td>`;
-                    }
-                    else if(pfKey === 'vaa') {
-                        const { ss, vs, vws, as } = sig.raw;
-                        row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td><td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td><td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td>`;
-                    }
-                    else if(pfKey === 'daa') {
-                        const { vws, bns } = sig.raw;
-                        let def = (vws.score <= 0 || bns.score <= 0) ? 'YES (위험)' : 'NO (안전)';
-                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
-                    }
-                    else if(pfKey === 'baa') {
-                        const { ss, vs, vws, bns } = sig.raw;
-                        const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
-                        let def = minS <= 0 ? 'YES (대피 발동)' : 'NO (안전)';
-                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
-                    }
-
-                    // 월간 실제 수익률 및 벤치마크
-                    let actualRetHtml = '<td class="text-gray-400">--</td>';
-                    let benchRetHtml = '<td class="text-gray-400 bg-black/10">-- / --</td>';
-                    
-                    if (i < len - 1) { 
-                        let monRet = 0; let hasData = true;
-                        for(let asset of sig.assets) {
-                            const p0 = dataMap[asset.t][sortedMonths[i]];
-                            const p1 = dataMap[asset.t][sortedMonths[i+1]]; 
-                            if(p0 && p1) { monRet += asset.w * (p1 / p0 - 1); } else { hasData = false; }
-                        }
-                        if(hasData) {
-                            const retPct = monRet * 100;
-                            actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
-                        }
-
-                        const spy0 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i]] : null, spy1 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i+1]] : null;
-                        const qqq0 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i]] : null, qqq1 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i+1]] : null;
-                        
-                        let spyStr = '--', qqqStr = '--';
-                        if(spy0 && spy1) { const spyPct = (spy1/spy0 - 1) * 100; spyStr = `<span class="${spyPct > 0 ? 'text-up' : (spyPct < 0 ? 'text-down' : 'text-themeMuted')}">${spyPct > 0 ? '+' : ''}${spyPct.toFixed(2)}%</span>`; }
-                        if(qqq0 && qqq1) { const qqqPct = (qqq1/qqq0 - 1) * 100; qqqStr = `<span class="${qqqPct > 0 ? 'text-up' : (qqqPct < 0 ? 'text-down' : 'text-themeMuted')}">${qqqPct > 0 ? '+' : ''}${qqqPct.toFixed(2)}%</span>`; }
-                        benchRetHtml = `<td class="text-[0.65rem] font-bold whitespace-nowrap bg-black/10">S: ${spyStr} / Q: ${qqqStr}</td>`;
-                    } else {
-                        actualRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold">진행중</td>';
-                        benchRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold bg-black/10">진행중</td>';
-                    }
-
-                    row += actualRetHtml + benchRetHtml;
-                    row += `<td class="text-right font-black ${sig.color}">${sig.text}</td></tr>`;
-                    
-                    const proofHtml = sig.proofs.map(p => `<div>${p}</div>`).join('');
-                    row += `<tr class="proof-row"><td colspan="${colCount}" class="proof-cell"><div class="proof-box">${proofHtml}</div></td></tr>`;
-                    html += row;
-                }
-                
-                html += `</tbody>`;
-                tbody.innerHTML = html;
-                loading.style.display = 'none'; content.style.display = 'block';
-
-            } catch (error) {
-                logError(`Live Engine Failed (${pfKey})`, error);
-                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드에 실패했습니다.<br>우측 상단 [!] 버튼을 확인하세요.</p>`;
-            }
+        async function loadCryptoData(t) {
+            document.getElementById('crypto-loading-overlay').style.display = 'flex';
+            try { const d = await fetchStockData(t, '1d', '1y'); globalCryptoChartData = d; globalCryptoTicker = t; updateCryptoStatus("LIVE","bg-emerald-500"); renderCryptoDashboard(t,d); } 
+            catch(e) { logError("Crypto Error", e); } finally { document.getElementById('crypto-loading-overlay').style.display = 'none'; }
         }
 
-        // ==========================================
-        // 시스템 부트
-        // ==========================================
+        function updateStatus(t,c) { const l = document.getElementById('conn-label'), d = document.getElementById('status-dot'); if(l){l.innerText=t; d.className=`w-2 h-2 rounded-full ${c}`;} }
+        function updateCryptoStatus(t,c) { const l = document.getElementById('crypto-conn-label'), d = document.getElementById('crypto-status-dot'); if(l){l.innerText=t; d.className=`w-2 h-2 rounded-full ${c}`;} }
+
+        // --- 🚀 시스템 부트 ---
         document.addEventListener("DOMContentLoaded", () => {
-            window.scrollTo(0, 0);
-            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-            
+            window.scrollTo(0,0); if('scrollRestoration' in history) history.scrollRestoration='manual';
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
+                cryptoChart = echarts.init(document.getElementById('crypto-chart-main'));
+                pfChart = echarts.init(document.getElementById('chart-portfolio'));
                 
-                const form = document.getElementById('search-form');
-                if(form) {
-                    form.onsubmit = (e) => { 
-                        e.preventDefault(); 
-                        const t = document.getElementById('ticker-input').value.trim().toUpperCase(); 
-                        if(t) loadData(t); 
-                    };
-                }
+                setTheme(savedTheme); setFontSize(savedFontSize);
+                document.getElementById('currency-toggle').innerText = currentCurrency;
+                updateMAButtons(); updateCryptoMAButtons(); updatePfCardMetrics();
 
-                const cryptoForm = document.getElementById('crypto-search-form');
-                if(cryptoForm) {
-                    cryptoForm.onsubmit = (e) => { 
-                        e.preventDefault(); 
-                        const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase(); 
-                        if(t) loadCryptoData(t); 
-                    };
-                }
+                document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); };
+                document.getElementById('crypto-search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase(); if(t) loadCryptoData(t); };
 
-                const btn = document.getElementById('currency-toggle');
-                if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
-                
-                // 설정 변수 선언 추가
-                const savedTheme = safeStorageGet('dashboardTheme', 'theme-green');
-                const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
-                let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
-
-                setTheme(savedTheme);
-                setFontSize(savedFontSize);
-                document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
-                const lbtn = document.getElementById(`btn-line-${chartLineWidth}`);
-                if(lbtn) lbtn.classList.add('active');
-                
-                updateMAButtons();
-                updateCryptoMAButtons();
-                updatePfCardMetrics();
-                
-                const pfCompareInput = document.getElementById('pf-compare-input');
-                if(pfCompareInput) {
-                    pfCompareInput.addEventListener('keypress', function (e) {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            comparePortfolioStock();
-                        }
-                    });
-                }
-
-                setTimeout(() => { if(myChart) { myChart.resize(); loadData('SPY'); } }, 150);
-                
-                window.addEventListener('resize', () => { 
-                    requestAnimationFrame(() => {
-                        myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize();
-                    });
-                });
+                setTimeout(() => { loadData('SPY'); loadCryptoData('BTC-USD'); renderPortfolioChart(); }, 200);
+                window.addEventListener('resize', () => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); });
             } catch(e) { logError("Init Crash", e); }
         });
+
+        // --- 🛠️ 퀀트 연산 (필수) ---
+        const Indicator = {
+            macd: (d, s, l, sig) => {
+                const ema = (data, p) => { let r=[data[0]], k=2/(p+1); for(let i=1;i<data.length;i++) r.push(data[i]*k + r[i-1]*(1-k)); return r; };
+                const se = ema(d, s), le = ema(d, l);
+                const line = se.map((v, i) => v - le[i]);
+                const signal = ema(line, sig);
+                return { hist: line.map((v, i) => v - signal[i]) };
+            }
+        };
+
+        // UI 핸들러
+        function toggleCurrency() {
+            currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
+            safeStorageSet('dashboardCurrency', currentCurrency);
+            document.getElementById('currency-toggle').innerText = currentCurrency;
+            updatePfCardMetrics();
+            if(document.getElementById('view-dashboard').style.display !== 'none') loadData(globalTicker);
+            else if(document.getElementById('view-crypto').style.display !== 'none') loadCryptoData(globalCryptoTicker);
+            if(document.getElementById('pf-detail-modal').style.display === 'flex' && currentPfKey) showPfDetail(currentPfKey);
+            renderPortfolioChart();
+        }
+        function switchMainTab(t) {
+            ['dashboard','crypto','portfolio'].forEach(x => { document.getElementById(`view-${x}`).style.display = (x===t?'flex':'none'); document.getElementById(`tab-btn-${x}`).classList.toggle('active', x===t); });
+            if(t==='portfolio') { renderPortfolioChart(); updatePfCardMetrics(); }
+        }
+        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
+        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
+        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
+        function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
+        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function openErrorModal() { document.getElementById('error-log-text').value = errorLogs.join('-------------------\n'); document.getElementById('error-modal').style.display = 'flex'; }
+        function copyErrorLog() { const t = document.getElementById('error-log-text'); t.select(); document.execCommand('copy'); }
     </script>
 </body>
 </html>
