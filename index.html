@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ko" class="theme-default">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BUY or BYE | Precision AI Analysis</title>
+    <title>BUY or BYE | AI Precision Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -119,12 +120,14 @@
         .signal-neutral { background-color: rgba(107, 114, 128, 0.2); color: #9CA3AF; }
 
         /* 공통 아이콘 클래스 */
-        .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
+    <!-- ============================================== -->
     <!-- 1. 환경 설정 모달 -->
+    <!-- ============================================== -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
@@ -132,82 +135,86 @@
                     <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     앱 환경 설정
                 </h3>
-                <button onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition p-2"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             
             <div class="space-y-6">
-                <!-- 테마 -->
                 <div>
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
                     <div class="flex flex-wrap gap-4">
-                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
-                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6; border-color:#ccc;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
-                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
-                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
-                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6; border-color:#ccc;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
                     </div>
                 </div>
 
-                <!-- 폰트 크기 -->
                 <div class="border-t border-themeBorder pt-4">
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 조절</p>
                     <div class="flex gap-2">
-                        <button onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
-                        <button onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
-                        <button onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
+                        <button type="button" onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
+                        <button type="button" onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
+                        <button type="button" onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
                     </div>
                 </div>
 
-                <!-- 선 굵기 -->
                 <div class="border-t border-themeBorder pt-4">
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기</p>
                     <div class="flex gap-2">
-                        <button onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
-                        <button onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
-                        <button onclick="setLineWidth('3')" id="btn-line-3" class="setting-btn">두껍게</button>
+                        <button type="button" onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
+                        <button type="button" onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
+                        <button type="button" onclick="setLineWidth('3')" id="btn-line-3" class="setting-btn">두껍게</button>
                     </div>
                 </div>
             </div>
             <div class="mt-8 flex justify-end">
-                <button onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black hover:bg-blue-600 w-full md:w-auto">적용 및 닫기</button>
+                <button type="button" onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black hover:bg-blue-600 w-full md:w-auto transition">적용 및 닫기</button>
             </div>
         </div>
     </div>
 
+    <!-- ============================================== -->
     <!-- 2. Master 관점 디테일 모달 -->
-    <div id="detail-modal" class="modal-overlay" onclick="closeModal()">
+    <!-- ============================================== -->
+    <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4">
                 <div>
                     <h3 id="modal-title" class="text-xl font-black text-themeText uppercase italic">Detail</h3>
                     <p id="modal-period" class="text-[0.7rem] text-accent font-black tracking-widest uppercase mt-1">---</p>
                 </div>
-                <button onclick="closeModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon w-6 h-6" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="closeDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon w-6 h-6" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             <div id="modal-body" class="space-y-4 text-sm text-themeText"></div>
             <div class="mt-6 flex justify-end">
-                <button onclick="closeModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 border border-white/5">창 닫기</button>
+                <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 border border-white/5 transition">분석 창 닫기</button>
             </div>
         </div>
     </div>
 
+    <!-- ============================================== -->
     <!-- 3. 공용 정보(Info) 모달 -->
+    <!-- ============================================== -->
     <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4">
                 <h3 id="info-title" class="text-lg font-black text-themeText flex items-center">
-                    <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg>
                     안내
                 </h3>
-                <button onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             <p id="info-body" class="text-[0.8rem] md:text-sm text-themeMuted leading-relaxed"></p>
             <div class="mt-6 flex justify-end">
-                <button onclick="closeInfoModal()" class="bg-accent text-white px-6 py-2 rounded-xl text-sm font-black hover:bg-blue-600 w-full md:w-auto">확인</button>
+                <button type="button" onclick="closeInfoModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black hover:bg-blue-600 w-full md:w-auto transition">확인</button>
             </div>
         </div>
     </div>
 
+    <!-- ============================================== -->
+    <!-- 메인 대시보드 UI -->
+    <!-- ============================================== -->
     <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-4 relative">
         
         <!-- 헤더 -->
@@ -220,7 +227,7 @@
                     <h1 class="text-2xl font-black italic text-themeText tracking-tighter">BUY <span class="text-accent">or BYE</span></h1>
                 </div>
                 <!-- 톱니바퀴 버튼 -->
-                <button onclick="openSettingsModal()" class="p-2 bg-themeModal border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
+                <button type="button" onclick="openSettingsModal()" class="p-2 bg-themeModal border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
                     <svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
             </div>
@@ -258,21 +265,21 @@
                     <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
                         <span class="text-[0.6rem] font-black text-themeMuted shrink-0">PERIOD</span>
                         <div class="flex gap-1">
-                            <button onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉</button>
-                            <button onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn range-btn">주봉</button>
-                            <button onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn range-btn">월봉</button>
-                            <button onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">연봉</button>
-                            <button onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="chip-btn range-btn">MAX</button>
+                            <button type="button" onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉</button>
+                            <button type="button" onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn range-btn">주봉</button>
+                            <button type="button" onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn range-btn">월봉</button>
+                            <button type="button" onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">연봉</button>
+                            <button type="button" onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="chip-btn range-btn">MAX</button>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
                         <span class="text-[0.6rem] font-black text-themeMuted shrink-0">MA LNS</span>
                         <div class="flex gap-1">
-                            <button onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">20</button>
-                            <button onclick="toggleMA(50)" id="btn-ma-50" class="chip-btn active">50</button>
-                            <button onclick="toggleMA(60)" id="btn-ma-60" class="chip-btn">60</button>
-                            <button onclick="toggleMA(120)" id="btn-ma-120" class="chip-btn active">120</button>
-                            <button onclick="toggleMA(200)" id="btn-ma-200" class="chip-btn active">200</button>
+                            <button type="button" onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">20</button>
+                            <button type="button" onclick="toggleMA(50)" id="btn-ma-50" class="chip-btn active">50</button>
+                            <button type="button" onclick="toggleMA(60)" id="btn-ma-60" class="chip-btn">60</button>
+                            <button type="button" onclick="toggleMA(120)" id="btn-ma-120" class="chip-btn active">120</button>
+                            <button type="button" onclick="toggleMA(200)" id="btn-ma-200" class="chip-btn active">200</button>
                         </div>
                     </div>
                 </div>
@@ -282,12 +289,11 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            
             <!-- 마스터 판단 패널 -->
             <div class="glass rounded-2xl p-4 lg:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <svg class="icon w-4 h-4 text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                         <p class="text-themeMuted text-[0.65rem] font-black uppercase tracking-widest">Master Intelligence</p>
                     </div>
                 </div>
@@ -306,41 +312,39 @@
                         <div id="lt-signal-text" class="text-base font-black italic text-themeMuted">WAIT</div>
                     </div>
                 </div>
-                <p class="text-[0.6rem] text-themeMuted text-center mt-3">박스를 클릭하면 상세 매매 전략을 볼 수 있습니다.</p>
+                <p class="text-[0.6rem] text-themeMuted text-center mt-3">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
             </div>
 
             <!-- 5대 핵심 지표 요약 패널 -->
             <div class="glass rounded-2xl p-4 lg:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
                 <div class="flex items-center gap-1.5 mb-4 border-b border-themeBorder pb-3">
-                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    <svg class="icon w-4 h-4 text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                     <p class="text-themeText text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 팩트체크</p>
                 </div>
                 
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 h-full">
-                    <!-- 클릭(터치) 이벤트로 정보 모달을 띄움 -->
-                    <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일 이동평균선 간의 거리(%)입니다. 양수(+)면 장기 추세보다 위에 있어 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')" style="cursor: pointer;">
-                        <p class="stat-label">이격도 <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></button></p>
+                    <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재 주가와 120일 이동평균선 간의 거리(%)입니다. 양수(+)면 장기 추세보다 위에 있어 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')" style="cursor: pointer;">
+                        <p class="stat-label">이격도 <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
                         <p id="val-ma-dist" class="stat-value text-themeText">---</p>
                     </div>
                     <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '주가의 상승 압력과 하락 압력 간의 상대적인 강도를 백분율로 나타냅니다. 30 이하는 과매도(저점 근접), 70 이상은 과매수(고점 근접)로 해석합니다.')" style="cursor: pointer;">
-                        <p class="stat-label">RSI(14) <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></button></p>
+                        <p class="stat-label">RSI(14) <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
                         <p id="val-rsi-main" class="stat-value text-themeText">---</p>
                     </div>
                     <div class="stat-box" onclick="showInfo('MACD (이동평균수렴확산)', '단기 이동평균선과 장기 이동평균선의 차이입니다. 히스토그램이 양수(+)면 단기 상승 에너지가, 음수(-)면 하락 에너지가 강함을 의미합니다.')" style="cursor: pointer;">
-                        <p class="stat-label">MACD <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></button></p>
+                        <p class="stat-label">MACD <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
                         <p id="val-macd-main" class="stat-value text-themeText">---</p>
                     </div>
-                    <div class="stat-box" onclick="showInfo('볼린저 밴드 (Bollinger Bands)', '가격의 95%가 밴드 내에 존재합니다. 상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')" style="cursor: pointer;">
-                        <p class="stat-label">BB밴드 <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></button></p>
+                    <div class="stat-box" onclick="showInfo('볼린저 밴드 (Bollinger Bands)', '주가의 변동성에 따라 상하단 폭이 변하는 채널 지표입니다. 가격의 95%가 밴드 내에 존재하며 상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')" style="cursor: pointer;">
+                        <p class="stat-label">BB밴드 <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
                         <p id="val-bb-main" class="stat-value text-themeText">---</p>
                     </div>
                     <div class="stat-box" onclick="showInfo('스토캐스틱 (Stochastic %K)', '일정 기간 최고가와 최저가 사이에서 현재 주가 위치를 백분율로 나타냅니다. 20 이하는 바닥권 침체, 80 이상은 천장권 과열을 뜻합니다.')" style="cursor: pointer;">
-                        <p class="stat-label">Stoch <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></button></p>
+                        <p class="stat-label">Stoch <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
                         <p id="val-stoch-main" class="stat-value text-themeText">---</p>
                     </div>
                 </div>
 
-                <!-- 분석 텍스트 컨테이너 -->
                 <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-1 custom-scroll max-h-[250px] mt-2">
                     <p class="text-xs text-themeMuted text-center py-10">데이터를 분석 중입니다...</p>
                 </div>
@@ -353,7 +357,7 @@
     </div>
 
     <script>
-        // 전역 안전 장치
+        // 안전 스토리지 접근
         function safeStorageGet(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
         function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
@@ -373,16 +377,43 @@
         const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
         let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
         
+        // --- 모달 제어 함수 ---
         function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
         function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
         
         function showInfo(title, text) {
-            document.getElementById('info-title').innerHTML = `<svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> ${title}`;
+            document.getElementById('info-title').innerHTML = `<svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg> ${title}`;
             document.getElementById('info-body').innerText = text;
             document.getElementById('info-modal').style.display = 'flex';
         }
         function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
 
+        function showDetail(p) {
+            const m = document.getElementById('detail-modal');
+            const d = analysisDetails[p];
+            if (!d.status) return;
+            m.style.display = 'flex';
+            document.getElementById('modal-title').innerText = `${p.toUpperCase()} View`;
+            document.getElementById('modal-period').innerText = p==='short'?'분석 범위: 1-20일 (단기 모멘텀)':(p==='mid'?'분석 범위: 20-60일 (중기 추세 스윙)':'분석 범위: 60일 이상 (장기 펀더멘털)');
+            
+            let statusClass = `status-${d.status.replace(/ /g, '-')}`;
+            
+            document.getElementById('modal-body').innerHTML = `
+                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center shadow-inner opacity-80 border border-themeBorder">
+                    <span class="text-4xl font-black italic uppercase ${statusClass}">${d.status}</span>
+                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
+                </div>
+                <div class="grid grid-cols-1 gap-3 mt-4">
+                    <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder">
+                        <p class="text-[11px] font-black text-emerald-500 uppercase mb-2">AI 전략적 조언</p>
+                        <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
+                    </div>
+                </div>
+            `;
+        }
+        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+
+        // --- UI 조절 함수 ---
         function setTheme(themeName) {
             document.documentElement.className = themeName;
             safeStorageSet('dashboardTheme', themeName);
@@ -411,6 +442,7 @@
             if(globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
         }
 
+        // --- 지표 및 API 엔진 ---
         async function fetchWithRetry(url, options = {}, maxRetries = 3) {
             let delay = 1000;
             for (let i = 0; i < maxRetries; i++) {
@@ -459,30 +491,6 @@
             document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active')); 
             document.getElementById(`range-${l}`).classList.add('active'); 
             loadData(globalTicker, i, r); 
-        }
-
-        function showDetail(p) {
-            const m = document.getElementById('detail-modal');
-            const d = analysisDetails[p];
-            if (!d.status) return;
-            m.style.display = 'flex';
-            document.getElementById('modal-title').innerText = `${p.toUpperCase()} View`;
-            document.getElementById('modal-period').innerText = p==='short'?'분석 범위: 1-20일 (단기 모멘텀)':(p==='mid'?'분석 범위: 20-60일 (중기 추세 스윙)':'분석 범위: 60일 이상 (장기 펀더멘털)');
-            
-            let statusClass = `status-${d.status.replace(/ /g, '-')}`;
-            
-            document.getElementById('modal-body').innerHTML = `
-                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center shadow-inner opacity-80 border border-themeBorder">
-                    <span class="text-4xl font-black italic uppercase ${statusClass}">${d.status}</span>
-                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
-                </div>
-                <div class="grid grid-cols-1 gap-3 mt-4">
-                    <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder">
-                        <p class="text-[11px] font-black text-emerald-500 uppercase mb-2">AI 전략적 조언</p>
-                        <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
-                    </div>
-                </div>
-            `;
         }
 
         async function calculateTriplePerspectiveDecision(ticker) {
@@ -539,7 +547,7 @@
                 const up = (id, r) => { 
                     const el = document.getElementById(id);
                     el.innerText = r.status; 
-                    el.className = `text-lg font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; 
+                    el.className = `text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; 
                 };
                 up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
                 
@@ -565,21 +573,22 @@
                 const cRes = await fetchWithRetry(`/api/stock/${ticker}?interval=${reqInterval}&range=${range}`, { signal });
                 const cJson = await cRes.json();
                 const d = cJson.chart.result[0];
-                updateStatus("LIVE", "bg-emerald-500");
+                
+                document.getElementById('conn-label').innerText = "LIVE DATA"; 
+                document.getElementById('status-dot').className = `w-2 h-2 rounded-full bg-emerald-500`; 
+
                 globalChartData = d; globalTicker = ticker;
                 
                 calculateTriplePerspectiveDecision(ticker); // 병렬 처리
                 renderDashboard(ticker, d);
             } catch (e) { 
-                if (e.name !== 'AbortError') updateStatus("LIMIT", "bg-rose-500"); 
+                if (e.name !== 'AbortError') {
+                    document.getElementById('conn-label').innerText = "LIMIT REACHED"; 
+                    document.getElementById('status-dot').className = `w-2 h-2 rounded-full bg-rose-500`; 
+                }
             } finally { 
                 document.getElementById('loading-overlay').style.display = 'none'; 
             }
-        }
-
-        function updateStatus(t, c) { 
-            document.getElementById('conn-label').innerText = t; 
-            document.getElementById('status-dot').className = `w-2 h-2 rounded-full ${c}`; 
         }
 
         function aggregateToYearly(dates, kData, closes) {
@@ -621,16 +630,16 @@
             let reasoning = [];
             if(ma120[last]) {
                 const maPct = (((closes[last] - ma120[last]) / ma120[last]) * 100).toFixed(2);
-                reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치에 있습니다.`, h:'120일 이동평균선은 펀더멘털을 반영하는 강력한 장기 지지/저항선입니다.'});
+                reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치에 있습니다.`});
             }
-            if(rsi[last] < 30) reasoning.push({type: 'up', t:'RSI (14) 수급', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 심한 과매도 상태입니다. 반등이 임박했습니다.`, h:'RSI 30 미만은 매도세가 극에 달해 곧 매수세 유입 가능성이 높음을 의미합니다.'});
-            else if(rsi[last] > 70) reasoning.push({type: 'down', t:'RSI (14) 수급', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 과매수 상태입니다. 차익 실현을 조심하세요.`, h:'RSI 70 초과는 단기 상승폭이 지나쳐 하락 반전될 확률이 높은 구간입니다.'});
+            if(rsi[last] < 30) reasoning.push({type: 'up', t:'RSI 수급 판단', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 심한 과매도 상태입니다. 반등이 임박했습니다.`});
+            else if(rsi[last] > 70) reasoning.push({type: 'down', t:'RSI 수급 판단', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 과매수 상태입니다. 차익 실현을 조심하세요.`});
 
-            if(macd.hist[last] > 0) reasoning.push({type: 'up', t:'MACD 에너지', d:`양의 방향으로 상승 에너지를 발산 중입니다.`, h:'MACD 히스토그램의 양 전환은 추세가 우상향으로 가속받고 있음을 의미합니다.'});
-            else reasoning.push({type: 'down', t:'MACD 에너지', d:`음의 방향으로 하락 에너지가 강해집니다.`, h:'MACD 히스토그램의 음 전환은 하방 압력이 거세지고 있음을 경고합니다.'});
+            if(macd.hist[last] > 0) reasoning.push({type: 'up', t:'MACD 에너지', d:`양의 방향으로 상승 에너지를 발산 중입니다.`});
+            else reasoning.push({type: 'down', t:'MACD 에너지', d:`음의 방향으로 하락 에너지가 강해집니다.`});
             
-            if(stoch.k[last] < 20) reasoning.push({type: 'up', t:'스토캐스틱', d:`%K 값이 ${stoch.k[last].toFixed(1)}로 바닥권에 위치합니다.`, h:'스토캐스틱 20 미만 침체권 진입은 단기적으로 주가가 바닥을 다지고 있음을 뜻합니다.'});
-            if(stoch.k[last] > 80) reasoning.push({type: 'down', t:'스토캐스틱', d:`%K 값이 ${stoch.k[last].toFixed(1)}로 천장권에 위치합니다.`, h:'스토캐스틱 80 이상 과열권 진입은 고점 저항선에 다다랐음을 뜻합니다.'});
+            if(stoch.k[last] < 20) reasoning.push({type: 'up', t:'스토캐스틱', d:`%K 값이 ${stoch.k[last].toFixed(1)}로 바닥권에 위치합니다.`});
+            if(stoch.k[last] > 80) reasoning.push({type: 'down', t:'스토캐스틱', d:`%K 값이 ${stoch.k[last].toFixed(1)}로 천장권에 위치합니다.`});
 
             document.getElementById('reasoning-container').innerHTML = reasoning.map(i => `
                 <div class="p-3 md:p-4 glass rounded-xl flex flex-col space-y-1.5 border border-themeBorder">
@@ -639,15 +648,12 @@
                             <span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'BUY':'SELL'}</span>
                             <p class="text-[0.65rem] md:text-[0.7rem] font-black text-themeText uppercase">${i.t}</p>
                         </div>
-                        <button type="button" onclick="showInfo('${i.t}', '${i.h}')" class="p-1 text-themeMuted hover:text-accent transition rounded-full">
-                            <svg class="icon w-3.5 h-3.5 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                        </button>
                     </div>
                     <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted pl-[3.2rem]">${i.d}</p>
                 </div>
             `).join('');
             
-            // ECharts 테마 반영
+            // ECharts 테마 적용
             const styleColor = getComputedStyle(document.documentElement);
             const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
             const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
@@ -660,9 +666,6 @@
             const widthNum = parseFloat(chartLineWidth);
             Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
             
-            // BB 투명하게 추가
-            series.push({ name: 'BB Upper', type: 'line', data: Indicator.bollinger(closes, 20, 2).upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'BB Lower', type: 'line', data: Indicator.bollinger(closes, 20, 2).lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
             series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
 
             myChart.setOption({
@@ -671,7 +674,6 @@
                     trigger: 'axis', 
                     axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, 
                     backgroundColor: tooltipBg, borderColor: chartSplitColor, textStyle: { color: tooltipText, fontSize: 11 },
-                    // 직전 캔들 대비 % 변동만 노출
                     formatter: (ps) => {
                         const idx = ps[0].dataIndex;
                         const curr = closes[idx];
@@ -695,7 +697,6 @@
             }, true);
         }
 
-        // 앱 초기화 구문
         document.addEventListener("DOMContentLoaded", () => {
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
@@ -710,7 +711,7 @@
                 
                 setTimeout(() => { if(myChart) myChart.resize(); loadData('SPY'); }, 100);
                 window.addEventListener('resize', () => { if(myChart) myChart.resize(); });
-            } catch(e) { console.error("Initialization Error:", e); }
+            } catch(e) { console.error("Init Error:", e); }
         });
     </script>
 </body>
