@@ -168,12 +168,12 @@
                 </div>
             </div>
             <div class="mt-8 flex justify-end">
-                <button type="button" onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto">적용 및 닫기</button>
+                <button type="button" onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black hover:bg-blue-600 w-full md:w-auto transition">적용 및 닫기</button>
             </div>
         </div>
     </div>
 
-    <!-- 에러 모달 -->
+    <!-- 2. 에러 로그 모달 -->
     <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-rose-500/30 pb-3">
@@ -183,7 +183,7 @@
                 </h3>
                 <button type="button" onclick="closeErrorModal()" class="text-themeMuted hover:text-rose-500 p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
-            <p class="text-xs text-themeMuted mb-2">아래 내용을 복사하여 알려주시면 원인 파악이 가능합니다.</p>
+            <p class="text-xs text-themeMuted mb-2">아래 내용을 복사하여 AI에게 전달해주시면 원인 파악이 가능합니다.</p>
             <textarea id="error-log-text" class="w-full h-32 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.65rem] font-mono p-2 rounded-lg outline-none resize-none" readonly></textarea>
             <div class="mt-4 flex gap-2 justify-end">
                 <button type="button" onclick="copyErrorLog()" id="btn-copy-error" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black hover:bg-rose-700 transition">복사하기</button>
@@ -192,7 +192,7 @@
         </div>
     </div>
 
-    <!-- 정보 설명 모달 -->
+    <!-- 3. 정보 설명 모달 -->
     <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
@@ -209,7 +209,7 @@
         </div>
     </div>
 
-    <!-- 종목 분석 모달 -->
+    <!-- 4. 종목 분석 모달 -->
     <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
@@ -221,12 +221,12 @@
             </div>
             <div id="modal-body" class="space-y-4 text-sm text-themeText py-2"></div>
             <div class="mt-6 flex justify-end">
-                <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
+                <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 transition border border-white/5">닫기</button>
             </div>
         </div>
     </div>
 
-    <!-- 포트폴리오 디테일 및 라이브 계산기 모달 -->
+    <!-- 5. 포트폴리오 상세 및 라이브 계산기 모달 -->
     <div id="pf-detail-modal" class="modal-overlay" onclick="closePfDetailModal()">
         <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
@@ -261,12 +261,11 @@
                     <div id="pf-pie-chart" class="pie-container"></div>
                 </div>
 
-                <!-- 라이브 엔진 영역 (증명 기능 포함) -->
                 <div id="pf-modal-live-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
-                    <div class="p-3 border-b border-themeBorder flex justify-between items-center bg-black/20">
+                    <div class="p-2 border-b border-themeBorder flex justify-between items-center bg-black/20">
                         <div class="flex items-center gap-2">
-                            <svg class="icon-md text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                            <span class="text-sm font-black text-themeText">Live Strategy Engine (API)</span>
+                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            <span class="text-xs font-black text-themeText">Live Strategy Engine</span>
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="toggle-proof" class="w-4 h-4 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
@@ -296,20 +295,18 @@
         </div>
     </div>
 
-
     <!-- ============================================== -->
     <!-- 메인 대시보드 래퍼 -->
     <!-- ============================================== -->
     <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
         
-        <!-- 상단 헤더 -->
         <header class="glass rounded-2xl shadow-sm overflow-hidden">
             <div class="flex justify-between items-center p-3 md:p-4">
                 <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
                     <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40 flex items-center justify-center">
                         <svg class="icon-lg text-white" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
                     </div>
-                    <h1 class="text-xl md:text-2xl font-black italic text-themeText tracking-tighter">BUY <span class="text-accent">or BYE</span></h1>
+                    <h1 class="text-xl md:text-2xl font-black italic text-themeText tracking-tighter ml-1">BUY <span class="text-accent">or BYE</span></h1>
                 </div>
                 
                 <div class="flex items-center gap-2 md:gap-4">
@@ -318,7 +315,6 @@
                         <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
                     </div>
                     
-                    <!-- 에러 보기 버튼 (히든 디폴트) -->
                     <button type="button" onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 border border-rose-500/50 rounded-xl text-rose-500 hover:bg-rose-500 hover:text-white transition shadow-sm">
                         <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     </button>
@@ -387,7 +383,6 @@
                     </div>
                 </div>
 
-                <!-- 차트 출력 -->
                 <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
 
@@ -425,7 +420,7 @@
                         <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
                     </div>
                     
-                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 h-full mb-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-full mb-3">
                         <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일선 간의 거리(%)입니다. 양수(+)면 장기 추세보다 위에 있어 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')">
                             <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-ma-dist" class="stat-value text-themeText">---</p>
@@ -460,7 +455,6 @@
         <!-- ============================================== -->
         <div id="view-portfolio" class="hidden flex-col space-y-4">
             
-            <!-- 정적 포트폴리오 -->
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
                 <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
                     <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
@@ -497,7 +491,6 @@
                 </div>
             </div>
 
-            <!-- 동적 포트폴리오 -->
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-accent">
                 <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
                     <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
@@ -538,7 +531,6 @@
                 </div>
             </div>
 
-            <!-- 시뮬레이션 통합 그래프 (고정 크기) -->
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
                 <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 (2000~)</h3>
                 <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
@@ -546,13 +538,13 @@
         </div>
 
         <div class="text-center mt-2 pb-6">
-            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data (Base 100)</p>
+            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data</p>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // 🛠️ 전역 안전 장치 및 디버그 (오류 알림용)
+        // 전역 에러 핸들링 로직
         // ==========================================
         let errorLogs = [];
         function logError(msg, err) {
@@ -587,9 +579,11 @@
         function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
         // ==========================================
-        // 📊 글로벌 변수 및 공통 설정
+        // 글로벌 데이터 세팅
         // ==========================================
         let myChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
+        const API_BASE_URL = ''; 
+
         let maSettings = { 10: false, 20: true, 50: true, 60: false, 120: true, 200: true };
         let currentInterval = '1d', currentRange = '1y';
         let globalChartData = null, globalTicker = "SPY", abortController = null;
@@ -621,11 +615,43 @@
         let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
 
         // ==========================================
-        // 🔄 핵심 UI 조작 함수 (에러 수정됨)
+        // 모달 및 UI 로직 
         // ==========================================
+        function switchMainTab(tab) {
+            document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
+            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
+            
+            document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
+            document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
+            
+            requestAnimationFrame(() => {
+                if(tab === 'dashboard' && myChart) { myChart.resize(); } 
+                else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart.resize(); }
+            });
+        }
+
+        function toggleProofs(show) {
+            document.querySelectorAll('.proof-row').forEach(row => {
+                if(show) row.classList.add('show');
+                else row.classList.remove('show');
+            });
+        }
+
+        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
+        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
+        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
+
+        function showInfo(title, text) {
+            document.getElementById('info-title').innerHTML = `<svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg> ${title}`;
+            document.getElementById('info-body').innerText = text;
+            document.getElementById('info-modal').style.display = 'flex';
+        }
+
         function setTheme(t) {
-            document.documentElement.className = t;
-            safeStorageSet('dashboardTheme', t);
+            document.documentElement.className = t; safeStorageSet('dashboardTheme', t);
             document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-${t}`)?.classList.add('active');
             requestAnimationFrame(() => {
@@ -645,8 +671,7 @@
         }
 
         function setLineWidth(w) {
-            chartLineWidth = w;
-            safeStorageSet('dashboardLineWidth', w);
+            chartLineWidth = w; safeStorageSet('dashboardLineWidth', w);
             document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-line-${w}`)?.classList.add('active');
             requestAnimationFrame(() => {
@@ -654,30 +679,8 @@
             });
         }
 
-        function toggleProofs(show) {
-            document.querySelectorAll('.proof-row').forEach(row => {
-                if(show) row.classList.add('show');
-                else row.classList.remove('show');
-            });
-        }
-
-        function switchMainTab(tab) {
-            document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
-            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
-            
-            document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
-            document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
-            
-            // UI 레이아웃 안정화 후 리사이즈
-            setTimeout(() => {
-                if(tab === 'dashboard' && myChart) { myChart.resize(); } 
-                else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart.resize(); }
-            }, 50);
-        }
-
         // ==========================================
-        // 📡 API 통신 및 수학 엔진 (빈 데이터 정제)
+        // 데이터 통신 및 기술 지표 계산 엔진
         // ==========================================
         async function fetchWithRetry(url, options = {}, maxRetries = 2) {
             let delay = 1500;
@@ -686,10 +689,9 @@
                     const response = await fetch(url, options);
                     if (response.ok) return response;
                     if (response.status === 429) {
-                        logError(`API 429 Limit: ${url}`);
+                        logError(`API Limit 429: ${url}`);
                         await new Promise(res => setTimeout(res, delay));
-                        delay *= 1.5;
-                        continue;
+                        delay *= 1.5; continue;
                     }
                     throw new Error(`HTTP ${response.status}`);
                 } catch (err) { 
@@ -701,12 +703,10 @@
             throw new Error(`Fetch failed: ${url}`);
         }
 
-        // 빈 값, null 제거 함수 (차트 깨짐 및 에러의 주원인 차단)
         function extractCleanData(data) {
             if(!data || !data.indicators || !data.indicators.quote || !data.indicators.quote[0]) return { dates:[], kData:[], closes:[] };
             const q = data.indicators.quote[0], ts = data.timestamp || [];
             let dates = [], kData = [], closes = [];
-            
             for(let i=0; i<ts.length; i++) {
                 if (q.close && q.close[i] !== null && q.close[i] !== undefined) {
                     dates.push(new Date(ts[i] * 1000).toISOString().split('T')[0]); 
@@ -736,7 +736,7 @@
         }
 
         // ==========================================
-        // 대시보드 뷰 로직 (종목 분석)
+        // 뷰 1: 종목 분석 차트 로딩 및 렌더링
         // ==========================================
         async function loadData(ticker, interval = currentInterval, range = currentRange) {
             if (abortController) abortController.abort();
@@ -757,13 +757,12 @@
                 updateStatus("LIVE DATA", "bg-emerald-500");
                 renderDashboard(ticker, d);
                 
-                // 디테일 연산은 에러나도 차트가 죽지 않도록 독립적으로 실행
                 calculateTriplePerspectiveDecision(ticker).catch(e => logError("Triple Calc Error", e));
 
             } catch (e) { 
                 if (e.name !== 'AbortError') {
                     logError(`loadData failed for ${ticker}`, e);
-                    updateStatus("API LMT (에러)", "bg-rose-500"); 
+                    updateStatus("API ERROR", "bg-rose-500"); 
                     if(myChart) myChart.clear();
                     document.getElementById('display-ticker').innerText = "ERROR";
                     document.getElementById('live-price').innerText = "---";
@@ -788,7 +787,8 @@
             if(closes.length === 0) return;
 
             document.getElementById('display-ticker').innerText = ticker;
-            document.getElementById('live-price').innerText = closes[closes.length - 1].toLocaleString(undefined, {minimumFractionDigits: 2});
+            const price = closes[closes.length - 1];
+            document.getElementById('live-price').innerText = price?.toLocaleString(undefined, {minimumFractionDigits: 2});
             
             if (currentInterval === '1y') {
                 let yearly = {};
@@ -798,9 +798,7 @@
                     else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); }
                 });
                 const sorted = Object.keys(yearly).sort();
-                dates = sorted;
-                kData = sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]);
-                closes = sorted.map(y => yearly[y].close);
+                dates = sorted; kData = sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]); closes = sorted.map(y => yearly[y].close);
             }
 
             const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9);
@@ -851,6 +849,8 @@
                 dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
                 series: series
             }, true);
+            
+            requestAnimationFrame(() => myChart.resize());
         }
 
         async function calculateTriplePerspectiveDecision(ticker) {
@@ -862,6 +862,8 @@
             const wD = (await wRes.json()).chart.result[0];
             
             const analyze = (data, weight) => {
+                if(!data || !data.indicators || !data.indicators.quote[0].close) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
+                
                 let { kData, closes } = extractCleanData(data);
                 if(closes.length < 120) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
                 
@@ -890,9 +892,9 @@
             const lt = analyze(wD, { ma: 3.0, rsi: 0.5, macd: 0.5 });
             
             analysisDetails = { 
-                short: {...st, summary: "단기 모멘텀 분석입니다.", advice: "단기 스윙 포지션에 적합합니다." }, 
-                mid: {...mt, summary: "중기 이평선과 밴드 분석입니다.", advice: "일봉, 주봉의 추세가 일치하는지 확인하세요." }, 
-                long: {...lt, summary: "장기 펀더멘털 결과입니다.", advice: "장기 우상향 시 하락 노이즈는 기회입니다." } 
+                short: {...st, summary: "단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 스윙 포지션에 적합합니다." }, 
+                mid: {...mt, summary: "중기 이평선과 밴드를 분석한 결과입니다.", advice: "일봉, 주봉의 추세가 일치하는지 확인하세요." }, 
+                long: {...lt, summary: "장기 펀더멘털 결과입니다.", advice: "장기 우상향 시 하락 노이즈는 매수 기회입니다." } 
             };
             
             const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
@@ -905,8 +907,25 @@
             uiUpdate('val-stoch-main', st.stoch, st.stoch>80?'#EF5350':(st.stoch<20?'#26A69A':''));
         }
 
+        function showDetail(p) {
+            const m = document.getElementById('detail-modal');
+            const d = analysisDetails[p];
+            if (!d || !d.status) return;
+            document.getElementById('modal-title').innerText = `${p.toUpperCase()} View`;
+            document.getElementById('modal-body').innerHTML = `
+                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center">
+                    <span class="text-3xl font-black italic status-${d.status.replace(/ /g, '-')} uppercase">${d.status}</span>
+                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
+                </div>
+                <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder mt-4">
+                    <p class="text-[11px] font-black text-emerald-500 mb-2">전략적 조언</p>
+                    <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
+                </div>`;
+            m.style.display = 'flex';
+        }
+
         // ==========================================
-        // 뷰 2: 포트폴리오 백테스트 & 라이브 엔진
+        // 뷰 2: 포트폴리오 차트 및 라이브 엔진
         // ==========================================
         function initPortfolioChart() {
             if(!document.getElementById('chart-portfolio')) return;
@@ -935,6 +954,113 @@
             }, true);
         }
 
+        // !!! 여기가 이전 답변에서 누락되었던 필수 함수들입니다 !!!
+        function showPfDetail(pfKey) {
+            currentPfKey = pfKey; const data = pfDetails[pfKey];
+            if(!data) return;
+
+            document.getElementById('pf-modal-title').innerText = data.title;
+            document.getElementById('pf-modal-cagr').innerText = data.cagr;
+            document.getElementById('pf-modal-mdd').innerText = data.mdd;
+            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li>${r}</li>`).join('');
+            document.getElementById('pf-compare-input').value = '';
+            
+            const pieArea = document.getElementById('pf-modal-pie-area');
+            const liveArea = document.getElementById('pf-modal-live-area');
+            document.getElementById('pf-detail-modal').style.display = 'flex';
+
+            if(data.type === 'dynamic') {
+                pieArea.style.display = 'none';
+                liveArea.style.display = 'block';
+                runLiveCalc(pfKey);
+            } else {
+                liveArea.style.display = 'none';
+            }
+
+            requestAnimationFrame(() => {
+                if(!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
+                pfModalChart.clear();
+
+                const styleColor = getComputedStyle(document.documentElement);
+                const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+                const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+
+                pfModalChart.setOption({
+                    backgroundColor: 'transparent',
+                    tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 11 } },
+                    legend: { data: [data.title], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
+                    grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
+                    xAxis: { type: 'category', data: pfSimData.years, axisLabel: { color: chartTextColor } },
+                    yAxis: { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
+                    series: [{ name: data.title, type: 'line', data: pfSimData[pfKey], smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 }]
+                }, true);
+                pfModalChart.resize();
+
+                if(data.type === 'static' && data.allocation) {
+                    pieArea.style.display = 'block';
+                    if(!pfPieChart) pfPieChart = echarts.init(document.getElementById('pf-pie-chart'));
+                    const textColor = styleColor.getPropertyValue('--text-main').trim() || '#fff';
+                    
+                    pfPieChart.setOption({
+                        backgroundColor: 'transparent',
+                        tooltip: { trigger: 'item', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 12 }, formatter: '{b}: <b>{c}%</b>' },
+                        color: ['#EF5350', '#3B82F6', '#EAB308', '#9CA3AF', '#A855F7'],
+                        series: [{
+                            type: 'pie', radius: ['40%', '75%'], avoidLabelOverlap: true, center: ['50%', '55%'],
+                            itemStyle: { borderRadius: 4, borderColor: 'var(--bg-color)', borderWidth: 2 },
+                            label: { show: true, color: textColor, fontSize: 10, formatter: '{b}\n{c}%' },
+                            data: data.allocation
+                        }]
+                    }, true);
+                    pfPieChart.resize();
+                }
+            });
+        }
+
+        async function comparePortfolioStock() {
+            const ticker = document.getElementById('pf-compare-input').value.trim().toUpperCase();
+            const btn = document.getElementById('pf-compare-btn');
+            if(!ticker || !currentPfKey || !pfModalChart) return;
+
+            btn.innerText = '검색중...';
+            try {
+                const res = await fetchWithRetry(`/api/stock/${ticker}?interval=1mo&range=max`);
+                const json = await res.json();
+                if(!json.chart || !json.chart.result) throw new Error("No data");
+
+                const q = json.chart.result[0].indicators.quote[0].close;
+                const ts = json.chart.result[0].timestamp;
+                let yearlyData = {};
+                for(let i=0; i<ts.length; i++){
+                    if(q[i] != null) yearlyData[new Date(ts[i]*1000).getFullYear().toString()] = q[i];
+                }
+                
+                let compData = [], basePrice = null; 
+                pfSimData.years.forEach(yr => {
+                    if(yearlyData[yr]) {
+                        if(basePrice === null) basePrice = yearlyData[yr];
+                        compData.push((yearlyData[yr] / basePrice) * 100);
+                    } else compData.push(null);
+                });
+
+                const styleColor = getComputedStyle(document.documentElement);
+                const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+                
+                pfModalChart.setOption({
+                    legend: { data: [pfDetails[currentPfKey].title, ticker], textStyle: { color: chartTextColor, fontSize: 10 } },
+                    series: [
+                        { name: pfDetails[currentPfKey].title, type: 'line', data: pfSimData[currentPfKey], smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 },
+                        { name: ticker, type: 'line', data: compData, smooth: true, lineStyle: { color: '#EF5350', width: 2, type: 'dashed' }, connectNulls: true, showSymbol: false, z: 5 }
+                    ]
+                });
+                btn.innerText = '완료'; setTimeout(() => btn.innerText = '비교', 2000);
+            } catch(e) {
+                logError(`Compare Failed for ${ticker}`, e);
+                btn.innerText = '오류'; btn.classList.add('bg-rose-500');
+                setTimeout(() => { btn.innerText = '비교'; btn.classList.remove('bg-rose-500'); }, 2000);
+            }
+        }
+
         async function runLiveCalc(pfKey) {
             const area = document.getElementById('pf-modal-live-area');
             const loading = document.getElementById('pf-live-loading');
@@ -943,10 +1069,7 @@
             const toggleBox = document.getElementById('toggle-proof');
             
             if(!area) return;
-            area.style.display = 'block';
-            loading.style.display = 'flex';
-            content.style.display = 'none';
-            tbody.innerHTML = '';
+            area.style.display = 'block'; loading.style.display = 'flex'; content.style.display = 'none'; tbody.innerHTML = '';
             if(toggleBox) toggleBox.checked = false;
 
             try {
@@ -954,24 +1077,24 @@
                 if(pfKey === 'dual') tickers = ['SPY', 'VEA', 'BIL'];
                 else if(pfKey === 'vaa') tickers = ['SPY', 'VEA', 'VWO', 'AGG'];
                 else if(pfKey === 'daa') tickers = ['VWO', 'BND', 'SPY'];
-                else if(pfKey === 'baa') tickers = ['SPY', 'VWO', 'BND', 'QQQ'];
+                else if(pfKey === 'baa') tickers = ['SPY', 'VEA', 'VWO', 'BND'];
 
                 const dataMap = {};
                 let unifiedMonths = new Set();
                 
-                // 직렬 다운로드로 API 과부하 차단
+                // 직렬 다운로드로 API 과부하 100% 차단
                 for(let i=0; i<tickers.length; i++) {
                     const t = tickers[i];
-                    document.getElementById('pf-live-loading-text').innerText = `API 호출 중 (${i+1}/${tickers.length}) - ${t}`;
+                    document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t}`;
                     if(i > 0) await new Promise(r => setTimeout(r, 1000));
                     
-                    const res = await fetchWithRetry(`/api/stock/${t}?interval=1mo&range=2y`);
+                    const res = await fetchWithRetry(`/api/stock/${t}?interval=1mo&range=2y`, {}, 1);
                     const json = await res.json();
                     let { dates, closes } = extractCleanData(json.chart.result[0]);
                     
                     dataMap[t] = {};
                     for(let j=0; j<dates.length; j++) {
-                        const dStr = dates[j].substring(0, 7); // YYYY-MM
+                        const dStr = dates[j].substring(0, 7);
                         dataMap[t][dStr] = closes[j];
                         unifiedMonths.add(dStr);
                     }
@@ -986,13 +1109,8 @@
                 html += `<th class="text-right">결과</th></tr></thead><tbody>`;
 
                 const calcScore = (t, currIdx) => {
-                    const P0 = dataMap[t][sortedMonths[currIdx]];
-                    const P1 = dataMap[t][sortedMonths[currIdx-1]];
-                    const P3 = dataMap[t][sortedMonths[currIdx-3]];
-                    const P6 = dataMap[t][sortedMonths[currIdx-6]];
-                    const P12 = dataMap[t][sortedMonths[currIdx-12]];
-
-                    if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `[${t}] 데이터 부족 (12개월)` };
+                    const P0 = dataMap[t][sortedMonths[currIdx]], P1 = dataMap[t][sortedMonths[currIdx-1]], P3 = dataMap[t][sortedMonths[currIdx-3]], P6 = dataMap[t][sortedMonths[currIdx-6]], P12 = dataMap[t][sortedMonths[currIdx-12]];
+                    if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `[${t}] 부족` };
                     const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
                     const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
                     return { score, proof: `[${t}] P0:${P0.toFixed(2)} | P1:${P1.toFixed(2)}(<span class="proof-hl">${(r1*100).toFixed(1)}%</span>) | P3:${P3.toFixed(2)}(<span class="proof-hl">${(r3*100).toFixed(1)}%</span>) | P6:${P6.toFixed(2)}(<span class="proof-hl">${(r6*100).toFixed(1)}%</span>) | P12:${P12.toFixed(2)}(<span class="proof-hl">${(r12*100).toFixed(1)}%</span>) => <span class="text-white">Score: ${score.toFixed(2)}</span>` };
@@ -1000,9 +1118,9 @@
 
                 const calcRet = (t, currIdx) => {
                     const P0 = dataMap[t][sortedMonths[currIdx]], P12 = dataMap[t][sortedMonths[currIdx-12]];
-                    if(!P0 || !P12) return { ret: -999, proof: `[${t}] 데이터 부족` };
+                    if(!P0 || !P12) return { ret: -999, proof: `[${t}] 부족` };
                     const ret = (P0/P12 - 1) * 100;
-                    return { ret, proof: `[${t}] ${sortedMonths[currIdx]}: $${P0.toFixed(2)} / 12개월전: $${P12.toFixed(2)} => <span class="text-white">${ret.toFixed(2)}%</span>` };
+                    return { ret, proof: `[${t}] ${sortedMonths[currIdx]}: $${P0.toFixed(2)} / 12M전: $${P12.toFixed(2)} => <span class="text-white">${ret.toFixed(2)}%</span>` };
                 }
 
                 for(let i = sortedMonths.length - 1; i >= sortedMonths.length - 4; i--) {
@@ -1027,8 +1145,8 @@
                         row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def==='YES'?'text-down':'text-up'} font-bold">${def}</td><td class="text-right font-black ${win.includes('공격')?'text-up':'text-gray-400'}">${win}</td>`;
                     }
                     else if(pfKey === 'baa') {
-                        const ss = calcScore('SPY', i), vws = calcScore('VWO', i), bns = calcScore('BND', i); proofs.push(ss.proof, vws.proof, bns.proof);
-                        const minS = Math.min(ss.score, vws.score, bns.score);
+                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), bns = calcScore('BND', i); proofs.push(ss.proof, vs.proof, vws.proof, bns.proof);
+                        const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
                         let def = minS <= 0 ? 'YES' : 'NO';
                         let win = def === 'YES' ? '수비(BIL/IEF)' : '공격(QQQ)';
                         row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def==='YES'?'text-down':'text-up'} font-bold">${def}</td><td class="text-right font-black ${win.includes('QQQ')?'text-up':'text-gray-400'}">${win}</td>`;
@@ -1045,8 +1163,8 @@
                 content.style.display = 'block';
 
             } catch (error) {
-                logError(`Live Engine Failed`, error);
-                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드 실패 (Rate Limit)<br>잠시 후 다시 열어주세요.</p>`;
+                logError(`Live Engine Failed (${pfKey})`, error);
+                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 호출 실패.<br>잠시 후 우측 상단 [!] 를 확인하세요.</p>`;
             }
         }
 
@@ -1058,7 +1176,13 @@
                 myChart = echarts.init(document.getElementById('chart-main'));
                 
                 const form = document.getElementById('search-form');
-                if(form) { form.onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); }; }
+                if(form) {
+                    form.onsubmit = (e) => { 
+                        e.preventDefault(); 
+                        const t = document.getElementById('ticker-input').value.trim().toUpperCase(); 
+                        if(t) loadData(t); 
+                    };
+                }
                 
                 setTheme(savedTheme);
                 setFontSize(savedFontSize);
@@ -1068,7 +1192,14 @@
                 updateMAButtons();
                 
                 const pfCompareInput = document.getElementById('pf-compare-input');
-                if(pfCompareInput) { pfCompareInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') { e.preventDefault(); comparePortfolioStock(); } }); }
+                if(pfCompareInput) {
+                    pfCompareInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            comparePortfolioStock();
+                        }
+                    });
+                }
 
                 setTimeout(() => { if(myChart) { myChart.resize(); loadData('SPY'); } }, 150);
                 
