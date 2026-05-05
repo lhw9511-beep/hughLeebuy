@@ -130,7 +130,7 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
-    <!-- 설정 모달 -->
+    <!-- 1. 설정 모달 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
@@ -158,9 +158,17 @@
                         <button type="button" onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
                     </div>
                 </div>
+                <div class="border-t border-themeBorder pt-4">
+                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기</p>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
+                        <button type="button" onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
+                        <button type="button" onclick="setLineWidth('3')" id="btn-line-3" class="setting-btn">두껍게</button>
+                    </div>
+                </div>
             </div>
             <div class="mt-8 flex justify-end">
-                <button type="button" onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto">적용</button>
+                <button type="button" onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto">적용 및 닫기</button>
             </div>
         </div>
     </div>
@@ -175,7 +183,7 @@
                 </h3>
                 <button type="button" onclick="closeErrorModal()" class="text-themeMuted hover:text-rose-500 p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
-            <p class="text-xs text-themeMuted mb-2">아래 내용을 복사하여 AI에게 전달해주시면 원인 파악이 가능합니다.</p>
+            <p class="text-xs text-themeMuted mb-2">아래 내용을 복사하여 알려주시면 원인 파악이 가능합니다.</p>
             <textarea id="error-log-text" class="w-full h-32 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.65rem] font-mono p-2 rounded-lg outline-none resize-none" readonly></textarea>
             <div class="mt-4 flex gap-2 justify-end">
                 <button type="button" onclick="copyErrorLog()" id="btn-copy-error" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black hover:bg-rose-700 transition">복사하기</button>
@@ -258,16 +266,16 @@
                     <div class="p-3 border-b border-themeBorder flex justify-between items-center bg-black/20">
                         <div class="flex items-center gap-2">
                             <svg class="icon-md text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                            <span class="text-sm font-black text-themeText">Live Strategy Engine</span>
+                            <span class="text-sm font-black text-themeText">Live Strategy Engine (API)</span>
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="toggle-proof" class="w-4 h-4 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
-                            <span class="text-[0.65rem] font-bold text-themeMuted uppercase">계산 과정 증명(보기)</span>
+                            <span class="text-[0.65rem] font-bold text-themeMuted uppercase">계산 과정 보기</span>
                         </label>
                     </div>
                     <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
                         <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
-                        <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 통신 및 수학적 분석 중...</p>
+                        <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
                     </div>
                     <div id="pf-live-content" class="hidden overflow-x-auto custom-scroll p-1">
                         <table class="calc-table" id="pf-live-table"></table>
@@ -290,10 +298,11 @@
 
 
     <!-- ============================================== -->
-    <!-- 메인 대시보드 UI -->
+    <!-- 메인 대시보드 래퍼 -->
     <!-- ============================================== -->
     <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
         
+        <!-- 상단 헤더 -->
         <header class="glass rounded-2xl shadow-sm overflow-hidden">
             <div class="flex justify-between items-center p-3 md:p-4">
                 <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
@@ -382,7 +391,9 @@
                 <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
 
+            <!-- 하단 분석 패널 -->
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
+                
                 <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
                     <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
                         <div class="flex items-center gap-2">
@@ -392,17 +403,17 @@
                     </div>
                     
                     <div class="grid grid-cols-3 gap-2 flex-grow mb-2">
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('short')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span>
-                            <div id="st-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showDetail('short')">
+                            <p class="text-[0.5rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">SHORT</p>
+                            <div id="st-signal-text" class="text-sm md:text-base font-black italic text-themeMuted">WAIT</div>
                         </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('mid')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span>
-                            <div id="mt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showDetail('mid')">
+                            <p class="text-[0.5rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">MID</p>
+                            <div id="mt-signal-text" class="text-sm md:text-base font-black italic text-themeMuted">WAIT</div>
                         </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('long')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span>
-                            <div id="lt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showDetail('long')">
+                            <p class="text-[0.5rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">LONG</p>
+                            <div id="lt-signal-text" class="text-sm md:text-base font-black italic text-themeMuted">WAIT</div>
                         </div>
                     </div>
                     <p class="text-[0.55rem] text-themeMuted text-center">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
@@ -414,7 +425,7 @@
                         <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
                     </div>
                     
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-full mb-3">
+                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 h-full mb-3">
                         <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일선 간의 거리(%)입니다. 양수(+)면 장기 추세보다 위에 있어 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')">
                             <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-ma-dist" class="stat-value text-themeText">---</p>
@@ -445,95 +456,103 @@
         </div>
 
         <!-- ============================================== -->
-        <!-- VIEW 2: 자산배분 (정적/동적) -->
+        <!-- VIEW 2: 포트폴리오 백테스트 화면 -->
         <!-- ============================================== -->
         <div id="view-portfolio" class="hidden flex-col space-y-4">
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <div class="glass p-4 rounded-2xl border-t-4 border-t-emerald-500">
-                    <h3 class="font-black text-themeText text-lg mb-4 flex items-center gap-2">
+            
+            <!-- 정적 포트폴리오 -->
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
+                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
+                    <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
                         <svg class="icon-md text-emerald-500" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                        Static Portfolios
-                    </h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div class="pf-card" onclick="showPfDetail('6040')">
-                            <p class="font-black text-themeText text-xs mb-1">60/40 Portfolio</p>
-                            <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식 60 : 채권 40 분할</p>
-                            <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
-                                <span class="text-[0.65rem] font-bold text-up">8.3%</span>
-                                <span class="text-[0.65rem] font-bold text-down">-29%</span>
-                            </div>
-                        </div>
-                        <div class="pf-card" onclick="showPfDetail('permanent')">
-                            <p class="font-black text-themeText text-xs mb-1">Permanent</p>
-                            <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식/채권/금/현금 25%</p>
-                            <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
-                                <span class="text-[0.65rem] font-bold text-up">6.5%</span>
-                                <span class="text-[0.65rem] font-bold text-down">-13%</span>
-                            </div>
-                        </div>
-                        <div class="pf-card" onclick="showPfDetail('allweather')">
-                            <p class="font-black text-themeText text-xs mb-1">All Weather</p>
-                            <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오 리스크 분산</p>
-                            <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
-                                <span class="text-[0.65rem] font-bold text-up">7.8%</span>
-                                <span class="text-[0.65rem] font-bold text-down">-14%</span>
-                            </div>
+                        정적 자산배분 (Static)
+                    </h2>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="pf-card" onclick="showPfDetail('6040')">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">60/40 Portfolio <span class="text-[0.55rem] bg-gray-500/20 text-gray-400 px-2 py-1 rounded">Basic</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식 60%, 채권 40%. 기관 표준.</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">8.3%</span></span>
+                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-29.0%</span></span>
                         </div>
                     </div>
-                </div>
-
-                <div class="glass p-4 rounded-2xl border-t-4 border-t-accent">
-                    <h3 class="font-black text-themeText text-lg mb-4 flex items-center gap-2">
-                        <svg class="icon-md text-accent" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-                        Dynamic Portfolios
-                    </h3>
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div class="pf-card" onclick="showPfDetail('dual')">
-                            <p class="font-black text-themeText text-xs mb-1">Dual Mom.</p>
-                            <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col lg:flex-row lg:justify-between">
-                                <span class="text-[0.6rem] font-bold text-up">12.5%</span>
-                                <span class="text-[0.6rem] font-bold text-down">-17%</span>
-                            </div>
+                    <div class="pf-card" onclick="showPfDetail('permanent')">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">Permanent <span class="text-[0.55rem] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">Safe</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">해리 브라운 고안. 4가지 경제 계절 방어.</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">6.5%</span></span>
+                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-13.5%</span></span>
                         </div>
-                        <div class="pf-card" onclick="showPfDetail('vaa')">
-                            <p class="font-black text-themeText text-xs mb-1">VAA</p>
-                            <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col lg:flex-row lg:justify-between">
-                                <span class="text-[0.6rem] font-bold text-up">15.2%</span>
-                                <span class="text-[0.6rem] font-bold text-down">-16%</span>
-                            </div>
-                        </div>
-                        <div class="pf-card" onclick="showPfDetail('daa')">
-                            <p class="font-black text-themeText text-xs mb-1">DAA</p>
-                            <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col lg:flex-row lg:justify-between">
-                                <span class="text-[0.6rem] font-bold text-up">13.5%</span>
-                                <span class="text-[0.6rem] font-bold text-down">-12%</span>
-                            </div>
-                        </div>
-                        <div class="pf-card border-accent/40" onclick="showPfDetail('baa')">
-                            <p class="font-black text-themeText text-xs mb-1">BAA(Bold)</p>
-                            <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col lg:flex-row lg:justify-between">
-                                <span class="text-[0.6rem] font-bold text-up">16.5%</span>
-                                <span class="text-[0.6rem] font-bold text-down">-11%</span>
-                            </div>
+                    </div>
+                    <div class="pf-card" onclick="showPfDetail('allweather')">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 리스크 패리티 전략.</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">7.8%</span></span>
+                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-14.2%</span></span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="glass p-4 rounded-2xl shadow-xl">
-                <p class="text-[0.65rem] font-black text-themeMuted mb-3 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 (2000 ~ 시뮬레이션)</p>
-                <div id="chart-portfolio" class="portfolio-chart-container"></div>
+            <!-- 동적 포트폴리오 -->
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-accent">
+                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
+                    <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
+                        <svg class="icon-md text-accent" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        동적 자산배분 (Dynamic)
+                    </h2>
+                </div>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="pf-card" onclick="showPfDetail('dual')">
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">Dual Momentum</h3>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">12.5%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-17.8%</span></span>
+                        </div>
+                    </div>
+                    <div class="pf-card" onclick="showPfDetail('vaa')">
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">15.2%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-16.1%</span></span>
+                        </div>
+                    </div>
+                    <div class="pf-card" onclick="showPfDetail('daa')">
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">13.5%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-12.0%</span></span>
+                        </div>
+                    </div>
+                    <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">16.5%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-11.2%</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 시뮬레이션 통합 그래프 (고정 크기) -->
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
+                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 (2000~)</h3>
+                <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
             </div>
         </div>
 
         <div class="text-center mt-2 pb-6">
-            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data</p>
+            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data (Base 100)</p>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // 전역 안전 장치 및 디버그(에러 로깅) 시스템
+        // 🛠️ 전역 안전 장치 및 디버그 (오류 알림용)
         // ==========================================
         let errorLogs = [];
         function logError(msg, err) {
@@ -555,16 +574,10 @@
         function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
         
         function copyErrorLog() {
-            const text = document.getElementById('error-log-text').value;
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = document.getElementById('btn-copy-error');
-                btn.innerText = '복사 완료!'; setTimeout(() => btn.innerText = '복사하기', 2000);
-            }).catch(e => {
-                const textArea = document.getElementById('error-log-text');
-                textArea.select(); document.execCommand('copy');
-                const btn = document.getElementById('btn-copy-error');
-                btn.innerText = '복사 완료!'; setTimeout(() => btn.innerText = '복사하기', 2000);
-            });
+            const textArea = document.getElementById('error-log-text');
+            textArea.select(); document.execCommand('copy');
+            const btn = document.getElementById('btn-copy-error');
+            btn.innerText = '복사 완료!'; setTimeout(() => btn.innerText = '복사하기', 2000);
         }
 
         window.onerror = function(message, source, lineno, colno, error) { logError("Global JS Error", error || message); updateStatus("ERROR", "bg-rose-500"); };
@@ -574,11 +587,9 @@
         function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
         // ==========================================
-        // 글로벌 변수 
+        // 📊 글로벌 변수 및 공통 설정
         // ==========================================
         let myChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
-        const API_BASE_URL = ''; 
-
         let maSettings = { 10: false, 20: true, 50: true, 60: false, 120: true, 200: true };
         let currentInterval = '1d', currentRange = '1y';
         let globalChartData = null, globalTicker = "SPY", abortController = null;
@@ -605,20 +616,41 @@
             'baa': { title: 'BAA (Bold)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic', rules: ['카나리아 4개 중 1개라도 0 이하면 즉시 방어 전환', '공격 시 QQQ 등 상위 1개 몰빵', '방어 시 안전자산 상위 3개 분산'] }
         };
 
+        const savedTheme = safeStorageGet('dashboardTheme', 'theme-default');
+        const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
+        let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
+
         // ==========================================
-        // UI 제어 (탭, 모달, 리사이즈)
+        // 🔄 핵심 UI 조작 함수 (에러 수정됨)
         // ==========================================
-        function switchMainTab(tab) {
-            document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
-            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
-            
-            document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
-            document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
-            
+        function setTheme(t) {
+            document.documentElement.className = t;
+            safeStorageSet('dashboardTheme', t);
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${t}`)?.classList.add('active');
             requestAnimationFrame(() => {
-                if(tab === 'dashboard' && myChart) { myChart.resize(); } 
-                else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart.resize(); }
+                if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
+                if (pfChart) renderPortfolioChart(); 
+            });
+        }
+
+        function setFontSize(s) {
+            document.documentElement.style.fontSize = {sm:'14px',md:'16px',lg:'18px'}[s];
+            safeStorageSet('dashboardFontSize', s);
+            document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-font-${s}`)?.classList.add('active');
+            requestAnimationFrame(() => {
+                myChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize();
+            });
+        }
+
+        function setLineWidth(w) {
+            chartLineWidth = w;
+            safeStorageSet('dashboardLineWidth', w);
+            document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-line-${w}`)?.classList.add('active');
+            requestAnimationFrame(() => {
+                if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
             });
         }
 
@@ -629,8 +661,23 @@
             });
         }
 
+        function switchMainTab(tab) {
+            document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
+            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
+            
+            document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
+            document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
+            
+            // UI 레이아웃 안정화 후 리사이즈
+            setTimeout(() => {
+                if(tab === 'dashboard' && myChart) { myChart.resize(); } 
+                else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart.resize(); }
+            }, 50);
+        }
+
         // ==========================================
-        // 통신 및 계산 엔진
+        // 📡 API 통신 및 수학 엔진 (빈 데이터 정제)
         // ==========================================
         async function fetchWithRetry(url, options = {}, maxRetries = 2) {
             let delay = 1500;
@@ -639,7 +686,7 @@
                     const response = await fetch(url, options);
                     if (response.ok) return response;
                     if (response.status === 429) {
-                        logError(`API 429 (Rate Limit) on ${url}. Retrying...`);
+                        logError(`API 429 Limit: ${url}`);
                         await new Promise(res => setTimeout(res, delay));
                         delay *= 1.5;
                         continue;
@@ -651,10 +698,243 @@
                     await new Promise(res => setTimeout(res, delay)); 
                 }
             }
-            throw new Error(`Failed to fetch ${url}`);
+            throw new Error(`Fetch failed: ${url}`);
         }
 
-        // 라이브 엔진 데이터 수집 및 수학적 증명 렌더링
+        // 빈 값, null 제거 함수 (차트 깨짐 및 에러의 주원인 차단)
+        function extractCleanData(data) {
+            if(!data || !data.indicators || !data.indicators.quote || !data.indicators.quote[0]) return { dates:[], kData:[], closes:[] };
+            const q = data.indicators.quote[0], ts = data.timestamp || [];
+            let dates = [], kData = [], closes = [];
+            
+            for(let i=0; i<ts.length; i++) {
+                if (q.close && q.close[i] !== null && q.close[i] !== undefined) {
+                    dates.push(new Date(ts[i] * 1000).toISOString().split('T')[0]); 
+                    kData.push([q.open[i]||q.close[i], q.close[i], q.low[i]||q.close[i], q.high[i]||q.close[i]]); 
+                    closes.push(q.close[i]);
+                }
+            }
+            return { dates, kData, closes };
+        }
+
+        const Indicator = {
+            sma: (d, p) => d.map((_, i) => i < p - 1 ? null : d.slice(i - p + 1, i + 1).reduce((a, b) => a + b) / p),
+            ema: (d, p) => { let r=Array(d.length).fill(null), k=2/(p+1), s=d.findIndex(v=>v!==null); if(s===-1)return r; r[s]=d[s]; for(let i=s+1;i<d.length;i++) r[i]=d[i]*k+r[i-1]*(1-k); return r; },
+            macd: (d, s, l, sig) => { const se=Indicator.ema(d,s), le=Indicator.ema(d,l), line=se.map((v,i)=>v===null||le[i]===null?null:v-le[i]); return { hist: line.map((v,i)=>v===null||Indicator.ema(line,sig)[i]===null?null:v-Indicator.ema(line,sig)[i]) }; },
+            rsi: (d, p) => { let r=Array(d.length).fill(null), g=0, l=0; for(let i=1;i<d.length;i++){ let df=d[i]-d[i-1], cg=df>0?df:0, cl=df<0?-df:0; g=(g*(p-1)+cg)/p; l=(l*(p-1)+cl)/p; if(i>=p)r[i]=100-(100/(1+g/l)); } return r; },
+            bollinger: (d, p, m) => { const sma=Indicator.sma(d,p), up=Array(d.length).fill(null), low=Array(d.length).fill(null); for(let i=p-1;i<d.length;i++){ if(sma[i]===null)continue; const sl=d.slice(i-p+1,i+1); const v=sl.reduce((a,val)=>a+Math.pow(val-sma[i],2),0)/p; const sd=Math.sqrt(v); up[i]=sma[i]+(m*sd); low[i]=sma[i]-(m*sd); } return { upper: up, lower: low }; },
+            stochastic: (k, p, s) => { let r=Array(k.length).fill(null); for(let i=p-1;i<k.length;i++){ const sl=k.slice(i-p+1,i+1); const h=Math.max(...sl.map(d=>d[3])), l=Math.min(...sl.map(d=>d[2])); r[i]=(h!==l)?((k[i][1]-l)/(h-l))*100:50; } return { k: r, d: Indicator.sma(r, s) }; }
+        };
+
+        function toggleMA(p) { maSettings[p] = !maSettings[p]; updateMAButtons(); if (globalChartData) renderDashboard(globalTicker, globalChartData); }
+        function updateMAButtons() { Object.keys(maSettings).forEach(p => { const b = document.getElementById(`btn-ma-${p}`); if(b) { if(maSettings[p]) b.classList.add('active'); else b.classList.remove('active'); }}); }
+        function changeInterval(i, r, l) { 
+            currentInterval = i; currentRange = r; 
+            document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active')); 
+            document.getElementById(`range-${l}`)?.classList.add('active'); 
+            loadData(globalTicker, i, r); 
+        }
+
+        // ==========================================
+        // 대시보드 뷰 로직 (종목 분석)
+        // ==========================================
+        async function loadData(ticker, interval = currentInterval, range = currentRange) {
+            if (abortController) abortController.abort();
+            abortController = new AbortController();
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if(loadingOverlay) loadingOverlay.style.display = 'flex';
+            
+            try {
+                const reqInterval = interval === '1y' ? '1mo' : interval;
+                const cRes = await fetchWithRetry(`/api/stock/${ticker}?interval=${reqInterval}&range=${range}`, { signal: abortController.signal });
+                const cJson = await cRes.json();
+                
+                if(!cJson.chart || !cJson.chart.result) throw new Error("API Data Format Error");
+                
+                const d = cJson.chart.result[0];
+                globalChartData = d; globalTicker = ticker;
+                
+                updateStatus("LIVE DATA", "bg-emerald-500");
+                renderDashboard(ticker, d);
+                
+                // 디테일 연산은 에러나도 차트가 죽지 않도록 독립적으로 실행
+                calculateTriplePerspectiveDecision(ticker).catch(e => logError("Triple Calc Error", e));
+
+            } catch (e) { 
+                if (e.name !== 'AbortError') {
+                    logError(`loadData failed for ${ticker}`, e);
+                    updateStatus("API LMT (에러)", "bg-rose-500"); 
+                    if(myChart) myChart.clear();
+                    document.getElementById('display-ticker').innerText = "ERROR";
+                    document.getElementById('live-price').innerText = "---";
+                    document.getElementById('reasoning-container').innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br>우측 상단 [!] 버튼을 눌러 에러 로그를 확인하세요.</p>';
+                }
+            } finally { 
+                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
+            }
+        }
+
+        function updateStatus(t, c) { 
+            const label = document.getElementById('conn-label');
+            const dot = document.getElementById('status-dot');
+            if(label) label.innerText = t; 
+            if(dot) dot.className = `w-2 h-2 rounded-full ${c}`; 
+        }
+
+        function renderDashboard(ticker, data) {
+            if(!myChart || !data) return;
+            
+            let { dates, kData, closes } = extractCleanData(data);
+            if(closes.length === 0) return;
+
+            document.getElementById('display-ticker').innerText = ticker;
+            document.getElementById('live-price').innerText = closes[closes.length - 1].toLocaleString(undefined, {minimumFractionDigits: 2});
+            
+            if (currentInterval === '1y') {
+                let yearly = {};
+                dates.forEach((date, i) => {
+                    const year = date.split('-')[0];
+                    if (!yearly[year]) { yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] }; } 
+                    else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); }
+                });
+                const sorted = Object.keys(yearly).sort();
+                dates = sorted;
+                kData = sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]);
+                closes = sorted.map(y => yearly[y].close);
+            }
+
+            const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9);
+            const stoch = Indicator.stochastic(kData, 14, 3);
+            const bb = Indicator.bollinger(closes, 20, 2);
+            const last = closes.length - 1;
+            
+            let reasoning = [];
+            if(ma120[last]) {
+                const maPct = (((closes[last] - ma120[last]) / ma120[last]) * 100).toFixed(2);
+                reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치`});
+            }
+            if(rsi[last] < 30) reasoning.push({type: 'up', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 심한 과매도 상태.`});
+            else if(rsi[last] > 70) reasoning.push({type: 'down', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 과매수 상태.`});
+            if(macd.hist[last] > 0) reasoning.push({type: 'up', t:'MACD', d:`상승 에너지 발산 중`});
+            else reasoning.push({type: 'down', t:'MACD', d:`하락 에너지 진행 중`});
+            
+            document.getElementById('reasoning-container').innerHTML = reasoning.length > 0 ? reasoning.map(i => `
+                <div class="p-3 glass rounded-xl flex items-center justify-between border border-themeBorder mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'BUY':'SELL'}</span>
+                        <p class="text-[0.65rem] font-black text-themeText">${i.t}</p>
+                    </div>
+                    <p class="text-[0.6rem] text-themeMuted">${i.d}</p>
+                </div>
+            `).join('') : '<p class="text-xs text-themeMuted text-center py-10">특이 지표가 없습니다.</p>';
+            
+            const styleColor = getComputedStyle(document.documentElement);
+            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+
+            const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
+            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
+            
+            const widthNum = parseFloat(chartLineWidth);
+            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
+            
+            series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
+            series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
+            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
+
+            myChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 } },
+                grid: [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
+                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
+                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
+                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
+                series: series
+            }, true);
+        }
+
+        async function calculateTriplePerspectiveDecision(ticker) {
+            const [dRes, wRes] = await Promise.all([
+                fetchWithRetry(`/api/stock/${ticker}?interval=1d&range=2y`),
+                fetchWithRetry(`/api/stock/${ticker}?interval=1wk&range=max`)
+            ]);
+            const dD = (await dRes.json()).chart.result[0];
+            const wD = (await wRes.json()).chart.result[0];
+            
+            const analyze = (data, weight) => {
+                let { kData, closes } = extractCleanData(data);
+                if(closes.length < 120) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
+                
+                const last = closes.length - 1;
+                const rsi = Indicator.rsi(closes, 14)[last] || 50;
+                const macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0;
+                const sma = Indicator.sma(closes, 120)[last] || closes[last];
+                const stoch = Indicator.stochastic(kData, 14, 3).k[last] || 50;
+                const bb = Indicator.bollinger(closes, 20, 2);
+                const dist = ((closes[last] - sma) / sma) * 100;
+                
+                let buy = 0, sell = 0;
+                if (closes[last] > sma) buy += weight.ma; else sell += weight.ma;
+                if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
+                if (macd > 0) buy += weight.macd; else sell += weight.macd;
+                if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
+                
+                let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
+                let bbStr = "밴드 내"; if(bb.upper[last] && closes[last] > bb.upper[last]) bbStr = "과열"; if(bb.lower[last] && closes[last] < bb.lower[last]) bbStr = "침체";
+
+                return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1), bbStr: bbStr };
+            };
+
+            const st = analyze(dD, { ma: 0.5, rsi: 1.8, macd: 1.5 });
+            const mt = analyze(dD, { ma: 1.5, rsi: 1.0, macd: 1.2 });
+            const lt = analyze(wD, { ma: 3.0, rsi: 0.5, macd: 0.5 });
+            
+            analysisDetails = { 
+                short: {...st, summary: "단기 모멘텀 분석입니다.", advice: "단기 스윙 포지션에 적합합니다." }, 
+                mid: {...mt, summary: "중기 이평선과 밴드 분석입니다.", advice: "일봉, 주봉의 추세가 일치하는지 확인하세요." }, 
+                long: {...lt, summary: "장기 펀더멘털 결과입니다.", advice: "장기 우상향 시 하락 노이즈는 기회입니다." } 
+            };
+            
+            const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
+            up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
+            
+            const uiUpdate = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } }
+            uiUpdate('val-ma-dist', `${st.maDist>0?'+':''}${st.maDist}%`, st.maDist>0?'#26A69A':'#EF5350');
+            uiUpdate('val-rsi-main', st.rsi); uiUpdate('val-macd-main', st.macd);
+            uiUpdate('val-bb-main', st.bbStr, st.bbStr==='과열'?'#EF5350':(st.bbStr==='침체'?'#26A69A':''));
+            uiUpdate('val-stoch-main', st.stoch, st.stoch>80?'#EF5350':(st.stoch<20?'#26A69A':''));
+        }
+
+        // ==========================================
+        // 뷰 2: 포트폴리오 백테스트 & 라이브 엔진
+        // ==========================================
+        function initPortfolioChart() {
+            if(!document.getElementById('chart-portfolio')) return;
+            pfChart = echarts.init(document.getElementById('chart-portfolio'));
+            renderPortfolioChart();
+        }
+
+        function renderPortfolioChart() {
+            if(!pfChart) return;
+            const styleColor = getComputedStyle(document.documentElement);
+            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+
+            pfChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 } },
+                legend: { data: ['S&P 500 (SPY)', 'All-Weather', 'BAA (Bold)'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
+                grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
+                xAxis: { type: 'category', data: pfSimData.years, axisLabel: { color: chartTextColor } },
+                yAxis: { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
+                series: [
+                    { name: 'S&P 500 (SPY)', type: 'line', data: [100, 60, 85, 110, 65, 100, 120, 180, 210, 270, 320, 380, 480], smooth: true, lineStyle: { color: '#EF5350', width: 2 }, showSymbol: false },
+                    { name: 'All-Weather', type: 'line', data: pfSimData['allweather'], smooth: true, lineStyle: { color: '#3B82F6', width: 2 }, showSymbol: false },
+                    { name: 'BAA (Bold)', type: 'line', data: pfSimData['baa'], smooth: true, lineStyle: { color: '#10B981', width: 3 }, showSymbol: false }
+                ]
+            }, true);
+        }
+
         async function runLiveCalc(pfKey) {
             const area = document.getElementById('pf-modal-live-area');
             const loading = document.getElementById('pf-live-loading');
@@ -671,145 +951,91 @@
 
             try {
                 let tickers = [];
-                // API 리밋 방지를 위한 최소 필요 티커만
                 if(pfKey === 'dual') tickers = ['SPY', 'VEA', 'BIL'];
-                else if(pfKey === 'vaa') tickers = ['SPY', 'VEA', 'VWO', 'AGG']; // 실제론 더 많지만 예시용 4개
+                else if(pfKey === 'vaa') tickers = ['SPY', 'VEA', 'VWO', 'AGG'];
                 else if(pfKey === 'daa') tickers = ['VWO', 'BND', 'SPY'];
-                else if(pfKey === 'baa') tickers = ['SPY', 'VEA', 'VWO', 'BND']; // 카나리아 4개만
+                else if(pfKey === 'baa') tickers = ['SPY', 'VWO', 'BND', 'QQQ'];
 
                 const dataMap = {};
-                
-                // 순차적(직렬) 데이터 패칭 및 YYYY-MM 구조화
                 let unifiedMonths = new Set();
+                
+                // 직렬 다운로드로 API 과부하 차단
                 for(let i=0; i<tickers.length; i++) {
                     const t = tickers[i];
-                    document.getElementById('pf-live-loading-text').innerText = `데이터 수집 중... (${i+1}/${tickers.length}) - ${t}`;
+                    document.getElementById('pf-live-loading-text').innerText = `API 호출 중 (${i+1}/${tickers.length}) - ${t}`;
+                    if(i > 0) await new Promise(r => setTimeout(r, 1000));
                     
-                    if(i > 0) await new Promise(r => setTimeout(r, 800)); // 의도적 딜레이
-                    const res = await fetchWithRetry(`/api/stock/${t}?interval=1mo&range=2y`, {}, 1);
+                    const res = await fetchWithRetry(`/api/stock/${t}?interval=1mo&range=2y`);
                     const json = await res.json();
-                    if(!json.chart || !json.chart.result) throw new Error(`Empty Data for ${t}`);
-                    
-                    const q = json.chart.result[0].indicators.quote[0].close;
-                    const ts = json.chart.result[0].timestamp;
+                    let { dates, closes } = extractCleanData(json.chart.result[0]);
                     
                     dataMap[t] = {};
-                    for(let j=0; j<ts.length; j++) {
-                        if(q[j] != null) {
-                            const d = new Date(ts[j]*1000);
-                            const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-                            dataMap[t][ym] = q[j];
-                            unifiedMonths.add(ym);
-                        }
+                    for(let j=0; j<dates.length; j++) {
+                        const dStr = dates[j].substring(0, 7); // YYYY-MM
+                        dataMap[t][dStr] = closes[j];
+                        unifiedMonths.add(dStr);
                     }
                 }
 
-                // 타임라인 정렬
                 const sortedMonths = Array.from(unifiedMonths).sort();
-                
-                let html = '<thead><tr><th class="text-left">투자 월(Month)</th>';
+                let html = '<thead><tr><th class="text-left">Month</th>';
                 if(pfKey === 'dual') html += `<th>SPY 12M수익</th><th>VEA 12M수익</th><th>BIL 12M수익</th>`;
                 else if(pfKey === 'vaa') html += `<th>SPY 점수</th><th>VEA 점수</th><th>VWO 점수</th><th>AGG 점수</th>`;
                 else if(pfKey === 'daa') html += `<th>VWO 점수</th><th>BND 점수</th><th>위험?</th>`;
-                else if(pfKey === 'baa') html += `<th>최저 카나리아 점수</th><th>안전 대피?</th>`;
+                else if(pfKey === 'baa') html += `<th>최저 카나리아</th><th>안전 대피?</th>`;
                 html += `<th class="text-right">결과</th></tr></thead><tbody>`;
 
-                // 가중 모멘텀 계산기 + 증명 문자열 반환
                 const calcScore = (t, currIdx) => {
-                    const currYM = sortedMonths[currIdx];
-                    const m1YM = sortedMonths[currIdx-1];
-                    const m3YM = sortedMonths[currIdx-3];
-                    const m6YM = sortedMonths[currIdx-6];
-                    const m12YM = sortedMonths[currIdx-12];
-                    
-                    const P0 = dataMap[t][currYM];
-                    const P1 = m1YM ? dataMap[t][m1YM] : null;
-                    const P3 = m3YM ? dataMap[t][m3YM] : null;
-                    const P6 = m6YM ? dataMap[t][m6YM] : null;
-                    const P12 = m12YM ? dataMap[t][m12YM] : null;
+                    const P0 = dataMap[t][sortedMonths[currIdx]];
+                    const P1 = dataMap[t][sortedMonths[currIdx-1]];
+                    const P3 = dataMap[t][sortedMonths[currIdx-3]];
+                    const P6 = dataMap[t][sortedMonths[currIdx-6]];
+                    const P12 = dataMap[t][sortedMonths[currIdx-12]];
 
-                    if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `[${t}] 데이터 부족 (12개월치 미달)` };
-
-                    const r1 = (P0/P1 - 1); const r3 = (P0/P3 - 1); const r6 = (P0/P6 - 1); const r12 = (P0/P12 - 1);
-                    const score = (r1*12 + r3*4 + r6*2 + r1*1) * 100;
-                    
-                    const proof = `[${t}] P0:${P0.toFixed(2)} | P1:${P1.toFixed(2)}(<span class="proof-hl">${(r1*100).toFixed(1)}%</span>) | P3:${P3.toFixed(2)}(<span class="proof-hl">${(r3*100).toFixed(1)}%</span>) | P6:${P6.toFixed(2)}(<span class="proof-hl">${(r6*100).toFixed(1)}%</span>) | P12:${P12.toFixed(2)}(<span class="proof-hl">${(r12*100).toFixed(1)}%</span>) => <span class="text-white">Score: ${score.toFixed(2)}</span>`;
-                    
-                    return { score, proof };
+                    if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `[${t}] 데이터 부족 (12개월)` };
+                    const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
+                    const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
+                    return { score, proof: `[${t}] P0:${P0.toFixed(2)} | P1:${P1.toFixed(2)}(<span class="proof-hl">${(r1*100).toFixed(1)}%</span>) | P3:${P3.toFixed(2)}(<span class="proof-hl">${(r3*100).toFixed(1)}%</span>) | P6:${P6.toFixed(2)}(<span class="proof-hl">${(r6*100).toFixed(1)}%</span>) | P12:${P12.toFixed(2)}(<span class="proof-hl">${(r12*100).toFixed(1)}%</span>) => <span class="text-white">Score: ${score.toFixed(2)}</span>` };
                 };
 
-                // Dual 전용 단순 12개월 수익
                 const calcRet = (t, currIdx) => {
-                    const currYM = sortedMonths[currIdx];
-                    const m12YM = sortedMonths[currIdx-12];
-                    const P0 = dataMap[t][currYM];
-                    const P12 = m12YM ? dataMap[t][m12YM] : null;
-                    
+                    const P0 = dataMap[t][sortedMonths[currIdx]], P12 = dataMap[t][sortedMonths[currIdx-12]];
                     if(!P0 || !P12) return { ret: -999, proof: `[${t}] 데이터 부족` };
                     const ret = (P0/P12 - 1) * 100;
-                    const proof = `[${t}] 현재가(${currYM}): $${P0.toFixed(2)} / 12개월전(${m12YM}): $${P12.toFixed(2)} => 수익률: <span class="text-white">${ret.toFixed(2)}%</span>`;
-                    return { ret, proof };
+                    return { ret, proof: `[${t}] ${sortedMonths[currIdx]}: $${P0.toFixed(2)} / 12개월전: $${P12.toFixed(2)} => <span class="text-white">${ret.toFixed(2)}%</span>` };
                 }
 
-                // 최근 3개월치 계산
-                const len = sortedMonths.length;
-                for(let i = len - 1; i >= len - 3; i--) {
+                for(let i = sortedMonths.length - 1; i >= sortedMonths.length - 4; i--) {
                     if(i - 12 < 0) break;
-                    
-                    const ym = sortedMonths[i];
-                    let row = `<tr><td class="text-left font-bold text-accent">${ym}</td>`;
+                    let row = `<tr><td class="text-left font-bold text-accent">${sortedMonths[i]}</td>`;
                     let proofs = [];
                     
                     if(pfKey === 'dual') {
-                        const s = calcRet('SPY', i), v = calcRet('VEA', i), b = calcRet('BIL', i);
-                        proofs.push(s.proof, v.proof, b.proof);
-                        
-                        let win = s.ret < b.ret && v.ret < b.ret ? 'AGG (대피)' : (s.ret > v.ret ? 'SPY' : 'VEA');
-                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td>`;
-                        row += `<td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td>`;
-                        row += `<td class="text-gray-400">+${b.ret.toFixed(2)}%</td>`;
-                        row += `<td class="text-right font-black ${win.includes('SPY')?'text-up':(win.includes('AGG')?'text-gray-400':'text-accent')}">${win}</td>`;
+                        const s = calcRet('SPY', i), v = calcRet('VEA', i), b = calcRet('BIL', i); proofs.push(s.proof, v.proof, b.proof);
+                        let win = s.ret < b.ret && v.ret < b.ret ? 'AGG' : (s.ret > v.ret ? 'SPY' : 'VEA');
+                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td><td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td><td class="text-gray-400">+${b.ret.toFixed(2)}%</td><td class="text-right font-black ${win.includes('SPY')?'text-up':(win.includes('AGG')?'text-gray-400':'text-accent')}">${win}</td>`;
                     }
                     else if(pfKey === 'vaa') {
-                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), as = calcScore('AGG', i);
-                        proofs.push(ss.proof, vs.proof, vws.proof, as.proof);
-                        
-                        let win = (ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) ? '공격자산' : '수비자산(LQD/IEF)';
-                        row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td>`;
-                        row += `<td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td>`;
-                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td>`;
-                        row += `<td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td>`;
-                        row += `<td class="text-right font-black ${win.includes('공격')?'text-up':'text-gray-400'}">${win}</td>`;
+                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), as = calcScore('AGG', i); proofs.push(ss.proof, vs.proof, vws.proof, as.proof);
+                        let win = (ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) ? '공격자산' : '수비자산';
+                        row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td><td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td><td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td><td class="text-right font-black ${win.includes('공격')?'text-up':'text-gray-400'}">${win}</td>`;
                     }
                     else if(pfKey === 'daa') {
-                        const vws = calcScore('VWO', i), bns = calcScore('BND', i);
-                        proofs.push(vws.proof, bns.proof);
-                        
+                        const vws = calcScore('VWO', i), bns = calcScore('BND', i); proofs.push(vws.proof, bns.proof);
                         let def = (vws.score <= 0 || bns.score <= 0) ? 'YES' : 'NO';
                         let win = def === 'YES' ? '수비(SHY)' : '공격(SPY/VEA)';
-                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td>`;
-                        row += `<td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td>`;
-                        row += `<td class="${def==='YES'?'text-down':'text-up'} font-bold">${def}</td>`;
-                        row += `<td class="text-right font-black ${win.includes('공격')?'text-up':'text-gray-400'}">${win}</td>`;
+                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def==='YES'?'text-down':'text-up'} font-bold">${def}</td><td class="text-right font-black ${win.includes('공격')?'text-up':'text-gray-400'}">${win}</td>`;
                     }
                     else if(pfKey === 'baa') {
-                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), bns = calcScore('BND', i);
-                        proofs.push(ss.proof, vs.proof, vws.proof, bns.proof);
-                        
-                        const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
+                        const ss = calcScore('SPY', i), vws = calcScore('VWO', i), bns = calcScore('BND', i); proofs.push(ss.proof, vws.proof, bns.proof);
+                        const minS = Math.min(ss.score, vws.score, bns.score);
                         let def = minS <= 0 ? 'YES' : 'NO';
                         let win = def === 'YES' ? '수비(BIL/IEF)' : '공격(QQQ)';
-                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td>`;
-                        row += `<td class="${def==='YES'?'text-down':'text-up'} font-bold">${def}</td>`;
-                        row += `<td class="text-right font-black ${win.includes('QQQ')?'text-up':'text-gray-400'}">${win}</td>`;
+                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def==='YES'?'text-down':'text-up'} font-bold">${def}</td><td class="text-right font-black ${win.includes('QQQ')?'text-up':'text-gray-400'}">${win}</td>`;
                     }
 
                     row += `</tr>`;
-                    
-                    // 증명 토글 행 추가
-                    const proofHtml = proofs.map(p => `<div>${p}</div>`).join('');
-                    row += `<tr class="proof-row"><td colspan="5" class="proof-cell"><div class="proof-box">${proofHtml}</div></td></tr>`;
-                    
+                    row += `<tr class="proof-row"><td colspan="5" class="proof-cell"><div class="proof-box">${proofs.map(p => `<div>${p}</div>`).join('')}</div></td></tr>`;
                     html += row;
                 }
                 
@@ -819,24 +1045,20 @@
                 content.style.display = 'block';
 
             } catch (error) {
-                logError(`Live Engine Failed (${pfKey})`, error);
-                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드에 실패했습니다.<br>우측 상단 [!] 버튼을 확인하세요.</p>`;
+                logError(`Live Engine Failed`, error);
+                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드 실패 (Rate Limit)<br>잠시 후 다시 열어주세요.</p>`;
             }
         }
 
-        // --- 초기화 ---
+        // ==========================================
+        // 시스템 부트
+        // ==========================================
         document.addEventListener("DOMContentLoaded", () => {
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
                 
                 const form = document.getElementById('search-form');
-                if(form) {
-                    form.onsubmit = (e) => { 
-                        e.preventDefault(); 
-                        const t = document.getElementById('ticker-input').value.trim().toUpperCase(); 
-                        if(t) loadData(t); 
-                    };
-                }
+                if(form) { form.onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); }; }
                 
                 setTheme(savedTheme);
                 setFontSize(savedFontSize);
@@ -845,13 +1067,17 @@
                 if(lbtn) lbtn.classList.add('active');
                 updateMAButtons();
                 
+                const pfCompareInput = document.getElementById('pf-compare-input');
+                if(pfCompareInput) { pfCompareInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') { e.preventDefault(); comparePortfolioStock(); } }); }
+
                 setTimeout(() => { if(myChart) { myChart.resize(); loadData('SPY'); } }, 150);
+                
                 window.addEventListener('resize', () => { 
                     requestAnimationFrame(() => {
                         myChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize();
                     });
                 });
-            } catch(e) { logError("Init Error", e); }
+            } catch(e) { logError("Init Crash", e); }
         });
     </script>
 </body>
