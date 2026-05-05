@@ -50,6 +50,22 @@
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.1);
         }
+        .theme-purple {
+            --bg-color: #171026;
+            --panel-color: rgba(37, 26, 58, 0.8);
+            --modal-bg: #251a3a;
+            --text-main: #f3e8ff;
+            --text-muted: #a855f7;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        .theme-green {
+            --bg-color: #022c22;
+            --panel-color: rgba(6, 78, 59, 0.8);
+            --modal-bg: #064e3b;
+            --text-main: #ecfdf5;
+            --text-muted: #34d399;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
 
         .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
         .status-BUY { color: #34D399; }
@@ -82,7 +98,7 @@
         #loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 1rem; flex-direction: column; }
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 1rem; }
         .modal-content { max-width: 500px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-        .modal-content-large { max-width: 850px; } 
+        .modal-content-large { max-width: 900px; } 
         
         .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
@@ -109,7 +125,6 @@
 
         .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column;}
         .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(59,130,246,0.3); }
-        .pf-badge { font-size: 0.55rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); color: var(--text-main); white-space: nowrap; }
         
         /* 라이브 테이블 & 증명 영역 스타일 */
         .calc-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
@@ -125,8 +140,8 @@
         
         /* 줄바꿈 및 가독성 개선된 리스트 스타일 */
         .rule-list { list-style-type: none; padding-left: 0; margin-top: 10px; }
-        .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: flex-start; line-height: 1.6; }
-        .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 2px; font-size: 0.8rem; }
+        .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: flex-start; line-height: 1.5; }
+        .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 1px; font-size: 0.8rem; }
         .rule-highlight { color: var(--text-main); font-weight: 800; background: rgba(59, 130, 246, 0.2); padding: 3px 6px; border-radius: 6px; margin-right: 6px; display: inline-block; margin-bottom: 4px; border: 1px solid rgba(59, 130, 246, 0.4); word-break: keep-all; }
         
         #error-log-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; border-radius: 8px; padding: 8px; margin-top: 8px; font-family: monospace; font-size: 0.65rem; color: #FCA5A5; max-height: 100px; overflow-y: auto; word-break: break-all; }
@@ -273,16 +288,29 @@
 
                 <!-- 라이브 엔진 영역 (증명 기능 포함) -->
                 <div id="pf-modal-live-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
-                    <div class="p-3 border-b border-themeBorder flex justify-between items-center bg-black/20">
+                    <div class="p-3 border-b border-themeBorder flex flex-col md:flex-row md:justify-between md:items-center bg-black/20 gap-3">
                         <div class="flex items-center gap-2">
                             <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                             <span class="text-sm font-black text-themeText">Live Strategy Engine</span>
                         </div>
-                        <label class="flex items-center gap-2 cursor-pointer bg-themeBorder/50 px-2 py-1 rounded-lg border border-themeBorder hover:bg-themeBorder transition">
-                            <input type="checkbox" id="toggle-proof" class="w-3 h-3 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
-                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 증명 (상세보기)</span>
+                        <label class="flex items-center gap-2 cursor-pointer bg-themeBorder/50 px-3 py-1.5 rounded-lg border border-themeBorder hover:bg-themeBorder transition justify-center md:justify-end">
+                            <input type="checkbox" id="toggle-proof" class="w-4 h-4 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
+                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 및 원데이터 증명 보기</span>
                         </label>
                     </div>
+                    
+                    <!-- 라이브 백테스트 요약 결과 -->
+                    <div id="pf-live-summary" class="hidden m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between">
+                        <div>
+                            <p class="text-[0.65rem] font-black text-emerald-500 uppercase tracking-widest mb-1">최근 12개월 실시간 운용 성과</p>
+                            <p class="text-xs text-themeMuted">현재 전략대로 투자 시 실제 수익률 (API 기반)</p>
+                        </div>
+                        <div class="text-right">
+                            <p id="pf-live-summary-cagr" class="text-2xl font-black text-themeText">--</p>
+                            <p class="text-xs font-bold text-themeMuted mt-1">MDD: <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
+                        </div>
+                    </div>
+
                     <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
                         <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
                         <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
@@ -484,7 +512,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('allweather')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 사계절 대응 전략</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 리스크 패리티 전략</p>
                         <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">7.8%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-14.2%</span></span>
@@ -613,8 +641,8 @@
                 title: '60/40 포트폴리오', cagr: '8.3%', mdd: '-29.0%', type: 'static', 
                 desc: '가장 고전적이고 검증된 패시브 전략입니다. 경제 성장기에는 주식이, 침체기에는 채권이 방어하여 꾸준한 우상향을 그립니다.',
                 rules: [
-                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%', 
-                    '<span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.'
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.</div>'
                 ], 
                 allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] 
             },
@@ -622,8 +650,8 @@
                 title: '영구 포트폴리오 (Permanent)', cagr: '6.5%', mdd: '-13.5%', type: 'static', 
                 desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절(성장, 침체, 인플레이션, 디플레이션) 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
                 rules: [
-                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%',
-                    '<span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.'
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%</div>',
+                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.</div>'
                 ], 
                 allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] 
             },
@@ -631,8 +659,8 @@
                 title: '올웨더 포트폴리오 (All-Weather)', cagr: '7.8%', mdd: '-14.2%', type: 'static', 
                 desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 포트폴리오 전체에 미치는 변동성(리스크)을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.',
                 rules: [
-                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%',
-                    '<span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.'
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%</div>',
+                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.</div>'
                 ], 
                 allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] 
             },
@@ -640,39 +668,39 @@
                 title: '오리지널 듀얼 모멘텀', cagr: '12.5%', mdd: '-17.8%', type: 'dynamic', 
                 desc: 'Gary Antonacci가 발표한 동적 자산배분의 고전입니다. 자산이 과거 대비 상승장인지 파악하는 <b>절대 모멘텀</b>과, 여러 자산 중 어느 것이 더 강한지 파악하는 <b>상대 모멘텀</b>을 결합하여 하락장을 피하고 상승장에 올라탑니다.',
                 rules: [
-                    '<span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span>',
-                    '<span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.', 
-                    '<span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.'
+                    '<div class="flex-1"><span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span></div>',
+                    '<div class="flex-1"><span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수정종가 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.</div>'
                 ] 
             },
             'vaa': { 
                 title: 'VAA (Vigilant Asset Allocation)', cagr: '15.2%', mdd: '-16.1%', type: 'dynamic', 
                 desc: 'Wouter Keller 박사가 개발한 극강의 방어형 모멘텀 전략입니다. 시장이 꺾이는 순간을 귀신같이 포착하기 위해 과거 1개월 단기 수익률에 무려 12배의 압도적인 가중치를 두어 <b>번개처럼 빠른 스위칭</b>을 목표로 합니다.',
                 rules: [
-                    '<span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span>',
-                    '<span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span>',
-                    '<span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 스코어를 계산합니다.', 
-                    '<span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 스코어가 <b>모두 0 이상</b>이면, 스코어가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.', 
-                    '<span class="rule-highlight">수비 모드:</span> 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 스코어 1위 자산으로 <strong>100% 전액 대피</strong>합니다.'
+                    '<div class="flex-1"><span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span></div>',
+                    '<div class="flex-1"><span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span></div>',
+                    '<div class="flex-1"><span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 스코어를 계산합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 스코어가 <b>모두 0 이상</b>이면, 스코어가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">수비 모드:</span> 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 스코어 1위 자산으로 <strong>100% 전액 대피</strong>합니다.</div>'
                 ] 
             },
             'daa': { 
                 title: 'DAA (Defensive Asset Allocation)', cagr: '13.5%', mdd: '-12.0%', type: 'dynamic', 
                 desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기에 가장 먼저 타격을 받는 <b>탄광 속 카나리아(Canary) 자산</b>을 도입하여, 평소엔 주식 비중을 유지하면서 위험 시점에만 효과적으로 도망갑니다.',
                 rules: [
-                    '<span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span>',
-                    '<span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)',
-                    '<span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 스코어(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.',
-                    '<span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.'
+                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span></div>',
+                    '<div class="flex-1"><span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)</div>',
+                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 스코어(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.</div>',
+                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.</div>'
                 ] 
             },
             'baa': { 
                 title: 'BAA (Bold Asset Allocation)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic', 
                 desc: '현존하는 최고 수준의 최신 동적 자산배분 모델. 2022년 금리 인상기 주식/채권 동반 폭락장에서도 훌륭한 방어력을 증명했습니다. 방어력을 한층 더 끌어올리고, 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화합니다.',
                 rules: [
-                    '<span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.',
-                    '<span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 스코어(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.', 
-                    '<span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 금리 인상으로 인한 채권 시장 붕괴 리스크까지 완벽히 차단합니다.'
+                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.</div>',
+                    '<div class="flex-1"><span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 스코어(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 금리 인상으로 인한 채권 시장 붕괴 리스크까지 완벽히 차단합니다.</div>'
                 ] 
             }
         };
@@ -1058,21 +1086,24 @@
             setTimeout(() => pfChart.resize(), 100);
         }
 
+        // 모달 띄우기 로직 (설명 렌더링 수정 포함)
         function showPfDetail(pfKey) {
             currentPfKey = pfKey; const data = pfDetails[pfKey];
             if(!data) return;
 
             document.getElementById('pf-modal-title').innerText = data.title;
+            
             const descEl = document.getElementById('pf-modal-desc');
             if (descEl) {
                 if (data.desc) { descEl.innerHTML = data.desc; descEl.style.display = 'block'; } 
                 else { descEl.style.display = 'none'; }
             }
+            
             document.getElementById('pf-modal-cagr').innerText = data.cagr;
             document.getElementById('pf-modal-mdd').innerText = data.mdd;
             
-            // 설명 박스를 flex-1 div로 감싸 텍스트 노드가 Flex 컬럼화 되는 버그 해결
-            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1">${r}</div></li>`).join('');
+            // 모달 안의 규칙 렌더링 시 display:flex 충돌 해결을 위해 div 래퍼 사용
+            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1 text-[0.7rem] md:text-[0.75rem] leading-relaxed">${r}</div></li>`).join('');
             document.getElementById('pf-compare-input').value = '';
             
             const pieArea = document.getElementById('pf-modal-pie-area');
@@ -1178,21 +1209,25 @@
             const content = document.getElementById('pf-live-content');
             const tbody = document.getElementById('pf-live-table');
             const toggleBox = document.getElementById('toggle-proof');
+            const summaryBox = document.getElementById('pf-live-summary');
+            const summaryCagr = document.getElementById('pf-live-summary-cagr');
+            const summaryMdd = document.getElementById('pf-live-summary-mdd');
             
             if(!area) return;
             area.style.display = 'block';
             loading.style.display = 'flex';
             content.style.display = 'none';
+            if(summaryBox) summaryBox.style.display = 'none';
             tbody.innerHTML = '';
             if(toggleBox) toggleBox.checked = false;
 
             try {
                 let tickers = [];
                 let colCount = 5;
-                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL']; colCount = 5; }
-                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG']; colCount = 6; }
-                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY']; colCount = 5; }
-                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND']; colCount = 4; }
+                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'AGG']; colCount = 5; } // AGG added for backtest
+                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY']; colCount = 6; }
+                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY']; colCount = 5; } // SHY added for defense
+                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 4; }
 
                 const dataMap = {};
                 let unifiedMonths = new Set();
@@ -1222,7 +1257,7 @@
                 else if(pfKey === 'vaa') html += `<th>SPY 점수</th><th>VEA 점수</th><th>VWO 점수</th><th>AGG 점수</th>`;
                 else if(pfKey === 'daa') html += `<th>VWO 점수</th><th>BND 점수</th><th>위험?</th>`;
                 else if(pfKey === 'baa') html += `<th>최저 카나리아</th><th>안전 대피?</th>`;
-                html += `<th class="text-right">결과</th></tr></thead><tbody>`;
+                html += `<th class="text-right">투자 비중</th></tr></thead><tbody>`;
 
                 const calcScore = (t, currIdx) => {
                     const currYM = sortedMonths[currIdx];
@@ -1258,61 +1293,146 @@
                     const ret = (P0/P12 - 1) * 100;
                     const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) $${P0.toFixed(2)} / 과거(${m12YM}) $${P12.toFixed(2)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
                     return { ret, proof };
-                }
+                };
 
-                for(let i = sortedMonths.length - 1; i >= sortedMonths.length - 12; i--) {
-                    if(i - 12 < 0) break;
-                    let row = `<tr><td class="text-left font-bold text-accent">${sortedMonths[i]}</td>`;
-                    let proofs = [];
+                const getSignal = (idx) => {
+                    if(idx - 12 < 0) return null;
+                    let result = { assets: [], text: '', proofs: [], color: '' };
                     
                     if(pfKey === 'dual') {
-                        const s = calcRet('SPY', i), v = calcRet('VEA', i), b = calcRet('BIL', i); proofs.push(s.proof, v.proof, b.proof);
-                        let win = s.ret < b.ret && v.ret < b.ret ? 'AGG 100%' : (s.ret > v.ret ? 'SPY 100%' : 'VEA 100%');
-                        let wColor = win.includes('SPY') ? 'text-up' : (win.includes('AGG') ? 'text-gray-400' : 'text-accent');
+                        const s = calcRet('SPY', idx), v = calcRet('VEA', idx), b = calcRet('BIL', idx);
+                        result.proofs.push(s.proof, v.proof, b.proof);
+                        if(s.ret === -999 || v.ret === -999 || b.ret === -999) return null;
                         
-                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td>`;
-                        row += `<td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td>`;
-                        row += `<td class="text-gray-400">+${b.ret.toFixed(2)}%</td>`;
-                        row += `<td class="text-right font-black ${wColor}">${win}</td>`;
+                        if(s.ret < b.ret && v.ret < b.ret) { result.assets=[{t:'AGG', w:1}]; result.text='AGG 100%'; result.color='text-gray-400'; }
+                        else if(s.ret > v.ret) { result.assets=[{t:'SPY', w:1}]; result.text='SPY 100%'; result.color='text-up'; }
+                        else { result.assets=[{t:'VEA', w:1}]; result.text='VEA 100%'; result.color='text-accent'; }
                     }
                     else if(pfKey === 'vaa') {
-                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), as = calcScore('AGG', i); proofs.push(ss.proof, vs.proof, vws.proof, as.proof);
-                        let win = (ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) ? '공격 1등 100%' : '수비(LQD) 100%';
-                        row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td>`;
-                        row += `<td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td>`;
-                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td>`;
-                        row += `<td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td>`;
-                        row += `<td class="text-right font-black ${win.includes('공격')?'text-up':'text-gray-400'}">${win}</td>`;
+                        const ss=calcScore('SPY',idx), vs=calcScore('VEA',idx), vws=calcScore('VWO',idx), as=calcScore('AGG',idx);
+                        result.proofs.push(ss.proof, vs.proof, vws.proof, as.proof);
+                        if(ss.score===-999) return null;
+                        
+                        if(ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) {
+                            const m = Math.max(ss.score, vs.score, vws.score, as.score);
+                            const t = ss.score===m?'SPY':(vs.score===m?'VEA':(vws.score===m?'VWO':'AGG'));
+                            result.assets=[{t, w:1}]; result.text=`${t} 100% (공격)`; result.color='text-up';
+                        } else {
+                            const lq=calcScore('LQD',idx), ie=calcScore('IEF',idx), sh=calcScore('SHY',idx);
+                            result.proofs.push(lq.proof, ie.proof, sh.proof);
+                            const m = Math.max(lq.score, ie.score, sh.score);
+                            const t = lq.score===m?'LQD':(ie.score===m?'IEF':'SHY');
+                            result.assets=[{t, w:1}]; result.text=`${t} 100% (방어)`; result.color='text-gray-400';
+                        }
                     }
                     else if(pfKey === 'daa') {
-                        const vws = calcScore('VWO', i), bns = calcScore('BND', i); proofs.push(vws.proof, bns.proof);
-                        let def = (vws.score <= 0 || bns.score <= 0) ? 'YES (위험)' : 'NO (안전)';
-                        let win = def.includes('YES') ? 'SHY 100%' : 'SPY 50%, VEA 50%';
-                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td>`;
-                        row += `<td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td>`;
-                        row += `<td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
-                        row += `<td class="text-right font-black ${win.includes('SPY')?'text-up':'text-gray-400'}">${win}</td>`;
+                        const vws=calcScore('VWO',idx), bns=calcScore('BND',idx);
+                        result.proofs.push(vws.proof, bns.proof);
+                        if(vws.score===-999) return null;
+                        
+                        if(vws.score>0 && bns.score>0) {
+                            result.assets=[{t:'SPY', w:0.5}, {t:'VEA', w:0.5}]; result.text='SPY 50%, VEA 50%'; result.color='text-up';
+                        } else {
+                            result.assets=[{t:'SHY', w:1}]; result.text='SHY 100% (방어)'; result.color='text-gray-400';
+                        }
                     }
                     else if(pfKey === 'baa') {
-                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), bns = calcScore('BND', i); proofs.push(ss.proof, vs.proof, vws.proof, bns.proof);
+                        const ss=calcScore('SPY',idx), vs=calcScore('VEA',idx), vws=calcScore('VWO',idx), bns=calcScore('BND',idx);
+                        result.proofs.push(ss.proof, vs.proof, vws.proof, bns.proof);
+                        if(ss.score===-999) return null;
+                        
                         const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
-                        let def = minS <= 0 ? 'YES (전면 대피)' : 'NO (안전)';
-                        let win = def.includes('YES') ? 'BIL 33.3%, IEF 33.3%, TLT 33.3%' : 'QQQ 100%';
-                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td>`;
-                        row += `<td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
-                        row += `<td class="text-right font-black ${win.includes('QQQ')?'text-up':'text-gray-400'}">${win}</td>`;
+                        if(minS > 0) {
+                            result.assets=[{t:'QQQ', w:1}]; result.text='QQQ 100% (공격)'; result.color='text-up';
+                        } else {
+                            result.assets=[{t:'BIL', w:0.333}, {t:'IEF', w:0.333}, {t:'TLT', w:0.333}]; result.text='BIL 33%, IEF 33%, TLT 33%'; result.color='text-gray-400';
+                        }
+                    }
+                    return result;
+                };
+
+                // 최근 12개월 테이블 생성
+                const len = sortedMonths.length;
+                for(let i = len - 1; i >= len - 12; i--) {
+                    if(i - 12 < 0) break;
+                    
+                    const sig = getSignal(i);
+                    if(!sig) continue;
+
+                    let row = `<tr><td class="text-left font-bold text-accent">${sortedMonths[i]}</td>`;
+                    
+                    if(pfKey === 'dual') {
+                        const s = calcRet('SPY', i), v = calcRet('VEA', i), b = calcRet('BIL', i);
+                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td><td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td><td class="text-gray-400">+${b.ret.toFixed(2)}%</td>`;
+                    }
+                    else if(pfKey === 'vaa') {
+                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), as = calcScore('AGG', i);
+                        row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td><td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td><td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td>`;
+                    }
+                    else if(pfKey === 'daa') {
+                        const vws = calcScore('VWO', i), bns = calcScore('BND', i);
+                        let def = (vws.score <= 0 || bns.score <= 0) ? 'YES (위험)' : 'NO (안전)';
+                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
+                    }
+                    else if(pfKey === 'baa') {
+                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), bns = calcScore('BND', i);
+                        const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
+                        let def = minS <= 0 ? 'YES (대피 발동)' : 'NO (안전)';
+                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
                     }
 
-                    row += `</tr>`;
-                    
-                    const proofHtml = proofs.map(p => `<div>${p}</div>`).join('');
+                    row += `<td class="text-right font-black ${sig.color}">${sig.text}</td></tr>`;
+                    const proofHtml = sig.proofs.map(p => `<div>${p}</div>`).join('');
                     row += `<tr class="proof-row"><td colspan="${colCount}" class="proof-cell"><div class="proof-box">${proofHtml}</div></td></tr>`;
-                    
                     html += row;
                 }
                 
                 html += `</tbody>`;
                 tbody.innerHTML = html;
+
+                // 12개월 실시간 운용 성과 시뮬레이션
+                let portValue = 100;
+                let peak = 100;
+                let mdd = 0;
+                let monthsCalculated = 0;
+
+                // len-1 이 최근 달이므로, 12개월 전인 len-13에서 발생한 시그널을 바탕으로 len-12 ~ len-1 까지의 수익률을 누적함
+                for (let i = len - 13; i < len - 1; i++) {
+                    if(i < 12) continue;
+
+                    const sig = getSignal(i); 
+                    if(!sig) continue;
+
+                    let monRet = 0;
+                    let hasData = true;
+                    for(let asset of sig.assets) {
+                        const p0 = dataMap[asset.t][sortedMonths[i]];
+                        const p1 = dataMap[asset.t][sortedMonths[i+1]]; // 1개월 뒤 종가
+                        if(p0 && p1) {
+                            monRet += asset.w * (p1 / p0 - 1);
+                        } else {
+                            hasData = false;
+                        }
+                    }
+
+                    if(hasData) {
+                        portValue *= (1 + monRet);
+                        if(portValue > peak) peak = portValue;
+                        let dd = (portValue - peak) / peak;
+                        if(dd < mdd) mdd = dd;
+                        monthsCalculated++;
+                    }
+                }
+
+                if(monthsCalculated > 0) {
+                    const finalRet = ((portValue / 100) - 1) * 100;
+                    summaryCagr.innerText = `${finalRet > 0 ? '+' : ''}${finalRet.toFixed(2)}%`;
+                    summaryCagr.className = `text-2xl md:text-3xl font-black ${finalRet > 0 ? 'text-up' : 'text-down'}`;
+                    summaryMdd.innerText = `${(mdd * 100).toFixed(2)}%`;
+                    summaryMdd.className = `text-sm font-bold ml-1 ${mdd < -0.05 ? 'text-down' : 'text-themeMuted'}`;
+                    if(summaryBox) summaryBox.style.display = 'flex';
+                }
+
                 loading.style.display = 'none';
                 content.style.display = 'block';
 
