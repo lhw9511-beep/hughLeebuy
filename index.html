@@ -2,6 +2,7 @@
 <html lang="ko" class="theme-default">
 <head>
     <meta charset="UTF-8">
+    <!-- 모바일 확대 방지 및 레이아웃 고정 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BUY or BYE | AI Precision Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -77,18 +78,17 @@
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); transition: background 0.3s ease, border-color 0.3s ease; }
         
-        .chart-container { height: 400px; width: 100%; min-height: 400px; }
-        @media (min-width: 1024px) { .chart-container { height: 500px; min-height: 500px; } }
-        .portfolio-chart-container { height: 350px; width: 100%; min-height: 350px; }
-        .pie-container { height: 250px; width: 100%; min-height: 250px; }
-        .pf-modal-chart-container { height: 280px; width: 100%; min-height: 280px; }
+        /* 높이 강제 고정으로 빈 공간 렌더링 방지 */
+        .chart-container { height: 400px; width: 100%; display: block; }
+        @media (min-width: 1024px) { .chart-container { height: 500px; } }
+        .portfolio-chart-container { height: 350px; width: 100%; display: block; }
+        .pie-container { height: 250px; width: 100%; display: block; }
+        .pf-modal-chart-container { height: 280px; width: 100%; display: block; }
         
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 10px; }
         
-        /* 버튼 스타일 */
         .chip-btn { padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 800; border-radius: 0.5rem; background: rgba(0,0,0,0.1); color: var(--text-muted); border: 1px solid var(--border-color); transition: all 0.2s; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
         .chip-btn:hover { border-color: #3B82F6; color: var(--text-main); }
         .chip-btn.active { background-color: #3B82F6; border-color: #3B82F6; color: white; }
@@ -115,9 +115,11 @@
         .signal-badge { font-weight: 900; font-size: 0.6rem; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; white-space: nowrap; }
         .signal-up { background-color: rgba(38, 166, 154, 0.2); color: #26A69A; }
         .signal-down { background-color: rgba(239, 83, 80, 0.2); color: #EF5350; }
-        .signal-neutral { background-color: rgba(107, 114, 128, 0.2); color: #9CA3AF; }
 
-        .icon { width: 16px; height: 16px; min-width: 16px; min-height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+        /* SVG 아이콘 강제 고정 속성 (레이아웃 파괴 원인 차단) */
+        .icon-sm { width: 14px !important; height: 14px !important; min-width: 14px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+        .icon-md { width: 20px !important; height: 20px !important; min-width: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+        .icon-lg { width: 24px !important; height: 24px !important; min-width: 24px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
         
         .main-tab-btn { padding: 0.6rem 1rem; font-weight: 900; font-size: 0.85rem; color: var(--text-muted); border-bottom: 2px solid transparent; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
         .main-tab-btn.active { color: var(--text-main); border-bottom-color: #3B82F6; }
@@ -136,8 +138,7 @@
         .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: flex-start; line-height: 1.4; }
         .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 8px; font-weight: bold; flex-shrink: 0; }
 
-        /* 상태 뱃지 전용 (에러 시 강조) */
-        .status-indicator { transition: all 0.3s ease; }
+        #error-log-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; border-radius: 8px; padding: 8px; margin-top: 8px; font-family: monospace; font-size: 0.65rem; color: #FCA5A5; max-height: 100px; overflow-y: auto; word-break: break-all; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
@@ -147,10 +148,10 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
                 <h3 class="text-lg font-black text-themeText flex items-center">
-                    <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     앱 환경 설정
                 </h3>
-                <button type="button" onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition p-2"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             
             <div class="space-y-6">
@@ -164,22 +165,12 @@
                         <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
                     </div>
                 </div>
-
                 <div class="border-t border-themeBorder pt-4">
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 조절</p>
                     <div class="flex gap-2">
                         <button type="button" onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
                         <button type="button" onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
                         <button type="button" onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
-                    </div>
-                </div>
-
-                <div class="border-t border-themeBorder pt-4">
-                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기</p>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
-                        <button type="button" onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
-                        <button type="button" onclick="setLineWidth('3')" id="btn-line-3" class="setting-btn">두껍게</button>
                     </div>
                 </div>
             </div>
@@ -194,10 +185,10 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
                 <h3 id="info-title" class="text-lg font-black text-themeText flex items-center">
-                    <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
+                    <svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
                     지표 설명
                 </h3>
-                <button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             <p id="info-body" class="text-sm text-themeMuted leading-relaxed py-2"></p>
             <div class="mt-6 flex justify-end">
@@ -206,7 +197,27 @@
         </div>
     </div>
 
-    <!-- 3. 종목 분석 모달 -->
+    <!-- 3. 에러 확인용 (디버그) 모달 -->
+    <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start mb-4 border-b border-rose-500/30 pb-3">
+                <h3 class="text-lg font-black text-rose-500 flex items-center">
+                    <svg class="icon-md mr-2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    에러 로그 (Debug)
+                </h3>
+                <button type="button" onclick="closeErrorModal()" class="text-themeMuted hover:text-rose-500 p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+            </div>
+            <p class="text-xs text-themeMuted mb-2">아래 내용을 복사하여 AI에게 전달해주시면 원인 파악이 가능합니다.</p>
+            <textarea id="error-log-text" class="w-full h-32 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.65rem] font-mono p-2 rounded-lg outline-none resize-none" readonly></textarea>
+            <div class="mt-4 flex gap-2 justify-end">
+                <button type="button" onclick="copyErrorLog()" id="btn-copy-error" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black hover:bg-rose-700 transition">복사하기</button>
+                <button type="button" onclick="closeErrorModal()" class="bg-themeBorder text-themeText px-4 py-2 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 종목 분석 및 포트폴리오 상세 모달 등 (기존 동일 구조 유지하되 SVG 아이콘 사이즈 지정) -->
+    <!-- ... 모달 코드 생략, 아이콘은 모두 class="icon-md" 또는 "icon-sm" 사용 ... -->
     <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
@@ -214,93 +225,92 @@
                     <h3 id="modal-title" class="text-xl font-black text-themeText uppercase italic">Detail View</h3>
                     <p id="modal-period" class="text-[0.7rem] text-accent font-black tracking-widest uppercase mt-1">---</p>
                 </div>
-                <button type="button" onclick="closeDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="closeDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             <div id="modal-body" class="space-y-4 text-sm text-themeText py-2"></div>
             <div class="mt-6 flex justify-end">
-                <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 transition border border-white/5">닫기</button>
+                <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
             </div>
         </div>
     </div>
 
-    <!-- 4. 포트폴리오 상세 및 주식 비교 모달 -->
     <div id="pf-detail-modal" class="modal-overlay" onclick="closePfDetailModal()">
         <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
                 <div>
-                    <h3 id="pf-modal-title" class="text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
-                    <p id="pf-modal-subtitle" class="text-[0.8rem] text-themeMuted mt-1 font-bold">설명</p>
+                    <h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
+                    <p id="pf-modal-subtitle" class="text-[0.7rem] md:text-[0.8rem] text-themeMuted mt-1 font-bold">설명</p>
                 </div>
-                <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             
             <div class="py-2">
-                <div class="flex flex-row gap-4 mb-4">
-                    <div class="flex-1 bg-themeBorder/30 p-3 md:p-4 rounded-xl text-center border border-themeBorder">
-                        <p class="text-[0.65rem] text-themeMuted font-black uppercase mb-1">CAGR (연평균 수익률)</p>
-                        <p id="pf-modal-cagr" class="text-xl md:text-2xl font-black text-up">0%</p>
+                <div class="flex flex-row gap-2 md:gap-4 mb-4">
+                    <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
+                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">CAGR(연평균)</p>
+                        <p id="pf-modal-cagr" class="text-lg md:text-xl font-black text-up">0%</p>
                     </div>
-                    <div class="flex-1 bg-themeBorder/30 p-3 md:p-4 rounded-xl text-center border border-themeBorder">
-                        <p class="text-[0.65rem] text-themeMuted font-black uppercase mb-1">MDD (최대 낙폭)</p>
-                        <p id="pf-modal-mdd" class="text-xl md:text-2xl font-black text-down">0%</p>
+                    <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
+                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">MDD(최대낙폭)</p>
+                        <p id="pf-modal-mdd" class="text-lg md:text-xl font-black text-down">0%</p>
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center gap-2 mb-4 bg-themeBorder/20 p-2 md:p-3 rounded-xl border border-themeBorder">
-                    <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-4 py-2 uppercase outline-none text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교 종목 검색 (예: QQQ)">
-                    <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="w-full sm:w-auto bg-accent text-white px-5 py-2.5 rounded-lg font-black text-sm hover:bg-blue-600 transition shrink-0 shadow-lg shadow-accent/30">차트 비교</button>
+                <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
+                    <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-3 py-2 uppercase outline-none text-xs md:text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교 (예: QQQ)">
+                    <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="bg-accent text-white px-4 py-2 rounded-lg font-black text-xs md:text-sm hover:bg-blue-600 transition shrink-0 shadow-lg shadow-accent/30">차트 비교</button>
                 </div>
 
                 <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
 
                 <div id="pf-modal-pie-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-themeBorder mb-4 hidden relative overflow-hidden">
-                    <div class="absolute top-3 left-4 text-xs font-black text-themeMuted tracking-widest z-10">목표 자산 배분 비율</div>
+                    <div class="absolute top-2 left-3 text-[0.65rem] font-black text-themeMuted tracking-widest z-10">자산 배분 비율</div>
                     <div id="pf-pie-chart" class="pie-container"></div>
                 </div>
 
-                <!-- 라이브 계산기 영역 -->
                 <div id="pf-modal-live-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
-                    <div class="p-3 border-b border-themeBorder flex items-center gap-2">
-                        <svg class="icon text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                        <span class="text-sm font-black text-themeText">Live Strategy Engine (API)</span>
+                    <div class="p-2 border-b border-themeBorder flex items-center gap-2">
+                        <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        <span class="text-xs font-black text-themeText">Live Strategy Engine</span>
                     </div>
-                    <div id="pf-live-loading" class="flex flex-col items-center justify-center p-8">
-                        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
-                        <p id="pf-live-loading-text" class="text-[0.65rem] font-bold text-themeMuted uppercase tracking-widest">수학적 데이터 분석 중...</p>
+                    <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
+                        <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
+                        <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
                     </div>
-                    <div id="pf-live-content" class="hidden overflow-x-auto custom-scroll p-2">
+                    <div id="pf-live-content" class="hidden overflow-x-auto custom-scroll p-1">
                         <table class="calc-table" id="pf-live-table"></table>
                     </div>
                 </div>
 
-                <div class="bg-[var(--modal-bg)] p-4 rounded-xl border border-themeBorder">
-                    <p class="text-[0.75rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-2">
-                        <svg class="icon mr-1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <div class="bg-[var(--modal-bg)] p-3 md:p-4 rounded-xl border border-themeBorder">
+                    <p class="text-[0.7rem] md:text-[0.75rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-2">
+                        <svg class="icon-sm mr-1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                         운용 알고리즘 및 규칙
                     </p>
                     <ul id="pf-modal-rules" class="rule-list"></ul>
                 </div>
             </div>
-
             <div class="mt-4 flex justify-end">
                 <button type="button" onclick="closePfDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 transition border border-white/5">닫기</button>
             </div>
         </div>
     </div>
 
+
     <!-- ============================================== -->
-    <!-- 메인 래퍼 -->
+    <!-- 메인 대시보드 래퍼 -->
     <!-- ============================================== -->
-    <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-4 relative">
+    <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
         
         <!-- 상단 헤더 -->
         <header class="glass rounded-2xl shadow-sm overflow-hidden">
-            <div class="flex justify-between items-center p-4">
+            <div class="flex justify-between items-center p-3 md:p-4">
                 <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
-                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40">
-                        <svg class="icon text-white w-5 h-5" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
+                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40 flex items-center justify-center">
+                        <!-- 사이즈 절대 고정 -->
+                        <svg class="icon-lg text-white" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
                     </div>
-                    <h1 class="text-2xl font-black italic text-themeText tracking-tighter ml-1">BUY <span class="text-accent">or BYE</span></h1>
+                    <h1 class="text-xl md:text-2xl font-black italic text-themeText tracking-tighter">BUY <span class="text-accent">or BYE</span></h1>
                 </div>
                 
                 <div class="flex items-center gap-2 md:gap-4">
@@ -308,50 +318,57 @@
                         <button type="button" onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">종목 AI 분석</button>
                         <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
                     </div>
-                    <button type="button" onclick="openSettingsModal()" class="p-2.5 bg-[var(--modal-bg)] border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
-                        <svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    
+                    <!-- 에러 보기 버튼 (히든 디폴트) -->
+                    <button type="button" onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 border border-rose-500/50 rounded-xl text-rose-500 hover:bg-rose-500 hover:text-white transition shadow-sm">
+                        <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </button>
+
+                    <button type="button" onclick="openSettingsModal()" class="p-2 bg-[var(--modal-bg)] border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
+                        <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
                 </div>
             </div>
+            <!-- 모바일 탭 -->
             <div class="md:hidden flex border-t border-themeBorder bg-black/10">
-                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 active text-center text-sm py-3">종목 분석</button>
-                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 text-center text-sm py-3">포트폴리오</button>
+                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 active text-center text-sm py-2">종목 분석</button>
+                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 text-center text-sm py-2">포트폴리오</button>
             </div>
         </header>
 
         <!-- ============================================== -->
         <!-- VIEW 1: 종목 분석 대시보드 -->
         <!-- ============================================== -->
-        <div id="view-dashboard" class="flex flex-col space-y-4">
+        <div id="view-dashboard" class="flex flex-col space-y-3 md:space-y-4">
             
-            <div class="flex flex-col sm:flex-row gap-3 items-center w-full">
+            <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
                 <form id="search-form" class="flex w-full sm:flex-grow">
-                    <input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="종목 검색 (예: TSLA)">
-                    <button type="submit" class="bg-accent text-white px-6 py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button>
+                    <input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="종목 심볼 (예: QQQ)">
+                    <button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button>
                 </form>
-                <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2 status-indicator">
+                <div id="status-text" class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2">
                     <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
                     <span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span>
                 </div>
             </div>
 
             <!-- 차트 영역 -->
-            <div class="glass rounded-2xl p-4 md:p-5 flex flex-col shadow-xl relative min-h-[450px]">
+            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]">
                 <div id="loading-overlay">
                     <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
-                    <p id="loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">Data Loading...</p>
+                    <p id="loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">Loading Data...</p>
                 </div>
                 
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-4 gap-4">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-3 md:pb-4 gap-3">
                     <div>
-                        <h2 id="display-ticker" class="text-4xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-2">---</h2>
-                        <div id="live-price" class="text-2xl md:text-3xl font-mono font-black text-themeText">---</div>
+                        <h2 id="display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
+                        <div id="live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
                     </div>
                     
                     <div class="flex flex-col w-full lg:w-auto gap-2">
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1.5">
-                            <span class="text-[0.6rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">기간</span>
-                            <div class="flex gap-1.5">
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">기간</span>
+                            <div class="flex gap-1">
                                 <button type="button" onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉</button>
                                 <button type="button" onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn range-btn">주봉</button>
                                 <button type="button" onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn range-btn">월봉</button>
@@ -359,9 +376,9 @@
                                 <button type="button" onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="chip-btn range-btn">MAX</button>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1.5">
-                            <span class="text-[0.6rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">지표</span>
-                            <div class="flex gap-1.5">
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">지표</span>
+                            <div class="flex gap-1">
                                 <button type="button" onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">MA 20</button>
                                 <button type="button" onclick="toggleMA(50)" id="btn-ma-50" class="chip-btn active">MA 50</button>
                                 <button type="button" onclick="toggleMA(60)" id="btn-ma-60" class="chip-btn">MA 60</button>
@@ -372,66 +389,69 @@
                     </div>
                 </div>
 
-                <!-- 차트 출력 -->
+                <!-- 차트 출력 컨테이너 (고정 크기) -->
                 <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
 
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                <div class="glass rounded-2xl p-4 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
-                    <div class="flex justify-between items-center mb-4 border-b border-themeBorder pb-3">
+            <!-- 하단 분석 패널 (레이아웃 파괴 방지) -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
+                
+                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
+                    <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
                         <div class="flex items-center gap-2">
-                            <svg class="icon w-4 h-4 text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            <p class="text-themeMuted text-[0.65rem] font-black uppercase tracking-widest">Master Intelligence</p>
+                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            <p class="text-themeMuted text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">Master Intelligence</p>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-2 flex-grow mb-2">
                         <div class="perspective-col" onclick="showDetail('short')">
-                            <p class="text-[0.55rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">SHORT</p>
+                            <p class="text-[0.5rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">SHORT</p>
                             <div id="st-signal-text" class="text-sm md:text-base font-black italic text-themeMuted">WAIT</div>
                         </div>
                         <div class="perspective-col" onclick="showDetail('mid')">
-                            <p class="text-[0.55rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">MID</p>
+                            <p class="text-[0.5rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">MID</p>
                             <div id="mt-signal-text" class="text-sm md:text-base font-black italic text-themeMuted">WAIT</div>
                         </div>
                         <div class="perspective-col" onclick="showDetail('long')">
-                            <p class="text-[0.55rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">LONG</p>
+                            <p class="text-[0.5rem] font-black text-themeMuted mb-2 tracking-widest border-b border-themeBorder pb-1">LONG</p>
                             <div id="lt-signal-text" class="text-sm md:text-base font-black italic text-themeMuted">WAIT</div>
                         </div>
                     </div>
+                    <p class="text-[0.55rem] text-themeMuted text-center">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
                 </div>
 
-                <div class="glass rounded-2xl p-4 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
-                    <div class="flex items-center gap-2 mb-4 border-b border-themeBorder pb-3">
-                        <svg class="icon w-4 h-4 text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                        <p class="text-themeText text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
+                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
+                    <div class="flex items-center gap-2 mb-3 border-b border-themeBorder pb-2">
+                        <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
                     </div>
                     
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 h-full mb-4">
-                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일 이동평균선 간의 거리(%)입니다. 양수(+)면 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')">
-                            <p class="stat-label">이격도 <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 h-full mb-3">
+                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일선 간의 거리(%)입니다. 양수(+)면 장기 추세보다 위에 있어 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')">
+                            <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '30 이하는 과매도, 70 이상은 과매수로 해석합니다.')">
-                            <p class="stat-label">RSI(14) <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '주가의 상대적인 강도. 30 이하는 과매도(저점), 70 이상은 과매수(고점)로 해석합니다.')">
+                            <p class="stat-label">RSI(14) <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-rsi-main" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('MACD', '양수(+)면 단기 상승 에너지가, 음수(-)면 하락 에너지가 강함을 의미합니다.')">
-                            <p class="stat-label">MACD <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산. 히스토그램이 양수(+)면 단기 상승, 음수(-)면 하락 에너지가 강함을 의미합니다.')">
+                            <p class="stat-label">MACD <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-macd-main" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('볼린저 밴드', '상단 돌파 시 과열, 하단 이탈 시 침체를 의미합니다.')">
-                            <p class="stat-label">BB밴드 <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')">
+                            <p class="stat-label">BB <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-bb-main" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('스토캐스틱', '20 이하는 침체, 80 이상은 과열을 뜻합니다.')">
-                            <p class="stat-label">Stoch <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '일정 기간 최고가와 최저가 사이 현재 위치. 20 이하는 바닥권, 80 이상은 천장권 과열을 뜻합니다.')">
+                            <p class="stat-label">Stoch <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-stoch-main" class="stat-value text-themeText">---</p>
                         </div>
                     </div>
 
-                    <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[220px]">
-                        <p class="text-xs text-themeMuted text-center py-10">데이터 대기 중...</p>
+                    <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[150px] md:max-h-[200px]">
+                        <p class="text-xs text-themeMuted text-center py-6">데이터 대기 중...</p>
                     </div>
                 </div>
             </div>
@@ -442,35 +462,36 @@
         <!-- ============================================== -->
         <div id="view-portfolio" class="hidden flex-col space-y-4">
             
-            <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
-                <div class="flex items-center justify-between mb-4 border-b border-themeBorder pb-3">
-                    <h2 class="text-lg md:text-xl font-black text-themeText flex items-center gap-2">
-                        <svg class="icon text-emerald-500" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <!-- 정적 포트폴리오 -->
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
+                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
+                    <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
+                        <svg class="icon-md text-emerald-500" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                         정적 자산배분 (Static)
                     </h2>
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="pf-card" onclick="showPfDetail('6040')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">60/40 Portfolio</h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">주식 60%, 채권 40%. 기관 표준 벤치마크.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-3">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">60/40 Portfolio <span class="text-[0.55rem] bg-gray-500/20 text-gray-400 px-2 py-1 rounded">Basic</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식 60%, 채권 40%. 기관 표준.</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">8.3%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-29.0%</span></span>
                         </div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('permanent')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">Permanent</h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">해리 브라운 고안. 4가지 경제 계절에 모두 방어.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-3">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">Permanent <span class="text-[0.55rem] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">Safe</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">해리 브라운. 4가지 경제 계절 방어.</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">6.5%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-13.5%</span></span>
                         </div>
                     </div>
-                    <div class="pf-card sm:col-span-2 xl:col-span-1" onclick="showPfDetail('allweather')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">All-Weather</h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">레이 달리오 고안. 사계절에 모두 대응합니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-3">
+                    <div class="pf-card" onclick="showPfDetail('allweather')">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 리스크 패리티 전략.</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">7.8%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-14.2%</span></span>
                         </div>
@@ -478,63 +499,108 @@
                 </div>
             </div>
 
-            <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-accent">
-                <div class="flex items-center justify-between mb-4 border-b border-themeBorder pb-3">
-                    <h2 class="text-lg md:text-xl font-black text-themeText flex items-center gap-2">
-                        <svg class="icon text-accent" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            <!-- 동적 포트폴리오 -->
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-accent">
+                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
+                    <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
+                        <svg class="icon-md text-accent" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                         동적 자산배분 (Dynamic)
                     </h2>
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <div class="pf-card" onclick="showPfDetail('dual')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">Dual Momentum</h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">모멘텀을 이용해 1등 자산에 몰빵합니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-3">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">12.5%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-17.8%</span></span>
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">Dual Momentum</h3>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">12.5%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-17.8%</span></span>
                         </div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('vaa')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">VAA</h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">단기 수익률 가중치로 강력하고 빠른 자산을 찾습니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-3">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">15.2%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-16.1%</span></span>
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">15.2%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-16.1%</span></span>
                         </div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('daa')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">DAA</h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">카나리아 자산이 꺾이면 안전 자산으로 도망갑니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-3">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">13.5%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-12.0%</span></span>
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">13.5%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-12.0%</span></span>
                         </div>
                     </div>
                     <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">BAA</h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">철저한 방어와 공격적 스위칭을 구사하는 전략.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-3">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">16.5%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-11.2%</span></span>
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">16.5%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-11.2%</span></span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 시뮬레이션 통합 그래프 -->
-            <div class="glass p-4 rounded-2xl shadow-xl">
-                <h3 class="text-sm font-black text-themeText mb-3 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 시뮬레이션 (2000~)</h3>
-                <div id="chart-portfolio" class="portfolio-chart-container"></div>
+            <!-- 시뮬레이션 통합 그래프 (고정 크기) -->
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
+                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 (2000~)</h3>
+                <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
             </div>
+        </div>
+
+        <div class="text-center mt-2 pb-6">
+            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data (Base 100)</p>
         </div>
     </div>
 
     <script>
-        // 전역 안전 장치 (스크립트 멈춤 방지)
+        // ==========================================
+        // 전역 안전 장치 및 디버그(에러 로깅) 시스템
+        // ==========================================
+        let errorLogs = [];
+        function logError(msg, err) {
+            console.error(msg, err);
+            const time = new Date().toLocaleTimeString();
+            let errStr = (err && err.message) ? err.message : String(err);
+            if(err && err.stack) errStr += `\n${err.stack}`;
+            errorLogs.unshift(`[${time}] ${msg}\n${errStr}\n`);
+            if(errorLogs.length > 10) errorLogs.pop(); // 최근 10개만 유지
+            
+            const btn = document.getElementById('btn-show-error');
+            if(btn) btn.classList.remove('hidden'); // 에러 발생 시 ! 버튼 표시
+        }
+
+        function openErrorModal() {
+            document.getElementById('error-log-text').value = errorLogs.join('\n-------------------\n') || '에러 로그가 없습니다.';
+            document.getElementById('error-modal').style.display = 'flex';
+        }
+        function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
+        
+        function copyErrorLog() {
+            const text = document.getElementById('error-log-text').value;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('btn-copy-error');
+                btn.innerText = '복사 완료!';
+                setTimeout(() => btn.innerText = '복사하기', 2000);
+            }).catch(e => {
+                // Clipboard API 실패 시 fallback (구형 브라우저 대응)
+                const textArea = document.getElementById('error-log-text');
+                textArea.select();
+                document.execCommand('copy');
+                const btn = document.getElementById('btn-copy-error');
+                btn.innerText = '복사 완료!';
+                setTimeout(() => btn.innerText = '복사하기', 2000);
+            });
+        }
+
+        window.onerror = function(message, source, lineno, colno, error) { logError("Global JS Error", error || message); updateStatus("ERROR", "bg-rose-500"); };
+        window.addEventListener("unhandledrejection", function(event) { logError("Promise Rejection", event.reason); updateStatus("API ERROR", "bg-rose-500"); });
+
         function safeStorageGet(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
         function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
+        // ==========================================
+        // 글로벌 변수 및 데이터 선언
+        // ==========================================
         let myChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
         const API_BASE_URL = ''; 
 
@@ -542,9 +608,7 @@
         let currentInterval = '1d', currentRange = '1y';
         let globalChartData = null, globalTicker = "SPY", abortController = null;
         let analysisDetails = { short: {}, mid: {}, long: {} }, currentPfKey = '';
-        let liveCalcLoaded = false; // API 중복 요청 방지
 
-        // --- 데이터 딕셔너리 ---
         const pfSimData = {
             years: ["2000","2002","2004","2006","2008","2010","2012","2014","2016","2018","2020","2022","2024"],
             '6040': [100, 80, 100, 120, 85, 110, 130, 160, 180, 200, 240, 210, 260],
@@ -566,27 +630,33 @@
             'baa': { title: 'BAA (Bold)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic', rules: ['카나리아 4개 중 1개라도 0 이하면 즉시 방어 전환', '공격 시 QQQ 등 상위 1개 몰빵', '방어 시 안전자산 상위 3개 분산'] }
         };
 
-        // --- 탭 컨트롤 ---
+        const savedTheme = safeStorageGet('dashboardTheme', 'theme-default');
+        const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
+        let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
+        
+        // ==========================================
+        // UI 제어 (탭, 모달, 리사이즈 버그 수정)
+        // ==========================================
         function switchMainTab(tab) {
             document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-btn-${tab}`).classList.add('active');
+            document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
             document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
             
             document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
             document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
             
-            // 렌더링 사이클 동기화
-            requestAnimationFrame(() => {
+            // Flex 레이아웃이 완전히 잡힌 뒤(100ms) 리사이즈를 강제 호출하여 까만 빈화면 방지
+            setTimeout(() => {
                 if(tab === 'dashboard' && myChart) {
                     myChart.resize();
                 } else if(tab === 'portfolio') {
                     if(!pfChart) initPortfolioChart();
-                    pfChart.resize();
+                    else pfChart.resize();
                 }
-            });
+            }, 100);
         }
 
-        // --- 모달 컨트롤 ---
+        // --- 기타 모달 컨트롤 ---
         function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
         function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
         function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
@@ -599,56 +669,53 @@
             document.getElementById('info-modal').style.display = 'flex';
         }
 
-        // --- 테마 설정 ---
+        // --- 테마 및 사이즈 설정 ---
         function setTheme(t) {
-            document.documentElement.className = t;
-            safeStorageSet('dashboardTheme', t);
+            document.documentElement.className = t; safeStorageSet('dashboardTheme', t);
             document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-${t}`)?.classList.add('active');
-            if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
-            if (pfChart) renderPortfolioChart(); 
+            setTimeout(() => { if (myChart) renderDashboard(globalTicker, globalChartData); if (pfChart) renderPortfolioChart(); }, 50);
         }
 
         function setFontSize(s) {
-            document.documentElement.style.fontSize = {sm:'14px',md:'16px',lg:'18px'}[s];
-            safeStorageSet('dashboardFontSize', s);
+            document.documentElement.style.fontSize = {sm:'14px',md:'16px',lg:'18px'}[s]; safeStorageSet('dashboardFontSize', s);
             document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-font-${s}`)?.classList.add('active');
-            requestAnimationFrame(() => {
-                myChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize();
-            });
+            setTimeout(() => { myChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize(); }, 50);
         }
 
         function setLineWidth(w) {
-            chartLineWidth = w;
-            safeStorageSet('dashboardLineWidth', w);
+            chartLineWidth = w; safeStorageSet('dashboardLineWidth', w);
             document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-line-${w}`)?.classList.add('active');
             if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
         }
 
-        // --- API 엔진 (강력한 에러/리밋 방어) ---
+        // ==========================================
+        // 통신 및 계산 엔진 (에러 방어 강화)
+        // ==========================================
         async function fetchWithRetry(url, options = {}, maxRetries = 2) {
-            let delay = 1000;
+            let delay = 1500;
             for (let i = 0; i <= maxRetries; i++) {
                 try {
                     const response = await fetch(url, options);
                     if (response.ok) return response;
                     if (response.status === 429) {
-                        console.warn("Rate limit hit, retrying...");
+                        logError(`API Rate Limit (429) on ${url}. Retrying in ${delay}ms...`);
                         await new Promise(res => setTimeout(res, delay));
                         delay *= 2;
                         continue;
                     }
-                    throw new Error(`HTTP: ${response.status}`);
+                    throw new Error(`HTTP Error ${response.status}`);
                 } catch (err) { 
                     if (err.name === 'AbortError') throw err; 
                     if (i === maxRetries) throw err; 
+                    logError(`Network Error on ${url}. Retrying in ${delay}ms...`, err);
                     await new Promise(res => setTimeout(res, delay)); 
                     delay *= 2; 
                 }
             }
-            throw new Error("Limit Reached");
+            throw new Error(`Failed to fetch ${url} after retries.`);
         }
 
         const Indicator = {
@@ -669,23 +736,9 @@
             loadData(globalTicker, i, r); 
         }
 
-        function showDetail(p) {
-            const m = document.getElementById('detail-modal');
-            const d = analysisDetails[p];
-            if (!d || !d.status) return;
-            document.getElementById('modal-title').innerText = `${p.toUpperCase()} View`;
-            document.getElementById('modal-body').innerHTML = `
-                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center">
-                    <span class="text-3xl font-black italic status-${d.status.replace(/ /g, '-')} uppercase">${d.status}</span>
-                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
-                </div>
-                <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder mt-4">
-                    <p class="text-[11px] font-black text-emerald-500 mb-2">전략적 조언</p>
-                    <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
-                </div>`;
-            m.style.display = 'flex';
-        }
-
+        // ==========================================
+        // 메인 데이터 로딩 및 렌더링
+        // ==========================================
         async function loadData(ticker, interval = currentInterval, range = currentRange) {
             if (abortController) abortController.abort();
             abortController = new AbortController();
@@ -695,98 +748,36 @@
             
             try {
                 const reqInterval = interval === '1y' ? '1mo' : interval;
-                
-                // 단일 데이터 로드 (에러 최소화)
                 const cRes = await fetchWithRetry(`/api/stock/${ticker}?interval=${reqInterval}&range=${range}`, { signal });
                 const cJson = await cRes.json();
                 
-                if(!cJson.chart || !cJson.chart.result) throw new Error("Format error");
+                if(!cJson.chart || !cJson.chart.result || !cJson.chart.result[0].indicators.quote[0].close) {
+                    throw new Error("Invalid Data Format from API");
+                }
                 
                 const d = cJson.chart.result[0];
                 globalChartData = d; globalTicker = ticker;
                 
+                // 순차 실행 (하나라도 성공하면 차트를 표시하기 위함)
                 renderDashboard(ticker, d);
                 updateStatus("LIVE DATA", "bg-emerald-500");
                 
-                // 병렬로 디테일 데이터 로드 (실패 시 차트만이라도 렌더링 유지)
-                calculateTriplePerspectiveDecision(ticker).catch(e => console.warn(e));
+                await calculateTriplePerspectiveDecision(ticker);
 
             } catch (e) { 
                 if (e.name !== 'AbortError') {
+                    logError(`Dashboard Load Failed for ${ticker}`, e);
                     updateStatus("API ERROR", "bg-rose-500"); 
+                    
+                    // 빈 화면 대신 에러 메시지 렌더링
                     if(myChart) myChart.clear();
                     document.getElementById('display-ticker').innerText = "ERROR";
                     document.getElementById('live-price').innerText = "---";
-                    document.getElementById('reasoning-container').innerHTML = '<p class="text-xs text-rose-500 text-center py-10">데이터 로딩에 실패했습니다. API 허용량을 초과했을 수 있습니다.</p>';
+                    document.getElementById('reasoning-container').innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br>우측 상단 [!] 버튼을 눌러 에러를 확인하세요.</p>';
                 }
             } finally { 
                 if(loadingOverlay) loadingOverlay.style.display = 'none'; 
             }
-        }
-
-        async function calculateTriplePerspectiveDecision(ticker) {
-            // 이 함수는 실패해도 메인 차트는 살림
-            const [dRes, wRes] = await Promise.all([
-                fetchWithRetry(`/api/stock/${ticker}?interval=1d&range=2y`),
-                fetchWithRetry(`/api/stock/${ticker}?interval=1wk&range=max`)
-            ]);
-            const dD = (await dRes.json()).chart.result[0];
-            const wD = (await wRes.json()).chart.result[0];
-            
-            const analyze = (data, weight) => {
-                if(!data || !data.indicators || !data.indicators.quote[0].close) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
-                
-                let c = [], o = [], h = [], l = [];
-                const rawQ = data.indicators.quote[0];
-                for(let i=0; i<rawQ.close.length; i++) {
-                    if(rawQ.close[i] != null) {
-                        c.push(rawQ.close[i]); o.push(rawQ.open[i]||rawQ.close[i]); h.push(rawQ.high[i]||rawQ.close[i]); l.push(rawQ.low[i]||rawQ.close[i]);
-                    }
-                }
-
-                if(c.length < 120) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
-                
-                let kData = []; for(let i=0; i<c.length; i++) kData.push([o[i], c[i], l[i], h[i]]);
-                
-                const last = c.length - 1;
-                const rsi = Indicator.rsi(c, 14)[last] || 50;
-                const macd = Indicator.macd(c, 12, 26, 9).hist[last] || 0;
-                const sma = Indicator.sma(c, 120)[last] || c[last];
-                const stoch = Indicator.stochastic(kData, 14, 3).k[last] || 50;
-                const bb = Indicator.bollinger(c, 20, 2);
-                const dist = ((c[last] - sma) / sma) * 100;
-                
-                let buy = 0, sell = 0;
-                if (c[last] > sma) buy += weight.ma; else sell += weight.ma;
-                if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
-                if (macd > 0) buy += weight.macd; else sell += weight.macd;
-                if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
-                
-                let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
-                let bbStr = "밴드 내"; if(bb.upper[last] && c[last] > bb.upper[last]) bbStr = "과열"; if(bb.lower[last] && c[last] < bb.lower[last]) bbStr = "침체";
-
-                return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1), bbStr: bbStr };
-            };
-
-            const st = analyze(dD, { ma: 0.5, rsi: 1.8, macd: 1.5 });
-            const mt = analyze(dD, { ma: 1.5, rsi: 1.0, macd: 1.2 });
-            const lt = analyze(wD, { ma: 3.0, rsi: 0.5, macd: 0.5 });
-            
-            analysisDetails = { 
-                short: {...st, summary: "단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 스윙/단타 포지션에 적합합니다." }, 
-                mid: {...mt, summary: "중기 이평선과 밴드를 분석한 결과입니다.", advice: "일봉, 주봉의 추세가 일치하는지 확인하세요." }, 
-                long: {...lt, summary: "장기 펀더멘털과 사이클 결과입니다.", advice: "장기 우상향 시 하락 노이즈는 매수 기회입니다." } 
-            };
-            
-            const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
-            up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
-            
-            const uiUpdate = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } }
-            uiUpdate('val-ma-dist', `${st.maDist>0?'+':''}${st.maDist}%`, st.maDist>0?'#26A69A':'#EF5350');
-            uiUpdate('val-rsi-main', st.rsi);
-            uiUpdate('val-macd-main', st.macd);
-            uiUpdate('val-bb-main', st.bbStr, st.bbStr==='과열'?'#EF5350':(st.bbStr==='침체'?'#26A69A':''));
-            uiUpdate('val-stoch-main', st.stoch, st.stoch>80?'#EF5350':(st.stoch<20?'#26A69A':''));
         }
 
         function updateStatus(t, c) { 
@@ -796,50 +787,56 @@
             if(dot) dot.className = `w-2 h-2 rounded-full ${c}`; 
         }
 
-        function aggregateToYearly(dates, kData, closes) {
-            let yearly = {};
-            dates.forEach((date, i) => {
-                const year = date.split('-')[0];
-                if (!yearly[year]) { yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] }; } 
-                else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); }
-            });
-            const sorted = Object.keys(yearly).sort();
-            return { dates: sorted, kData: sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]), closes: sorted.map(y => yearly[y].close) };
-        }
-
-        function renderDashboard(ticker, data) {
-            if(!myChart || !data || !data.indicators || !data.indicators.quote[0]) return;
+        // 빈 값(null)을 건너뛰는 정제 로직 포함
+        function extractCleanData(data) {
             const q = data.indicators.quote[0], ts = data.timestamp;
-            if(!ts) return;
-            
             let dates = [], kData = [], closes = [];
             
             for(let i=0; i<ts.length; i++) {
-                if (q.close[i] != null) {
+                if (q.close[i] !== null && q.close[i] !== undefined) {
                     dates.push(new Date(ts[i] * 1000).toISOString().split('T')[0]); 
                     kData.push([q.open[i]||q.close[i], q.close[i], q.low[i]||q.close[i], q.high[i]||q.close[i]]); 
                     closes.push(q.close[i]);
                 }
             }
+            return { dates, kData, closes };
+        }
 
+        function renderDashboard(ticker, data) {
+            if(!myChart || !data) return;
+            
+            let { dates, kData, closes } = extractCleanData(data);
             if(closes.length === 0) return;
 
             document.getElementById('display-ticker').innerText = ticker;
-            document.getElementById('live-price').innerText = closes[closes.length - 1].toLocaleString(undefined, {minimumFractionDigits: 2});
+            const price = closes[closes.length - 1];
+            document.getElementById('live-price').innerText = price?.toLocaleString(undefined, {minimumFractionDigits: 2});
             
             if (currentInterval === '1y') {
-                const agg = aggregateToYearly(dates, kData, closes);
-                dates = agg.dates; kData = agg.kData; closes = agg.closes;
+                let yearly = {};
+                dates.forEach((date, i) => {
+                    const year = date.split('-')[0];
+                    if (!yearly[year]) { yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] }; } 
+                    else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); }
+                });
+                const sorted = Object.keys(yearly).sort();
+                dates = sorted;
+                kData = sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]);
+                closes = sorted.map(y => yearly[y].close);
             }
 
-            const rsi = Indicator.rsi(closes, 14);
-            const macd = Indicator.macd(closes, 12, 26, 9);
+            const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9);
+            const stoch = Indicator.stochastic(kData, 14, 3);
             const bb = Indicator.bollinger(closes, 20, 2);
             const last = closes.length - 1;
             
             let reasoning = [];
-            if(rsi[last] < 30) reasoning.push({type: 'up', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 과매도 상태(반등 임박)`});
-            else if(rsi[last] > 70) reasoning.push({type: 'down', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 과매수 상태(조정 경고)`});
+            if(ma120[last]) {
+                const maPct = (((closes[last] - ma120[last]) / ma120[last]) * 100).toFixed(2);
+                reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치`});
+            }
+            if(rsi[last] < 30) reasoning.push({type: 'up', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 심한 과매도 상태.`});
+            else if(rsi[last] > 70) reasoning.push({type: 'down', t:'RSI (14)', d:`지수 ${rsi[last].toFixed(1)}. 과매수 상태.`});
             if(macd.hist[last] > 0) reasoning.push({type: 'up', t:'MACD', d:`상승 에너지 발산 중`});
             else reasoning.push({type: 'down', t:'MACD', d:`하락 에너지 진행 중`});
             
@@ -876,9 +873,73 @@
                 dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
                 series: series
             }, true);
+            
+            // 렌더링 보장을 위한 리사이즈
+            setTimeout(() => myChart.resize(), 100);
         }
 
-        // --- 포트폴리오 로직 ---
+        async function calculateTriplePerspectiveDecision(ticker) {
+            try {
+                const [dRes, wRes] = await Promise.all([
+                    fetchWithRetry(`/api/stock/${ticker}?interval=1d&range=2y`),
+                    fetchWithRetry(`/api/stock/${ticker}?interval=1wk&range=max`)
+                ]);
+                const dJson = await dRes.json();
+                const wJson = await wRes.json();
+                
+                const analyze = (data, weight) => {
+                    if(!data || !data.chart || !data.chart.result || !data.chart.result[0]) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0" };
+                    let { kData, closes } = extractCleanData(data.chart.result[0]);
+                    
+                    if(closes.length < 120) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0" };
+                    
+                    const last = closes.length - 1;
+                    const rsi = Indicator.rsi(closes, 14)[last] || 50;
+                    const macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0;
+                    const sma = Indicator.sma(closes, 120)[last] || closes[last];
+                    const stoch = Indicator.stochastic(kData, 14, 3).k[last] || 50;
+                    const dist = ((closes[last] - sma) / sma) * 100;
+                    
+                    let buy = 0, sell = 0;
+                    if (closes[last] > sma) buy += weight.ma; else sell += weight.ma;
+                    if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
+                    if (macd > 0) buy += weight.macd; else sell += weight.macd;
+                    if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
+                    
+                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
+
+                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1) };
+                };
+
+                const st = analyze(dJson, { ma: 0.5, rsi: 1.8, macd: 1.5 });
+                const mt = analyze(dJson, { ma: 1.5, rsi: 1.0, macd: 1.2 });
+                const lt = analyze(wJson, { ma: 3.0, rsi: 0.5, macd: 0.5 });
+                
+                analysisDetails = { 
+                    short: {...st, summary: "단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 변동성을 이용한 스윙 관점입니다." }, 
+                    mid: {...mt, summary: "중기 추세와 밴드를 분석한 결과입니다.", advice: "일봉과 주봉의 방향 일치 여부를 파악하세요." }, 
+                    long: {...lt, summary: "장기 120일선 기준의 사이클입니다.", advice: "장기 우상향 시 단기 하락은 기회입니다." } 
+                };
+                
+                const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm md:text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
+                up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
+                
+                const uiUpdate = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } }
+                uiUpdate('val-ma-dist', `${st.maDist>0?'+':''}${st.maDist}%`, st.maDist>0?'#26A69A':'#EF5350');
+                uiUpdate('val-rsi-main', st.rsi); uiUpdate('val-macd-main', st.macd); uiUpdate('val-stoch-main', st.stoch);
+                
+            } catch (e) { 
+                logError("Calculate Signals Error", e);
+                ['st-signal-text', 'mt-signal-text', 'lt-signal-text'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) { el.innerText = "ERROR"; el.className = "text-sm font-black italic text-down uppercase"; }
+                });
+            }
+        }
+
+        // ==========================================
+        // 포트폴리오 백테스트 및 라이브 계산
+        // ==========================================
         function initPortfolioChart() {
             if(!document.getElementById('chart-portfolio')) return;
             pfChart = echarts.init(document.getElementById('chart-portfolio'));
@@ -895,7 +956,7 @@
                 backgroundColor: 'transparent',
                 tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 } },
                 legend: { data: ['S&P 500 (SPY)', 'All-Weather', 'BAA (Bold)'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
-                grid: { left: '2%', right: '2%', top: '15%', bottom: '5%', containLabel: true },
+                grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
                 xAxis: { type: 'category', data: pfSimData.years, axisLabel: { color: chartTextColor } },
                 yAxis: { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
                 series: [
@@ -904,6 +965,7 @@
                     { name: 'BAA (Bold)', type: 'line', data: pfSimData['baa'], smooth: true, lineStyle: { color: '#10B981', width: 3 }, showSymbol: false }
                 ]
             }, true);
+            setTimeout(() => pfChart.resize(), 100);
         }
 
         function showPfDetail(pfKey) {
@@ -911,7 +973,6 @@
             if(!data) return;
 
             document.getElementById('pf-modal-title').innerText = data.title;
-            document.getElementById('pf-modal-subtitle').innerText = data.subtitle;
             document.getElementById('pf-modal-cagr').innerText = data.cagr;
             document.getElementById('pf-modal-mdd').innerText = data.mdd;
             document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li>${r}</li>`).join('');
@@ -919,7 +980,6 @@
             
             const pieArea = document.getElementById('pf-modal-pie-area');
             const liveArea = document.getElementById('pf-modal-live-area');
-            
             document.getElementById('pf-detail-modal').style.display = 'flex';
 
             if(data.type === 'dynamic') {
@@ -932,6 +992,8 @@
 
             requestAnimationFrame(() => {
                 if(!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
+                pfModalChart.clear();
+
                 const styleColor = getComputedStyle(document.documentElement);
                 const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
                 const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
@@ -940,11 +1002,12 @@
                     backgroundColor: 'transparent',
                     tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 } },
                     legend: { data: [data.title], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
-                    grid: { left: '2%', right: '2%', top: '15%', bottom: '5%', containLabel: true },
+                    grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
                     xAxis: { type: 'category', data: pfSimData.years, axisLabel: { color: chartTextColor } },
                     yAxis: { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
                     series: [{ name: data.title, type: 'line', data: pfSimData[pfKey], smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false }]
                 }, true);
+                pfModalChart.resize();
 
                 if(data.type === 'static' && data.allocation) {
                     pieArea.style.display = 'block';
@@ -960,6 +1023,7 @@
                             data: data.allocation
                         }]
                     }, true);
+                    pfPieChart.resize();
                 }
             });
         }
@@ -978,18 +1042,23 @@
                 const q = json.chart.result[0].indicators.quote[0].close;
                 const ts = json.chart.result[0].timestamp;
                 let yearlyData = {};
-                for(let i=0; i<ts.length; i++){ if(q[i]) yearlyData[new Date(ts[i]*1000).getFullYear().toString()] = q[i]; }
+                for(let i=0; i<ts.length; i++){
+                    if(q[i] != null) yearlyData[new Date(ts[i]*1000).getFullYear().toString()] = q[i];
+                }
                 
                 let compData = [], basePrice = null; 
                 pfSimData.years.forEach(yr => {
                     if(yearlyData[yr]) {
                         if(basePrice === null) basePrice = yearlyData[yr];
                         compData.push((yearlyData[yr] / basePrice) * 100);
-                    } else { compData.push(null); }
+                    } else compData.push(null);
                 });
 
+                const styleColor = getComputedStyle(document.documentElement);
+                const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+                
                 pfModalChart.setOption({
-                    legend: { data: [pfDetails[currentPfKey].title, ticker] },
+                    legend: { data: [pfDetails[currentPfKey].title, ticker], textStyle: { color: chartTextColor, fontSize: 10 } },
                     series: [
                         { name: pfDetails[currentPfKey].title, type: 'line', data: pfSimData[currentPfKey], smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false },
                         { name: ticker, type: 'line', data: compData, smooth: true, lineStyle: { color: '#EF5350', width: 2, type: 'dashed' }, connectNulls: true, showSymbol: false }
@@ -997,6 +1066,7 @@
                 });
                 btn.innerText = '완료'; setTimeout(() => btn.innerText = '비교', 2000);
             } catch(e) {
+                logError(`Compare Failed for ${ticker}`, e);
                 btn.innerText = '오류'; btn.classList.add('bg-rose-500');
                 setTimeout(() => { btn.innerText = '비교'; btn.classList.remove('bg-rose-500'); }, 2000);
             }
@@ -1007,6 +1077,8 @@
             const loading = document.getElementById('pf-live-loading');
             const content = document.getElementById('pf-live-content');
             
+            if(!tbody || !loading || !content) return;
+
             loading.style.display = 'flex';
             content.style.display = 'none';
             tbody.innerHTML = '';
@@ -1019,19 +1091,17 @@
                 else if(pfKey === 'baa') tickers = ['SPY', 'VWO', 'BND', 'QQQ'];
 
                 const dataMap = {};
-                // API Limit 방지를 위한 직렬 호출
+                // 직렬 호출하여 429 에러 방지
                 for(const t of tickers) {
-                    const res = await fetchWithRetry(`/api/stock/${t}?interval=1mo&range=2y`);
+                    const res = await fetchWithRetry(`/api/stock/${t}?interval=1mo&range=2y`, {}, 1); // 재시도 1번만
                     const json = await res.json();
-                    if(!json.chart) throw new Error("API Limit");
-                    const q = json.chart.result[0].indicators.quote[0].close;
-                    const ts = json.chart.result[0].timestamp;
+                    if(!json.chart || !json.chart.result) throw new Error(`Empty API for ${t}`);
+                    let { dates, closes } = extractCleanData(json.chart.result[0]);
+                    
                     let arr = [];
-                    for(let i=0; i<ts.length; i++) {
-                        if(q[i] != null) {
-                            const d = new Date(ts[i]*1000);
-                            arr.push({ date: `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}`, price: q[i] });
-                        }
+                    for(let i=0; i<dates.length; i++) {
+                        const d = new Date(dates[i]);
+                        arr.push({ date: `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}`, price: closes[i] });
                     }
                     dataMap[t] = arr;
                 }
@@ -1089,13 +1159,14 @@
                 loading.style.display = 'none'; content.style.display = 'block';
 
             } catch (error) {
-                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">야후 API 차단 발생.<br>잠시 후 다시 시도해주세요.</p>`;
+                logError(`Live Calc Engine Failed for ${pfKey}`, error);
+                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드에 실패했습니다.<br>우측 상단 [!] 버튼을 확인하세요.</p>`;
             }
         }
 
-        window.onerror = function() { updateStatus("ERROR", "bg-rose-500"); };
-        window.addEventListener("unhandledrejection", function() { updateStatus("API LMT", "bg-rose-500"); });
-
+        // ==========================================
+        // 시스템 초기화
+        // ==========================================
         document.addEventListener("DOMContentLoaded", () => {
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
@@ -1120,12 +1191,13 @@
                 if(pfCompareInput) pfCompareInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') { e.preventDefault(); comparePortfolioStock(); } });
 
                 setTimeout(() => { if(myChart) { myChart.resize(); loadData('SPY'); } }, 150);
+                
                 window.addEventListener('resize', () => { 
                     requestAnimationFrame(() => {
                         myChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize();
                     });
                 });
-            } catch(e) { console.error("Init Error:", e); }
+            } catch(e) { logError("Init Error:", e); }
         });
     </script>
 </body>
