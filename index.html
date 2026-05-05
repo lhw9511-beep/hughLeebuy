@@ -50,22 +50,6 @@
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.1);
         }
-        .theme-purple {
-            --bg-color: #171026;
-            --panel-color: rgba(37, 26, 58, 0.8);
-            --modal-bg: #251a3a;
-            --text-main: #f3e8ff;
-            --text-muted: #a855f7;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
-        .theme-green {
-            --bg-color: #022c22;
-            --panel-color: rgba(6, 78, 59, 0.8);
-            --modal-bg: #064e3b;
-            --text-main: #ecfdf5;
-            --text-muted: #34d399;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
 
         .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
         .status-BUY { color: #34D399; }
@@ -139,10 +123,12 @@
         .proof-box { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 6px; font-family: monospace; font-size: 0.65rem; color: var(--text-muted); overflow-x: auto; line-height: 1.6; }
         .proof-hl { color: #3B82F6; font-weight: bold; }
         
+        /* 줄바꿈 및 가독성 개선된 리스트 스타일 */
         .rule-list { list-style-type: none; padding-left: 0; margin-top: 10px; }
-        .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: flex-start; line-height: 1.4; }
-        .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 8px; font-weight: bold; flex-shrink: 0; }
-
+        .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: flex-start; line-height: 1.6; }
+        .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 2px; font-size: 0.8rem; }
+        .rule-highlight { color: var(--text-main); font-weight: 800; background: rgba(59, 130, 246, 0.2); padding: 3px 6px; border-radius: 6px; margin-right: 6px; display: inline-block; margin-bottom: 4px; border: 1px solid rgba(59, 130, 246, 0.4); word-break: keep-all; }
+        
         #error-log-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; border-radius: 8px; padding: 8px; margin-top: 8px; font-family: monospace; font-size: 0.65rem; color: #FCA5A5; max-height: 100px; overflow-y: auto; word-break: break-all; }
     </style>
 </head>
@@ -260,7 +246,7 @@
             
             <div class="py-2">
                 <!-- 자산배분 설명 복구 영역 -->
-                <p id="pf-modal-desc" class="text-[0.7rem] md:text-[0.75rem] text-themeMuted mb-4 leading-relaxed bg-themeBorder/10 p-3 md:p-4 rounded-xl border border-themeBorder"></p>
+                <div id="pf-modal-desc" class="text-[0.75rem] md:text-[0.8rem] text-themeMuted mb-4 leading-relaxed bg-themeBorder/10 p-4 md:p-5 rounded-xl border border-themeBorder shadow-inner"></div>
 
                 <div class="flex flex-row gap-2 md:gap-4 mb-4">
                     <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
@@ -274,7 +260,7 @@
                 </div>
 
                 <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
-                    <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-3 py-2 uppercase outline-none text-xs md:text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교 (예: QQQ)">
+                    <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-3 py-2 uppercase outline-none text-xs md:text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교할 주식 심볼 (예: QQQ)">
                     <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="bg-accent text-white px-4 py-2 rounded-lg font-black text-xs md:text-sm hover:bg-blue-600 transition shrink-0 shadow-lg shadow-accent/30">차트 비교</button>
                 </div>
 
@@ -294,7 +280,7 @@
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer bg-themeBorder/50 px-2 py-1 rounded-lg border border-themeBorder hover:bg-themeBorder transition">
                             <input type="checkbox" id="toggle-proof" class="w-3 h-3 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
-                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 보기</span>
+                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 증명 (상세보기)</span>
                         </label>
                     </div>
                     <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
@@ -306,9 +292,9 @@
                     </div>
                 </div>
 
-                <div class="bg-[var(--modal-bg)] p-3 md:p-4 rounded-xl border border-themeBorder">
-                    <p class="text-[0.7rem] md:text-[0.75rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-2">
-                        <svg class="icon-sm mr-1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <div class="bg-[var(--modal-bg)] p-4 md:p-5 rounded-xl border border-themeBorder">
+                    <p class="text-[0.8rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-3">
+                        <svg class="icon-md mr-1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                         운용 알고리즘 및 규칙
                     </p>
                     <ul id="pf-modal-rules" class="rule-list"></ul>
@@ -439,7 +425,7 @@
                         <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
                     </div>
                     
-                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 h-full mb-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-full mb-3">
                         <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 기준 이동평균선 간의 거리(%)입니다. 양수(+)면 긍정, 음수(-)면 역배열입니다.')">
                             <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-ma-dist" class="stat-value text-themeText">---</p>
@@ -552,7 +538,7 @@
             </div>
 
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
-                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 시뮬레이션 (Base 100)</h3>
+                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 (2000~)</h3>
                 <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
             </div>
         </div>
@@ -626,40 +612,68 @@
             '6040': { 
                 title: '60/40 포트폴리오', cagr: '8.3%', mdd: '-29.0%', type: 'static', 
                 desc: '가장 고전적이고 검증된 패시브 전략입니다. 경제 성장기에는 주식이, 침체기에는 채권이 방어하여 꾸준한 우상향을 그립니다.',
-                rules: ['미국 주식(SPY) 60% 상시 보유', '미국 중기채권(IEF) 40% 상시 보유', '연 1회 목표 비중 리밸런싱'], 
+                rules: [
+                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%', 
+                    '<span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.'
+                ], 
                 allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] 
             },
             'permanent': { 
                 title: '영구 포트폴리오 (Permanent)', cagr: '6.5%', mdd: '-13.5%', type: 'static', 
                 desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절(성장, 침체, 인플레이션, 디플레이션) 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
-                rules: ['미국 주식(SPY) 25% - 경제 성장기 대비', '미국 장기채(TLT) 25% - 디플레이션/침체 상승', '금(GLD) 25% - 인플레이션 대비', '현금(BIL) 25% - 경제 침체기 방어'], 
+                rules: [
+                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%',
+                    '<span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.'
+                ], 
                 allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] 
             },
             'allweather': { 
                 title: '올웨더 포트폴리오 (All-Weather)', cagr: '7.8%', mdd: '-14.2%', type: 'static', 
-                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 포트폴리오에 미치는 변동성(리스크)을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.',
-                rules: ['미국 주식(SPY) 30%', '미국 장기채(TLT) 40%', '미국 중기채(IEF) 15%', '금(GLD) 7.5%', '원자재(DBC) 7.5%'], 
+                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 포트폴리오 전체에 미치는 변동성(리스크)을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.',
+                rules: [
+                    '<span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%',
+                    '<span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.'
+                ], 
                 allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] 
             },
             'dual': { 
                 title: '오리지널 듀얼 모멘텀', cagr: '12.5%', mdd: '-17.8%', type: 'dynamic', 
                 desc: 'Gary Antonacci가 발표한 동적 자산배분의 고전입니다. 자산이 과거 대비 상승장인지 파악하는 <b>절대 모멘텀</b>과, 여러 자산 중 어느 것이 더 강한지 파악하는 <b>상대 모멘텀</b>을 결합하여 하락장을 피하고 상승장에 올라탑니다.',
-                rules: ['[1] 매월 마지막 거래일에 미국(SPY), 선진국(VEA), 현금(BIL)의 최근 12개월 수정종가 수익률을 산출합니다.', '[2] <b>[절대모멘텀]</b> SPY와 VEA의 수익률이 둘 다 BIL보다 낮다면, 시장 전체가 하락장이라 판단하여 안전 자산인 채권(AGG)으로 100% 도망갑니다.', '[3] <b>[상대모멘텀]</b> 그 외의 경우, SPY와 VEA 중 수익률 1등인 자산을 100% 매수하여 보유합니다.'] 
+                rules: [
+                    '<span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span>',
+                    '<span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.', 
+                    '<span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.'
+                ] 
             },
             'vaa': { 
                 title: 'VAA (Vigilant Asset Allocation)', cagr: '15.2%', mdd: '-16.1%', type: 'dynamic', 
-                desc: 'Wouter Keller 박사가 개발한 극강의 방어형 모멘텀 전략입니다. 시장이 꺾이는 순간을 귀신같이 포착하기 위해 과거 1개월 수익률에 무려 12배의 압도적인 가중치를 두어 <b>번개처럼 빠른 스위칭</b>을 목표로 합니다.',
-                rules: ['[1] <b>가중 모멘텀 공식:</b> (1M수익*12) + (3M수익*4) + (6M수익*2) + (12M수익*1)', '[2] <b>공격 자산(4개):</b> SPY(미국), VEA(선진국), VWO(신흥국), AGG(채권)', '[3] <b>수비 자산(3개):</b> LQD(회사채), IEF(중기채), SHY(단기채)', '[4] 공격 자산 4개가 <b>전부 다 0점 이상</b>이면 대세 상승장으로 판단, 스코어 1위 공격 자산에 100% 몰빵합니다.', '[5] 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 1위에 100% 대피합니다.'] 
+                desc: 'Wouter Keller 박사가 개발한 극강의 방어형 모멘텀 전략입니다. 시장이 꺾이는 순간을 귀신같이 포착하기 위해 과거 1개월 단기 수익률에 무려 12배의 압도적인 가중치를 두어 <b>번개처럼 빠른 스위칭</b>을 목표로 합니다.',
+                rules: [
+                    '<span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span>',
+                    '<span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span>',
+                    '<span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 스코어를 계산합니다.', 
+                    '<span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 스코어가 <b>모두 0 이상</b>이면, 스코어가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.', 
+                    '<span class="rule-highlight">수비 모드:</span> 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 스코어 1위 자산으로 <strong>100% 전액 대피</strong>합니다.'
+                ] 
             },
             'daa': { 
                 title: 'DAA (Defensive Asset Allocation)', cagr: '13.5%', mdd: '-12.0%', type: 'dynamic', 
-                desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기 시 가장 먼저 타격을 받는 <b>탄광 속의 카나리아(Canary) 자산</b>을 도입하여, 주식 비중을 유지하면서도 위기 시점에 효과적으로 도망갑니다.',
-                rules: ['[1] <b>카나리아 자산:</b> VWO(신흥국 주식), BND(미국 총채권)', '[2] 매월 말 카나리아 자산의 모멘텀 스코어(VAA와 동일한 13612 공식)를 감시합니다.', '[3] 카나리아 자산 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산 중 상위 자산에 50%씩 분산 투자합니다.', '[4] 카나리아 자산 중 <b>1개라도 0 이하</b>라면 시장 위험 신호로 판단, 즉시 안전 자산(SHY 등)으로 전액 스위칭합니다.'] 
+                desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기에 가장 먼저 타격을 받는 <b>탄광 속 카나리아(Canary) 자산</b>을 도입하여, 평소엔 주식 비중을 유지하면서 위험 시점에만 효과적으로 도망갑니다.',
+                rules: [
+                    '<span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span>',
+                    '<span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)',
+                    '<span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 스코어(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.',
+                    '<span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.'
+                ] 
             },
             'baa': { 
                 title: 'BAA (Bold Asset Allocation)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic', 
-                desc: '현존하는 최고 수준의 동적 자산배분 모델로, 2022년 금리 인상기 주식/채권 동반 폭락장에서도 훌륭한 방어력을 증명했습니다. DAA의 방어력을 한층 더 끌어올리고, 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화합니다.',
-                rules: ['[1] <b>카나리아 자산(4개):</b> SPY, VEA, VWO, BND (감시망 대폭 강화)', '[2] 카나리아 4개 중 <b>단 1개라도 점수가 0 이하</b>라면 전면 방어 모드로 전환합니다.', '[3] <b>[공격 시]</b> 방어 모드가 아닐 때, QQQ(나스닥)와 같은 고수익 성장형 자산 중 스코어 1등에 몰빵 투자합니다.', '[4] <b>[방어 시]</b> 금리 상승기에는 채권도 하락하므로, <b>방어 자산을 3개로 분산</b>(예: BIL 33%, IEF 33%, TLT 33%)하여 채권 리스크마저 헷지합니다.'] 
+                desc: '현존하는 최고 수준의 최신 동적 자산배분 모델. 2022년 금리 인상기 주식/채권 동반 폭락장에서도 훌륭한 방어력을 증명했습니다. 방어력을 한층 더 끌어올리고, 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화합니다.',
+                rules: [
+                    '<span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.',
+                    '<span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 스코어(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.', 
+                    '<span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 금리 인상으로 인한 채권 시장 붕괴 리스크까지 완벽히 차단합니다.'
+                ] 
             }
         };
 
@@ -1056,7 +1070,9 @@
             }
             document.getElementById('pf-modal-cagr').innerText = data.cagr;
             document.getElementById('pf-modal-mdd').innerText = data.mdd;
-            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li>${r}</li>`).join('');
+            
+            // 설명 박스를 flex-1 div로 감싸 텍스트 노드가 Flex 컬럼화 되는 버그 해결
+            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1">${r}</div></li>`).join('');
             document.getElementById('pf-compare-input').value = '';
             
             const pieArea = document.getElementById('pf-modal-pie-area');
@@ -1181,6 +1197,7 @@
                 const dataMap = {};
                 let unifiedMonths = new Set();
                 
+                // 직렬 다운로드로 API 과부하 100% 차단
                 for(let i=0; i<tickers.length; i++) {
                     const t = tickers[i];
                     document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t} 데이터`;
@@ -1243,9 +1260,7 @@
                     return { ret, proof };
                 }
 
-                // 최근 12개월치 계산으로 루프 확장
-                const len = sortedMonths.length;
-                for(let i = len - 1; i >= len - 12; i--) {
+                for(let i = sortedMonths.length - 1; i >= sortedMonths.length - 12; i--) {
                     if(i - 12 < 0) break;
                     let row = `<tr><td class="text-left font-bold text-accent">${sortedMonths[i]}</td>`;
                     let proofs = [];
