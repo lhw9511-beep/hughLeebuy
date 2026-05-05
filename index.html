@@ -50,6 +50,22 @@
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.1);
         }
+        .theme-purple {
+            --bg-color: #171026;
+            --panel-color: rgba(37, 26, 58, 0.8);
+            --modal-bg: #251a3a;
+            --text-main: #f3e8ff;
+            --text-muted: #a855f7;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        .theme-green {
+            --bg-color: #022c22;
+            --panel-color: rgba(6, 78, 59, 0.8);
+            --modal-bg: #064e3b;
+            --text-main: #ecfdf5;
+            --text-muted: #34d399;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
 
         .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
         .status-BUY { color: #34D399; }
@@ -147,11 +163,11 @@
                 <div>
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
                     <div class="flex flex-wrap gap-4">
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
                         <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6; border-color:#ccc;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
                         <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
                         <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn active" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
                     </div>
                 </div>
 
@@ -321,7 +337,6 @@
                         <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
                     </div>
                     
-                    <!-- 에러 보기 버튼 (히든 디폴트) -->
                     <button type="button" onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 border border-rose-500/50 rounded-xl text-rose-500 hover:bg-rose-500 hover:text-white transition shadow-sm">
                         <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     </button>
@@ -379,7 +394,6 @@
                             <div class="flex gap-1">
                                 <button type="button" onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">MA 20</button>
                                 <button type="button" onclick="toggleMA(50)" id="btn-ma-50" class="chip-btn active">MA 50</button>
-                                <button type="button" onclick="toggleMA(60)" id="btn-ma-60" class="chip-btn">MA 60</button>
                                 <button type="button" onclick="toggleMA(120)" id="btn-ma-120" class="chip-btn active">MA 120</button>
                                 <button type="button" onclick="toggleMA(200)" id="btn-ma-200" class="chip-btn active">MA 200</button>
                             </div>
@@ -423,12 +437,12 @@
                     </div>
                     
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-full mb-3">
-                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일선 간의 거리(%)입니다. 양수(+)면 장기 추세보다 위에 있어 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')">
+                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 기준 이동평균선 간의 거리(%)입니다. 양수(+)면 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')">
                             <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '주가의 상대적인 강도. 30 이하는 과매도(저점), 70 이상은 과매수(고점)로 해석합니다.')">
-                            <p class="stat-label">RSI(14) <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '주가의 상승/하락 압력 강도. 30 이하는 과매도(저점), 70 이상은 과매수(고점)로 해석합니다.')">
+                            <p class="stat-label">RSI <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-rsi-main" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산. 히스토그램이 양수(+)면 단기 상승, 음수(-)면 하락 에너지가 강함을 의미합니다.')">
@@ -436,10 +450,10 @@
                             <p id="val-macd-main" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')">
-                            <p class="stat-label">BB <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p class="stat-label">BB밴드 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-bb-main" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '일정 기간 최고가와 최저가 사이 현재 위치. 20 이하는 바닥권, 80 이상은 천장권 과열을 뜻합니다.')">
+                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '일정 기간 최고가와 최저가 사이 현재 위치. 20 이하는 바닥권 침체, 80 이상은 과열을 뜻합니다.')">
                             <p class="stat-label">Stoch <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
                             <p id="val-stoch-main" class="stat-value text-themeText">---</p>
                         </div>
@@ -474,7 +488,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('permanent')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">Permanent <span class="text-[0.55rem] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">Safe</span></h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식/장기채/금/현금 25%씩 방어</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식/장기채/금/현금 분산</p>
                         <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">6.5%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-13.5%</span></span>
@@ -482,7 +496,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('allweather')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 사계절 대응 전략</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 리스크 패리티 전략</p>
                         <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">7.8%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-14.2%</span></span>
@@ -502,7 +516,7 @@
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <div class="pf-card" onclick="showPfDetail('dual')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">Dual Momentum</h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">절대/상대 모멘텀을 혼합해 1등 자산에 투자합니다.</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">모멘텀을 이용해 1등 자산에 투자합니다.</p>
                         <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">12.5%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-17.8%</span></span>
@@ -510,7 +524,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('vaa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">수익률 가중치로 가장 빠르고 강력한 자산을 찾습니다.</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">수익률 가중치로 강력한 자산을 찾습니다.</p>
                         <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">15.2%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-16.1%</span></span>
@@ -518,7 +532,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('daa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">카나리아 자산이 하락하면 즉시 안전 자산으로 도망갑니다.</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">카나리아 자산 하락 시 즉시 안전 자산으로.</p>
                         <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">13.5%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-12.0%</span></span>
@@ -526,7 +540,7 @@
                     </div>
                     <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">방어와 공격적 스위칭을 구사하는 최신 배분 전략.</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">방어와 스위칭을 구사하는 최신 전략.</p>
                         <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">16.5%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-11.2%</span></span>
@@ -550,6 +564,8 @@
         // ==========================================
         // 🛠️ 전역 안전 장치 및 디버그
         // ==========================================
+        function resetDashboard() { location.reload(); }
+
         let errorLogs = [];
         function logError(msg, err) {
             console.error(msg, err);
@@ -586,10 +602,9 @@
         // ==========================================
         let myChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
         
-        // 캔버스 미리보기 또는 로컬 파일에서 열었을 때 URL 파싱 에러 방지를 위한 서버 주소 고정
         const API_BASE_URL = 'https://buy-or-bye.onrender.com'; 
 
-        let maSettings = { 10: false, 20: true, 50: true, 60: false, 120: true, 200: true };
+        let maSettings = { 20: true, 50: true, 120: true, 200: true };
         let currentInterval = '1d', currentRange = '1y';
         let globalChartData = null, globalTicker = "SPY", abortController = null;
         let analysisDetails = { short: {}, mid: {}, long: {} }, currentPfKey = '';
@@ -681,7 +696,7 @@
         function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
 
         function showInfo(title, text) {
-            document.getElementById('info-title').innerHTML = `<svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg> ${title}`;
+            document.getElementById('info-title').innerHTML = `<svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg> ${title}`;
             document.getElementById('info-body').innerText = text;
             document.getElementById('info-modal').style.display = 'flex';
         }
@@ -727,12 +742,24 @@
         }
 
         const Indicator = {
-            sma: (d, p) => d.map((_, i) => i < p - 1 ? null : d.slice(i - p + 1, i + 1).reduce((a, b) => a + b) / p),
+            sma: (d, p) => d.map((_, i) => {
+                if (i < p - 1) return null;
+                const slice = d.slice(i - p + 1, i + 1).filter(v => v !== null);
+                return slice.length === p ? slice.reduce((a, b) => a + b) / p : null;
+            }),
             ema: (d, p) => { let r=Array(d.length).fill(null), k=2/(p+1), s=d.findIndex(v=>v!==null); if(s===-1)return r; r[s]=d[s]; for(let i=s+1;i<d.length;i++) r[i]=d[i]*k+r[i-1]*(1-k); return r; },
             macd: (d, s, l, sig) => { const se=Indicator.ema(d,s), le=Indicator.ema(d,l), line=se.map((v,i)=>v===null||le[i]===null?null:v-le[i]); return { hist: line.map((v,i)=>v===null||Indicator.ema(line,sig)[i]===null?null:v-Indicator.ema(line,sig)[i]) }; },
             rsi: (d, p) => { let r=Array(d.length).fill(null), g=0, l=0; for(let i=1;i<d.length;i++){ let df=d[i]-d[i-1], cg=df>0?df:0, cl=df<0?-df:0; g=(g*(p-1)+cg)/p; l=(l*(p-1)+cl)/p; if(i>=p)r[i]=100-(100/(1+g/l)); } return r; },
             bollinger: (d, p, m) => { const sma=Indicator.sma(d,p), up=Array(d.length).fill(null), low=Array(d.length).fill(null); for(let i=p-1;i<d.length;i++){ if(sma[i]===null)continue; const sl=d.slice(i-p+1,i+1); const v=sl.reduce((a,val)=>a+Math.pow(val-sma[i],2),0)/p; const sd=Math.sqrt(v); up[i]=sma[i]+(m*sd); low[i]=sma[i]-(m*sd); } return { upper: up, lower: low }; },
-            stochastic: (k, p, s) => { let r=Array(k.length).fill(null); for(let i=p-1;i<k.length;i++){ const sl=k.slice(i-p+1,i+1); const h=Math.max(...sl.map(d=>d[3])), l=Math.min(...sl.map(d=>d[2])); r[i]=(h!==l)?((k[i][1]-l)/(h-l))*100:50; } return { k: r, d: Indicator.sma(r, s) }; }
+            stochastic: (k, p, s) => { 
+                let r=Array(k.length).fill(null); 
+                for(let i=p-1;i<k.length;i++){ 
+                    const sl=k.slice(i-p+1,i+1); 
+                    const h=Math.max(...sl.map(d=>d[3])), l=Math.min(...sl.map(d=>d[2])); 
+                    r[i]=(h!==l)?((k[i][1]-l)/(h-l))*100:50; 
+                } 
+                return { k: r, d: Indicator.sma(r, s) }; 
+            }
         };
 
         function toggleMA(p) { maSettings[p] = !maSettings[p]; updateMAButtons(); if (globalChartData) renderDashboard(globalTicker, globalChartData); }
@@ -766,8 +793,7 @@
                 updateStatus("LIVE DATA", "bg-emerald-500");
                 renderDashboard(ticker, d);
                 
-                // 에러 발생 시 catch 로직 처리
-                calculateTriplePerspectiveDecision(ticker);
+                calculateTriplePerspectiveDecision(ticker).catch(e => logError("Triple Calc Error", e));
 
             } catch (e) { 
                 if (e.name !== 'AbortError') {
@@ -874,18 +900,18 @@
 
                 if(!dJson.chart || !dJson.chart.result || !wJson.chart || !wJson.chart.result) throw new Error("Empty result");
                 
-                const analyze = (data, weight) => {
+                const analyze = (data, weight, periods) => {
                     if(!data || !data.indicators || !data.indicators.quote[0].close) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0" };
                     let { kData, closes } = extractCleanData(data);
                     
-                    if(closes.length < 120) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0" };
+                    if(closes.length < periods.ma) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0" };
                     
                     const last = closes.length - 1;
-                    const rsi = Indicator.rsi(closes, 14)[last] || 50;
+                    const rsi = Indicator.rsi(closes, periods.rsi)[last] || 50;
                     const macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0;
-                    const sma = Indicator.sma(closes, 120)[last] || closes[last];
-                    const stoch = Indicator.stochastic(kData, 14, 3).k[last] || 50;
-                    const bb = Indicator.bollinger(closes, 20, 2);
+                    const sma = Indicator.sma(closes, periods.ma)[last] || closes[last];
+                    const stoch = Indicator.stochastic(kData, periods.stoch, 3).k[last] || 50;
+                    const bb = Indicator.bollinger(closes, periods.ma, 2);
                     const dist = ((closes[last] - sma) / sma) * 100;
                     
                     let buy = 0, sell = 0;
@@ -899,22 +925,31 @@
                     return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1) };
                 };
 
-                const st = analyze(dJson.chart.result[0], { ma: 0.5, rsi: 1.8, macd: 1.5 });
-                const mt = analyze(dJson.chart.result[0], { ma: 1.5, rsi: 1.0, macd: 1.2 });
-                const lt = analyze(wJson.chart.result[0], { ma: 3.0, rsi: 0.5, macd: 0.5 });
+                // 단기: 20일선 기준, 중기: 60일선 기준, 장기: 40주선(약 200일) 기준
+                const st = analyze(dJson.chart.result[0], { ma: 0.5, rsi: 1.8, macd: 1.5 }, { ma: 20, rsi: 9, stoch: 10 });
+                const mt = analyze(dJson.chart.result[0], { ma: 1.5, rsi: 1.0, macd: 1.2 }, { ma: 60, rsi: 14, stoch: 14 });
+                const lt = analyze(wJson.chart.result[0], { ma: 3.0, rsi: 0.5, macd: 0.5 }, { ma: 40, rsi: 14, stoch: 14 });
                 
                 analysisDetails = { 
-                    short: {...st, summary: "단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 스윙 포지션에 적합합니다." }, 
-                    mid: {...mt, summary: "중기 이평선과 밴드를 분석한 결과입니다.", advice: "일봉, 주봉의 추세가 일치하는지 확인하세요." }, 
-                    long: {...lt, summary: "장기 펀더멘털 결과입니다.", advice: "장기 우상향 시 하락 노이즈는 매수 기회입니다." } 
+                    short: {...st, summary: "20일선 및 단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 스윙 포지션에 적합합니다." }, 
+                    mid: {...mt, summary: "60일 중기 이평선과 추세를 분석한 결과입니다.", advice: "일봉과 주봉의 방향 일치 여부를 파악하세요." }, 
+                    long: {...lt, summary: "주봉 40주선 기반의 장기 사이클입니다.", advice: "장기 우상향 시 하락 노이즈는 매수 기회입니다." } 
                 };
                 
                 const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm md:text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
                 up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
                 
                 const uiUpdate = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } }
-                uiUpdate('val-ma-dist', `${st.maDist>0?'+':''}${st.maDist}%`, st.maDist>0?'#26A69A':'#EF5350');
-                uiUpdate('val-rsi-main', st.rsi); uiUpdate('val-macd-main', st.macd); uiUpdate('val-stoch-main', st.stoch);
+                
+                // 120일선 이격도는 메인 지표용으로 dJson의 120일선 기준 사용
+                const mainSma120 = Indicator.sma(extractCleanData(dJson.chart.result[0]).closes, 120);
+                const lastCl = extractCleanData(dJson.chart.result[0]).closes.pop();
+                const dist120 = mainSma120[mainSma120.length-1] ? ((lastCl - mainSma120[mainSma120.length-1]) / mainSma120[mainSma120.length-1] * 100).toFixed(2) : 0;
+                
+                uiUpdate('val-ma-dist', `${dist120>0?'+':''}${dist120}%`, dist120>0?'#26A69A':'#EF5350');
+                uiUpdate('val-rsi-main', mt.rsi); 
+                uiUpdate('val-macd-main', mt.macd); 
+                uiUpdate('val-stoch-main', mt.stoch);
             } catch (e) {
                 logError("Calculate Signals Error", e);
                 ['st-signal-text', 'mt-signal-text', 'lt-signal-text'].forEach(id => {
@@ -1095,10 +1130,11 @@
 
             try {
                 let tickers = [];
-                if(pfKey === 'dual') tickers = ['SPY', 'VEA', 'BIL'];
-                else if(pfKey === 'vaa') tickers = ['SPY', 'VEA', 'VWO', 'AGG'];
-                else if(pfKey === 'daa') tickers = ['VWO', 'BND', 'SPY'];
-                else if(pfKey === 'baa') tickers = ['SPY', 'VEA', 'VWO', 'BND'];
+                let colCount = 5;
+                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL']; colCount = 5; }
+                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG']; colCount = 6; }
+                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY']; colCount = 5; }
+                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND']; colCount = 4; }
 
                 const dataMap = {};
                 let unifiedMonths = new Set();
@@ -1131,7 +1167,7 @@
 
                 const calcScore = (t, currIdx) => {
                     const P0 = dataMap[t][sortedMonths[currIdx]], P1 = dataMap[t][sortedMonths[currIdx-1]], P3 = dataMap[t][sortedMonths[currIdx-3]], P6 = dataMap[t][sortedMonths[currIdx-6]], P12 = dataMap[t][sortedMonths[currIdx-12]];
-                    if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `[${t}] 부족` };
+                    if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `[${t}] 데이터 부족` };
                     const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
                     const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
                     return { score, proof: `[${t}] P0:${P0.toFixed(2)} | P1:${P1.toFixed(2)}(<span class="proof-hl">${(r1*100).toFixed(1)}%</span>) | P3:${P3.toFixed(2)}(<span class="proof-hl">${(r3*100).toFixed(1)}%</span>) | P6:${P6.toFixed(2)}(<span class="proof-hl">${(r6*100).toFixed(1)}%</span>) | P12:${P12.toFixed(2)}(<span class="proof-hl">${(r12*100).toFixed(1)}%</span>) => <span class="text-white">Score: ${score.toFixed(2)}</span>` };
@@ -1139,7 +1175,7 @@
 
                 const calcRet = (t, currIdx) => {
                     const P0 = dataMap[t][sortedMonths[currIdx]], P12 = dataMap[t][sortedMonths[currIdx-12]];
-                    if(!P0 || !P12) return { ret: -999, proof: `[${t}] 부족` };
+                    if(!P0 || !P12) return { ret: -999, proof: `[${t}] 데이터 부족` };
                     const ret = (P0/P12 - 1) * 100;
                     return { ret, proof: `[${t}] ${sortedMonths[currIdx]}: $${P0.toFixed(2)} / 12M전: $${P12.toFixed(2)} => <span class="text-white">${ret.toFixed(2)}%</span>` };
                 }
@@ -1174,7 +1210,7 @@
                     }
 
                     row += `</tr>`;
-                    row += `<tr class="proof-row"><td colspan="5" class="proof-cell"><div class="proof-box">${proofs.map(p => `<div>${p}</div>`).join('')}</div></td></tr>`;
+                    row += `<tr class="proof-row"><td colspan="${colCount}" class="proof-cell"><div class="proof-box">${proofs.map(p => `<div>${p}</div>`).join('')}</div></td></tr>`;
                     html += row;
                 }
                 
