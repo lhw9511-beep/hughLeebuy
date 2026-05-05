@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="theme-green">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -50,6 +50,14 @@
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.1);
         }
+        .theme-purple {
+            --bg-color: #171026;
+            --panel-color: rgba(37, 26, 58, 0.8);
+            --modal-bg: #251a3a;
+            --text-main: #f3e8ff;
+            --text-muted: #a855f7;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
         .theme-green {
             --bg-color: #022c22;
             --panel-color: rgba(6, 78, 59, 0.8);
@@ -59,252 +67,1014 @@
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; transition: background-color 0.3s ease; }
+        .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
+        .status-BUY { color: #34D399; }
+        .status-HOLD { color: var(--text-muted); }
+        .status-BYE { color: #F87171; }
+        .status-STRONG-BYE { color: #EF4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+
+        html { font-size: 16px; transition: font-size 0.2s ease; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); }
-        .chart-container { height: 400px; width: 100%; }
-        @media (min-width: 1024px) { .chart-container { height: 500px; } }
-        .portfolio-chart-container { height: 350px; width: 100%; }
         
-        .chip-btn { padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 800; border-radius: 0.5rem; background: rgba(0,0,0,0.1); color: var(--text-muted); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
+        .chart-container { height: 400px; width: 100%; display: block; }
+        @media (min-width: 1024px) { .chart-container { height: 500px; } }
+        .portfolio-chart-container { height: 350px; width: 100%; display: block; }
+        .pie-container { height: 250px; width: 100%; display: block; }
+        .pf-modal-chart-container { height: 280px; width: 100%; display: block; }
+        
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); }
+        
+        .chip-btn { padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 800; border-radius: 0.5rem; background: rgba(0,0,0,0.1); color: var(--text-muted); border: 1px solid var(--border-color); transition: all 0.2s; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+        .chip-btn:hover { border-color: #3B82F6; color: var(--text-main); }
         .chip-btn.active { background-color: #3B82F6; border-color: #3B82F6; color: white; }
 
+        .setting-btn { border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); padding: 0.4rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: bold; flex: 1; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .setting-btn.active { background: #3B82F6; color: white; border-color: #3B82F6; }
+
+        #loading-overlay, #crypto-loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 1rem; flex-direction: column; }
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 1rem; }
-        .modal-content { max-width: 500px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
-        .modal-content-large { max-width: 900px; }
-
-        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 0.5rem; text-align: center; cursor: pointer; }
-        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 900; margin-top: 4px; }
+        .modal-content { max-width: 500px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
+        .modal-content-large { max-width: 900px; } 
         
-        .main-tab-btn { padding: 0.6rem 1rem; font-weight: 900; font-size: 0.85rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; }
-        .main-tab-btn.active { color: var(--text-main); border-bottom-color: #3B82F6; }
+        .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
 
-        .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; cursor: pointer; display: flex; flex-direction: column; min-height: 120px; }
-        .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); transition: all 0.2s; }
+        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; }
+        .stat-box:hover { border-color: #3B82F6; background: rgba(0,0,0,0.1); }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 900; margin-top: 4px; text-align: center;}
+        
+        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.75rem; border: 1px solid transparent; text-align: center; background: rgba(0,0,0,0.1); }
+        .perspective-col:hover { background: rgba(0,0,0,0.2); transform: translateY(-2px); border-color: #3B82F6; }
+
+        .signal-badge { font-weight: 900; font-size: 0.6rem; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; white-space: nowrap; }
+        .signal-up { background-color: rgba(38, 166, 154, 0.2); color: #26A69A; }
+        .signal-down { background-color: rgba(239, 83, 80, 0.2); color: #EF5350; }
+
+        .icon-sm { width: 14px !important; height: 14px !important; min-width: 14px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+        .icon-md { width: 20px !important; height: 20px !important; min-width: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+        .icon-lg { width: 24px !important; height: 24px !important; min-width: 24px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+        
+        .main-tab-btn { padding: 0.6rem 1rem; font-weight: 900; font-size: 0.85rem; color: var(--text-muted); border-bottom: 2px solid transparent; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
+        .main-tab-btn.active { color: var(--text-main); border-bottom-color: #3B82F6; }
+        .main-tab-btn:hover { color: var(--text-main); }
+
+        .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column; min-height: 120px;}
+        .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(59,130,246,0.3); }
+        
+        .calc-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        .calc-table th { font-size: 0.6rem; color: var(--text-muted); text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+        .calc-table td { font-size: 0.75rem; color: var(--text-main); font-family: monospace; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
+        .calc-table tr:last-child td { border-bottom: none; }
+        
+        .proof-row { display: none; background: rgba(0,0,0,0.2); }
+        .proof-row.show { display: table-row; }
+        .proof-cell { padding: 8px !important; border-bottom: 1px solid var(--border-color) !important; }
+        .proof-box { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 6px; font-family: monospace; font-size: 0.65rem; color: var(--text-muted); overflow-x: auto; line-height: 1.6; }
+        .proof-hl { color: #3B82F6; font-weight: bold; }
+        
+        .rule-list { list-style-type: none; padding-left: 0; margin-top: 10px; }
+        .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: flex-start; line-height: 1.5; }
+        .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 1px; font-size: 0.8rem; }
+        .rule-highlight { color: var(--text-main); font-weight: 800; background: rgba(59, 130, 246, 0.2); padding: 3px 6px; border-radius: 6px; margin-right: 6px; display: inline-block; margin-bottom: 4px; border: 1px solid rgba(59, 130, 246, 0.4); word-break: keep-all; }
+        
+        #error-log-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; border-radius: 8px; padding: 8px; margin-top: 8px; font-family: monospace; font-size: 0.65rem; color: #FCA5A5; max-height: 100px; overflow-y: auto; word-break: break-all; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
-    <!-- [HTML Structure] -->
-    <header class="glass rounded-2xl m-2 md:m-4">
-        <div class="flex justify-between items-center p-3 md:p-4">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="location.reload()">
-                <div class="bg-accent p-1.5 rounded-lg shadow-md"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg></div>
-                <h1 class="text-xl md:text-2xl font-black italic text-themeText">BUY <span class="text-accent">or BYE</span></h1>
+    <!-- 1. 설정 모달 -->
+    <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
+                <h3 class="text-lg font-black text-themeText flex items-center">
+                    <svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    앱 환경 설정
+                </h3>
+                <button type="button" onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
-            <div class="flex items-center gap-2 md:gap-4">
-                <button id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-black/20 border border-accent/40 rounded-xl text-themeText font-black text-sm w-20 shadow-inner">USD</button>
-                <div class="hidden md:flex items-center">
-                    <button onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">주식 분석</button>
-                    <button onclick="switchMainTab('crypto')" id="tab-btn-crypto" class="main-tab-btn">크립토 분석</button>
-                    <button onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오</button>
+            
+            <div class="space-y-6">
+                <div>
+                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6; border-color:#ccc;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
+                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn active" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
+                    </div>
                 </div>
-                <button onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 rounded-xl text-rose-500 font-bold w-10">!</button>
+
+                <div class="border-t border-themeBorder pt-4">
+                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 조절</p>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
+                        <button type="button" onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
+                        <button type="button" onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
+                    </div>
+                </div>
+
+                <div class="border-t border-themeBorder pt-4">
+                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기</p>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
+                        <button type="button" onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
+                        <button type="button" onclick="setLineWidth('3')" id="btn-line-3" class="setting-btn">두껍게</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-end">
+                <button type="button" onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto transition">적용 및 닫기</button>
             </div>
         </div>
-    </header>
+    </div>
 
-    <main class="max-w-[1400px] mx-auto w-full p-2 md:p-4">
-        <div id="view-dashboard" class="flex flex-col space-y-4">
-            <form id="search-form" class="flex w-full"><input type="text" id="ticker-input" class="flex-grow bg-themePanel border border-themeBorder text-themeText rounded-l-xl px-4 py-3 uppercase outline-none focus:border-accent font-black shadow-inner" value="SPY"><button type="submit" class="bg-accent text-white px-6 rounded-r-xl font-black">분석</button></form>
-            <div class="flex items-center gap-2 px-2"><span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span><span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted uppercase">WAITING</span></div>
-            <div class="glass rounded-2xl p-5 flex flex-col shadow-xl relative min-h-[500px]">
-                <div id="loading-overlay" class="absolute inset-0 bg-black/60 z-50 flex flex-col items-center justify-center rounded-2xl hidden"><div class="animate-spin rounded-full h-10 w-10 border-t-2 border-accent mb-3"></div><p class="text-xs font-black text-accent uppercase">Loading...</p></div>
-                <div class="flex justify-between mb-4 border-b border-themeBorder pb-3">
-                    <h2 id="display-ticker" class="text-3xl font-black text-themeText uppercase italic">---</h2>
-                    <div id="live-price" class="text-2xl font-black text-themeText">---</div>
+    <!-- 2. 에러 로그 모달 -->
+    <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start mb-4 border-b border-rose-500/30 pb-3">
+                <h3 class="text-lg font-black text-rose-500 flex items-center">
+                    <svg class="icon-md mr-2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    에러 로그 (Debug)
+                </h3>
+                <button type="button" onclick="closeErrorModal()" class="text-themeMuted hover:text-rose-500 p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+            </div>
+            <textarea id="error-log-text" class="w-full h-32 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.65rem] font-mono p-2 rounded-lg outline-none resize-none" readonly></textarea>
+            <div class="mt-4 flex gap-2 justify-end">
+                <button type="button" onclick="copyErrorLog()" id="btn-copy-error" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black hover:bg-rose-700 transition">복사하기</button>
+                <button type="button" onclick="closeErrorModal()" class="bg-themeBorder text-themeText px-4 py-2 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 정보 설명 모달 -->
+    <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
+                <h3 id="info-title" class="text-lg font-black text-themeText flex items-center">
+                    <svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg>
+                    지표 설명
+                </h3>
+                <button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+            </div>
+            <p id="info-body" class="text-sm text-themeMuted leading-relaxed py-2"></p>
+            <div class="mt-6 flex justify-end">
+                <button type="button" onclick="closeInfoModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 w-full md:w-auto transition border border-white/5">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 종목 분석 모달 -->
+    <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
+                <div>
+                    <h3 id="modal-title" class="text-xl font-black text-themeText uppercase italic">Detail View</h3>
+                    <p id="modal-period" class="text-[0.7rem] text-accent font-black tracking-widest uppercase mt-1">---</p>
                 </div>
+                <button type="button" onclick="closeDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+            </div>
+            <div id="modal-body" class="space-y-4 text-sm text-themeText py-2"></div>
+            <div class="mt-6 flex justify-end">
+                <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 포트폴리오 상세 및 라이브 계산기 모달 -->
+    <div id="pf-detail-modal" class="modal-overlay" onclick="closePfDetailModal()">
+        <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
+                <div>
+                    <h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
+                </div>
+                <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="py-2">
+                <!-- 자산배분 설명 영역 -->
+                <div id="pf-modal-desc" class="text-[0.75rem] md:text-[0.8rem] text-themeMuted mb-4 leading-relaxed bg-themeBorder/10 p-4 md:p-5 rounded-xl border border-themeBorder shadow-inner"></div>
+
+                <div class="flex flex-row gap-2 md:gap-4 mb-4">
+                    <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
+                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">CAGR(연평균)</p>
+                        <p id="pf-modal-cagr" class="text-lg md:text-xl font-black text-up">0%</p>
+                    </div>
+                    <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
+                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">MDD(최대낙폭)</p>
+                        <p id="pf-modal-mdd" class="text-lg md:text-xl font-black text-down">0%</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
+                    <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-3 py-2 uppercase outline-none text-xs md:text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교할 주식 심볼 (예: QQQ)">
+                    <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="bg-accent text-white px-4 py-2 rounded-lg font-black text-xs md:text-sm hover:bg-blue-600 transition shrink-0 shadow-lg shadow-accent/30">차트 비교</button>
+                </div>
+
+                <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
+
+                <div id="pf-modal-pie-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-themeBorder mb-4 hidden relative overflow-hidden">
+                    <div class="absolute top-2 left-3 text-[0.65rem] font-black text-themeMuted tracking-widest z-10">자산 배분 비율</div>
+                    <div id="pf-pie-chart" class="pie-container"></div>
+                </div>
+
+                <!-- 라이브 엔진 영역 (증명 기능 포함) -->
+                <div id="pf-modal-live-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
+                    <div class="p-3 border-b border-themeBorder flex flex-col md:flex-row md:justify-between md:items-center bg-black/20 gap-3">
+                        <div class="flex items-center gap-2">
+                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            <span class="text-sm font-black text-themeText">Live Strategy Engine</span>
+                        </div>
+                        <label class="flex items-center gap-2 cursor-pointer bg-themeBorder/50 px-3 py-1.5 rounded-lg border border-themeBorder hover:bg-themeBorder transition justify-center md:justify-end">
+                            <input type="checkbox" id="toggle-proof" class="w-4 h-4 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
+                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 및 원데이터 증명 보기</span>
+                        </label>
+                    </div>
+                    
+                    <div id="pf-live-summary" class="flex-col m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between" style="display: none;">
+                        <div>
+                            <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">실시간 운용 성과 (최근 12개월)</p>
+                            <span class="bg-black/40 border border-themeBorder text-themeText text-[0.65rem] rounded px-2 py-1 font-bold">API 실시간</span>
+                        </div>
+                        <div class="text-right">
+                            <p id="pf-live-summary-cagr" class="text-2xl md:text-3xl font-black text-themeText">--</p>
+                            <p class="text-[0.65rem] md:text-xs font-bold text-themeMuted mt-1">기간 내 최대낙폭(MDD): <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
+                        </div>
+                    </div>
+
+                    <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
+                        <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
+                        <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
+                    </div>
+                    <div id="pf-live-content" class="hidden overflow-x-auto custom-scroll p-1">
+                        <table class="calc-table" id="pf-live-table"></table>
+                    </div>
+                </div>
+
+                <div class="bg-[var(--modal-bg)] p-4 md:p-5 rounded-xl border border-themeBorder">
+                    <p class="text-[0.8rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-3">
+                        <svg class="icon-md mr-1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                        운용 알고리즘 및 규칙
+                    </p>
+                    <ul id="pf-modal-rules" class="rule-list"></ul>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button type="button" onclick="closePfDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 transition border border-white/5">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 대시보드 래퍼 -->
+    <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
+        
+        <header class="glass rounded-2xl shadow-sm overflow-hidden">
+            <div class="flex justify-between items-center p-3 md:p-4">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
+                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40 flex items-center justify-center">
+                        <svg class="icon-lg text-white" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
+                    </div>
+                    <h1 class="text-xl md:text-2xl font-black italic text-themeText tracking-tighter ml-1">BUY <span class="text-accent">or BYE</span></h1>
+                </div>
+                
+                <div class="flex items-center gap-2 md:gap-4">
+                    <button type="button" id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-[var(--modal-bg)] border border-accent/40 rounded-xl text-themeText font-black text-sm hover:bg-accent hover:text-white transition shadow-sm shadow-accent/20 w-20 text-center">
+                        USD
+                    </button>
+
+                    <div class="hidden md:flex items-center">
+                        <button type="button" onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">종목 AI 분석</button>
+                        <button type="button" onclick="switchMainTab('crypto')" id="tab-btn-crypto" class="main-tab-btn">크립토 분석</button>
+                        <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
+                    </div>
+                    
+                    <button type="button" onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 border border-rose-500/50 rounded-xl text-rose-500 hover:bg-rose-500 hover:text-white transition shadow-sm">
+                        <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </button>
+
+                    <button type="button" onclick="openSettingsModal()" class="p-2 bg-[var(--modal-bg)] border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
+                        <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="md:hidden flex border-t border-themeBorder bg-black/10">
+                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 active text-center text-sm py-2">주식</button>
+                <button type="button" onclick="switchMainTab('crypto')" id="mob-tab-btn-crypto" class="main-tab-btn flex-1 text-center text-sm py-2">크립토</button>
+                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 text-center text-sm py-2">포트폴리오</button>
+            </div>
+        </header>
+
+        <!-- VIEW 1: 주식 종목 분석 대시보드 -->
+        <div id="view-dashboard" class="flex flex-col space-y-3 md:space-y-4">
+            <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
+                <form id="search-form" class="flex w-full sm:flex-grow">
+                    <input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="주식 심볼 (예: QQQ)">
+                    <button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button>
+                </form>
+                <div id="status-text" class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2">
+                    <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                    <span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]">
+                <div id="loading-overlay">
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
+                    <p id="loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">Loading Data...</p>
+                </div>
+                
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-3 md:pb-4 gap-3">
+                    <div>
+                        <h2 id="display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
+                        <div id="live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
+                    </div>
+                    
+                    <div class="flex flex-col w-full lg:w-auto gap-2">
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">기간</span>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉</button>
+                                <button type="button" onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn range-btn">주봉</button>
+                                <button type="button" onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn range-btn">월봉</button>
+                                <button type="button" onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">연봉</button>
+                                <button type="button" onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="chip-btn range-btn">MAX</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">지표</span>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">MA 20</button>
+                                <button type="button" onclick="toggleMA(50)" id="btn-ma-50" class="chip-btn active">MA 50</button>
+                                <button type="button" onclick="toggleMA(120)" id="btn-ma-120" class="chip-btn active">MA 120</button>
+                                <button type="button" onclick="toggleMA(200)" id="btn-ma-200" class="chip-btn active">MA 200</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
-        </div>
 
-        <div id="view-crypto" class="hidden flex-col space-y-4">
-            <form id="crypto-search-form" class="flex w-full"><input type="text" id="crypto-ticker-input" class="flex-grow bg-themePanel border border-themeBorder text-themeText rounded-l-xl px-4 py-3 uppercase outline-none font-black shadow-inner" value="BTC-USD"><button type="submit" class="bg-accent text-white px-6 rounded-r-xl font-black">분석</button></form>
-            <div id="crypto-chart-main" class="chart-container glass rounded-2xl p-5"></div>
-        </div>
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
+                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
+                    <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
+                        <div class="flex items-center gap-2">
+                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            <p class="text-themeMuted text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">Master Intelligence</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 flex-grow mb-2">
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('short')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span>
+                            <div id="st-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        </div>
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('mid')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span>
+                            <div id="mt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        </div>
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('long')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span>
+                            <div id="lt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        </div>
+                    </div>
+                    <p class="text-[0.55rem] text-themeMuted text-center">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
+                </div>
 
-        <div id="view-portfolio" class="hidden flex-col space-y-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="pf-card" onclick="showPfDetail('6040')"><h3 class="font-black text-sm">60/40</h3><div class="mt-auto border-t border-themeBorder pt-2 text-[0.65rem] font-bold"><p>CAGR: <span id="card-cagr-6040">--</span></p><p>MDD: <span id="card-mdd-6040">--</span></p></div></div>
-                <div class="pf-card" onclick="showPfDetail('baa')"><h3 class="font-black text-sm">BAA (Bold)</h3><div class="mt-auto border-t border-themeBorder pt-2 text-[0.65rem] font-bold"><p>CAGR: <span id="card-cagr-baa">--</span></p><p>MDD: <span id="card-mdd-baa">--</span></p></div></div>
+                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
+                    <div class="flex items-center gap-2 mb-3 border-b border-themeBorder pb-2">
+                        <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-full mb-3">
+                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 기준 이동평균선 간의 거리(%)입니다. 양수(+)면 긍정, 음수(-)면 역배열입니다.')">
+                            <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-ma-dist" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '30 이하는 과매도(저점), 70 이상은 과매수(고점)로 해석합니다.')">
+                            <p class="stat-label">RSI <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-rsi-main" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산. 히스토그램이 양수(+)면 상승, 음수(-)면 하락 에너지입니다.')">
+                            <p class="stat-label">MACD <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-macd-main" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')">
+                            <p class="stat-label">BB밴드 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-bb-main" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '최근 기간 중 현재 위치. 20 이하는 바닥, 80 이상은 과열을 뜻합니다.')">
+                            <p class="stat-label">Stoch <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-stoch-main" class="stat-value text-themeText">---</p>
+                        </div>
+                    </div>
+                    <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[150px] md:max-h-[200px]">
+                        <p class="text-xs text-themeMuted text-center py-6">데이터 대기 중...</p>
+                    </div>
+                </div>
             </div>
-            <div class="glass p-5 rounded-2xl"><div id="chart-portfolio" class="portfolio-chart-container w-full"></div></div>
         </div>
-    </main>
 
-    <!-- 에러 모달 -->
-    <div id="error-modal" class="modal-overlay" onclick="this.style.display='none'"><div class="modal-content"><h3 class="text-lg font-black text-rose-500 mb-4">Error Log</h3><textarea id="error-log-text" class="w-full h-40 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.7rem] font-mono p-2 rounded-lg" readonly></textarea></div></div>
+        <!-- VIEW 2: 크립토 분석 대시보드 -->
+        <div id="view-crypto" class="hidden flex-col space-y-3 md:space-y-4">
+            <div class="flex gap-2 mb-1 overflow-x-auto custom-scroll pb-1">
+                <button type="button" onclick="loadCryptoData('BTC-USD')" class="chip-btn bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/30">Bitcoin (BTC)</button>
+                <button type="button" onclick="loadCryptoData('ETH-USD')" class="chip-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border-indigo-500/30">Ethereum (ETH)</button>
+                <button type="button" onclick="loadCryptoData('SOL-USD')" class="chip-btn bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 border-teal-500/30">Solana (SOL)</button>
+                <button type="button" onclick="loadCryptoData('XRP-USD')" class="chip-btn bg-gray-500/10 hover:bg-gray-500/20 text-gray-400 border-gray-500/30">Ripple (XRP)</button>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
+                <form id="crypto-search-form" class="flex w-full sm:flex-grow">
+                    <input type="text" id="crypto-ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="BTC-USD" placeholder="크립토 심볼 (예: ETH-USD)">
+                    <button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button>
+                </form>
+                <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2">
+                    <span id="crypto-status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                    <span id="crypto-conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]">
+                <div id="crypto-loading-overlay">
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
+                    <p id="crypto-loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">Loading Crypto Data...</p>
+                </div>
+                
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-3 md:pb-4 gap-3">
+                    <div>
+                        <h2 id="crypto-display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
+                        <div id="crypto-live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
+                    </div>
+                    
+                    <div class="flex flex-col w-full lg:w-auto gap-2">
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">기간</span>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="changeCryptoInterval('1d', '1y', 'D')" id="crypto-range-D" class="chip-btn range-btn active">일봉</button>
+                                <button type="button" onclick="changeCryptoInterval('1wk', '2y', 'W')" id="crypto-range-W" class="chip-btn range-btn">주봉</button>
+                                <button type="button" onclick="changeCryptoInterval('1mo', '5y', 'M')" id="crypto-range-M" class="chip-btn range-btn">월봉</button>
+                                <button type="button" onclick="changeCryptoInterval('1y', 'max', 'Y')" id="crypto-range-Y" class="chip-btn range-btn">연봉</button>
+                                <button type="button" onclick="changeCryptoInterval('1mo', 'max', 'MAX')" id="crypto-range-MAX" class="chip-btn range-btn">MAX</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                            <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">지표</span>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="toggleCryptoMA(20)" id="crypto-btn-ma-20" class="chip-btn active">MA 20</button>
+                                <button type="button" onclick="toggleCryptoMA(50)" id="crypto-btn-ma-50" class="chip-btn active">MA 50</button>
+                                <button type="button" onclick="toggleCryptoMA(120)" id="crypto-btn-ma-120" class="chip-btn active">MA 120</button>
+                                <button type="button" onclick="toggleCryptoMA(200)" id="crypto-btn-ma-200" class="chip-btn active">MA 200</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="crypto-chart-main" class="chart-container flex-grow"></div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
+                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
+                    <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
+                        <div class="flex items-center gap-2">
+                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            <p class="text-themeMuted text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">Crypto Intelligence</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 flex-grow mb-2">
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('short')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span>
+                            <div id="crypto-st-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        </div>
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('mid')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span>
+                            <div id="crypto-mt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        </div>
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('long')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span>
+                            <div id="crypto-lt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        </div>
+                    </div>
+                    <p class="text-[0.55rem] text-themeMuted text-center">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
+                </div>
+
+                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
+                    <div class="flex items-center gap-2 mb-3 border-b border-themeBorder pb-2">
+                        <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 리포트</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 h-full mb-3">
+                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 기준 이동평균선 간의 거리(%)입니다. 양수(+)면 긍정, 음수(-)면 역배열입니다.')">
+                            <p class="stat-label">이격도 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '30 이하는 과매도(저점), 70 이상은 과매수(고점)로 해석합니다.')">
+                            <p class="stat-label">RSI <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산. 히스토그램이 양수(+)면 상승, 음수(-)면 하락 에너지입니다.')">
+                            <p class="stat-label">MACD <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="crypto-val-macd-main" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')">
+                            <p class="stat-label">BB밴드 <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="crypto-val-bb-main" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '최근 기간 중 현재 위치. 20 이하는 바닥, 80 이상은 과열을 뜻합니다.')">
+                            <p class="stat-label">Stoch <svg class="icon-sm text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="crypto-val-stoch-main" class="stat-value text-themeText">---</p>
+                        </div>
+                    </div>
+                    <div id="crypto-reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[150px] md:max-h-[200px]">
+                        <p class="text-xs text-themeMuted text-center py-6">데이터 대기 중...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: 포트폴리오 백테스트 화면 -->
+        <div id="view-portfolio" class="hidden flex-col space-y-4">
+            
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
+                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
+                    <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
+                        <svg class="icon-md text-emerald-500" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        정적 자산배분 (Static)
+                    </h2>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="pf-card" onclick="showPfDetail('6040')">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">60/40 Portfolio <span class="text-[0.55rem] bg-gray-500/20 text-gray-400 px-2 py-1 rounded">Basic</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식 60%, 채권 40%</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                            <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-6040" class="text-up ml-1">--%</span></span>
+                            <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-6040" class="text-down ml-1">--%</span></span>
+                        </div>
+                    </div>
+                    <div class="pf-card" onclick="showPfDetail('permanent')">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">Permanent <span class="text-[0.55rem] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">Safe</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식/장기채/금/현금 분산</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                            <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-permanent" class="text-up ml-1">--%</span></span>
+                            <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-permanent" class="text-down ml-1">--%</span></span>
+                        </div>
+                    </div>
+                    <div class="pf-card" onclick="showPfDetail('allweather')">
+                        <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 사계절 대응 전략</p>
+                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                            <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-allweather" class="text-up ml-1">--%</span></span>
+                            <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-allweather" class="text-down ml-1">--%</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-accent">
+                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
+                    <h2 class="text-base md:text-lg font-black text-themeText flex items-center gap-2">
+                        <svg class="icon-md text-accent" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        동적 자산배분 (Dynamic)
+                    </h2>
+                </div>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="pf-card" onclick="showPfDetail('dual')">
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">Dual Momentum</h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">절대/상대 모멘텀을 혼합해 1등 자산에 투자합니다.</p>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-dual" class="text-up ml-1">--%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-dual" class="text-down ml-1">--%</span></span>
+                        </div>
+                    </div>
+                    <div class="pf-card" onclick="showPfDetail('vaa')">
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">수익률 가중치로 가장 빠르고 강력한 자산을 찾습니다.</p>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-vaa" class="text-up ml-1">--%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-vaa" class="text-down ml-1">--%</span></span>
+                        </div>
+                    </div>
+                    <div class="pf-card" onclick="showPfDetail('daa')">
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">카나리아 자산이 하락하면 즉시 안전 자산으로 도망갑니다.</p>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-daa" class="text-up ml-1">--%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-daa" class="text-down ml-1">--%</span></span>
+                        </div>
+                    </div>
+                    <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
+                        <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">방어와 공격적 스위칭을 구사하는 최신 배분 전략.</p>
+                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                            <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-baa" class="text-up ml-1">--%</span></span>
+                            <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-baa" class="text-down ml-1">--%</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
+                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 시뮬레이션 (Base 100)</h3>
+                <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
+            </div>
+        </div>
+
+        <div class="text-center mt-2 pb-6">
+            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data (Base 100)</p>
+        </div>
+    </div>
 
     <script>
         // ==========================================
-        // 🚀 1. 전역 변수 및 상수 (Hoisting 방지)
+        // 🛠️ 전역 안전 장치 및 디버그
         // ==========================================
-        const API_BASE_URL = 'https://buy-or-bye.onrender.com';
-        let errorLogs = [];
-        let myChart = null, cryptoChart = null, pfChart = null;
-        let globalChartData = null, globalTicker = "SPY", globalCryptoTicker = "BTC-USD";
-        let currentInterval = '1d', currentRange = '1y';
-        let currentCurrency = localStorage.getItem('dashboardCurrency') || 'USD';
-        let fxCache = {};
+        function resetDashboard() { location.reload(); }
 
-        // ==========================================
-        // 🚀 2. 필수 유틸리티 함수 (최상단 정의)
-        // ==========================================
+        let errorLogs = [];
         function logError(msg, err) {
             console.error(msg, err);
             const time = new Date().toLocaleTimeString();
-            errorLogs.unshift(`[${time}] ${msg}: ${err?.message || err}\n`);
-            document.getElementById('btn-show-error')?.classList.remove('hidden');
-            updateStatus("ERROR", "bg-rose-500");
+            let errStr = (err && err.message) ? err.message : String(err);
+            if(err && err.stack) errStr += `\n${err.stack}`;
+            errorLogs.unshift(`[${time}] ${msg}\n${errStr}\n`);
+            if(errorLogs.length > 10) errorLogs.pop(); 
+            const btn = document.getElementById('btn-show-error');
+            if(btn) btn.classList.remove('hidden'); 
         }
 
-        function updateStatus(t, c) {
-            const l = document.getElementById('conn-label'), d = document.getElementById('status-dot');
-            if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; }
-        }
+        window.onerror = function(message, source, lineno, colno, error) { logError("Global JS Error", error || message); updateStatus("ERROR", "bg-rose-500"); updateCryptoStatus("ERROR", "bg-rose-500"); };
+        window.addEventListener("unhandledrejection", function(event) { logError("Promise Rejection", event.reason); updateStatus("API ERROR", "bg-rose-500"); updateCryptoStatus("API ERROR", "bg-rose-500"); });
 
-        function setTheme(t) {
-            try {
-                document.documentElement.className = t;
-                localStorage.setItem('dashboardTheme', t);
-                document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.id === `btn-${t}`));
-                if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
-            } catch(e) { console.warn("setTheme failed", e); }
-        }
-
-        async function fetchWithRetry(url, options = {}, maxRetries = 2) {
-            for (let i = 0; i <= maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) return response;
-                    await new Promise(res => setTimeout(res, 1000 * (i + 1)));
-                } catch (err) {
-                    if (i === maxRetries) throw err;
-                }
-            }
-        }
+        function safeStorageGet(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
+        function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
         // ==========================================
-        // 🚀 3. 데이터 및 퀀트 엔진
+        // 📊 글로벌 변수 및 공통 설정
         // ==========================================
+        let myChart = null, cryptoChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
+        const API_BASE_URL = 'https://buy-or-bye.onrender.com'; 
+
+        // 환율 모드 글로벌 변수 ('USD' | 'KRW')
+        let currentCurrency = safeStorageGet('dashboardCurrency', 'USD');
+        let fxCache = {};
+
+        const savedTheme = safeStorageGet('dashboardTheme', 'theme-green');
+        const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
+        let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
+
+        // 주식 변수
+        let maSettings = { 20: true, 50: true, 120: true, 200: true };
+        let currentInterval = '1d', currentRange = '1y';
+        let globalChartData = null, globalTicker = "SPY", abortController = null;
+        let analysisDetails = { short: {}, mid: {}, long: {} };
+        
+        // 크립토 변수
+        let cryptoMaSettings = { 20: true, 50: true, 120: true, 200: true };
+        let currentCryptoInterval = '1d', currentCryptoRange = '1y';
+        let globalCryptoChartData = null, globalCryptoTicker = "BTC-USD", cryptoAbortController = null;
+        let cryptoAnalysisDetails = { short: {}, mid: {}, long: {} };
+
+        let currentPfKey = '';
+
         const pfSimData = {
             years: ["2000","2002","2004","2006","2008","2010","2012","2014","2016","2018","2020","2022","2024", "2025", "2026"],
             'spy': [100, 88, 68, 87, 96, 100, 115, 121, 75, 93, 107, 109, 126, 166, 185],
             '6040': [100, 93, 82, 97, 104, 107, 118, 123, 90, 105, 116, 120, 131, 155, 168],
+            'permanent': [100, 102, 105, 110, 113, 116, 123, 130, 125, 133, 142, 150, 155, 152, 162],
+            'allweather': [100, 103, 105, 115, 121, 125, 134, 142, 130, 145, 158, 170, 178, 172, 185],
+            'dual': [100, 105, 110, 112, 125, 135, 150, 165, 160, 180, 205, 215, 235, 280, 305],
+            'vaa': [100, 108, 115, 118, 135, 148, 170, 185, 180, 210, 240, 255, 275, 320, 350],
+            'daa': [100, 105, 112, 115, 130, 142, 160, 175, 170, 195, 225, 235, 255, 290, 320],
             'baa': [100, 110, 118, 122, 140, 155, 180, 195, 195, 230, 270, 285, 310, 370, 400]
         };
-        const fxSimData = [1130, 1290, 1186, 1192, 1145, 1013, 929, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207];
+        const fxSimData = [1130, 1290, 1186, 1192, 1145, 1013, 929, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1330, 1400, 1450];
+        const pfSimYears = Array.from({length: pfSimData.years.length}, (_, i) => pfSimData.years[i]);
 
-        const getAdjustedSimData = (k) => {
-            let d = pfSimData[k]; if (currentCurrency === 'USD') return d;
-            let fx0 = fxSimData[0]; return d.map((v, i) => v * (fxSimData[i] / fx0));
+        const pfDetails = {
+            '6040': { title: '60/40 포트폴리오', type: 'static', desc: '가장 고전적이고 검증된 패시브 전략입니다. 경제 성장기에는 주식이, 침체기에는 채권이 방어하여 꾸준한 우상향을 그립니다.', rules: ['미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%', '연 1회 목표 비중 리밸런싱'], allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] },
+            'permanent': { title: '영구 포트폴리오 (Permanent)', type: 'static', desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 포트폴리오입니다.', rules: ['주식(SPY) 25%, 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%'], allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] },
+            'allweather': { title: '올웨더 포트폴리오 (All-Weather)', type: 'static', desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 변동성을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.', rules: ['미국 주식 30%, 장기채 40%, 중기채 15%, 금 7.5%, 원자재 7.5%'], allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] },
+            'dual': { title: '오리지널 듀얼 모멘텀', type: 'dynamic', desc: '상대적 우위 자산을 찾는 상대 모멘텀과 현금 대비 상승장인지 보는 절대 모멘텀을 결합한 동적 전략입니다.', rules: ['SPY, VEA 12M 수익률 비교', '둘 다 BIL보다 낮으면 AGG 매수', '그 외 1등 자산 매수'] },
+            'vaa': { title: 'VAA (Vigilant)', type: 'dynamic', desc: '과거 1개월 수익률에 높은 가중치를 두어 번개처럼 빠른 스위칭을 목표로 하는 전략입니다.', rules: ['가중치: (1M*12) + (3M*4) + (6M*2) + (12M*1)', '공격 자산 4개 모두 0 이상이면 1등 매수', '단 1개라도 0 이하면 수비 자산 대피'] },
+            'daa': { title: 'DAA (Defensive)', type: 'dynamic', desc: '경제 위기 시 먼저 타격받는 카나리아 자산을 도입해 수비 신호를 훨씬 보수적으로 잡는 전략입니다.', rules: ['카나리아(VWO, BND) 둘 다 0 이상이면 공격', '단 1개라도 0 이하면 안전 자산(SHY) 대피'] },
+            'baa': { title: 'BAA (Bold)', type: 'dynamic', desc: '현존 최고 수준의 전략으로 카나리아 감시망을 넓히고 공격 시 나스닥(QQQ)을 편입해 수익 극대화를 노립니다.', rules: ['카나리아 4개 중 1개라도 0 이하면 즉시 방어 전환', '공격 시 QQQ 등 상위 1개 몰빵', '방어 시 안전 자산 3개 분산'] }
         };
 
-        function extractCleanData(data) {
-            const q = data.indicators.quote[0], ts = data.timestamp;
-            let dates = [], kData = [], closes = [];
-            ts.forEach((t, i) => {
-                if (q.close[i]) {
-                    dates.push(new Date(t * 1000).toISOString().split('T')[0]);
-                    kData.push([q.open[i], q.close[i], q.low[i], q.high[i]]);
-                    closes.push(q.close[i]);
-                }
+        const calcMDDArray = (arr) => {
+            let mdd = []; let peak = arr[0];
+            for(let i=0; i<arr.length; i++) {
+                if(arr[i] > peak) peak = arr[i];
+                mdd.push(parseFloat(((arr[i] - peak) / peak * 100).toFixed(2)));
+            }
+            return mdd;
+        };
+
+        const getAdjustedSimData = (key) => {
+            const data = pfSimData[key];
+            if (currentCurrency === 'USD') return data;
+            const fxBase = fxSimData[0]; 
+            return data.map((val, idx) => { const fxRatio = fxSimData[idx] ? (fxSimData[idx] / fxBase) : 1; return val * fxRatio; });
+        };
+
+        const updatePfCardMetrics = () => {
+            Object.keys(pfDetails).forEach(key => {
+                const cagrEl = document.getElementById(`card-cagr-${key}`);
+                const mddEl = document.getElementById(`card-mdd-${key}`);
+                if(!cagrEl || !mddEl) return;
+                const dataArr = getAdjustedSimData(key);
+                const yearsCount = dataArr.length - 1;
+                const finalVal = dataArr[dataArr.length-1], initialVal = dataArr[0];
+                const cagr = (((finalVal / initialVal) ** (1 / yearsCount)) - 1) * 100;
+                const mddArr = calcMDDArray(dataArr);
+                const minMdd = Math.min(...mddArr);
+                cagrEl.innerText = `${cagr.toFixed(1)}%`;
+                mddEl.innerText = `${minMdd.toFixed(1)}%`;
             });
+        };
+
+        // ==========================================
+        // 🔄 핵심 UI 조작 함수
+        // ==========================================
+        function toggleCurrency() {
+            currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
+            safeStorageSet('dashboardCurrency', currentCurrency);
+            const btn = document.getElementById('currency-toggle');
+            if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
+
+            updatePfCardMetrics();
+            
+            const viewDash = document.getElementById('view-dashboard');
+            const viewCrypto = document.getElementById('view-crypto');
+            if(viewDash && viewDash.style.display !== 'none') { loadData(globalTicker); } 
+            else if (viewCrypto && viewCrypto.style.display !== 'none') { loadCryptoData(globalCryptoTicker); } 
+            
+            const modal = document.getElementById('pf-detail-modal');
+            if (modal && modal.style.display === 'flex' && currentPfKey) {
+                showPfDetail(currentPfKey);
+            }
+            renderPortfolioChart();
+        }
+
+        function getCurrSymbol() { return currentCurrency === 'USD' ? '$' : '₩'; }
+        function formatPriceStr(price) {
+            if (price === null || price === undefined || isNaN(price)) return '--';
+            if (currentCurrency === 'KRW') return Math.round(price).toLocaleString('ko-KR');
+            const digits = price < 1 ? 4 : 2;
+            return price.toLocaleString('en-US', {minimumFractionDigits: digits, maximumFractionDigits: digits});
+        }
+
+        function setTheme(t) {
+            document.documentElement.className = t; safeStorageSet('dashboardTheme', t);
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active')); document.getElementById(`btn-${t}`)?.classList.add('active');
+            requestAnimationFrame(() => { if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData); if (globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData); if (pfChart) renderPortfolioChart(); });
+        }
+
+        function setFontSize(s) {
+            document.documentElement.style.fontSize = {sm:'14px',md:'16px',lg:'18px'}[s]; safeStorageSet('dashboardFontSize', s);
+            document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active')); document.getElementById(`btn-font-${s}`)?.classList.add('active');
+            requestAnimationFrame(() => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize(); });
+        }
+
+        function setLineWidth(w) {
+            chartLineWidth = w; safeStorageSet('dashboardLineWidth', w);
+            document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active')); document.getElementById(`btn-line-${w}`)?.classList.add('active');
+            requestAnimationFrame(() => { if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData); if (globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData); });
+        }
+
+        function toggleProofs(show) { document.querySelectorAll('.proof-row').forEach(row => { if(show) row.classList.add('show'); else row.classList.remove('show'); }); }
+
+        function switchMainTab(tab) {
+            document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-btn-${tab}`)?.classList.add('active'); document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
+            document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
+            document.getElementById('view-crypto').style.display = tab==='crypto' ? 'flex' : 'none';
+            document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
+            setTimeout(() => {
+                if(tab === 'dashboard' && myChart) { myChart.resize(); } 
+                else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData('BTC-USD'); } cryptoChart.resize(); }
+                else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart.resize(); updatePfCardMetrics(); }
+            }, 50);
+        }
+
+        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
+        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
+        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
+
+        function showInfo(title, text) {
+            document.getElementById('info-title').innerHTML = `<svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg> ${title}`;
+            document.getElementById('info-body').innerText = text; document.getElementById('info-modal').style.display = 'flex';
+        }
+
+        // ==========================================
+        // 📡 API 통신 및 데이터 정제
+        // ==========================================
+        async function fetchWithRetry(url, options = {}, maxRetries = 2) {
+            let delay = 1500;
+            for (let i = 0; i <= maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return response;
+                    if (response.status === 429) {
+                        logError(`API 429 Limit: ${url}`); await new Promise(res => setTimeout(res, delay)); delay *= 1.5; continue;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                } catch (err) { 
+                    if (err.name === 'AbortError') throw err; 
+                    if (i === maxRetries) throw err; await new Promise(res => setTimeout(res, delay)); 
+                }
+            }
+            throw new Error(`Fetch failed: ${url}`);
+        }
+
+        async function getFxMap(interval, range) {
+            const key = `${interval}_${range}`; if(fxCache[key]) return fxCache[key];
+            try {
+                const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/KRW=X?interval=${interval}&range=${range}`);
+                const json = await res.json(); const data = json.chart.result[0];
+                let map = {}; const q = data.indicators.quote[0], ts = data.timestamp;
+                let lastValid = 1300; if (ts && q && q.close) { for(let i=0; i<ts.length; i++) { if(q.close[i]) lastValid = q.close[i]; const dStr = new Date(ts[i]*1000).toISOString().split('T')[0]; map[dStr] = lastValid; map[dStr.substring(0, 7)] = lastValid; } }
+                fxCache[key] = map; return map;
+            } catch(e) { console.error('FX Fetch Error:', e); return null; }
+        }
+
+        function applyFxToData(data, fxMap) {
+            if(!fxMap || !data || !data.indicators) return data;
+            const q = data.indicators.quote[0], ts = data.timestamp;
+            let lastFx = 1300;
+            for(let i=0; i<ts.length; i++) {
+                const dStr = new Date(ts[i]*1000).toISOString().split('T')[0];
+                if(fxMap[dStr]) lastFx = fxMap[dStr]; else if(fxMap[dStr.substring(0, 7)]) lastFx = fxMap[dStr.substring(0, 7)];
+                if(q.close[i] != null) {
+                    q.close[i] *= lastFx; if(q.open && q.open[i] != null) q.open[i] *= lastFx;
+                    if(q.high && q.high[i] != null) q.high[i] *= lastFx; if(q.low && q.low[i] != null) q.low[i] *= lastFx;
+                }
+            }
+            return data;
+        }
+
+        async function fetchStockData(ticker, interval, range) {
+            const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=${interval}&range=${range}`);
+            const json = await res.json(); const data = json.chart.result[0];
+            if (currentCurrency === 'KRW' && ticker !== 'KRW=X') { const fxMap = await getFxMap(interval, range); applyFxToData(data, fxMap); }
+            return data;
+        }
+
+        function extractCleanData(data) {
+            if(!data || !data.indicators || !data.indicators.quote || !data.indicators.quote[0]) return { dates:[], kData:[], closes:[] };
+            const q = data.indicators.quote[0], ts = data.timestamp || [];
+            let dates = [], kData = [], closes = [];
+            for(let i=0; i<ts.length; i++) { if (q.close && q.close[i] !== null) { dates.push(new Date(ts[i] * 1000).toISOString().split('T')[0]); kData.push([q.open[i]||q.close[i], q.close[i], q.low[i]||q.close[i], q.high[i]||q.close[i]]); closes.push(q.close[i]); } }
             return { dates, kData, closes };
         }
 
-        // ==========================================
-        // 🚀 4. 화면 렌더링 및 통신 로직
-        // ==========================================
-        async function loadData(ticker) {
-            const loader = document.getElementById('loading-overlay');
-            if(loader) loader.style.display = 'flex';
+        async function loadData(ticker, interval = currentInterval, range = currentRange) {
+            if (abortController) abortController.abort(); abortController = new AbortController();
+            const loadingOverlay = document.getElementById('loading-overlay'); if(loadingOverlay) loadingOverlay.style.display = 'flex';
             try {
-                const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=${currentInterval}&range=${currentRange}`);
-                const json = await res.json();
-                const d = json.chart.result[0];
+                const reqInterval = interval === '1y' ? '1mo' : interval;
+                const d = await fetchStockData(ticker, reqInterval, range);
                 globalChartData = d; globalTicker = ticker;
-                renderDashboard(ticker, d);
-                updateStatus("LIVE", "bg-emerald-500");
-            } catch(e) { logError("LoadData Failed", e); }
-            finally { if(loader) loader.style.display = 'none'; }
+                updateStatus("LIVE DATA", "bg-emerald-500"); renderDashboard(ticker, d);
+                calculateTriplePerspectiveDecision(ticker).catch(e => logError("Triple Calc Error", e));
+            } catch (e) { 
+                if (e.name !== 'AbortError') { logError(`loadData failed for ${ticker}`, e); updateStatus("API LMT (에러)", "bg-rose-500"); if(myChart) myChart.clear(); document.getElementById('display-ticker').innerText = "ERROR"; document.getElementById('live-price').innerText = "---"; document.getElementById('reasoning-container').innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br>우측 상단 [!] 버튼을 눌러 에러 로그를 확인하세요.</p>'; }
+            } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
         }
+
+        async function loadCryptoData(ticker, interval = currentCryptoInterval, range = currentCryptoRange) {
+            if (cryptoAbortController) cryptoAbortController.abort(); cryptoAbortController = new AbortController();
+            const loadingOverlay = document.getElementById('crypto-loading-overlay'); if(loadingOverlay) loadingOverlay.style.display = 'flex';
+            const searchInput = document.getElementById('crypto-ticker-input'); if(searchInput) searchInput.value = ticker;
+            try {
+                const reqInterval = interval === '1y' ? '1mo' : interval;
+                const d = await fetchStockData(ticker, reqInterval, range);
+                globalCryptoChartData = d; globalCryptoTicker = ticker;
+                updateCryptoStatus("LIVE DATA", "bg-emerald-500"); renderCryptoDashboard(ticker, d);
+                calculateCryptoTriplePerspectiveDecision(ticker).catch(e => logError("Crypto Triple Calc Error", e));
+            } catch (e) { 
+                if (e.name !== 'AbortError') { logError(`loadCryptoData failed for ${ticker}`, e); updateCryptoStatus("API LMT (에러)", "bg-rose-500"); if(cryptoChart) cryptoChart.clear(); document.getElementById('crypto-display-ticker').innerText = "ERROR"; document.getElementById('crypto-live-price').innerText = "---"; document.getElementById('crypto-reasoning-container').innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br>우측 상단 [!] 버튼을 눌러 에러 로그를 확인하세요.</p>'; }
+            } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
+        }
+
+        function updateStatus(t, c) { const label = document.getElementById('conn-label'), dot = document.getElementById('status-dot'); if(label) label.innerText = t; if(dot) dot.className = `w-2 h-2 rounded-full ${c}`; }
+        function updateCryptoStatus(t, c) { const label = document.getElementById('crypto-conn-label'), dot = document.getElementById('crypto-status-dot'); if(label) label.innerText = t; if(dot) dot.className = `w-2 h-2 rounded-full ${c}`; }
 
         function renderDashboard(ticker, data) {
-            if(!myChart) return;
-            const { dates, kData, closes } = extractCleanData(data);
+            if(!myChart || !data) return;
+            let { dates, kData, closes } = extractCleanData(data); if(closes.length === 0) return;
+            document.getElementById('display-ticker').innerText = ticker;
+            const price = closes[closes.length - 1];
+            document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(price)}`;
+            const macd = Indicator.macd(closes, 12, 26, 9);
+            const styleColor = getComputedStyle(document.documentElement), chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF', chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
+            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { width: parseFloat(chartLineWidth), opacity: 0.8 }, z: 5 }); });
+            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
             myChart.setOption({
-                tooltip: { trigger: 'axis' },
-                xAxis: { type: 'category', data: dates },
-                yAxis: { scale: true },
-                series: [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350' } }]
+                backgroundColor: 'transparent', tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff' }, formatter: (p) => { let res = `<b>${p[0].axisValue}</b><br/>`; p.forEach(item => { if (item.seriesType === 'candlestick') res += `종가: ${getCurrSymbol()}${formatPriceStr(item.data[2])}<br/>`; else { let val = item.value?.value !== undefined ? item.value.value : item.value; res += `${item.marker} ${item.seriesName}: ${Number(val).toFixed(2)}<br/>`; } }); return res; } },
+                xAxis: [{ data: dates, axisLabel: { show: false } }, { gridIndex: 1, data: dates, axisLabel: { color: chartTextColor } }],
+                yAxis: [{ scale: true, splitLine: { lineStyle: { color: chartSplitColor } } }, { gridIndex: 1, show: false }],
+                grid: [{ height: '60%' }, { top: '75%', height: '15%' }], series
             }, true);
         }
 
-        function toggleCurrency() {
-            currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
-            localStorage.setItem('dashboardCurrency', currentCurrency);
-            document.getElementById('currency-toggle').innerText = currentCurrency;
-            loadData(globalTicker);
-            renderPortfolioChart();
-            updatePfCardMetrics();
-        }
-
-        function switchMainTab(t) {
-            ['dashboard', 'crypto', 'portfolio'].forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if(el) el.style.display = (v === t ? 'flex' : 'none');
-                document.getElementById(`tab-btn-${v}`)?.classList.toggle('active', v === t);
-            });
-            if(t === 'portfolio') renderPortfolioChart();
-        }
-
-        function renderPortfolioChart() {
-            if(!pfChart) return;
-            const spy = getAdjustedSimData('spy'), baa = getAdjustedSimData('baa');
-            pfChart.setOption({
-                tooltip: {trigger:'axis'}, legend: {data:['SPY','BAA']},
-                xAxis: {type:'category', data:pfSimData.years}, yAxis: {scale:true},
-                series:[{name:'SPY', type:'line', data:spy}, {name:'BAA', type:'line', data:baa}]
+        function renderCryptoDashboard(ticker, data) {
+            if(!cryptoChart || !data) return;
+            let { dates, kData, closes } = extractCleanData(data); if(closes.length === 0) return;
+            document.getElementById('crypto-display-ticker').innerText = ticker.replace('-USD', '');
+            const price = closes[closes.length - 1];
+            document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(price)}`;
+            const macd = Indicator.macd(closes, 12, 26, 9);
+            const styleColor = getComputedStyle(document.documentElement), chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF', chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
+            Object.keys(cryptoMaSettings).forEach(p => { if (cryptoMaSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { width: parseFloat(chartLineWidth), opacity: 0.8 }, z: 5 }); });
+            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
+            cryptoChart.setOption({
+                backgroundColor: 'transparent', tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff' }, formatter: (p) => { let res = `<b>${p[0].axisValue}</b><br/>`; p.forEach(item => { if (item.seriesType === 'candlestick') res += `종가: ${getCurrSymbol()}${formatPriceStr(item.data[2])}<br/>`; else { let val = item.value?.value !== undefined ? item.value.value : item.value; res += `${item.marker} ${item.seriesName}: ${Number(val).toFixed(2)}<br/>`; } }); return res; } },
+                xAxis: [{ data: dates, axisLabel: { show: false } }, { gridIndex: 1, data: dates, axisLabel: { color: chartTextColor } }],
+                yAxis: [{ scale: true, splitLine: { lineStyle: { color: chartSplitColor } } }, { gridIndex: 1, show: false }],
+                grid: [{ height: '60%' }, { top: '75%', height: '15%' }], series
             }, true);
         }
 
-        function updatePfCardMetrics() {
-            ['6040', 'baa'].forEach(k => {
-                const cEl = document.getElementById(`card-cagr-${k}`);
-                if(cEl) {
-                    const d = getAdjustedSimData(k);
-                    const cagr = (((d[d.length-1]/d[0])**(1/(d.length-1)))-1)*100;
-                    cEl.innerText = cagr.toFixed(1) + '%';
-                }
-            });
-        }
-
-        // ==========================================
-        // 🚀 5. 최종 시스템 초기화
-        // ==========================================
-        document.addEventListener("DOMContentLoaded", () => {
-            window.scrollTo(0,0);
+        async function calculateTriplePerspectiveDecision(ticker) {
             try {
-                myChart = echarts.init(document.getElementById('chart-main'));
-                pfChart = echarts.init(document.getElementById('chart-portfolio'));
-                
-                // 전역 함수 호출 전 변수 선언 확인
-                const savedTheme = localStorage.getItem('dashboardTheme') || 'theme-green';
-                setTheme(savedTheme);
-                
-                document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); loadData(document.getElementById('ticker-input').value.toUpperCase()); };
-                
-                loadData('SPY');
-                updatePfCardMetrics();
-            } catch(e) { logError("Boot Error", e); }
-        });
+                const dData = await fetchStockData(ticker, '1d', '2y'); const wData = await fetchStockData(ticker, '1wk', 'max');
+                const analyze = (data, weight, periods) => {
+                    let { kData, closes } = extractCleanData(data); if(closes.length < periods.ma) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
+                    const last = closes.length - 1, rsi = Indicator.rsi(closes, periods.rsi)[last] || 50, macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0, sma = Indicator.sma(closes, periods.ma)[last], dist = ((closes[last] - sma) / sma) * 100;
+                    let buy = 0, sell = 0; if (closes[last] > sma) buy += weight.ma; else sell += weight.ma; if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi; if (macd > 0) buy += weight.macd; else sell += weight.macd;
+                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
+                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3) };
+                };
+                const st = analyze(dData, { ma: 0.5, rsi: 1.8, macd: 1.5 }, { ma: 20, rsi: 9 }), mt = analyze(dData, { ma: 1.5, rsi: 1.0, macd: 1.2 }, { ma: 60, rsi: 14 }), lt = analyze(wData, { ma: 3.0, rsi: 0.5, macd: 0.5 }, { ma: 40, rsi: 14 });
+                analysisDetails = { short: st, mid: mt, long: lt };
+                document.getElementById('st-signal-text').innerText = st.status; document.getElementById('mt-signal-text').innerText = mt.status; document.getElementById('lt-signal-text').innerText = lt.status;
+                document.getElementById('val-ma-dist').innerText = `${st.maDist}%`; document.getElementById('val-rsi-main').innerText = mt.rsi; document.getElementById('val-macd-main').innerText = mt.macd;
+            } catch (e) { logError("Signal Calc Fail", e); }
+        }
 
-        // 기타 UI용 더미 함수들
-        function openErrorModal() { document.getElementById('error-log-text').value = errorLogs.join(''); document.getElementById('error-modal').style.display='flex'; }
-        function closeErrorModal() { document.getElementById('error-modal').style.display='none'; }
-        function showPfDetail(k) { alert('Portfolio Detail: ' + k); }
-        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display='none'; }
-        function toggleProofs(v) { console.log("Toggle Proofs:", v); }
+        async function calculateCryptoTriplePerspectiveDecision(ticker) {
+            try {
+                const dData = await fetchStockData(ticker, '1d', '2y'); const wData = await fetchStockData(ticker, '1wk', 'max');
+                const analyze = (data, weight, periods) => {
+                    let { kData, closes } = extractCleanData(data); if(closes.length < periods.ma) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
+                    const last = closes.length - 1, rsi = Indicator.rsi(closes, periods.rsi)[last] || 50, macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0, sma = Indicator.sma(closes, periods.ma)[last], dist = ((closes[last] - sma) / sma) * 100;
+                    let buy = 0, sell = 0; if (closes[last] > sma) buy += weight.ma; else sell += weight.ma; if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi; if (macd > 0) buy += weight.macd; else sell += weight.macd;
+                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
+                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3) };
+                };
+                const st = analyze(dData, { ma: 0.5, rsi: 1.8, macd: 1.5 }, { ma: 20, rsi: 9 }), mt = analyze(dData, { ma: 1.5, rsi: 1.0, macd: 1.2 }, { ma: 60, rsi: 14 }), lt = analyze(wData, { ma: 3.0, rsi: 0.5, macd: 0.5 }, { ma: 40, rsi: 14 });
+                cryptoAnalysisDetails = { short: st, mid: mt, long: lt };
+                document.getElementById('crypto-st-signal-text').innerText = st.status; document.getElementById('crypto-mt-signal-text').innerText = mt.status; document.getElementById('crypto-lt-signal-text').innerText = lt.status;
+                document.getElementById('crypto-val-ma-dist').innerText = `${st.maDist}%`; document.getElementById('crypto-val-rsi-main').innerText = mt.rsi; document.getElementById('crypto-val-macd-main').innerText = mt.macd;
+            } catch (e) { logError("Crypto Signal Calc Fail", e); }
+        }
+
+        async function runLiveCalc(pfKey) {
+            const area = document.getElementById('pf-modal-live-area'), loading = document.getElementById('pf-live-loading'), content = document.getElementById('pf-live-content'), tbody = document.getElementById('pf-live-table'), summaryBox = document.getElementById('pf-live-summary'), summaryCagr = document.getElementById('pf-live-summary-cagr'), summaryMdd = document.getElementById('pf-live-summary-mdd');
+            if(!area) return; area.style.display = 'block'; loading.style.display = 'flex'; content.style.display = 'none'; summaryBox.style.display = 'none'; tbody.innerHTML = '';
+            try {
+                let tickers = ['SPY', 'VEA', 'BIL', 'QQQ', 'VWO', 'BND', 'LQD', 'IEF', 'SHY', 'TLT'];
+                const dataMap = {}; let unifiedMonths = new Set();
+                for(let t of tickers) {
+                    const d = await fetchStockData(t, '1mo', '2y'); let { dates, closes } = extractCleanData(d);
+                    dataMap[t] = {}; for(let j=0; j<dates.length; j++) { const dStr = dates[j].substring(0, 7); dataMap[t][dStr] = closes[j]; unifiedMonths.add(dStr); }
+                }
+                const sortedMonths = Array.from(unifiedMonths).sort();
+                let html = '<thead><tr><th class="text-left">투자 월</th><th>전략 수익률</th><th>SPY / QQQ</th><th class="text-right">투자 비중</th></tr></thead><tbody>';
+                const getSignal = (idx) => {
+                    const currYM = sortedMonths[idx];
+                    const calcScore = (t) => { const P0=dataMap[t][currYM], P1=dataMap[t][sortedMonths[idx-1]], P3=dataMap[t][sortedMonths[idx-3]], P6=dataMap[t][sortedMonths[idx-6]], P12=dataMap[t][sortedMonths[idx-12]]; if(!P0||!P1||!P3||!P6||!P12) return -999; return ((P0/P1-1)*12+(P0/P3-1)*4+(P0/P6-1)*2+(P0/P12-1))*100; };
+                    if(pfKey==='dual') { const s=(dataMap['SPY'][currYM]/dataMap['SPY'][sortedMonths[idx-12]]-1), v=(dataMap['VEA'][currYM]/dataMap['VEA'][sortedMonths[idx-12]]-1), b=(dataMap['BIL'][currYM]/dataMap['BIL'][sortedMonths[idx-12]]-1); return s<b&&v<b?{assets:[{t:'AGG',w:1}],text:'AGG 100%'}:{assets:s>v?[{t:'SPY',w:1}]:[{t:'VEA',w:1}],text:s>v?'SPY 100%':'VEA 100%'}; }
+                    if(pfKey==='vaa') { const ss=calcScore('SPY'),vs=calcScore('VEA'),vws=calcScore('VWO'),as=calcScore('AGG'); if(ss>0&&vs>0&&vws>0&&as>0) { const m=Math.max(ss,vs,vws,as); return {assets:[{t:ss===m?'SPY':(vs===m?'VEA':(vws===m?'VWO':'AGG')),w:1}],text:'공격 100%'}; } return {assets:[{t:'LQD',w:1}],text:'방어 100%'}; }
+                    if(pfKey==='daa') { const vws=calcScore('VWO'),bns=calcScore('BND'); if(vws>0&&bns>0) return {assets:[{t:'SPY',w:0.5},{t:'VEA',w:0.5}],text:'SPY 50% / VEA 50%'}; return {assets:[{t:'SHY',w:1}],text:'방어 100%'}; }
+                    if(pfKey==='baa') { const ss=calcScore('SPY'),vs=calcScore('VEA'),vws=calcScore('VWO'),bns=calcScore('BND'); if(ss>0&&vs>0&&vws>0&&bns>0) return {assets:[{t:'QQQ',w:1}],text:'QQQ 100%'}; return {assets:[{t:'BIL',w:0.33},{t:'IEF',w:0.33},{t:'TLT',w:0.33}],text:'방어 33% 분산'}; }
+                };
+                for(let i=sortedMonths.length-1; i>=sortedMonths.length-12; i--) {
+                    const sig = getSignal(i); if(!sig) continue;
+                    let monRet=0, spyRet=0, qqqRet=0;
+                    if(i<sortedMonths.length-1) { sig.assets.forEach(a => monRet+=a.w*(dataMap[a.t][sortedMonths[i+1]]/dataMap[a.t][sortedMonths[i]]-1)); spyRet=(dataMap['SPY'][sortedMonths[i+1]]/dataMap['SPY'][sortedMonths[i]]-1); qqqRet=(dataMap['QQQ'][sortedMonths[i+1]]/dataMap['QQQ'][sortedMonths[i]]-1); }
+                    html += `<tr><td>${sortedMonths[i]}</td><td class="${monRet>0?'text-up':'text-down'} font-bold">${(monRet*100).toFixed(2)}%</td><td class="bg-black/10">S:${(spyRet*100).toFixed(1)}% / Q:${(qqqRet*100).toFixed(1)}%</td><td class="text-right font-black text-accent">${sig.text}</td></tr>`;
+                }
+                tbody.innerHTML = html + '</tbody>'; loading.style.display='none'; content.style.display='block';
+            } catch(e) { logError("Live Engine Fail", e); }
+        }
+
+        const updateMAButtons = () => { Object.keys(maSettings).forEach(p => { const b = document.getElementById(`btn-ma-${p}`); if(b) b.classList.toggle('active', maSettings[p]); }); };
+        const updateCryptoMAButtons = () => { Object.keys(cryptoMaSettings).forEach(p => { const b = document.getElementById(`crypto-btn-ma-${p}`); if(b) b.classList.toggle('active', cryptoMaSettings[p]); }); };
     </script>
 </body>
 </html>
