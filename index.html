@@ -294,7 +294,7 @@
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer bg-themeBorder/50 px-2 py-1 rounded-lg border border-themeBorder hover:bg-themeBorder transition">
                             <input type="checkbox" id="toggle-proof" class="w-3 h-3 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
-                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 증명 (상세보기)</span>
+                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 보기</span>
                         </label>
                     </div>
                     <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
@@ -498,7 +498,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('allweather')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
-                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 리스크 패리티 전략</p>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 사계절 대응 전략</p>
                         <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">7.8%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-14.2%</span></span>
@@ -552,7 +552,7 @@
             </div>
 
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
-                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 (2000~)</h3>
+                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 시뮬레이션 (Base 100)</h3>
                 <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
             </div>
         </div>
@@ -654,7 +654,7 @@
             'daa': { 
                 title: 'DAA (Defensive Asset Allocation)', cagr: '13.5%', mdd: '-12.0%', type: 'dynamic', 
                 desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기 시 가장 먼저 타격을 받는 <b>탄광 속의 카나리아(Canary) 자산</b>을 도입하여, 주식 비중을 유지하면서도 위기 시점에 효과적으로 도망갑니다.',
-                rules: ['[1] <b>카나리아 자산:</b> VWO(신흥국 주식), BND(미국 총채권)', '[2] 매월 말 카나리아 자산의 모멘텀 스코어(VAA와 동일한 13612 공식)를 감시합니다.', '[3] 카나리아 자산 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산 중 상위 자산에 투자합니다.', '[4] 카나리아 자산 중 <b>1개라도 0 이하</b>라면 시장 위험 신호로 판단, 즉시 안전 자산(SHY 등)으로 전액 스위칭합니다.'] 
+                rules: ['[1] <b>카나리아 자산:</b> VWO(신흥국 주식), BND(미국 총채권)', '[2] 매월 말 카나리아 자산의 모멘텀 스코어(VAA와 동일한 13612 공식)를 감시합니다.', '[3] 카나리아 자산 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산 중 상위 자산에 50%씩 분산 투자합니다.', '[4] 카나리아 자산 중 <b>1개라도 0 이하</b>라면 시장 위험 신호로 판단, 즉시 안전 자산(SHY 등)으로 전액 스위칭합니다.'] 
             },
             'baa': { 
                 title: 'BAA (Bold Asset Allocation)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic', 
@@ -1243,7 +1243,9 @@
                     return { ret, proof };
                 }
 
-                for(let i = sortedMonths.length - 1; i >= sortedMonths.length - 4; i--) {
+                // 최근 12개월치 계산으로 루프 확장
+                const len = sortedMonths.length;
+                for(let i = len - 1; i >= len - 12; i--) {
                     if(i - 12 < 0) break;
                     let row = `<tr><td class="text-left font-bold text-accent">${sortedMonths[i]}</td>`;
                     let proofs = [];
