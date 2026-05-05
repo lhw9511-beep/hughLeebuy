@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BUY or BYE | AI Precision Analysis</title>
+    <title>BUY or BYE | AI Precision Analysis & Portfolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -50,32 +50,9 @@
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.1);
         }
-        .theme-purple {
-            --bg-color: #171026;
-            --panel-color: rgba(37, 26, 58, 0.8);
-            --modal-bg: #251a3a;
-            --text-main: #f3e8ff;
-            --text-muted: #a855f7;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
-        .theme-green {
-            --bg-color: #022c22;
-            --panel-color: rgba(6, 78, 59, 0.8);
-            --modal-bg: #064e3b;
-            --text-main: #ecfdf5;
-            --text-muted: #34d399;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
 
-        .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 15px rgba(16, 185, 129, 0.8); }
-        .status-BUY { color: #34D399; }
-        .status-HOLD { color: var(--text-muted); }
-        .status-BYE { color: #F87171; }
-        .status-STRONG-BYE { color: #EF4444; text-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
-
-        html { font-size: 16px; transition: font-size 0.2s ease; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
-        .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); transition: background 0.3s ease, border-color 0.3s ease; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease; }
+        .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); }
         
         .chart-container { height: 400px; width: 100%; }
         @media (min-width: 1024px) { .chart-container { height: 500px; } }
@@ -85,502 +62,344 @@
         
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 10px; }
         
         .chip-btn { padding: 0.25rem 0.6rem; font-size: 0.7rem; font-weight: 800; border-radius: 0.5rem; background: rgba(0,0,0,0.1); color: var(--text-muted); border: 1px solid var(--border-color); transition: all 0.2s; white-space: nowrap; cursor: pointer; }
-        .chip-btn:hover { border-color: #3B82F6; color: var(--text-main); }
         .chip-btn.active { background-color: #3B82F6; border-color: #3B82F6; color: white; }
 
-        .setting-btn { border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); padding: 0.4rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: bold; flex: 1; text-align: center; cursor: pointer; transition: all 0.2s; }
-        .setting-btn.active { background: #3B82F6; color: white; border-color: #3B82F6; }
-
-        #loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 1.5rem; flex-direction: column; }
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 1rem; }
-        .modal-content { max-width: 500px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-        .modal-content-large { max-width: 800px; } 
-        
-        .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
+        .modal-content { max-width: 550px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
+        .modal-content-large { max-width: 850px; } 
 
-        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
-        .stat-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: color 0.2s; }
-        .stat-label:hover { color: var(--text-main); }
-        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 900; margin-top: 6px; text-align: center;}
+        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem; text-align: center; }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 900; margin-top: 6px; }
         
-        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.75rem; border: 1px solid transparent; text-align: center; background: rgba(0,0,0,0.1); }
-        .perspective-col:hover { background: rgba(0,0,0,0.2); transform: translateY(-2px); border-color: #3B82F6; }
+        .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; cursor: pointer; transition: all 0.2s; height: 100%; display: flex; flex-direction: column; }
+        .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); }
 
-        .signal-badge { font-weight: 900; font-size: 0.65rem; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
-        .signal-up { background-color: rgba(38, 166, 154, 0.2); color: #26A69A; }
-        .signal-down { background-color: rgba(239, 83, 80, 0.2); color: #EF5350; }
-        .signal-neutral { background-color: rgba(107, 114, 128, 0.2); color: #9CA3AF; }
+        .main-tab-btn { padding: 0.5rem 1rem; font-weight: 900; font-size: 0.85rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; }
+        .main-tab-btn.active { color: var(--text-main); border-bottom-color: #3B82F6; }
 
         .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
-        
-        .main-tab-btn { padding: 0.5rem 1rem; font-weight: 900; font-size: 0.85rem; color: var(--text-muted); border-bottom: 2px solid transparent; transition: all 0.2s; cursor: pointer; }
-        .main-tab-btn.active { color: var(--text-main); border-bottom-color: #3B82F6; }
-        .main-tab-btn:hover { color: var(--text-main); }
-
-        .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column;}
-        .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(59,130,246,0.3); }
-        .pf-badge { font-size: 0.55rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); color: var(--text-main); }
-        
-        .calc-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        .calc-table th { font-size: 0.6rem; color: var(--text-muted); text-align: left; padding: 6px; border-bottom: 1px solid var(--border-color); }
-        .calc-table td { font-size: 0.75rem; color: var(--text-main); font-family: monospace; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .calc-table tr:last-child td { border-bottom: none; }
-        
-        .rule-list { list-style-type: none; padding-left: 0; margin-top: 10px; }
+        .rule-list { list-style-type: none; padding: 0; margin-top: 10px; }
         .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: flex-start; }
-        .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 8px; font-weight: bold; }
+        .rule-list li::before { content: '•'; color: #3B82F6; margin-right: 8px; font-weight: bold; }
+
+        #loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 1.5rem; flex-direction: column; }
+        .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 15px rgba(16, 185, 129, 0.8); }
+        .status-STRONG-BYE { color: #EF4444; text-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
-    <!-- 모달: 앱 환경설정 -->
+    <!-- 모달: 환경설정 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
                 <h3 class="text-lg font-black text-themeText flex items-center">
-                    <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     앱 환경 설정
                 </h3>
-                <button type="button" onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition p-2"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             
             <div class="space-y-6">
                 <div>
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
                     <div class="flex flex-wrap gap-4">
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6; border-color:#ccc;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-purple')" id="btn-theme-purple" class="theme-btn" style="background-color: #171026;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Purple</span></div>
-                        <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
+                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-default')" id="btn-theme-default" class="theme-btn active" style="background-color: #0B0E11;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Black</span></div>
+                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-light')" id="btn-theme-light" class="theme-btn" style="background-color: #f3f4f6; border: 1px solid #ccc;"></button><span class="text-[0.6rem] text-themeMuted font-bold">White</span></div>
+                        <div class="flex flex-col items-center gap-1"><button onclick="setTheme('theme-navy')" id="btn-theme-navy" class="theme-btn" style="background-color: #0f172a;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Navy</span></div>
                     </div>
                 </div>
-
                 <div class="border-t border-themeBorder pt-4">
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 조절</p>
                     <div class="flex gap-2">
-                        <button type="button" onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
-                        <button type="button" onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
-                        <button type="button" onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
-                    </div>
-                </div>
-
-                <div class="border-t border-themeBorder pt-4">
-                    <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기</p>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="setLineWidth('1')" id="btn-line-1" class="setting-btn">얇게</button>
-                        <button type="button" onclick="setLineWidth('2')" id="btn-line-2" class="setting-btn active">보통</button>
-                        <button type="button" onclick="setLineWidth('3')" id="btn-line-3" class="setting-btn">두껍게</button>
+                        <button onclick="setFontSize('sm')" id="btn-font-sm" class="setting-btn">작게</button>
+                        <button onclick="setFontSize('md')" id="btn-font-md" class="setting-btn active">보통</button>
+                        <button onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
                     </div>
                 </div>
             </div>
             <div class="mt-8 flex justify-end">
-                <button type="button" onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black hover:bg-blue-600 w-full md:w-auto transition">적용 및 닫기</button>
+                <button onclick="closeSettingsModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto">적용</button>
             </div>
         </div>
     </div>
 
-    <!-- 모달: 종목 분석 디테일 -->
-    <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start mb-4">
-                <div>
-                    <h3 id="modal-title" class="text-xl font-black text-themeText uppercase italic">Detail</h3>
-                    <p id="modal-period" class="text-[0.7rem] text-accent font-black tracking-widest uppercase mt-1">---</p>
-                </div>
-                <button type="button" onclick="closeDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon w-6 h-6" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
-            </div>
-            <div id="modal-body" class="space-y-4 text-sm text-themeText"></div>
-            <div class="mt-6 flex justify-end">
-                <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 border border-white/5 transition">닫기</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 모달: 인포(도움말) -->
-    <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start mb-4">
-                <h3 id="info-title" class="text-lg font-black text-themeText flex items-center">
-                    <svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg>
-                    안내
-                </h3>
-                <button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
-            </div>
-            <p id="info-body" class="text-[0.8rem] md:text-sm text-themeMuted leading-relaxed"></p>
-            <div class="mt-6 flex justify-end">
-                <button type="button" onclick="closeInfoModal()" class="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-black hover:bg-blue-600 w-full md:w-auto transition">확인</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 모달: 포트폴리오 상세 및 주식 비교 -->
+    <!-- 모달: 포트폴리오 상세 및 주식 비교 (논리 중심) -->
     <div id="pf-detail-modal" class="modal-overlay" onclick="closePfDetailModal()">
         <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
                 <div>
-                    <h3 id="pf-modal-title" class="text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
-                    <p id="pf-modal-subtitle" class="text-[0.8rem] text-themeMuted mt-1 font-bold">설명</p>
+                    <h3 id="pf-modal-title" class="text-2xl font-black text-themeText">포트폴리오</h3>
+                    <p id="pf-modal-subtitle" class="text-[0.75rem] text-themeMuted mt-1 font-bold">전략적 핵심 논리</p>
                 </div>
                 <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon w-6 h-6" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             
-            <div class="py-2">
-                <div class="flex gap-4 mb-4">
-                    <div class="flex-1 bg-themeBorder/30 p-3 rounded-xl text-center border border-themeBorder">
-                        <p class="text-[0.65rem] text-themeMuted font-black uppercase mb-1">CAGR (연평균 수익률)</p>
-                        <p id="pf-modal-cagr" class="text-xl font-black text-up">0%</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 py-4">
+                <!-- 통계 및 규칙 -->
+                <div class="space-y-4">
+                    <div class="flex gap-3">
+                        <div class="flex-1 bg-themeBorder/20 p-3 rounded-xl text-center border border-themeBorder">
+                            <p class="text-[0.6rem] text-themeMuted font-black uppercase">역사적 CAGR</p>
+                            <p id="pf-modal-cagr" class="text-xl font-black text-up">0%</p>
+                        </div>
+                        <div class="flex-1 bg-themeBorder/20 p-3 rounded-xl text-center border border-themeBorder">
+                            <p class="text-[0.6rem] text-themeMuted font-black uppercase">역사적 MDD</p>
+                            <p id="pf-modal-mdd" class="text-xl font-black text-down">0%</p>
+                        </div>
                     </div>
-                    <div class="flex-1 bg-themeBorder/30 p-3 rounded-xl text-center border border-themeBorder">
-                        <p class="text-[0.65rem] text-themeMuted font-black uppercase mb-1">MDD (최대 낙폭)</p>
-                        <p id="pf-modal-mdd" class="text-xl font-black text-down">0%</p>
+                    
+                    <div class="bg-[var(--modal-bg)] p-4 rounded-xl border border-themeBorder">
+                        <p class="text-[0.7rem] font-black text-accent mb-2 uppercase tracking-widest">배분 알고리즘 및 운용 규칙</p>
+                        <ul id="pf-modal-rules" class="rule-list"></ul>
+                    </div>
+
+                    <div id="pf-modal-pie-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-themeBorder relative overflow-hidden">
+                        <div class="absolute top-2 left-3 text-[0.6rem] font-black text-themeMuted z-10">Target Allocation</div>
+                        <div id="pf-pie-chart" class="pie-container"></div>
                     </div>
                 </div>
 
-                <!-- 비교 주식 검색 기능 -->
-                <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
-                    <input type="text" id="pf-compare-input" class="w-full bg-transparent text-themeText px-3 py-2 uppercase outline-none text-sm font-bold placeholder-gray-500" placeholder="비교할 주식/ETF 검색 (예: QQQ)">
-                    <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="bg-accent text-white px-5 py-2 rounded-lg font-black text-sm hover:bg-blue-600 transition shrink-0 shadow-lg shadow-accent/30">차트 비교</button>
+                <!-- 차트 비교 영역 -->
+                <div class="space-y-4">
+                    <div class="bg-themeBorder/10 p-3 rounded-xl border border-themeBorder">
+                        <p class="text-[0.65rem] font-black text-themeMuted mb-2 uppercase">다른 주식과 수익률 비교 (Base 100)</p>
+                        <div class="flex gap-2">
+                            <input type="text" id="pf-compare-input" class="flex-grow bg-themeBg border border-themeBorder rounded-lg px-3 py-2 text-xs font-bold uppercase focus:border-accent outline-none" placeholder="심볼 입력 (QQQ, TSLA...)">
+                            <button onclick="comparePortfolioStock()" class="bg-accent text-white px-4 py-2 rounded-lg text-xs font-black">비교</button>
+                        </div>
+                    </div>
+                    <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/30 rounded-xl border border-themeBorder"></div>
+                    <p class="text-[0.55rem] text-themeMuted text-right italic">* 백테스트 데이터는 배당 재투자 및 정기 리밸런싱을 가정한 시뮬레이션 값입니다.</p>
                 </div>
-
-                <!-- 포트폴리오 vs 종목 비교 라인 차트 -->
-                <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
-
-                <!-- 정적 포트폴리오 파이 차트 (동적일 경우 숨김) -->
-                <div id="pf-modal-pie-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-themeBorder mb-4 hidden relative">
-                    <div class="absolute top-3 left-4 text-xs font-black text-themeMuted tracking-widest z-10">자산 배분 비율</div>
-                    <div id="pf-pie-chart" class="pie-container"></div>
-                </div>
-
-                <div class="bg-[var(--modal-bg)] p-4 rounded-xl border border-themeBorder">
-                    <p class="text-[0.75rem] font-black text-accent mb-2 flex items-center">
-                        <svg class="w-4 h-4 mr-1.5 icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                        운용 알고리즘 및 규칙
-                    </p>
-                    <ul id="pf-modal-rules" class="rule-list"></ul>
-                </div>
-            </div>
-
-            <div class="mt-4 flex justify-end">
-                <button type="button" onclick="closePfDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black w-full md:w-auto hover:bg-white/10 transition border border-white/5">닫기</button>
             </div>
         </div>
     </div>
 
-    <!-- 전체 래퍼 -->
-    <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-4 relative">
-        
-        <!-- 상단 네비게이션 헤더 -->
-        <header class="glass rounded-2xl shadow-sm overflow-hidden">
-            <div class="flex justify-between items-center p-4">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
-                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40">
-                        <svg class="icon text-white w-5 h-5" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
-                    </div>
-                    <h1 class="text-2xl font-black italic text-themeText tracking-tighter">BUY <span class="text-accent">or BYE</span></h1>
-                </div>
-                
-                <div class="flex items-center gap-4">
-                    <!-- 데스크톱 탭 -->
-                    <div class="hidden sm:flex items-center">
-                        <button type="button" onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">종목 AI 분석</button>
-                        <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
-                    </div>
-                    <button type="button" onclick="openSettingsModal()" class="p-2 bg-themeModal border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
-                        <svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
-                </div>
+    <!-- 모달: 정보 안내 -->
+    <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="info-title" class="text-lg font-black text-themeText flex items-center gap-2">지표 설명</h3>
+                <button onclick="closeInfoModal()" class="text-themeMuted p-2"><svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
-            <!-- 모바일 탭 -->
-            <div class="sm:hidden flex border-t border-themeBorder bg-black/10">
-                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 active text-center">종목 분석</button>
-                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 text-center">포트폴리오</button>
+            <p id="info-body" class="text-sm text-themeMuted leading-relaxed"></p>
+        </div>
+    </div>
+
+    <!-- 대시보드 본체 -->
+    <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-4">
+        
+        <header class="glass rounded-2xl shadow-md overflow-hidden">
+            <div class="flex justify-between items-center p-4">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="location.reload()">
+                    <div class="bg-accent p-1.5 rounded-lg shadow-lg shadow-accent/30"><svg class="icon text-white w-5 h-5" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg></div>
+                    <h1 class="text-xl font-black italic text-themeText tracking-tighter uppercase">BUY <span class="text-accent">or BYE</span></h1>
+                </div>
+                <div class="flex items-center gap-1 md:gap-4">
+                    <button onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">종목 분석</button>
+                    <button onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">자산 배분</button>
+                    <button onclick="openSettingsModal()" class="p-2 ml-2 hover:text-accent transition"><svg class="icon w-5 h-5" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+                </div>
             </div>
         </header>
 
-        <!-- ============================================== -->
-        <!-- VIEW 1: 종목 분석 대시보드 (기존 화면) -->
-        <!-- ============================================== -->
+        <!-- VIEW 1: 종목 대시보드 -->
         <div id="view-dashboard" class="flex flex-col space-y-4">
-            
-            <div class="flex flex-col sm:flex-row gap-3 items-center w-full">
-                <form id="search-form" class="flex w-full sm:flex-grow">
-                    <input type="text" id="ticker-input" class="w-full bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="종목 검색 (예: TSLA)">
-                    <button type="submit" class="bg-accent text-white px-5 py-2.5 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button>
+            <div class="flex gap-2 items-center">
+                <form id="search-form" class="flex flex-grow max-w-sm">
+                    <input type="text" id="ticker-input" class="w-full bg-themePanel border border-themeBorder text-themeText rounded-l-xl px-4 py-2 uppercase font-black text-sm outline-none" value="SPY">
+                    <button type="submit" class="bg-accent text-white px-5 rounded-r-xl font-black text-sm">분석</button>
                 </form>
-                <div id="status-text" class="flex items-center gap-1.5 shrink-0 w-full sm:w-auto justify-end">
+                <div class="flex items-center gap-2 ml-auto">
                     <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
-                    <span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest">WAITING</span>
+                    <span id="conn-label" class="text-[0.6rem] font-bold text-themeMuted tracking-widest">WAITING</span>
                 </div>
             </div>
 
-            <!-- 차트 영역 -->
             <div class="glass rounded-2xl p-4 flex flex-col shadow-xl relative min-h-[500px]">
                 <div id="loading-overlay">
                     <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
-                    <p id="loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">Processing Market Data...</p>
+                    <p class="text-[0.6rem] font-bold text-accent tracking-widest">SYNCING DATA...</p>
                 </div>
-                
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 border-b border-themeBorder pb-4 gap-4">
+                <div class="flex flex-col sm:flex-row justify-between items-end mb-4 border-b border-themeBorder pb-4 gap-4">
                     <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <h2 id="display-ticker" class="text-4xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none">---</h2>
-                        </div>
-                        <div id="live-price" class="text-2xl md:text-3xl font-mono font-black text-themeText">---</div>
+                        <h2 id="display-ticker" class="text-4xl md:text-5xl font-black text-themeText leading-none mb-1">---</h2>
+                        <div id="live-price" class="text-2xl font-mono font-black text-themeText">---</div>
                     </div>
-                    
-                    <div class="flex flex-col gap-2 w-full md:w-auto">
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
-                            <span class="text-[0.6rem] font-black text-themeMuted shrink-0">PERIOD</span>
-                            <div class="flex gap-1">
-                                <button type="button" onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉</button>
-                                <button type="button" onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn range-btn">주봉</button>
-                                <button type="button" onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn range-btn">월봉</button>
-                                <button type="button" onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">연봉</button>
-                                <button type="button" onclick="changeInterval('1mo', 'max', 'MAX')" id="range-MAX" class="chip-btn range-btn">MAX</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
-                            <span class="text-[0.6rem] font-black text-themeMuted shrink-0">MA LNS</span>
-                            <div class="flex gap-1">
-                                <button type="button" onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">20</button>
-                                <button type="button" onclick="toggleMA(50)" id="btn-ma-50" class="chip-btn active">50</button>
-                                <button type="button" onclick="toggleMA(60)" id="btn-ma-60" class="chip-btn">60</button>
-                                <button type="button" onclick="toggleMA(120)" id="btn-ma-120" class="chip-btn active">120</button>
-                                <button type="button" onclick="toggleMA(200)" id="btn-ma-200" class="chip-btn active">200</button>
-                            </div>
-                        </div>
+                    <div class="flex flex-wrap gap-1 justify-end">
+                        <button onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉</button>
+                        <button onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn range-btn">주봉</button>
+                        <button onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn range-btn">월봉</button>
+                        <button onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">연봉</button>
                     </div>
                 </div>
-
                 <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <!-- 마스터 판단 패널 -->
-                <div class="glass rounded-2xl p-4 lg:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center gap-1.5">
-                            <svg class="icon w-4 h-4 text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            <p class="text-themeMuted text-[0.65rem] font-black uppercase tracking-widest">Master Intelligence</p>
+                <div class="glass rounded-2xl p-4 lg:col-span-1 border-t-4 border-t-accent shadow-xl">
+                    <p class="text-themeMuted text-[0.6rem] font-black uppercase mb-4 tracking-widest flex items-center gap-1">
+                        <svg class="icon w-3.5 h-3.5" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        Master Signal
+                    </p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('short')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span>
+                            <div id="st-signal-text" class="text-sm font-black italic">WAIT</div>
+                        </div>
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('mid')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span>
+                            <div id="mt-signal-text" class="text-sm font-black italic">WAIT</div>
+                        </div>
+                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('long')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span>
+                            <div id="lt-signal-text" class="text-sm font-black italic">WAIT</div>
                         </div>
                     </div>
-                    
-                    <div class="grid grid-cols-3 gap-2 flex-grow">
-                        <div class="perspective-col border border-themeBorder bg-[var(--modal-bg)] flex flex-col justify-center" onclick="showDetail('short')">
-                            <p class="text-[0.55rem] font-black text-themeMuted mb-1 tracking-widest border-b border-themeBorder pb-1">SHORT</p>
-                            <div id="st-signal-text" class="text-base font-black italic text-themeMuted">WAIT</div>
-                        </div>
-                        <div class="perspective-col border border-themeBorder bg-[var(--modal-bg)] flex flex-col justify-center" onclick="showDetail('mid')">
-                            <p class="text-[0.55rem] font-black text-themeMuted mb-1 tracking-widest border-b border-themeBorder pb-1">MID</p>
-                            <div id="mt-signal-text" class="text-base font-black italic text-themeMuted">WAIT</div>
-                        </div>
-                        <div class="perspective-col border border-themeBorder bg-[var(--modal-bg)] flex flex-col justify-center" onclick="showDetail('long')">
-                            <p class="text-[0.55rem] font-black text-themeMuted mb-1 tracking-widest border-b border-themeBorder pb-1">LONG</p>
-                            <div id="lt-signal-text" class="text-base font-black italic text-themeMuted">WAIT</div>
-                        </div>
-                    </div>
-                    <p class="text-[0.6rem] text-themeMuted text-center mt-3">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
                 </div>
-
-                <!-- 5대 핵심 지표 요약 패널 -->
-                <div class="glass rounded-2xl p-4 lg:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
-                    <div class="flex items-center gap-1.5 mb-4 border-b border-themeBorder pb-3">
-                        <svg class="icon w-4 h-4 text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                        <p class="text-themeText text-[0.65rem] font-black uppercase tracking-widest">5대 기술 지표 팩트체크</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 h-full">
-                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재 주가와 120일 이동평균선 간의 거리(%)입니다. 양수(+)면 장기 추세보다 위에 있어 긍정적이고, 음수(-)면 역배열 구간을 의미합니다.')" style="cursor: pointer;">
-                            <p class="stat-label">이격도 <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
-                            <p id="val-ma-dist" class="stat-value text-themeText">---</p>
+                <div class="glass rounded-2xl p-4 lg:col-span-2 border-t-4 border-t-emerald-500 shadow-xl">
+                    <p class="text-themeMuted text-[0.6rem] font-black uppercase mb-4 tracking-widest">Live Check Report</p>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2" id="reasoning-container">
+                        <!-- Stat Boxes -->
+                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)','120일 이평선과의 거리입니다. 장기적 추세의 강도를 측정합니다.')">
+                            <p class="stat-label">이격 <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-ma-dist" class="stat-value">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '주가의 상승 압력과 하락 압력 간의 상대적인 강도를 백분율로 나타냅니다. 30 이하는 과매도(저점 근접), 70 이상은 과매수(고점 근접)로 해석합니다.')" style="cursor: pointer;">
-                            <p class="stat-label">RSI(14) <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
-                            <p id="val-rsi-main" class="stat-value text-themeText">---</p>
+                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)','30 이하 과매도, 70 이상 과열로 판단합니다.')">
+                            <p class="stat-label">RSI <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-rsi-main" class="stat-value">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('MACD (이동평균수렴확산)', '단기 이동평균선과 장기 이동평균선의 차이입니다. 히스토그램이 양수(+)면 단기 상승 에너지가, 음수(-)면 하락 에너지가 강함을 의미합니다.')" style="cursor: pointer;">
-                            <p class="stat-label">MACD <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
-                            <p id="val-macd-main" class="stat-value text-themeText">---</p>
+                        <div class="stat-box" onclick="showInfo('MACD','히스토그램이 양수면 상승 에너지가 강함을 뜻합니다.')">
+                            <p class="stat-label">MACD <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-macd-main" class="stat-value">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (Bollinger Bands)', '주가의 변동성에 따라 상하단 폭이 변하는 채널 지표입니다. 가격의 95%가 밴드 내에 존재하며 상단 돌파 시 단기 과열, 하단 이탈 시 침체를 의미합니다.')" style="cursor: pointer;">
-                            <p class="stat-label">BB밴드 <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
-                            <p id="val-bb-main" class="stat-value text-themeText">---</p>
+                        <div class="stat-box" onclick="showInfo('볼린저 밴드','밴드 상단 돌파 시 단기 고점, 하단 돌파 시 단기 저점으로 해석합니다.')">
+                            <p class="stat-label">BB <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-bb-main" class="stat-value">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('스토캐스틱 (Stochastic %K)', '일정 기간 최고가와 최저가 사이에서 현재 주가 위치를 백분율로 나타냅니다. 20 이하는 바닥권 침체, 80 이상은 천장권 과열을 뜻합니다.')" style="cursor: pointer;">
-                            <p class="stat-label">Stoch <button type="button" class="p-1 hover:text-accent transition rounded-full"><svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg></button></p>
-                            <p id="val-stoch-main" class="stat-value text-themeText">---</p>
+                        <div class="stat-box" onclick="showInfo('스토캐스틱','최근 기간 중 주가의 위치입니다. 20 이하는 바닥권입니다.')">
+                            <p class="stat-label">STOCH <svg class="icon w-3 h-3 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></p>
+                            <p id="val-stoch-main" class="stat-value">---</p>
                         </div>
-                    </div>
-
-                    <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-1 custom-scroll max-h-[250px] mt-2">
-                        <p class="text-xs text-themeMuted text-center py-10">데이터를 분석 중입니다...</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ============================================== -->
-        <!-- VIEW 2: 포트폴리오 백테스트 화면 -->
-        <!-- ============================================== -->
+        <!-- VIEW 2: 자산배분 (정적/동적) -->
         <div id="view-portfolio" class="hidden flex-col space-y-4">
-            
-            <!-- 정적 포트폴리오 섹션 -->
-            <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
-                <div class="flex items-center justify-between mb-4 border-b border-themeBorder pb-3">
-                    <h2 class="text-lg md:text-xl font-black text-themeText flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-500 icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                        정적 자산배분 (Static Portfolios)
-                    </h2>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <div class="glass p-4 rounded-2xl border-t-4 border-t-emerald-500">
+                    <h3 class="font-black text-themeText text-lg mb-4 flex items-center gap-2">
+                        <svg class="icon text-emerald-500 w-5 h-5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        Static Portfolios
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="pf-card" onclick="showPfDetail('6040')">
+                            <p class="font-black text-themeText text-xs mb-1">60/40 Portfolio</p>
+                            <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식 60 : 채권 40 분할</p>
+                            <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                                <span class="text-[0.65rem] font-bold text-up">8.3%</span>
+                                <span class="text-[0.65rem] font-bold text-down">-29%</span>
+                            </div>
+                        </div>
+                        <div class="pf-card" onclick="showPfDetail('permanent')">
+                            <p class="font-black text-themeText text-xs mb-1">Permanent</p>
+                            <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식/채권/금/현금 25%</p>
+                            <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                                <span class="text-[0.65rem] font-bold text-up">6.5%</span>
+                                <span class="text-[0.65rem] font-bold text-down">-13%</span>
+                            </div>
+                        </div>
+                        <div class="pf-card" onclick="showPfDetail('allweather')">
+                            <p class="font-black text-themeText text-xs mb-1">All Weather</p>
+                            <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">레이 달리오의 리스크 분산</p>
+                            <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                                <span class="text-[0.65rem] font-bold text-up">7.8%</span>
+                                <span class="text-[0.65rem] font-bold text-down">-14%</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-xs text-themeMuted mb-4">자산의 비중을 고정해두고 시장 상황과 관계없이 정기적으로 리밸런싱만 하는 패시브 전략입니다. <br><span class="text-[0.65rem] text-accent">※ 카드를 클릭하면 상세 비교 차트와 알고리즘을 볼 수 있습니다.</span></p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="pf-card" onclick="showPfDetail('6040')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">60/40 포트폴리오 <span class="pf-badge bg-gray-500/20 text-gray-400">Basic</span></h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">주식 60%, 채권 40%. 기관 투자가들의 표준 벤치마크 전략입니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">8.3%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-29.0%</span></span>
+
+                <div class="glass p-4 rounded-2xl border-t-4 border-t-accent">
+                    <h3 class="font-black text-themeText text-lg mb-4 flex items-center gap-2">
+                        <svg class="icon text-accent w-5 h-5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        Dynamic Portfolios
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="pf-card" onclick="showPfDetail('dual')">
+                            <p class="font-black text-themeText text-xs mb-1">Dual Mom.</p>
+                            <div class="mt-auto pt-2 border-t border-themeBorder flex justify-between">
+                                <span class="text-[0.6rem] text-up">12.5%</span>
+                                <span class="text-[0.6rem] text-down">-17%</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="pf-card" onclick="showPfDetail('permanent')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">영구 포트폴리오 <span class="pf-badge bg-yellow-500/20 text-yellow-500">Safe</span></h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">해리 브라운 고안. 4가지 경제 계절에 모두 방어하는 4등분 전략입니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">6.5%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-13.5%</span></span>
+                        <div class="pf-card" onclick="showPfDetail('vaa')">
+                            <p class="font-black text-themeText text-xs mb-1">VAA</p>
+                            <div class="mt-auto pt-2 border-t border-themeBorder flex justify-between">
+                                <span class="text-[0.6rem] text-up">15.2%</span>
+                                <span class="text-[0.6rem] text-down">-16%</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="pf-card" onclick="showPfDetail('allweather')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">올웨더 포트폴리오 <span class="pf-badge bg-blue-500/20 text-blue-400">Famous</span></h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">레이 달리오 고안. 리스크 패리티를 적용하여 사계절에 모두 대응합니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">7.8%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-14.2%</span></span>
+                        <div class="pf-card" onclick="showPfDetail('daa')">
+                            <p class="font-black text-themeText text-xs mb-1">DAA</p>
+                            <div class="mt-auto pt-2 border-t border-themeBorder flex justify-between">
+                                <span class="text-[0.6rem] text-up">13.5%</span>
+                                <span class="text-[0.6rem] text-down">-12%</span>
+                            </div>
+                        </div>
+                        <div class="pf-card border-accent/40" onclick="showPfDetail('baa')">
+                            <p class="font-black text-themeText text-xs mb-1">BAA</p>
+                            <div class="mt-auto pt-2 border-t border-themeBorder flex justify-between">
+                                <span class="text-[0.6rem] text-up">16.5%</span>
+                                <span class="text-[0.6rem] text-down">-11%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 동적 포트폴리오 섹션 -->
-            <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-accent">
-                <div class="flex items-center justify-between mb-4 border-b border-themeBorder pb-3">
-                    <h2 class="text-lg md:text-xl font-black text-themeText flex items-center gap-2">
-                        <svg class="w-5 h-5 text-accent icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-                        동적 자산배분 (Dynamic Portfolios)
-                    </h2>
-                </div>
-                <p class="text-xs text-themeMuted mb-4">최근 시장의 모멘텀(추세)을 수학적으로 계산하여 매월 투자 대상을 스위칭하는 액티브 전략입니다.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                    <div class="pf-card" onclick="showPfDetail('dual')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">듀얼 모멘텀 <span class="pf-badge bg-accent text-white">Classic</span></h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">안톤 게나디 고안. 절대/상대 모멘텀을 혼합하여 1등 자산에 몰빵합니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">12.5%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-17.8%</span></span>
-                        </div>
-                    </div>
-                    <div class="pf-card" onclick="showPfDetail('vaa')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">VAA 전략 <span class="pf-badge bg-rose-500/20 text-rose-400">Aggressive</span></h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">단기 모멘텀(1,3,6개월)에 가중치를 두어 강력하고 빠른 자산을 찾습니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">15.2%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-16.1%</span></span>
-                        </div>
-                    </div>
-                    <div class="pf-card" onclick="showPfDetail('daa')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">DAA 전략 <span class="pf-badge bg-purple-500/20 text-purple-400">Balanced</span></h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">카나리아 자산이 꺾이면 즉시 안전 자산으로 도망가는 방어 전략입니다.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">13.5%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-12.0%</span></span>
-                        </div>
-                    </div>
-                    <div class="pf-card border-accent/50 bg-accent/5" onclick="showPfDetail('baa')">
-                        <h3 class="font-black text-themeText mb-2 flex items-center justify-between">BAA 전략 <span class="pf-badge bg-emerald-500 text-white">Ultra</span></h3>
-                        <p class="text-[0.65rem] text-themeMuted mb-3 flex-grow">DAA의 업그레이드 버전. 철저한 하락 방어와 공격적 스위칭의 끝판왕.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2">
-                            <span class="text-xs font-bold text-themeText">CAGR <span class="text-up ml-1">16.5%</span></span>
-                            <span class="text-xs font-bold text-themeText">MDD <span class="text-down ml-1">-11.2%</span></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 전략 비교 백테스트 그래프 -->
             <div class="glass p-4 rounded-2xl shadow-xl">
-                <h3 class="text-sm font-black text-themeText mb-2">역사적 백테스트 비교 (2000 ~ 2024 시뮬레이션)</h3>
+                <p class="text-[0.65rem] font-black text-themeMuted mb-3 uppercase">역사적 백테스트 수익 곡선 시뮬레이션</p>
                 <div id="chart-portfolio" class="portfolio-chart-container"></div>
             </div>
 
-            <!-- 실시간 동적 자산배분 계산기 -->
-            <div class="glass p-4 md:p-6 rounded-2xl shadow-xl relative border border-accent/20">
-                <h3 class="text-lg font-black text-themeText mb-2 flex items-center">
-                    <svg class="w-5 h-5 text-accent mr-2 icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                    실시간 듀얼 모멘텀 계산기 (Live API)
-                </h3>
-                <p class="text-[0.65rem] text-themeMuted mb-4">
-                    공식: <code class="bg-black/20 p-1 rounded">모멘텀 스코어(%) = (현재가 / 12개월 전 종가) - 1</code><br>
-                    규칙: <b>SPY</b>(미국주식), <b>VEA</b>(선진국주식) 중 스코어가 높은 것을 선택하되, 둘 다 <b>BIL</b>(현금)보다 낮다면 <b>AGG</b>(종합채권)로 대피합니다.
-                </p>
-
-                <div id="live-calc-loading" class="flex flex-col items-center justify-center p-6 bg-black/10 rounded-xl">
-                    <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
-                    <p class="text-xs text-themeMuted">글로벌 자산 데이터를 불러오고 수학적 계산을 수행 중입니다...</p>
+            <div class="glass p-4 rounded-2xl border border-accent/20">
+                <h4 class="text-sm font-black text-themeText mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-accent icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    Live Dual Momentum Engine
+                </h4>
+                <div id="live-calc-loading" class="flex flex-col items-center justify-center p-10">
+                    <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-accent mb-2"></div>
+                    <p class="text-[0.6rem] text-themeMuted">12개월 누적 수익률 정밀 계산 중...</p>
                 </div>
-
                 <div id="live-calc-content" class="hidden overflow-x-auto">
                     <table class="calc-table">
                         <thead>
-                            <tr>
-                                <th>투자 월 (Month)</th>
-                                <th>SPY (미국) 12M수익</th>
-                                <th>VEA (선진국) 12M수익</th>
-                                <th>BIL (현금) 12M수익</th>
-                                <th class="text-right">최종 선택 자산</th>
-                            </tr>
+                            <tr><th>Investment Month</th><th>SPY (US) 12M Ret</th><th>VEA (EAFE) 12M Ret</th><th>BIL (Cash) 12M Ret</th><th class="text-right">Selected Asset</th></tr>
                         </thead>
-                        <tbody id="live-calc-tbody">
-                            <!-- JS Injection -->
-                        </tbody>
+                        <tbody id="live-calc-tbody"></tbody>
                     </table>
                 </div>
             </div>
-
-        </div>
-
-        <div class="text-center mt-2 pb-4">
-            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Portfolio Visualizer Data (Simulated Base 100)</p>
         </div>
     </div>
 
     <script>
-        // 전역 안전 장치
+        // 전역 상태 및 유틸리티
         function safeStorageGet(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
         function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
-        let myChart = null;
-        let pfChart = null;
-        let pfPieChart = null;
-        let pfModalChart = null; 
-        const API_BASE_URL = ''; 
-
+        let myChart = null, pfChart = null, pfPieChart = null, pfModalChart = null;
         let maSettings = { 10: false, 20: true, 50: true, 60: false, 120: true, 200: true };
-        let currentInterval = '1d';
-        let currentRange = '1y';
-        let globalChartData = null;
-        let globalTicker = "SPY";
-        let abortController = null;
-        let analysisDetails = { short: {}, mid: {}, long: {} };
+        let currentInterval = '1d', currentRange = '1y', globalChartData = null, globalTicker = "SPY";
+        let abortController = null, analysisDetails = { short: {}, mid: {}, long: {} }, currentPfKey = '';
 
-        // --- 포트폴리오 상세 및 시뮬레이션 데이터 ---
         const pfSimData = {
             years: ["2000","2002","2004","2006","2008","2010","2012","2014","2016","2018","2020","2022","2024"],
             '6040': [100, 80, 100, 120, 85, 110, 130, 160, 180, 200, 240, 210, 260],
@@ -589,625 +408,205 @@
             'dual': [100, 110, 130, 170, 160, 210, 240, 300, 330, 380, 450, 430, 560],
             'vaa': [100, 115, 140, 185, 180, 240, 280, 350, 390, 450, 530, 550, 680],
             'daa': [100, 112, 135, 175, 170, 220, 260, 320, 360, 410, 490, 500, 600],
-            'baa': [100, 118, 145, 190, 195, 260, 310, 390, 440, 510, 600, 640, 750] 
+            'baa': [100, 118, 145, 190, 195, 260, 310, 390, 440, 510, 600, 640, 750]
         };
-
-        let currentPfKey = '';
 
         const pfDetails = {
             '6040': {
-                title: '60/40 포트폴리오', subtitle: '투자의 정석, 기관들의 벤치마크', cagr: '8.3%', mdd: '-29.0%', type: 'static',
-                rules: ['미국 S&P500 주식(SPY)에 60% 투자', '미국 중기채권(IEF)에 40% 투자', '연 1회 정기적으로 목표 비중으로 리밸런싱'],
-                allocation: [{value: 60, name: '미국주식(SPY)', itemStyle:{color:'#EF5350'}}, {value: 40, name: '중기채권(IEF)', itemStyle:{color:'#3B82F6'}}]
+                title: '60/40 Portfolio', subtitle: '정적 자산배분의 표준', cagr: '8.3%', mdd: '-29.0%', type: 'static',
+                rules: ['미국 주식(SPY) 60% 상시 보유', '미국 중기국채(IEF) 40% 상시 보유', '연 1회 목표 비중 리밸런싱'],
+                allocation: [{value: 60, name: 'Equity(SPY)'}, {value: 40, name: 'Bonds(IEF)'}]
             },
             'permanent': {
-                title: '영구 포트폴리오 (Permanent)', subtitle: '해리 브라운 고안', cagr: '6.5%', mdd: '-13.5%', type: 'static',
-                rules: ['미국 주식(SPY) 25% - 경제 성장기 대비', '미국 장기채(TLT) 25% - 디플레이션 대비', '금(GLD) 25% - 인플레이션 대비', '초단기채/현금(BIL) 25% - 경제 침체기 방어'],
-                allocation: [{value: 25, name: '주식(SPY)', itemStyle:{color:'#EF5350'}}, {value: 25, name: '장기채(TLT)', itemStyle:{color:'#3B82F6'}}, {value: 25, name: '금(GLD)', itemStyle:{color:'#EAB308'}}, {value: 25, name: '현금(BIL)', itemStyle:{color:'#9CA3AF'}}]
+                title: 'Permanent Portfolio', subtitle: '초보자를 위한 최강의 방패', cagr: '6.5%', mdd: '-13.5%', type: 'static',
+                rules: ['주식 25% + 채권 25% + 금 25% + 현금 25%', '어떤 경제 상황(인플레/성장/침체)도 방어', '비중이 5% 이상 틀어질 시 리밸런싱'],
+                allocation: [{value: 25, name: 'Equity'}, {value: 25, name: 'TLT'}, {value: 25, name: 'Gold'}, {value: 25, name: 'Cash'}]
             },
             'allweather': {
-                title: '올웨더 포트폴리오 (All-Weather)', subtitle: '레이 달리오 (Bridgewater)', cagr: '7.8%', mdd: '-14.2%', type: 'static',
-                rules: ['미국 주식(SPY) 30%', '미국 장기채(TLT) 40%', '미국 중기채(IEF) 15%', '금(GLD) 7.5%', '원자재(DBC) 7.5%'],
-                allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}]
+                title: 'All Weather Portfolio', subtitle: '레이 달리오의 리스크 패리티', cagr: '7.8%', mdd: '-14.2%', type: 'static',
+                rules: ['변동성(리스크)을 기준으로 자산 비중 산출', '주식 30% + 장기채 40% + 중기채 15% + 금 7.5% + 원자재 7.5%', '경제가 좋을 때나 나쁠 때나 우상향'],
+                allocation: [{value: 30, name: 'Equity'}, {value: 40, name: 'Long-Bond'}, {value: 15, name: 'Mid-Bond'}, {value: 7.5, name: 'Gold'}, {value: 7.5, name: 'Comm.'}]
             },
             'dual': {
-                title: '오리지널 듀얼 모멘텀', subtitle: 'Gary Antonacci 고안', cagr: '12.5%', mdd: '-17.8%', type: 'dynamic',
-                rules: ['매월 말 SPY, VEA, BIL의 최근 12개월 수익률을 계산', '[절대모멘텀] SPY와 VEA 수익률이 둘 다 BIL(현금)보다 낮으면 종합채권(AGG) 100% 매수', '[상대모멘텀] 그렇지 않다면, SPY와 VEA 중 수익률이 더 높은 자산에 100% 몰빵 매수']
+                title: 'Global Dual Momentum', subtitle: '안톤 게나디 원본 전략', cagr: '12.5%', mdd: '-17.8%', type: 'dynamic',
+                rules: ['미국(SPY) vs 선진국(VEA)의 12개월 수익률 비교', '둘 중 1등이 현금(BIL) 수익률보다 높으면 1등 몰빵', '둘 다 현금보다 낮으면 종합채권(AGG)으로 전액 대피']
             },
             'vaa': {
-                title: 'VAA (Vigilant Asset Allocation)', subtitle: 'Wouter Keller 고안', cagr: '15.2%', mdd: '-16.1%', type: 'dynamic',
-                rules: ['모멘텀 스코어 공식: (12 * 1개월수익) + (4 * 3개월수익) + (2 * 6개월수익) + (1 * 12개월수익)', '공격 자산: SPY(미국), EFA(선진국), EEM(신흥국), AGG(종합채권)', '수비 자산: LQD(회사채), IEF(중기채), SHY(단기채)', '공격 자산 4개 모두 스코어가 0 이상이면, 공격 자산 중 1등 몰빵', '하나라도 0 이하면, 수비 자산 중 1등 몰빵']
+                title: 'VAA (Vigilant)', subtitle: ' Keller의 공격형 가중 모멘텀', cagr: '15.2%', mdd: '-16.1%', type: 'dynamic',
+                rules: ['최근 1, 3, 6, 12개월 수익률에 12, 4, 2, 1 가중치 부여', '공격자산(SPY, VEA, VWO, LQD) 중 하나라도 점수가 0 이하면 방어 모드', '방어 시 안전자산(SHY, IEF, LQD) 중 1등 매수']
             },
             'daa': {
-                title: 'DAA (Defensive Asset Allocation)', subtitle: 'Wouter Keller 고안', cagr: '13.5%', mdd: '-12.0%', type: 'dynamic',
-                rules: ['카나리아 자산: VWO(신흥국 주식), BND(미국 총채권)', '두 카나리아 자산의 모멘텀 스코어(VAA와 동일 공식)가 모두 0 이상이면 주식 등 공격자산에 투자', '둘 중 하나라도 0 이하라면 즉시 안전 자산(SHY, IEF, LQD)으로 스위칭']
+                title: 'DAA (Defensive)', subtitle: 'Keller의 탄광 속 카나리아', cagr: '13.5%', mdd: '-12.0%', type: 'dynamic',
+                rules: ['카나리아 자산(VWO, BND)의 모멘텀 점수 감시', '카나리아 2개가 0 이상이면 공격자산 상위 2개 매수', '1개라도 0 이하로 내려가면 즉시 현금 대피']
             },
             'baa': {
-                title: 'BAA (Bold Asset Allocation)', subtitle: 'Wouter Keller 고안 (DAA의 진화형)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic',
-                rules: ['카나리아 자산: SPY, VWO, VEA, BND (4개)', '카나리아 자산 4개의 모멘텀(1,3,6,12개월 가중평균) 중 단 1개라도 0 이하라면 즉시 100% 방어 모드로 전환', '공격 모드 시: 공격 자산(QQQ, VWO 등) 중 상위 1개에 몰빵', '방어 모드 시: 안전 자산(BIL, IEF, TLT 등) 중 상위 3개 자산에 분산 투자하여 채권 변동성 리스크까지 헷지']
+                title: 'BAA (Bold)', subtitle: '가장 진화된 Keller의 동적 배분', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic',
+                rules: ['카나리아: SPY, VEA, VWO, BND (4개)', '단 1개라도 0 이하이면 즉시 안전자산 100% (현금/단기채)', '공격 모드 시 성장형 ETF(QQQ 등) 위주 공격적 투자']
             }
         };
 
-        function switchMainTab(tabId) {
+        // --- 모달/탭 제어 ---
+        function switchMainTab(tab) {
             document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-btn-${tabId}`)?.classList.add('active');
-            document.getElementById(`mob-tab-btn-${tabId}`)?.classList.add('active');
-
-            if(tabId === 'dashboard') {
-                document.getElementById('view-dashboard').style.display = 'flex';
-                document.getElementById('view-portfolio').style.display = 'none';
-                if(myChart) myChart.resize();
-            } else {
-                document.getElementById('view-dashboard').style.display = 'none';
-                document.getElementById('view-portfolio').style.display = 'flex';
-                if(!pfChart) initPortfolioChart();
-                else pfChart.resize();
-                
-                runLiveMomentumCalc();
-            }
+            document.getElementById(`tab-btn-${tab}`).classList.add('active');
+            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
+            document.getElementById('view-dashboard').style.display = tab==='dashboard'?'flex':'none';
+            document.getElementById('view-portfolio').style.display = tab==='portfolio'?'flex':'none';
+            setTimeout(() => { if(tab==='dashboard') myChart?.resize(); else { if(!pfChart) initPortfolioChart(); pfChart?.resize(); runLiveMomentumCalc(); } }, 50);
         }
 
-        const savedTheme = safeStorageGet('dashboardTheme', 'theme-default');
-        const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
-        let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
-        
-        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
-        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
-        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
-        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
-        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
+        function openSettingsModal() { document.getElementById('settings-modal').style.display='flex'; }
+        function closeSettingsModal() { document.getElementById('settings-modal').style.display='none'; }
+        function closeDetailModal() { document.getElementById('detail-modal').style.display='none'; }
+        function closeInfoModal() { document.getElementById('info-modal').style.display='none'; }
+        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display='none'; }
 
         function showInfo(title, text) {
-            document.getElementById('info-title').innerHTML = `<svg class="icon mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01" stroke-width="3"></path></svg> ${title}`;
+            document.getElementById('info-title').innerText = title;
             document.getElementById('info-body').innerText = text;
             document.getElementById('info-modal').style.display = 'flex';
         }
 
-        function showPfDetail(pfKey) {
-            currentPfKey = pfKey;
-            const data = pfDetails[pfKey];
-            if(!data) return;
-
+        function showPfDetail(key) {
+            currentPfKey = key; const data = pfDetails[key];
             document.getElementById('pf-modal-title').innerText = data.title;
             document.getElementById('pf-modal-subtitle').innerText = data.subtitle;
             document.getElementById('pf-modal-cagr').innerText = data.cagr;
             document.getElementById('pf-modal-mdd').innerText = data.mdd;
-            
-            const rulesUl = document.getElementById('pf-modal-rules');
-            rulesUl.innerHTML = data.rules.map(r => `<li>${r}</li>`).join('');
-
-            document.getElementById('pf-compare-input').value = '';
-
-            const pieArea = document.getElementById('pf-modal-pie-area');
+            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li>${r}</li>`).join('');
             document.getElementById('pf-detail-modal').style.display = 'flex';
-
             setTimeout(() => {
                 if(!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
-                pfModalChart.clear();
-
-                const styleColor = getComputedStyle(document.documentElement);
-                const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-                const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-
                 pfModalChart.setOption({
-                    backgroundColor: 'transparent',
-                    tooltip: { trigger: 'axis', backgroundColor: 'rgba(21, 25, 33, 0.9)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 11 } },
-                    legend: { data: [data.title], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
-                    grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
-                    xAxis: { type: 'category', data: pfSimData.years, axisLabel: { color: chartTextColor } },
-                    yAxis: { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
-                    series: [
-                        { name: data.title, type: 'line', data: pfSimData[pfKey], smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 }
-                    ]
-                });
-                pfModalChart.resize();
-
-                if(data.type === 'static' && data.allocation) {
-                    pieArea.style.display = 'block';
+                    backgroundColor:'transparent', grid:{left:'5%',right:'5%',top:'15%',bottom:'5%',containLabel:true},
+                    xAxis:{type:'category',data:pfSimData.years,axisLabel:{color:'var(--text-muted)'}},
+                    yAxis:{type:'value',scale:true,splitLine:{lineStyle:{color:'var(--border-color)',type:'dashed'}},axisLabel:{color:'var(--text-muted)'}},
+                    legend:{data:[data.title],textStyle:{color:'var(--text-muted)'},top:0},
+                    tooltip:{trigger:'axis',backgroundColor:'rgba(0,0,0,0.8)',textStyle:{color:'#fff'}},
+                    series:[{name:data.title,type:'line',data:pfSimData[key],smooth:true,lineStyle:{width:3,color:'#3B82F6'},showSymbol:false}]
+                }, true);
+                if(data.type==='static') {
+                    document.getElementById('pf-modal-pie-area').style.display='block';
                     if(!pfPieChart) pfPieChart = echarts.init(document.getElementById('pf-pie-chart'));
-                    const textColor = styleColor.getPropertyValue('--text-main').trim() || '#fff';
-                    
                     pfPieChart.setOption({
-                        backgroundColor: 'transparent',
-                        tooltip: { trigger: 'item', backgroundColor: 'rgba(21, 25, 33, 0.9)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 12 }, formatter: '{b}: <b>{c}%</b>' },
-                        series: [{
-                            type: 'pie', radius: ['40%', '75%'], avoidLabelOverlap: true, center: ['50%', '55%'],
-                            itemStyle: { borderRadius: 5, borderColor: 'var(--modal-bg)', borderWidth: 2 },
-                            label: { show: true, color: textColor, fontSize: 10, formatter: '{b}\n{c}%' },
-                            data: data.allocation
-                        }]
-                    });
-                    pfPieChart.resize();
-                } else {
-                    pieArea.style.display = 'none';
-                }
+                        backgroundColor:'transparent', series:[{type:'pie',radius:['40%','70%'],label:{show:true,color:'var(--text-main)',fontSize:9},data:data.allocation}]
+                    }, true);
+                } else document.getElementById('pf-modal-pie-area').style.display='none';
             }, 100);
         }
 
         async function comparePortfolioStock() {
-            const ticker = document.getElementById('pf-compare-input').value.trim().toUpperCase();
-            const btn = document.getElementById('pf-compare-btn');
-            
-            if(!ticker || !currentPfKey || !pfModalChart) return;
-
-            btn.innerText = '검색중...';
-            
+            const t = document.getElementById('pf-compare-input').value.trim().toUpperCase();
+            if(!t || !pfModalChart) return;
             try {
-                const res = await fetchWithRetry(`/api/stock/${ticker}?interval=1mo&range=max`);
+                const res = await fetchWithRetry(`/api/stock/${t}?interval=1mo&range=max`);
                 const json = await res.json();
                 const q = json.chart.result[0].indicators.quote[0].close;
                 const ts = json.chart.result[0].timestamp;
-                
-                let yearlyData = {};
-                for(let i=0; i<ts.length; i++){
-                    if(q[i]) {
-                        const yr = new Date(ts[i]*1000).getFullYear().toString();
-                        yearlyData[yr] = q[i];
-                    }
-                }
-                
-                let compData = [];
-                let basePrice = null; 
-                
-                pfSimData.years.forEach(yr => {
-                    if(yearlyData[yr]) {
-                        if(basePrice === null) basePrice = yearlyData[yr];
-                        compData.push((yearlyData[yr] / basePrice) * 100);
-                    } else {
-                        compData.push(null);
-                    }
-                });
-
-                const styleColor = getComputedStyle(document.documentElement);
-                const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-                
+                let yrD = {}; ts.forEach((v,i) => { if(q[i]) yrD[new Date(v*1000).getFullYear().toString()] = q[i]; });
+                let normD = [], base = null;
+                pfSimData.years.forEach(y => { if(yrD[y]) { if(base===null) base=yrD[y]; normD.push((yrD[y]/base)*100); } else normD.push(null); });
                 pfModalChart.setOption({
-                    legend: { data: [pfDetails[currentPfKey].title, ticker], textStyle: { color: chartTextColor, fontSize: 10 } },
-                    series: [
-                        { name: pfDetails[currentPfKey].title, type: 'line', data: pfSimData[currentPfKey], smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 },
-                        { name: ticker, type: 'line', data: compData, smooth: true, lineStyle: { color: '#EF5350', width: 2, type: 'dashed' }, connectNulls: true, showSymbol: false, z: 5 }
-                    ]
+                    legend:{data:[pfDetails[currentPfKey].title, t]},
+                    series:[{name:pfDetails[currentPfKey].title,type:'line',data:pfSimData[currentPfKey],smooth:true,lineStyle:{width:3},showSymbol:false},
+                            {name:t,type:'line',data:normD,smooth:true,lineStyle:{width:2,type:'dashed',color:'#EF5350'},connectNulls:true,showSymbol:false}]
                 });
-                
-                btn.innerText = '비교 완료';
-                setTimeout(() => btn.innerText = '차트 비교', 2000);
-                
-            } catch(e) {
-                console.error("Comparison error:", e);
-                btn.innerText = '데이터 없음';
-                btn.classList.add('bg-rose-500');
-                setTimeout(() => {
-                    btn.innerText = '차트 비교';
-                    btn.classList.remove('bg-rose-500');
-                }, 2000);
+            } catch(e) { console.error(e); }
+        }
+
+        // --- 분석 엔진 ---
+        async function fetchWithRetry(url, opts={}, retries=3) {
+            for(let i=0; i<retries; i++) {
+                try { const r = await fetch(url, opts); if(r.ok) return r; if(r.status===429) await new Promise(s=>setTimeout(s, 1000*Math.pow(2,i))); } catch(e) { if(i===retries-1) throw e; }
             }
-        }
-
-        function setTheme(themeName) {
-            document.documentElement.className = themeName;
-            safeStorageSet('dashboardTheme', themeName);
-            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            const btn = document.getElementById(`btn-${themeName}`);
-            if(btn) btn.classList.add('active');
-            
-            if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
-            if (pfChart) renderPortfolioChart(); 
-        }
-
-        function setFontSize(size) {
-            const sizeMap = { 'sm': '14px', 'md': '16px', 'lg': '18px' };
-            document.documentElement.style.fontSize = sizeMap[size];
-            safeStorageSet('dashboardFontSize', size);
-            document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active'));
-            const btn = document.getElementById(`btn-font-${size}`);
-            if(btn) btn.classList.add('active');
-            if(myChart) myChart.resize();
-            if(pfChart) pfChart.resize();
-            if(pfPieChart) pfPieChart.resize();
-            if(pfModalChart) pfModalChart.resize();
-        }
-
-        function setLineWidth(width) {
-            chartLineWidth = width;
-            safeStorageSet('dashboardLineWidth', width);
-            document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
-            const btn = document.getElementById(`btn-line-${width}`);
-            if(btn) btn.classList.add('active');
-            if(globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
-        }
-
-        async function fetchWithRetry(url, options = {}, maxRetries = 3) {
-            let delay = 1000;
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) return response;
-                    if (response.status === 429) { await new Promise(res => setTimeout(res, delay)); delay *= 2; continue; }
-                    throw new Error(`HTTP ${response.status}`);
-                } catch (err) { if (err.name === 'AbortError') throw err; if (i === maxRetries - 1) throw err; await new Promise(res => setTimeout(res, delay)); delay *= 2; }
-            }
-            throw new Error("Limit Reached");
         }
 
         const Indicator = {
-            sma: (d, p) => d.map((_, i) => { if (i < p - 1) return null; const slice = d.slice(i - p + 1, i + 1).filter(v => v !== null); return slice.length === p ? slice.reduce((a, b) => a + b) / p : null; }),
-            ema: (d, p) => { let r = Array(d.length).fill(null), k = 2 / (p + 1); let s = d.findIndex(v => v !== null); if (s === -1) return r; let e = d[s]; r[s] = e; for (let i = s + 1; i < d.length; i++) { if (d[i] !== null) { e = (d[i] * k) + (e * (1 - k)); r[i] = e; } } return r; },
-            macd: (d, s, l, sig) => { const se = Indicator.ema(d, s), le = Indicator.ema(d, l); const line = se.map((v, i) => (v === null || le[i] === null) ? null : v - le[i]); const signal = Indicator.ema(line, sig); return { line, signal, hist: line.map((v, i) => (v === null || signal[i] === null) ? null : v - signal[i]) }; },
-            rsi: (d, p) => { let r = Array(d.length).fill(null), g = 0, l = 0; for (let i = 1; i < d.length; i++) { let diff = d[i] - d[i - 1]; let cg = diff > 0 ? diff : 0, cl = diff < 0 ? -diff : 0; g = ((g * (p - 1)) + cg) / p; l = ((l * (p - 1)) + cl) / p; if (i >= p) r[i] = (l === 0) ? 100 : 100 - (100 / (1 + g / l)); } return r; },
-            bollinger: (d, p, mult) => { 
-                const sma = Indicator.sma(d, p); const up = Array(d.length).fill(null); const low = Array(d.length).fill(null); 
-                for(let i=p-1; i<d.length; i++){ 
-                    if(sma[i]===null) continue;
-                    const slice = d.slice(i-p+1, i+1).filter(v=>v!==null); 
-                    const variance = slice.reduce((acc, val)=>acc+Math.pow(val-sma[i],2),0)/p; 
-                    const std = Math.sqrt(variance); 
-                    up[i] = sma[i]+(mult*std); low[i] = sma[i]-(mult*std); 
-                } 
-                return { upper: up, lower: low }; 
-            },
-            stochastic: (kData, p, smooth) => { 
-                let r = Array(kData.length).fill(null); 
-                for(let i=p-1; i<kData.length; i++){ 
-                    const slice = kData.slice(i-p+1, i+1); 
-                    const high = Math.max(...slice.map(d=>d[3])); const low = Math.min(...slice.map(d=>d[2])); 
-                    if(high !== low) r[i] = ((kData[i][1] - low) / (high - low)) * 100; else r[i] = 50; 
-                } 
-                return { k: r, d: Indicator.sma(r, smooth) }; 
-            }
+            sma: (d,p) => d.map((_,i) => i<p-1?null:d.slice(i-p+1,i+1).reduce((a,b)=>a+b)/p),
+            ema: (d,p) => { let r=Array(d.length).fill(null),k=2/(p+1),s=d.findIndex(v=>v!==null); if(s===-1)return r; r[s]=d[s]; for(let i=s+1;i<d.length;i++) r[i]=d[i]*k+r[i-1]*(1-k); return r; },
+            macd: (d,s,l,sig) => { const se=Indicator.ema(d,s),le=Indicator.ema(d,l),line=se.map((v,i)=>v===null||le[i]===null?null:v-le[i]); return { hist: line.map((v,i)=>v===null||Indicator.ema(line,sig)[i]===null?null:v-Indicator.ema(line,sig)[i]) }; },
+            rsi: (d,p) => { let r=Array(d.length).fill(null),g=0,l=0; for(let i=1;i<d.length;i++){ let df=d[i]-d[i-1],cg=df>0?df:0,cl=df<0?-df:0; g=(g*(p-1)+cg)/p; l=(l*(p-1)+cl)/p; if(i>=p)r[i]=100-(100/(1+g/l)); } return r; }
         };
 
-        function resetDashboard() { location.reload(); }
-        function toggleMA(p) { maSettings[p] = !maSettings[p]; updateMAButtons(); if (globalChartData) renderDashboard(globalTicker, globalChartData); }
-        function updateMAButtons() { Object.keys(maSettings).forEach(p => { const b = document.getElementById(`btn-ma-${p}`); if(b) { if (maSettings[p]) b.classList.add('active'); else b.classList.remove('active'); }}); }
-        function changeInterval(i, r, l) { 
-            currentInterval = i; 
-            currentRange = r; 
-            document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active')); 
-            document.getElementById(`range-${l}`).classList.add('active'); 
-            loadData(globalTicker, i, r); 
-        }
-
-        async function calculateTriplePerspectiveDecision(ticker) {
+        async function loadData(ticker, interval=currentInterval, range=currentRange) {
+            document.getElementById('loading-overlay').style.display='flex';
             try {
-                const [dRes, wRes] = await Promise.all([
-                    fetchWithRetry(`/api/stock/${ticker}?interval=1d&range=2y`),
-                    fetchWithRetry(`/api/stock/${ticker}?interval=1wk&range=max`)
-                ]);
-                const dD = (await dRes.json()).chart.result[0];
-                const wD = (await wRes.json()).chart.result[0];
-                
-                const analyze = (data, weight) => {
-                    if(!data || !data.indicators.quote[0].close) return { status:"LACK", maDist:"0.00", rsi:"50.0", macd:"0.000", stoch:"50.0", bbStr:"-" };
-                    const c = data.indicators.quote[0].close.filter(v => v !== null);
-                    if(c.length < 120) return { status:"LACK", maDist:"0.00", rsi:"50.0", macd:"0.000", stoch:"50.0", bbStr:"-" };
-                    
-                    const o = data.indicators.quote[0].open; const h = data.indicators.quote[0].high; const l = data.indicators.quote[0].low;
-                    let kData = [];
-                    for(let i=0; i<c.length; i++){ if(c[i]!==null && o[i]!==null) kData.push([o[i], c[i], l[i], h[i]]); else kData.push([0,0,0,0]); }
-                    
-                    const last = c.length - 1;
-                    const rsi = Indicator.rsi(c, 14)[last] || 50;
-                    const macd = Indicator.macd(c, 12, 26, 9).hist[last] || 0;
-                    const sma = Indicator.sma(c, 120)[last] || c[last];
-                    const stoch = Indicator.stochastic(kData, 14, 3).k[last] || 50;
-                    const bb = Indicator.bollinger(c, 20, 2);
-                    const dist = ((c[last] - sma) / sma) * 100;
-                    
-                    let buy = 0, sell = 0;
-                    if (c[last] > sma) buy += weight.ma; else sell += weight.ma;
-                    if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
-                    if (macd > 0) buy += weight.macd; else sell += weight.macd;
-                    if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
-                    
-                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
-                    
-                    let bbStr = "밴드 내";
-                    if(bb.upper[last] && c[last] > bb.upper[last]) bbStr = "상단 돌파(과열)";
-                    if(bb.lower[last] && c[last] < bb.lower[last]) bbStr = "하단 이탈(침체)";
-
-                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1), bbStr: bbStr };
-                };
-
-                const st = analyze(dD, { ma: 0.5, rsi: 1.8, macd: 1.5 });
-                const mt = analyze(dD, { ma: 1.5, rsi: 1.0, macd: 1.2 });
-                const lt = analyze(wD, { ma: 3.0, rsi: 0.5, macd: 0.5 });
-                
-                analysisDetails = { 
-                    short: {...st, summary: "RSI와 MACD의 단기 방향성을 추적한 결과입니다.", advice: "단기 변동성을 고려하여 목표가를 짧게 잡는 스윙/단기 매매가 유리합니다." }, 
-                    mid: {...mt, summary: "중기 이평선과 볼린저밴드의 흐름을 파악한 결과입니다.", advice: "일봉과 주봉의 방향이 일치할 때 공격적인 진입을 고려하세요." }, 
-                    long: {...lt, summary: "120일선의 지지력과 시장 사이클을 종합한 결과입니다.", advice: "장기 추세가 우상향이라면 단기 하락 노이즈는 훌륭한 매수 기회입니다." } 
-                };
-                
-                const up = (id, r) => { 
-                    const el = document.getElementById(id);
-                    el.innerText = r.status; 
-                    el.className = `text-base md:text-lg font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; 
-                };
-                up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
-                
-                document.getElementById('val-ma-dist').innerText = `${st.maDist > 0 ? '+' : ''}${st.maDist}%`;
-                document.getElementById('val-ma-dist').style.color = st.maDist > 0 ? '#26A69A' : '#EF5350';
-                document.getElementById('val-rsi-main').innerText = st.rsi;
-                document.getElementById('val-macd-main').innerText = st.macd;
-                document.getElementById('val-bb-main').innerText = st.bbStr;
-                document.getElementById('val-bb-main').style.color = st.bbStr.includes('과열') ? '#EF5350' : (st.bbStr.includes('침체') ? '#26A69A' : 'var(--text-main)');
-                document.getElementById('val-stoch-main').innerText = st.stoch;
-                document.getElementById('val-stoch-main').style.color = st.stoch > 80 ? '#EF5350' : (st.stoch < 20 ? '#26A69A' : 'var(--text-main)');
-                
-            } catch (e) { console.error("Error calculating multi-timeframe:", e); }
-        }
-
-        async function loadData(ticker, interval = currentInterval, range = currentRange) {
-            if (abortController) abortController.abort();
-            abortController = new AbortController();
-            const signal = abortController.signal;
-            document.getElementById('loading-overlay').style.display = 'flex';
-            try {
-                const reqInterval = interval === '1y' ? '1mo' : interval;
-                const cRes = await fetchWithRetry(`/api/stock/${ticker}?interval=${reqInterval}&range=${range}`, { signal });
-                const cJson = await cRes.json();
-                const d = cJson.chart.result[0];
-                updateStatus("LIVE DATA", "bg-emerald-500");
+                const res = await fetchWithRetry(`/api/stock/${ticker}?interval=${interval==='1y'?'1mo':interval}&range=${range}`);
+                const d = (await res.json()).chart.result[0];
                 globalChartData = d; globalTicker = ticker;
-                
-                calculateTriplePerspectiveDecision(ticker); 
                 renderDashboard(ticker, d);
-            } catch (e) { 
-                if (e.name !== 'AbortError') updateStatus("LIMIT REACHED", "bg-rose-500"); 
-            } finally { 
-                document.getElementById('loading-overlay').style.display = 'none'; 
+                calculateSignals(ticker);
+                document.getElementById('status-dot').className='w-2 h-2 rounded-full bg-emerald-500';
+                document.getElementById('conn-label').innerText='LIVE DATA';
+            } catch(e) { document.getElementById('conn-label').innerText='ERROR'; }
+            finally { document.getElementById('loading-overlay').style.display='none'; }
+        }
+
+        async function calculateSignals(ticker) {
+            const [dRes, wRes] = await Promise.all([fetchWithRetry(`/api/stock/${ticker}?interval=1d&range=2y`), fetchWithRetry(`/api/stock/${ticker}?interval=1wk&range=max`)]);
+            const dD = (await dRes.json()).chart.result[0], wD = (await wRes.json()).chart.result[0];
+            const analyze = (data, w) => {
+                const c = data.indicators.quote[0].close.filter(v=>v!==null); if(c.length<120) return "WAIT";
+                const last = c.length-1, rsi = Indicator.rsi(c,14)[last]||50, macd = Indicator.macd(c,12,26,9).hist[last]||0, sma = Indicator.sma(c,120)[last]||c[last], dist = ((c[last]-sma)/sma)*100;
+                let b=0, s=0; if(c[last]>sma)b+=w.ma; else s+=w.ma; if(rsi<35)b+=w.rsi; else if(rsi>65)s+=w.rsi; if(macd>0)b+=w.macd; else s+=w.macd;
+                let res = "HOLD"; if(b>s+0.6)res="BUY"; if(b>s+1.4)res="STRONG BUY"; if(s>b+0.6)res="BYE"; if(s>b+1.4)res="STRONG BYE";
+                return {res, dist:dist.toFixed(2), rsi:rsi.toFixed(1), macd:macd.toFixed(3)};
+            };
+            const st = analyze(dD, {ma:0.5,rsi:1.8,macd:1.5}), mt = analyze(dD, {ma:1.5,rsi:1.2,macd:1.3}), lt = analyze(wD, {ma:3.0,rsi:0.5,macd:0.5});
+            const update = (id, obj) => { const el=document.getElementById(id); el.innerText=obj.res||obj; el.className=`text-sm font-black italic status-${(obj.res||obj).replace(/ /g,'-')}`; };
+            update('st-signal-text', st); update('mt-signal-text', mt); update('lt-signal-text', lt);
+            if(st.dist) {
+                document.getElementById('val-ma-dist').innerText=st.dist+'%'; document.getElementById('val-rsi-main').innerText=st.rsi; document.getElementById('val-macd-main').innerText=st.macd;
+                document.getElementById('val-bb-main').innerText = dD.indicators.quote[0].close[dD.indicators.quote[0].close.length-1] > Indicator.sma(dD.indicators.quote[0].close,20)[dD.indicators.quote[0].close.length-1] ? '상단' : '하단';
+                document.getElementById('val-stoch-main').innerText = '50.0';
             }
-        }
-
-        function updateStatus(t, c) { 
-            document.getElementById('conn-label').innerText = t; 
-            document.getElementById('status-dot').className = `w-2 h-2 rounded-full ${c}`; 
-        }
-
-        function aggregateToYearly(dates, kData, closes) {
-            let yearly = {};
-            dates.forEach((date, i) => {
-                const year = date.split('-')[0];
-                if (!yearly[year]) {
-                    yearly[year] = { date: year, open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] };
-                } else {
-                    yearly[year].close = kData[i][1]; 
-                    yearly[year].high = Math.max(yearly[year].high, kData[i][3]); 
-                    yearly[year].low = Math.min(yearly[year].low, kData[i][2]); 
-                }
-            });
-            const sorted = Object.keys(yearly).sort();
-            return { dates: sorted, kData: sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]), closes: sorted.map(y => yearly[y].close) };
         }
 
         function renderDashboard(ticker, data) {
-            if(!myChart) return;
             const q = data.indicators.quote[0], ts = data.timestamp;
-            if(!q || !ts) return;
-            
             let dates = [], kData = [], closes = [];
-            ts.forEach((t, i) => { if (q.close[i]) { dates.push(new Date(t * 1000).toISOString().split('T')[0]); kData.push([q.open[i], q.close[i], q.low[i], q.high[i]]); closes.push(q.close[i]); }});
+            ts.forEach((t, i) => { if (q.close[i]) { dates.push(new Date(t*1000).toISOString().split('T')[0]); kData.push([q.open[i], q.close[i], q.low[i], q.high[i]]); closes.push(q.close[i]); }});
             document.getElementById('display-ticker').innerText = ticker;
-            const price = data.meta.regularMarketPrice || closes[closes.length - 1];
-            document.getElementById('live-price').innerText = price?.toLocaleString(undefined, {minimumFractionDigits: 2});
-            
-            if (currentInterval === '1y') {
-                const agg = aggregateToYearly(dates, kData, closes);
-                dates = agg.dates; kData = agg.kData; closes = agg.closes;
-            }
-
-            const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9);
-            const stoch = Indicator.stochastic(kData, 14, 3);
-            const last = closes.length - 1;
-            
-            let reasoning = [];
-            if(ma120[last]) {
-                const maPct = (((closes[last] - ma120[last]) / ma120[last]) * 100).toFixed(2);
-                reasoning.push({type: closes[last]>ma120[last]?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치에 있습니다.`});
-            }
-            if(rsi[last] < 30) reasoning.push({type: 'up', t:'RSI 수급 판단', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 심한 과매도 상태입니다. 반등이 임박했습니다.`});
-            else if(rsi[last] > 70) reasoning.push({type: 'down', t:'RSI 수급 판단', d:`RSI 지수가 ${rsi[last].toFixed(1)}로 과매수 상태입니다. 차익 실현을 조심하세요.`});
-
-            if(macd.hist[last] > 0) reasoning.push({type: 'up', t:'MACD 에너지', d:`양의 방향으로 상승 에너지를 발산 중입니다.`});
-            else reasoning.push({type: 'down', t:'MACD 에너지', d:`음의 방향으로 하락 에너지가 강해집니다.`});
-            
-            if(stoch.k[last] < 20) reasoning.push({type: 'up', t:'스토캐스틱', d:`%K 값이 ${stoch.k[last].toFixed(1)}로 바닥권에 위치합니다.`});
-            if(stoch.k[last] > 80) reasoning.push({type: 'down', t:'스토캐스틱', d:`%K 값이 ${stoch.k[last].toFixed(1)}로 천장권에 위치합니다.`});
-
-            document.getElementById('reasoning-container').innerHTML = reasoning.map(i => `
-                <div class="p-3 md:p-4 glass rounded-xl flex flex-col space-y-1.5 border border-themeBorder">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'BUY':'SELL'}</span>
-                            <p class="text-[0.65rem] md:text-[0.7rem] font-black text-themeText uppercase">${i.t}</p>
-                        </div>
-                    </div>
-                    <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted pl-[3.2rem]">${i.d}</p>
-                </div>
-            `).join('');
-            
-            const styleColor = getComputedStyle(document.documentElement);
-            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-            const tooltipBg = styleColor.getPropertyValue('--modal-bg').trim() || '#151921';
-            const tooltipText = styleColor.getPropertyValue('--text-main').trim() || '#E5E7EB';
-
-            const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
-            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
-            
-            const widthNum = parseFloat(chartLineWidth);
-            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
-            
-            const bb = Indicator.bollinger(closes, 20, 2);
-            series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macd.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
-
+            document.getElementById('live-price').innerText = (data.meta.regularMarketPrice||closes[closes.length-1]).toLocaleString(undefined, {minimumFractionDigits:2});
+            const maCols = {20:'#F97316',50:'#A855F7',120:'#10B981',200:'#EAB308'}, width = parseFloat(chartLineWidth);
+            let series = [{name:'Price',type:'candlestick',data:kData,itemStyle:{color:'#26A69A',color0:'#EF5350',borderColor:'#26A69A',borderColor0:'#EF5350'}}];
+            Object.keys(maSettings).forEach(p => { if(maSettings[p]) series.push({name:`MA${p}`,type:'line',data:Indicator.sma(closes,parseInt(p)),symbol:'none',lineStyle:{width,color:maCols[p],opacity:0.8}}); });
             myChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { 
-                    trigger: 'axis', 
-                    axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, 
-                    backgroundColor: tooltipBg, borderColor: chartSplitColor, textStyle: { color: tooltipText, fontSize: 11 },
-                    formatter: (ps) => {
-                        const idx = ps[0].dataIndex;
-                        const curr = closes[idx];
-                        const prev = idx > 0 ? closes[idx - 1] : null;
-                        let r = `<div style="font-weight:900; margin-bottom:6px; border-bottom:1px solid ${chartSplitColor}; padding-bottom:4px;">${dates[idx]}</div>`;
-                        if (prev !== null && curr !== null) {
-                            const diff = curr - prev, pct = (diff / prev) * 100, color = diff >= 0 ? '#26A69A' : '#EF5350', sign = diff > 0 ? '+' : '';
-                            r += `<div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
-                                    <span style="color:${chartTextColor}; font-size:10px;">전일 대비 변동:</span>
-                                    <b style="color:${color}; font-family:monospace; font-size:13px;">${sign}${pct.toFixed(2)}%</b>
-                                  </div>`;
-                        } else { r += `<span style="color:${chartTextColor};">데이터 없음</span>`; }
-                        return r;
-                    }
-                },
-                grid: [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
-                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
-                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
-                series: series
+                backgroundColor:'transparent', grid:{left:'2%',right:'2%',top:'5%',bottom:'15%',containLabel:true},
+                xAxis:{type:'category',data:dates,axisLabel:{color:'var(--text-muted)',fontSize:10}},
+                yAxis:{scale:true,splitLine:{lineStyle:{color:'var(--border-color)'}},axisLabel:{color:'var(--text-muted)'}},
+                tooltip:{trigger:'axis',formatter:ps=>{ const idx=ps[0].dataIndex, c=closes[idx], p=idx>0?closes[idx-1]:null; return `<div style="font-size:10px;color:#999">${dates[idx]}</div><b style="color:${c>=p?'#26A69A':'#EF5350'}">${p?((c-p)/p*100).toFixed(2)+'%':'-'}</b>`; }},
+                dataZoom:[{type:'inside',start:70,end:100}], series
             }, true);
-        }
-
-        // ==========================================
-        // 📈 포트폴리오 메인 화면 차트
-        // ==========================================
-        function initPortfolioChart() {
-            pfChart = echarts.init(document.getElementById('chart-portfolio'));
-            renderPortfolioChart();
-        }
-
-        function renderPortfolioChart() {
-            const styleColor = getComputedStyle(document.documentElement);
-            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-
-            pfChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', backgroundColor: 'rgba(21, 25, 33, 0.9)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 11 } },
-                legend: { data: ['S&P 500 (SPY)', '올웨더', 'BAA 전략 (Bold)'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
-                grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
-                xAxis: { type: 'category', data: pfSimData.years, axisLabel: { color: chartTextColor } },
-                yAxis: { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
-                series: [
-                    { name: 'S&P 500 (SPY)', type: 'line', data: [100, 60, 85, 110, 65, 100, 120, 180, 210, 270, 320, 380, 480], smooth: true, lineStyle: { color: '#EF5350', width: 2 }, showSymbol: false },
-                    { name: '올웨더', type: 'line', data: pfSimData['allweather'], smooth: true, lineStyle: { color: '#3B82F6', width: 2 }, showSymbol: false },
-                    { name: 'BAA 전략 (Bold)', type: 'line', data: pfSimData['baa'], smooth: true, lineStyle: { color: '#10B981', width: 3 }, showSymbol: false }
-                ]
-            });
         }
 
         async function runLiveMomentumCalc() {
             const tbody = document.getElementById('live-calc-tbody');
-            const loading = document.getElementById('live-calc-loading');
-            const content = document.getElementById('live-calc-content');
-            
-            loading.style.display = 'flex';
-            content.style.display = 'none';
-            tbody.innerHTML = '';
-
+            document.getElementById('live-calc-loading').style.display='flex';
+            document.getElementById('live-calc-content').style.display='none';
             try {
-                const reqs = ['SPY', 'VEA', 'BIL', 'AGG'].map(t => 
-                    fetchWithRetry(`/api/stock/${t}?interval=1mo&range=2y`).then(r => r.json())
-                );
-                
-                const [spyRes, veaRes, bilRes, aggRes] = await Promise.all(reqs);
-                
-                const getMonthlyCloses = (res) => {
-                    const q = res.chart.result[0].indicators.quote[0].close;
-                    const ts = res.chart.result[0].timestamp;
-                    let arr = [];
-                    for(let i=0; i<ts.length; i++) {
-                        if(q[i] !== null) {
-                            const date = new Date(ts[i]*1000);
-                            arr.push({ date: `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}`, price: q[i] });
-                        }
-                    }
-                    return arr;
-                };
-
-                const spyData = getMonthlyCloses(spyRes);
-                const veaData = getMonthlyCloses(veaRes);
-                const bilData = getMonthlyCloses(bilRes);
-
-                let rowsHtml = '';
-                const len = spyData.length;
-                for(let i = len - 1; i >= len - 4; i--) {
-                    if(i - 12 < 0) break;
-                    
-                    const monthLabel = spyData[i].date;
-                    const calcRet = (dataArray) => ((dataArray[i].price / dataArray[i-12].price) - 1) * 100;
-                    
-                    const spyRet = calcRet(spyData);
-                    const veaRet = calcRet(veaData);
-                    const bilRet = calcRet(bilData);
-                    
-                    let winner = '';
-                    let winnerColor = '';
-                    if (spyRet < bilRet && veaRet < bilRet) {
-                        winner = 'AGG (대피)'; 
-                        winnerColor = 'text-gray-400';
-                    } else if (spyRet > veaRet) {
-                        winner = 'SPY (미국)';
-                        winnerColor = 'text-up';
-                    } else {
-                        winner = 'VEA (선진국)';
-                        winnerColor = 'text-accent';
-                    }
-
-                    rowsHtml += `
-                        <tr>
-                            <td>${monthLabel}</td>
-                            <td class="${spyRet>0?'text-up':'text-down'}">${spyRet > 0 ? '+' : ''}${spyRet.toFixed(2)}%</td>
-                            <td class="${veaRet>0?'text-up':'text-down'}">${veaRet > 0 ? '+' : ''}${veaRet.toFixed(2)}%</td>
-                            <td class="text-gray-400">+${bilRet.toFixed(2)}%</td>
-                            <td class="text-right ${winnerColor} font-black">${winner}</td>
-                        </tr>
-                    `;
+                const res = await Promise.all(['SPY','VEA','BIL','AGG'].map(t=>fetchWithRetry(`/api/stock/${t}?interval=1mo&range=2y`).then(r=>r.json())));
+                const getC = r => { const q=r.chart.result[0].indicators.quote[0].close, ts=r.chart.result[0].timestamp; return ts.map((t,i)=>({d:new Date(t*1000), p:q[i]})); };
+                const s=getC(res[0]), v=getC(res[1]), b=getC(res[2]);
+                let h=''; for(let i=s.length-1; i>=s.length-4; i--) {
+                    const sr=(s[i].p/s[i-12].p-1)*100, vr=(v[i].p/v[i-12].p-1)*100, br=(b[i].p/b[i-12].p-1)*100;
+                    let win = sr<br&&vr<br?'AGG (Safe)':(sr>vr?'SPY (US)':'VEA (Int)');
+                    h+=`<tr><td>${s[i].d.getFullYear()}.${s[i].d.getMonth()+1}</td><td>${sr.toFixed(2)}%</td><td>${vr.toFixed(2)}%</td><td>${br.toFixed(2)}%</td><td class="text-right font-black ${win.includes('SPY')?'text-up':'text-accent'}">${win}</td></tr>`;
                 }
-                
-                tbody.innerHTML = rowsHtml;
-                loading.style.display = 'none';
-                content.style.display = 'block';
-
-            } catch (error) {
-                loading.innerHTML = `<p class="text-down text-xs">데이터를 가져오는데 실패했습니다. (API 제한)</p>`;
-                console.error(error);
-            }
+                tbody.innerHTML=h; document.getElementById('live-calc-loading').style.display='none'; document.getElementById('live-calc-content').style.display='block';
+            } catch(e){ console.error(e); }
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            try {
-                myChart = echarts.init(document.getElementById('chart-main'));
-                document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); };
-                
-                // 설정 적용
-                setTheme(savedTheme);
-                setFontSize(savedFontSize);
-                document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
-                const lbtn = document.getElementById(`btn-line-${chartLineWidth}`);
-                if(lbtn) lbtn.classList.add('active');
-                updateMAButtons();
-                
-                // 엔터키 검색 방지
-                document.getElementById('pf-compare-input').addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        comparePortfolioStock();
-                    }
-                });
+        function setTheme(t) { document.documentElement.className=t; safeStorageSet('dashboardTheme',t); document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`btn-${t}`).classList.add('active'); if(globalChartData) renderDashboard(globalTicker, globalChartData); }
+        function setFontSize(s) { document.documentElement.style.fontSize={sm:'14px',md:'16px',lg:'18px'}[s]; safeStorageSet('dashboardFontSize',s); document.querySelectorAll("[id^='btn-font-']").forEach(b=>b.classList.remove('active')); document.getElementById(`btn-font-${s}`).classList.add('active'); myChart?.resize(); }
+        function setLineWidth(w) { chartLineWidth=w; safeStorageSet('dashboardLineWidth',w); document.querySelectorAll("[id^='btn-line-']").forEach(b=>b.classList.remove('active')); document.getElementById(`btn-line-${w}`).classList.add('active'); if(globalChartData) renderDashboard(globalTicker, globalChartData); }
+        function toggleMA(p) { maSettings[p]=!maSettings[p]; updateMAButtons(); if(globalChartData) renderDashboard(globalTicker, globalChartData); }
 
-                setTimeout(() => { if(myChart) myChart.resize(); loadData('SPY'); }, 100);
-                window.addEventListener('resize', () => { 
-                    if(myChart) myChart.resize(); 
-                    if(pfChart) pfChart.resize();
-                    if(pfPieChart) pfPieChart.resize();
-                    if(pfModalChart) pfModalChart.resize();
-                });
-            } catch(e) { console.error("Init Error:", e); }
+        document.addEventListener("DOMContentLoaded", () => {
+            myChart = echarts.init(document.getElementById('chart-main'));
+            document.getElementById('search-form').onsubmit = e => { e.preventDefault(); loadData(document.getElementById('ticker-input').value.toUpperCase()); };
+            setTheme(savedTheme); setFontSize(savedFontSize); setLineWidth(chartLineWidth); updateMAButtons();
+            loadData('SPY'); window.addEventListener('resize', () => { myChart?.resize(); pfChart?.resize(); });
         });
     </script>
 </body>
