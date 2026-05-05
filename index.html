@@ -98,7 +98,7 @@
         #loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 1rem; flex-direction: column; }
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 1rem; }
         .modal-content { max-width: 500px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-        .modal-content-large { max-width: 900px; } 
+        .modal-content-large { max-width: 850px; } 
         
         .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
@@ -125,6 +125,7 @@
 
         .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column;}
         .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(59,130,246,0.3); }
+        .pf-badge { font-size: 0.55rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); color: var(--text-main); white-space: nowrap; }
         
         /* 라이브 테이블 & 증명 영역 스타일 */
         .calc-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
@@ -260,7 +261,7 @@
             </div>
             
             <div class="py-2">
-                <!-- 자산배분 설명 복구 영역 -->
+                <!-- 자산배분 설명 영역 -->
                 <div id="pf-modal-desc" class="text-[0.75rem] md:text-[0.8rem] text-themeMuted mb-4 leading-relaxed bg-themeBorder/10 p-4 md:p-5 rounded-xl border border-themeBorder shadow-inner"></div>
 
                 <div class="flex flex-row gap-2 md:gap-4 mb-4">
@@ -299,15 +300,33 @@
                         </label>
                     </div>
                     
-                    <!-- 라이브 백테스트 요약 결과 -->
-                    <div id="pf-live-summary" class="hidden m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between">
-                        <div>
-                            <p class="text-[0.65rem] font-black text-emerald-500 uppercase tracking-widest mb-1">최근 12개월 실시간 운용 성과</p>
-                            <p class="text-xs text-themeMuted">현재 전략대로 투자 시 실제 수익률 (API 기반)</p>
+                    <!-- 기간 선택형 라이브 백테스트 요약 결과 -->
+                    <div id="pf-live-summary" class="flex-col m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl" style="display: none;">
+                        <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2 mb-3">
+                            <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest">실시간 운용 성과 시뮬레이션</p>
+                            <select id="pf-live-period-select" class="bg-black/40 border border-themeBorder text-themeText text-[0.65rem] md:text-xs rounded px-2 py-1 outline-none font-bold cursor-pointer transition focus:border-accent" onchange="if(window.updateLiveSummary) window.updateLiveSummary(parseInt(this.value))">
+                                <option value="1">최근 1개월</option>
+                                <option value="2">최근 2개월</option>
+                                <option value="3">최근 3개월</option>
+                                <option value="4">최근 4개월</option>
+                                <option value="5">최근 5개월</option>
+                                <option value="6">최근 6개월</option>
+                                <option value="7">최근 7개월</option>
+                                <option value="8">최근 8개월</option>
+                                <option value="9">최근 9개월</option>
+                                <option value="10">최근 10개월</option>
+                                <option value="11">최근 11개월</option>
+                                <option value="12" selected>최근 12개월</option>
+                            </select>
                         </div>
-                        <div class="text-right">
-                            <p id="pf-live-summary-cagr" class="text-2xl font-black text-themeText">--</p>
-                            <p class="text-xs font-bold text-themeMuted mt-1">MDD: <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[0.65rem] md:text-xs text-themeMuted">선택 기간 실제 누적 수익률</p>
+                            </div>
+                            <div class="text-right">
+                                <p id="pf-live-summary-cagr" class="text-2xl md:text-3xl font-black text-themeText">--</p>
+                                <p class="text-[0.65rem] md:text-xs font-bold text-themeMuted mt-1">기간 내 MDD: <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
+                            </div>
                         </div>
                     </div>
 
@@ -566,7 +585,7 @@
             </div>
 
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
-                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 (2000~)</h3>
+                <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 시뮬레이션 (Base 100)</h3>
                 <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
             </div>
         </div>
@@ -1086,7 +1105,7 @@
             setTimeout(() => pfChart.resize(), 100);
         }
 
-        // 모달 띄우기 로직 (설명 렌더링 수정 포함)
+        // 모달 띄우기 및 정보 세팅 (설명 렌더링 수정 포함)
         function showPfDetail(pfKey) {
             currentPfKey = pfKey; const data = pfDetails[pfKey];
             if(!data) return;
@@ -1102,8 +1121,8 @@
             document.getElementById('pf-modal-cagr').innerText = data.cagr;
             document.getElementById('pf-modal-mdd').innerText = data.mdd;
             
-            // 모달 안의 규칙 렌더링 시 display:flex 충돌 해결을 위해 div 래퍼 사용
-            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1 text-[0.7rem] md:text-[0.75rem] leading-relaxed">${r}</div></li>`).join('');
+            // Flexbox에서 텍스트 줄바꿈 충돌 방지를 위해 div.flex-1로 감싸줌
+            document.getElementById('pf-modal-rules').innerHTML = data.rules.map(r => `<li><div class="flex-1">${r}</div></li>`).join('');
             document.getElementById('pf-compare-input').value = '';
             
             const pieArea = document.getElementById('pf-modal-pie-area');
@@ -1259,49 +1278,50 @@
                 else if(pfKey === 'baa') html += `<th>최저 카나리아</th><th>안전 대피?</th>`;
                 html += `<th class="text-right">투자 비중</th></tr></thead><tbody>`;
 
-                const calcScore = (t, currIdx) => {
-                    const currYM = sortedMonths[currIdx];
-                    const m1YM = sortedMonths[currIdx-1], m3YM = sortedMonths[currIdx-3], m6YM = sortedMonths[currIdx-6], m12YM = sortedMonths[currIdx-12];
-                    
-                    const P0 = dataMap[t][currYM], P1 = m1YM ? dataMap[t][m1YM] : null, P3 = m3YM ? dataMap[t][m3YM] : null, P6 = m6YM ? dataMap[t][m6YM] : null, P12 = m12YM ? dataMap[t][m12YM] : null;
-
-                    if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `<span class="text-rose-400">[${t}] 과거 12개월 데이터 부족</span>` };
-
-                    const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
-                    const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
-                    
-                    const proof = `
-                        <div class="mb-2 pb-2 border-b border-themeBorder/50">
-                            <span class="text-accent font-bold">[${t}] 모멘텀 계산:</span><br>
-                            <span class="text-[0.6rem] leading-relaxed">
-                            • 1M 수익: ${(r1*100).toFixed(2)}% × 12 = ${(r1*12*100).toFixed(2)}<br>
-                            • 3M 수익: ${(r3*100).toFixed(2)}% × 4 = ${(r3*4*100).toFixed(2)}<br>
-                            • 6M 수익: ${(r6*100).toFixed(2)}% × 2 = ${(r6*2*100).toFixed(2)}<br>
-                            • 12M 수익: ${(r12*100).toFixed(2)}% × 1 = ${(r12*100).toFixed(2)}
-                            </span><br>
-                            <span class="text-white font-bold">👉 가중 합산 스코어: ${score.toFixed(2)}</span>
-                        </div>`;
-                    
-                    return { score, proof };
-                };
-
-                const calcRet = (t, currIdx) => {
-                    const currYM = sortedMonths[currIdx], m12YM = sortedMonths[currIdx-12];
-                    const P0 = dataMap[t][currYM], P12 = m12YM ? dataMap[t][m12YM] : null;
-                    
-                    if(!P0 || !P12) return { ret: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
-                    const ret = (P0/P12 - 1) * 100;
-                    const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) $${P0.toFixed(2)} / 과거(${m12YM}) $${P12.toFixed(2)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
-                    return { ret, proof };
-                };
-
+                // 시뮬레이션을 위해 각 시점별 시그널(계산 결과)을 한 번씩 구해서 저장
                 const getSignal = (idx) => {
                     if(idx - 12 < 0) return null;
                     let result = { assets: [], text: '', proofs: [], color: '' };
+                    const currYM = sortedMonths[idx];
                     
+                    // 내부 헬퍼 함수
+                    const calcScore = (t) => {
+                        const m1YM = sortedMonths[idx-1], m3YM = sortedMonths[idx-3], m6YM = sortedMonths[idx-6], m12YM = sortedMonths[idx-12];
+                        const P0 = dataMap[t][currYM], P1 = m1YM ? dataMap[t][m1YM] : null, P3 = m3YM ? dataMap[t][m3YM] : null, P6 = m6YM ? dataMap[t][m6YM] : null, P12 = m12YM ? dataMap[t][m12YM] : null;
+
+                        if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `<span class="text-rose-400">[${t}] 과거 12개월 데이터 부족</span>` };
+
+                        const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
+                        const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
+                        
+                        const proof = `
+                            <div class="mb-2 pb-2 border-b border-themeBorder/50">
+                                <span class="text-accent font-bold">[${t}] 모멘텀 계산:</span><br>
+                                <span class="text-[0.6rem] leading-relaxed">
+                                • 1M 수익: ${(r1*100).toFixed(2)}% × 12 = ${(r1*12*100).toFixed(2)}<br>
+                                • 3M 수익: ${(r3*100).toFixed(2)}% × 4 = ${(r3*4*100).toFixed(2)}<br>
+                                • 6M 수익: ${(r6*100).toFixed(2)}% × 2 = ${(r6*2*100).toFixed(2)}<br>
+                                • 12M 수익: ${(r12*100).toFixed(2)}% × 1 = ${(r12*100).toFixed(2)}
+                                </span><br>
+                                <span class="text-white font-bold">👉 가중 합산 스코어: ${score.toFixed(2)}</span>
+                            </div>`;
+                        return { score, proof };
+                    };
+
+                    const calcRet = (t) => {
+                        const m12YM = sortedMonths[idx-12];
+                        const P0 = dataMap[t][currYM], P12 = m12YM ? dataMap[t][m12YM] : null;
+                        
+                        if(!P0 || !P12) return { ret: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
+                        const ret = (P0/P12 - 1) * 100;
+                        const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) $${P0.toFixed(2)} / 과거(${m12YM}) $${P12.toFixed(2)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
+                        return { ret, proof };
+                    };
+
                     if(pfKey === 'dual') {
-                        const s = calcRet('SPY', idx), v = calcRet('VEA', idx), b = calcRet('BIL', idx);
+                        const s = calcRet('SPY'), v = calcRet('VEA'), b = calcRet('BIL');
                         result.proofs.push(s.proof, v.proof, b.proof);
+                        result.raw = { s, v, b };
                         if(s.ret === -999 || v.ret === -999 || b.ret === -999) return null;
                         
                         if(s.ret < b.ret && v.ret < b.ret) { result.assets=[{t:'AGG', w:1}]; result.text='AGG 100%'; result.color='text-gray-400'; }
@@ -1309,8 +1329,9 @@
                         else { result.assets=[{t:'VEA', w:1}]; result.text='VEA 100%'; result.color='text-accent'; }
                     }
                     else if(pfKey === 'vaa') {
-                        const ss=calcScore('SPY',idx), vs=calcScore('VEA',idx), vws=calcScore('VWO',idx), as=calcScore('AGG',idx);
+                        const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), as=calcScore('AGG');
                         result.proofs.push(ss.proof, vs.proof, vws.proof, as.proof);
+                        result.raw = { ss, vs, vws, as };
                         if(ss.score===-999) return null;
                         
                         if(ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) {
@@ -1318,7 +1339,7 @@
                             const t = ss.score===m?'SPY':(vs.score===m?'VEA':(vws.score===m?'VWO':'AGG'));
                             result.assets=[{t, w:1}]; result.text=`${t} 100% (공격)`; result.color='text-up';
                         } else {
-                            const lq=calcScore('LQD',idx), ie=calcScore('IEF',idx), sh=calcScore('SHY',idx);
+                            const lq=calcScore('LQD'), ie=calcScore('IEF'), sh=calcScore('SHY');
                             result.proofs.push(lq.proof, ie.proof, sh.proof);
                             const m = Math.max(lq.score, ie.score, sh.score);
                             const t = lq.score===m?'LQD':(ie.score===m?'IEF':'SHY');
@@ -1326,8 +1347,9 @@
                         }
                     }
                     else if(pfKey === 'daa') {
-                        const vws=calcScore('VWO',idx), bns=calcScore('BND',idx);
+                        const vws=calcScore('VWO'), bns=calcScore('BND');
                         result.proofs.push(vws.proof, bns.proof);
+                        result.raw = { vws, bns };
                         if(vws.score===-999) return null;
                         
                         if(vws.score>0 && bns.score>0) {
@@ -1337,8 +1359,9 @@
                         }
                     }
                     else if(pfKey === 'baa') {
-                        const ss=calcScore('SPY',idx), vs=calcScore('VEA',idx), vws=calcScore('VWO',idx), bns=calcScore('BND',idx);
+                        const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), bns=calcScore('BND');
                         result.proofs.push(ss.proof, vs.proof, vws.proof, bns.proof);
+                        result.raw = { ss, vs, vws, bns };
                         if(ss.score===-999) return null;
                         
                         const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
@@ -1353,6 +1376,56 @@
 
                 // 최근 12개월 테이블 생성
                 const len = sortedMonths.length;
+                
+                // summary를 그리기 위한 데이터를 클로저로 저장
+                window.updateLiveSummary = function(monthsCount) {
+                    let portValue = 100;
+                    let peak = 100;
+                    let mdd = 0;
+                    let monthsCalculated = 0;
+
+                    const endIdx = len - 2; 
+                    const startIdx = endIdx - monthsCount;
+
+                    for (let i = startIdx; i < endIdx; i++) {
+                        if(i < 12) continue;
+
+                        const sig = getSignal(i); 
+                        if(!sig) continue;
+
+                        let monRet = 0;
+                        let hasData = true;
+                        for(let asset of sig.assets) {
+                            const p0 = dataMap[asset.t][sortedMonths[i]];
+                            const p1 = dataMap[asset.t][sortedMonths[i+1]]; 
+                            if(p0 && p1) {
+                                monRet += asset.w * (p1 / p0 - 1);
+                            } else {
+                                hasData = false;
+                            }
+                        }
+
+                        if(hasData) {
+                            portValue *= (1 + monRet);
+                            if(portValue > peak) peak = portValue;
+                            let dd = (portValue - peak) / peak;
+                            if(dd < mdd) mdd = dd;
+                            monthsCalculated++;
+                        }
+                    }
+
+                    if(monthsCalculated > 0) {
+                        const finalRet = ((portValue / 100) - 1) * 100;
+                        summaryCagr.innerText = `${finalRet > 0 ? '+' : ''}${finalRet.toFixed(2)}%`;
+                        summaryCagr.className = `text-2xl md:text-3xl font-black ${finalRet > 0 ? 'text-up' : 'text-down'}`;
+                        summaryMdd.innerText = `${(mdd * 100).toFixed(2)}%`;
+                        summaryMdd.className = `text-sm font-bold ml-1 ${mdd < -0.05 ? 'text-down' : 'text-themeMuted'}`;
+                    } else {
+                        summaryCagr.innerText = `--`;
+                        summaryMdd.innerText = `--`;
+                    }
+                };
+
                 for(let i = len - 1; i >= len - 12; i--) {
                     if(i - 12 < 0) break;
                     
@@ -1362,20 +1435,20 @@
                     let row = `<tr><td class="text-left font-bold text-accent">${sortedMonths[i]}</td>`;
                     
                     if(pfKey === 'dual') {
-                        const s = calcRet('SPY', i), v = calcRet('VEA', i), b = calcRet('BIL', i);
+                        const { s, v, b } = sig.raw;
                         row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td><td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td><td class="text-gray-400">+${b.ret.toFixed(2)}%</td>`;
                     }
                     else if(pfKey === 'vaa') {
-                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), as = calcScore('AGG', i);
+                        const { ss, vs, vws, as } = sig.raw;
                         row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td><td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td><td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td>`;
                     }
                     else if(pfKey === 'daa') {
-                        const vws = calcScore('VWO', i), bns = calcScore('BND', i);
+                        const { vws, bns } = sig.raw;
                         let def = (vws.score <= 0 || bns.score <= 0) ? 'YES (위험)' : 'NO (안전)';
                         row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
                     }
                     else if(pfKey === 'baa') {
-                        const ss = calcScore('SPY', i), vs = calcScore('VEA', i), vws = calcScore('VWO', i), bns = calcScore('BND', i);
+                        const { ss, vs, vws, bns } = sig.raw;
                         const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
                         let def = minS <= 0 ? 'YES (대피 발동)' : 'NO (안전)';
                         row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
@@ -1390,48 +1463,11 @@
                 html += `</tbody>`;
                 tbody.innerHTML = html;
 
-                // 12개월 실시간 운용 성과 시뮬레이션
-                let portValue = 100;
-                let peak = 100;
-                let mdd = 0;
-                let monthsCalculated = 0;
-
-                // len-1 이 최근 달이므로, 12개월 전인 len-13에서 발생한 시그널을 바탕으로 len-12 ~ len-1 까지의 수익률을 누적함
-                for (let i = len - 13; i < len - 1; i++) {
-                    if(i < 12) continue;
-
-                    const sig = getSignal(i); 
-                    if(!sig) continue;
-
-                    let monRet = 0;
-                    let hasData = true;
-                    for(let asset of sig.assets) {
-                        const p0 = dataMap[asset.t][sortedMonths[i]];
-                        const p1 = dataMap[asset.t][sortedMonths[i+1]]; // 1개월 뒤 종가
-                        if(p0 && p1) {
-                            monRet += asset.w * (p1 / p0 - 1);
-                        } else {
-                            hasData = false;
-                        }
-                    }
-
-                    if(hasData) {
-                        portValue *= (1 + monRet);
-                        if(portValue > peak) peak = portValue;
-                        let dd = (portValue - peak) / peak;
-                        if(dd < mdd) mdd = dd;
-                        monthsCalculated++;
-                    }
-                }
-
-                if(monthsCalculated > 0) {
-                    const finalRet = ((portValue / 100) - 1) * 100;
-                    summaryCagr.innerText = `${finalRet > 0 ? '+' : ''}${finalRet.toFixed(2)}%`;
-                    summaryCagr.className = `text-2xl md:text-3xl font-black ${finalRet > 0 ? 'text-up' : 'text-down'}`;
-                    summaryMdd.innerText = `${(mdd * 100).toFixed(2)}%`;
-                    summaryMdd.className = `text-sm font-bold ml-1 ${mdd < -0.05 ? 'text-down' : 'text-themeMuted'}`;
-                    if(summaryBox) summaryBox.style.display = 'flex';
-                }
+                // 초기 서머리 12개월로 설정 및 표시
+                const selectEl = document.getElementById('pf-live-period-select');
+                if(selectEl) selectEl.value = "12";
+                window.updateLiveSummary(12);
+                if(summaryBox) summaryBox.style.display = 'flex';
 
                 loading.style.display = 'none';
                 content.style.display = 'block';
