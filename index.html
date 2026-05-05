@@ -142,6 +142,7 @@
                 </h3>
                 <button type="button" onclick="closeSettingsModal()" class="text-themeMuted hover:text-accent transition p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
+            
             <div class="space-y-6">
                 <div>
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">배경 테마</p>
@@ -153,6 +154,7 @@
                         <div class="flex flex-col items-center gap-1"><button type="button" onclick="setTheme('theme-green')" id="btn-theme-green" class="theme-btn" style="background-color: #022c22;"></button><span class="text-[0.6rem] text-themeMuted font-bold">Green</span></div>
                     </div>
                 </div>
+
                 <div class="border-t border-themeBorder pt-4">
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">글자 크기 조절</p>
                     <div class="flex gap-2">
@@ -161,6 +163,7 @@
                         <button type="button" onclick="setFontSize('lg')" id="btn-font-lg" class="setting-btn">크게</button>
                     </div>
                 </div>
+
                 <div class="border-t border-themeBorder pt-4">
                     <p class="text-[0.7rem] text-themeMuted font-bold mb-3 uppercase tracking-widest">차트 선 굵기</p>
                     <div class="flex gap-2">
@@ -318,6 +321,7 @@
                         <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
                     </div>
                     
+                    <!-- 에러 보기 버튼 (히든 디폴트) -->
                     <button type="button" onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 border border-rose-500/50 rounded-xl text-rose-500 hover:bg-rose-500 hover:text-white transition shadow-sm">
                         <svg class="icon-md" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     </button>
@@ -758,7 +762,8 @@
                 updateStatus("LIVE DATA", "bg-emerald-500");
                 renderDashboard(ticker, d);
                 
-                calculateTriplePerspectiveDecision(ticker).catch(e => logError("Triple Calc Error", e));
+                // 에러 발생 시 catch 로직 처리
+                calculateTriplePerspectiveDecision(ticker);
 
             } catch (e) { 
                 if (e.name !== 'AbortError') {
@@ -863,49 +868,77 @@
                 const dJson = await dRes.json();
                 const wJson = await wRes.json();
 
-                if(!dJson.chart.result || !wJson.chart.result) throw new Error("Empty result");
-                let { kData, closes } = extractCleanData(data.chart.result[0]);
+                if(!dJson.chart || !dJson.chart.result || !wJson.chart || !wJson.chart.result) throw new Error("Empty result");
                 
-                if(closes.length < 120) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0" };
-                
-                const last = closes.length - 1;
-                const rsi = Indicator.rsi(closes, 14)[last] || 50;
-                const macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0;
-                const sma = Indicator.sma(closes, 120)[last] || closes[last];
-                const stoch = Indicator.stochastic(kData, 14, 3).k[last] || 50;
-                const dist = ((closes[last] - sma) / sma) * 100;
-                
-                let buy = 0, sell = 0;
-                if (closes[last] > sma) buy += weight.ma; else sell += weight.ma;
-                if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
-                if (macd > 0) buy += weight.macd; else sell += weight.macd;
-                if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
-                
-                let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
+                const analyze = (data, weight) => {
+                    if(!data || !data.indicators || !data.indicators.quote[0].close) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0" };
+                    let { kData, closes } = extractCleanData(data);
+                    
+                    if(closes.length < 120) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0" };
+                    
+                    const last = closes.length - 1;
+                    const rsi = Indicator.rsi(closes, 14)[last] || 50;
+                    const macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0;
+                    const sma = Indicator.sma(closes, 120)[last] || closes[last];
+                    const stoch = Indicator.stochastic(kData, 14, 3).k[last] || 50;
+                    const bb = Indicator.bollinger(closes, 20, 2);
+                    const dist = ((closes[last] - sma) / sma) * 100;
+                    
+                    let buy = 0, sell = 0;
+                    if (closes[last] > sma) buy += weight.ma; else sell += weight.ma;
+                    if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
+                    if (macd > 0) buy += weight.macd; else sell += weight.macd;
+                    if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
+                    
+                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
 
-                return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1) };
-            };
+                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1) };
+                };
 
-            const st = analyze(dJson, { ma: 0.5, rsi: 1.8, macd: 1.5 });
-            const mt = analyze(dJson, { ma: 1.5, rsi: 1.0, macd: 1.2 });
-            const lt = analyze(wJson, { ma: 3.0, rsi: 0.5, macd: 0.5 });
-            
-            analysisDetails = { 
-                short: {...st, summary: "단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 스윙 포지션에 적합합니다." }, 
-                mid: {...mt, summary: "중기 이평선과 밴드를 분석한 결과입니다.", advice: "일봉, 주봉의 추세가 일치하는지 확인하세요." }, 
-                long: {...lt, summary: "장기 펀더멘털 결과입니다.", advice: "장기 우상향 시 하락 노이즈는 매수 기회입니다." } 
-            };
-            
-            const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm md:text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
-            up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
-            
-            const uiUpdate = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } }
-            uiUpdate('val-ma-dist', `${st.maDist>0?'+':''}${st.maDist}%`, st.maDist>0?'#26A69A':'#EF5350');
-            uiUpdate('val-rsi-main', st.rsi); uiUpdate('val-macd-main', st.macd); uiUpdate('val-stoch-main', st.stoch);
+                const st = analyze(dJson.chart.result[0], { ma: 0.5, rsi: 1.8, macd: 1.5 });
+                const mt = analyze(dJson.chart.result[0], { ma: 1.5, rsi: 1.0, macd: 1.2 });
+                const lt = analyze(wJson.chart.result[0], { ma: 3.0, rsi: 0.5, macd: 0.5 });
+                
+                analysisDetails = { 
+                    short: {...st, summary: "단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 스윙 포지션에 적합합니다." }, 
+                    mid: {...mt, summary: "중기 이평선과 밴드를 분석한 결과입니다.", advice: "일봉, 주봉의 추세가 일치하는지 확인하세요." }, 
+                    long: {...lt, summary: "장기 펀더멘털 결과입니다.", advice: "장기 우상향 시 하락 노이즈는 매수 기회입니다." } 
+                };
+                
+                const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm md:text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
+                up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
+                
+                const uiUpdate = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } }
+                uiUpdate('val-ma-dist', `${st.maDist>0?'+':''}${st.maDist}%`, st.maDist>0?'#26A69A':'#EF5350');
+                uiUpdate('val-rsi-main', st.rsi); uiUpdate('val-macd-main', st.macd); uiUpdate('val-stoch-main', st.stoch);
+            } catch (e) {
+                logError("Calculate Signals Error", e);
+                ['st-signal-text', 'mt-signal-text', 'lt-signal-text'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) { el.innerText = "ERROR"; el.className = "text-sm font-black italic text-down uppercase"; }
+                });
+            }
+        }
+
+        function showDetail(p) {
+            const m = document.getElementById('detail-modal');
+            const d = analysisDetails[p];
+            if (!d || !d.status) return;
+            document.getElementById('modal-title').innerText = `${p.toUpperCase()} View`;
+            document.getElementById('modal-body').innerHTML = `
+                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center">
+                    <span class="text-3xl font-black italic status-${d.status.replace(/ /g, '-')} uppercase">${d.status}</span>
+                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
+                </div>
+                <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder mt-4">
+                    <p class="text-[11px] font-black text-emerald-500 mb-2">전략적 조언</p>
+                    <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
+                </div>`;
+            m.style.display = 'flex';
         }
 
         // ==========================================
-        // 뷰 2: 포트폴리오 백테스트 및 라이브 엔진
+        // 뷰 2: 포트폴리오 차트 및 라이브 엔진
         // ==========================================
         function initPortfolioChart() {
             if(!document.getElementById('chart-portfolio')) return;
@@ -935,7 +968,6 @@
             setTimeout(() => pfChart.resize(), 100);
         }
 
-        // 모달 띄우기 로직 복구
         function showPfDetail(pfKey) {
             currentPfKey = pfKey; const data = pfDetails[pfKey];
             if(!data) return;
@@ -970,7 +1002,7 @@
                 pfModalChart.setOption({
                     backgroundColor: 'transparent',
                     tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 11 } },
-                    legend: { data: [data.title], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
+                    legend: { data: [data.title], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
                     grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
                     xAxis: { type: 'category', data: pfSimData.years, axisLabel: { color: chartTextColor } },
                     yAxis: { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
@@ -1067,7 +1099,6 @@
                 const dataMap = {};
                 let unifiedMonths = new Set();
                 
-                // 직렬 다운로드로 API 과부하 100% 차단
                 for(let i=0; i<tickers.length; i++) {
                     const t = tickers[i];
                     document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t} 데이터`;
@@ -1150,7 +1181,7 @@
 
             } catch (error) {
                 logError(`Live Engine Failed (${pfKey})`, error);
-                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 호출 실패.<br>우측 상단 [!] 를 확인하세요.</p>`;
+                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드 실패 (Rate Limit)<br>잠시 후 다시 열어주세요.</p>`;
             }
         }
 
