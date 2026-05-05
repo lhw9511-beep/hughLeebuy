@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BUY or BYE | AI Precision Analysis</title>
+    
+    <!-- 폰트 로드 추가 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -27,44 +34,24 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
         :root, .theme-default {
-            --bg-color: #0B0E11;
-            --panel-color: rgba(21, 25, 33, 0.8);
-            --modal-bg: #151921;
-            --text-main: #ffffff;
-            --text-muted: #9CA3AF;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-color: #0B0E11; --panel-color: rgba(21, 25, 33, 0.8); --modal-bg: #151921;
+            --text-main: #ffffff; --text-muted: #9CA3AF; --border-color: rgba(255, 255, 255, 0.1);
         }
         .theme-light {
-            --bg-color: #f3f4f6;
-            --panel-color: rgba(255, 255, 255, 0.95);
-            --modal-bg: #ffffff;
-            --text-main: #111827;
-            --text-muted: #4b5563;
-            --border-color: rgba(0, 0, 0, 0.15);
+            --bg-color: #f3f4f6; --panel-color: rgba(255, 255, 255, 0.95); --modal-bg: #ffffff;
+            --text-main: #111827; --text-muted: #4b5563; --border-color: rgba(0, 0, 0, 0.15);
         }
         .theme-navy {
-            --bg-color: #0f172a;
-            --panel-color: rgba(30, 41, 59, 0.8);
-            --modal-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-color: #0f172a; --panel-color: rgba(30, 41, 59, 0.8); --modal-bg: #1e293b;
+            --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: rgba(255, 255, 255, 0.1);
         }
         .theme-purple {
-            --bg-color: #171026;
-            --panel-color: rgba(37, 26, 58, 0.8);
-            --modal-bg: #251a3a;
-            --text-main: #f3e8ff;
-            --text-muted: #a855f7;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-color: #171026; --panel-color: rgba(37, 26, 58, 0.8); --modal-bg: #251a3a;
+            --text-main: #f3e8ff; --text-muted: #a855f7; --border-color: rgba(255, 255, 255, 0.1);
         }
         .theme-green {
-            --bg-color: #022c22;
-            --panel-color: rgba(6, 78, 59, 0.8);
-            --modal-bg: #064e3b;
-            --text-main: #ecfdf5;
-            --text-muted: #34d399;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-color: #022c22; --panel-color: rgba(6, 78, 59, 0.8); --modal-bg: #064e3b;
+            --text-main: #ecfdf5; --text-muted: #34d399; --border-color: rgba(255, 255, 255, 0.1);
         }
 
         .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
@@ -128,13 +115,13 @@
         
         .calc-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
         .calc-table th { font-size: 0.6rem; color: var(--text-muted); text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
-        .calc-table td { font-size: 0.75rem; color: var(--text-main); font-family: monospace; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
+        .calc-table td { font-size: 0.75rem; color: var(--text-main); font-family: 'JetBrains Mono', monospace; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap; }
         .calc-table tr:last-child td { border-bottom: none; }
         
         .proof-row { display: none; background: rgba(0,0,0,0.2); }
         .proof-row.show { display: table-row; }
         .proof-cell { padding: 8px !important; border-bottom: 1px solid var(--border-color) !important; }
-        .proof-box { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 6px; font-family: monospace; font-size: 0.65rem; color: var(--text-muted); overflow-x: auto; line-height: 1.6; }
+        .proof-box { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-muted); overflow-x: auto; line-height: 1.6; }
         .proof-hl { color: #3B82F6; font-weight: bold; }
         
         .rule-list { list-style-type: none; padding-left: 0; margin-top: 10px; }
@@ -147,6 +134,7 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
+    <!-- 모달들은 동일하게 유지 -->
     <!-- 1. 설정 모달 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -294,17 +282,6 @@
                             <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 및 원데이터 증명 보기</span>
                         </label>
                     </div>
-                    
-                    <div id="pf-live-summary" class="m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between" style="display: none;">
-                        <div>
-                            <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">실시간 운용 성과 (최근 12개월)</p>
-                            <span class="bg-black/40 border border-themeBorder text-themeText text-[0.65rem] rounded px-2 py-1 font-bold">API 실시간</span>
-                        </div>
-                        <div class="text-right">
-                            <p id="pf-live-summary-cagr" class="text-2xl md:text-3xl font-black text-themeText">--</p>
-                            <p class="text-[0.65rem] md:text-xs font-bold text-themeMuted mt-1">기간 내 최대낙폭(MDD): <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
-                        </div>
-                    </div>
 
                     <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
                         <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
@@ -344,8 +321,8 @@
                 </div>
                 
                 <div class="flex items-center gap-2 md:gap-4">
-                    <!-- 글로벌 통화 전환 토글 버튼 추가 -->
-                    <button type="button" id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-[var(--modal-bg)] border border-accent/40 rounded-xl text-themeText font-black text-sm hover:bg-accent hover:text-white transition shadow-sm shadow-accent/20 w-14 text-center">
+                    <!-- 글로벌 통화 전환 토글 버튼 -->
+                    <button type="button" id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-[var(--modal-bg)] border border-accent/40 rounded-xl text-themeText font-black text-sm hover:bg-accent hover:text-white transition shadow-sm shadow-accent/20 w-16 text-center">
                         USD
                     </button>
 
@@ -737,14 +714,13 @@
         // 📊 글로벌 변수 및 공통 설정
         // ==========================================
         let myChart = null, cryptoChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
-        
         const API_BASE_URL = 'https://buy-or-bye.onrender.com'; 
 
-        // 환율 모드 글로벌 변수 ('USD' | 'KRW')
         let currentCurrency = safeStorageGet('dashboardCurrency', 'USD');
-        
-        // 캐싱용 객체
         let fxCache = {};
+        
+        // 메모리 캐싱 (동일 티커/기간 중복 호출 방지용)
+        const reqCache = new Map();
 
         // 주식 변수
         let maSettings = { 20: true, 50: true, 120: true, 200: true };
@@ -771,9 +747,8 @@
             'daa': [100, 105, 112, 115, 130, 142, 160, 175, 170, 195, 225, 235, 255, 290, 320],
             'baa': [100, 110, 118, 122, 140, 155, 180, 195, 195, 230, 270, 285, 310, 370, 400]
         };
-        // 2000년부터 2026년까지의 역사적 원/달러 환율 (연말 또는 연평균 기준 근사치)
         const fxSimData = [1260, 1186, 1035, 929, 1259, 1134, 1070, 1099, 1207, 1115, 1086, 1264, 1330, 1400, 1450];
-        const pfSimYears = Array.from({length: 15}, (_, i) => String(2000 + (i*2 >= 24 ? 24+(i-12) : i*2))); // 00,02..24, 25, 26
+        const pfSimYears = Array.from({length: 15}, (_, i) => String(2000 + (i*2 >= 24 ? 24+(i-12) : i*2)));
 
         const pfDetails = {
             '6040': { 
@@ -787,59 +762,49 @@
             },
             'permanent': { 
                 title: '영구 포트폴리오 (Permanent)', cagr: '6.5%', mdd: '-13.5%', type: 'static', 
-                desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절(성장, 침체, 인플레이션, 디플레이션) 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
+                desc: '어느 경제 사계절이 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%</div>',
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.</div>'
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 주식 25%, 장기채 25%, 금 25%, 현금 25%</div>'
                 ], 
-                allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] 
+                allocation: [{value: 25, name: '주식'}, {value: 25, name: '장기채'}, {value: 25, name: '금'}, {value: 25, name: '현금'}] 
             },
             'allweather': { 
                 title: '올웨더 포트폴리오 (All-Weather)', cagr: '7.8%', mdd: '-14.2%', type: 'static', 
-                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 포트폴리오 전체에 미치는 변동성(리스크)을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.',
+                desc: '각 자산군이 미치는 리스크를 동일하게 맞추는 리스크 패리티 기법.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%</div>',
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.</div>'
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 주식 30%, 장기채 40%, 중기채 15%, 금 7.5%, 원자재 7.5%</div>'
                 ], 
-                allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] 
+                allocation: [{value: 30, name: '주식'}, {value: 40, name: '장기채'}, {value: 15, name: '중기채'}, {value: 7.5, name: '금'}, {value: 7.5, name: '원자재'}] 
             },
             'dual': { 
                 title: '오리지널 듀얼 모멘텀', cagr: '12.5%', mdd: '-17.8%', type: 'dynamic', 
-                desc: 'Gary Antonacci가 발표한 동적 자산배분의 고전입니다. 자산이 과거 대비 상승장인지 파악하는 <b>절대 모멘텀</b>과, 여러 자산 중 어느 것이 더 강한지 파악하는 <b>상대 모멘텀</b>을 결합하여 하락장을 피하고 상승장에 올라탑니다.',
+                desc: '절대/상대 모멘텀을 혼합하여 하락장을 피하고 상승장에 올라탑니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수정종가 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.</div>'
+                    '<div class="flex-1"><span class="rule-highlight">절대 모멘텀:</span> SPY, VEA가 BIL(초단기채)보다 수익이 낮으면 AGG로 100% 대피</div>',
+                    '<div class="flex-1"><span class="rule-highlight">상대 모멘텀:</span> SPY와 VEA 중 수익률이 더 높은 자산에 100% 몰빵</div>'
                 ] 
             },
             'vaa': { 
                 title: 'VAA (Vigilant Asset Allocation)', cagr: '15.2%', mdd: '-16.1%', type: 'dynamic', 
-                desc: 'Wouter Keller 박사가 개발한 극강의 방어형 모멘텀 전략입니다. 시장이 꺾이는 순간을 귀신같이 포착하기 위해 과거 1개월 단기 수익률에 무려 12배의 압도적인 가중치를 두어 <b>번개처럼 빠른 스위칭</b>을 목표로 합니다.',
+                desc: '단기 수익률에 높은 가중치를 두어 번개처럼 빠른 스위칭을 목표로 합니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 스코어를 계산합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 스코어가 <b>모두 0 이상</b>이면, 스코어가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드:</span> 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 스코어 1위 자산으로 <strong>100% 전액 대피</strong>합니다.</div>'
+                    '<div class="flex-1"><span class="rule-highlight">스코어 공식:</span> (1M×12) + (3M×4) + (6M×2) + (12M×1)</div>',
+                    '<div class="flex-1"><span class="rule-highlight">공격/수비:</span> 공격 자산 중 하나라도 스코어가 0 이하면 방어 자산으로 대피</div>'
                 ] 
             },
             'daa': { 
                 title: 'DAA (Defensive Asset Allocation)', cagr: '13.5%', mdd: '-12.0%', type: 'dynamic', 
-                desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기에 가장 먼저 타격을 받는 <b>탄광 속 카나리아(Canary) 자산</b>을 도입하여, 평소엔 주식 비중을 유지하면서 위험 시점에만 효과적으로 도망갑니다.',
+                desc: '카나리아 자산을 감시하여 위험 시점에만 효과적으로 도망갑니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)</div>',
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 스코어(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.</div>',
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.</div>'
+                    '<div class="flex-1"><span class="rule-highlight">카나리아:</span> VWO, BND 중 하나라도 0 이하면 방어 자산으로 도피</div>'
                 ] 
             },
             'baa': { 
                 title: 'BAA (Bold Asset Allocation)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic', 
-                desc: '현존하는 최고 수준의 최신 동적 자산배분 모델. 2022년 금리 인상기 주식/채권 동반 폭락장에서도 훌륭한 방어력을 증명했습니다. 방어력을 한층 더 끌어올리고, 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화합니다.',
+                desc: '현존 최고 수준의 방어력과 나스닥(QQQ)을 활용한 공격력을 갖춘 전략.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.</div>',
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 스코어(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 금리 인상으로 인한 채권 시장 붕괴 리스크까지 완벽히 차단합니다.</div>'
+                    '<div class="flex-1"><span class="rule-highlight">카나리아 감시:</span> 4개 자산 모두 안전할 때만 QQQ 100% 몰빵</div>',
+                    '<div class="flex-1"><span class="rule-highlight">방어 모드:</span> 단 1개라도 위험하면 BIL, IEF, TLT에 분산 헷징</div>'
                 ] 
             }
         };
@@ -848,7 +813,6 @@
         const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
         let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
 
-        // MDD 계산 유틸리티 함수
         function calcMDDArray(arr) {
             let mdd = [];
             let peak = arr[0];
@@ -863,7 +827,6 @@
         // ==========================================
         // 🔄 핵심 UI 조작 함수
         // ==========================================
-        // 환율 변환기 토글 함수
         function toggleCurrency() {
             currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
             safeStorageSet('dashboardCurrency', currentCurrency);
@@ -871,7 +834,6 @@
             const btn = document.getElementById('currency-toggle');
             if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
 
-            // 현재 켜져 있는 탭에 맞춰 데이터 강제 리로드
             const viewDash = document.getElementById('view-dashboard');
             const viewCrypto = document.getElementById('view-crypto');
             
@@ -892,11 +854,14 @@
         function formatPriceStr(price) {
             if (price === null || price === undefined || isNaN(price)) return '--';
             if (currentCurrency === 'KRW') {
-                // KRW는 소수점 제거 후 천 단위 콤마
+                // KRW: 10원 미만은 소수점 두 자리, 그 외엔 정수
+                if (price < 10) return price.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 return Math.round(price).toLocaleString('ko-KR');
             } else {
-                // USD는 소수점 2자리 (1달러 미만 코인은 4자리)
-                const digits = price < 1 ? 4 : 2;
+                // USD: 소수점에 따라 유동적
+                let digits = 2;
+                if (price < 0.001) digits = 6;
+                else if (price < 1) digits = 4;
                 return price.toLocaleString('en-US', {minimumFractionDigits: digits, maximumFractionDigits: digits});
             }
         }
@@ -976,7 +941,7 @@
         }
 
         // ==========================================
-        // 📡 API 통신 및 데이터 정제 (환율 로직 포함)
+        // 📡 API 통신 및 데이터 정제 (환율/캐싱 적용)
         // ==========================================
         async function fetchWithRetry(url, options = {}, maxRetries = 2) {
             let delay = 1500;
@@ -984,8 +949,9 @@
                 try {
                     const response = await fetch(url, options);
                     if (response.ok) return response;
-                    if (response.status === 429) {
-                        logError(`API 429 Limit: ${url}`);
+                    // Render 무료서버 콜드스타트(50x) 및 Rate Limit(429) 대응
+                    if (response.status === 429 || response.status >= 500) {
+                        logError(`API Retry (${response.status}): ${url}`);
                         await new Promise(res => setTimeout(res, delay));
                         delay *= 1.5;
                         continue;
@@ -1000,7 +966,6 @@
             throw new Error(`Fetch failed: ${url}`);
         }
 
-        // 환율 데이터 가져오기 (캐싱 활용)
         async function getFxMap(interval, range) {
             const key = `${interval}_${range}`;
             if(fxCache[key]) return fxCache[key];
@@ -1011,15 +976,14 @@
                 let map = {};
                 const q = data.indicators.quote[0];
                 const ts = data.timestamp;
-                let lastValid = 1300; // API 오류 시 기본 방어값
+                let lastValid = 1300; 
                 
                 if (ts && q && q.close) {
                     for(let i=0; i<ts.length; i++) {
                         if(q.close[i]) lastValid = q.close[i];
                         const dObj = new Date(ts[i]*1000);
-                        const dStr = dObj.toISOString().split('T')[0]; // YYYY-MM-DD
-                        const ymStr = dStr.substring(0, 7); // YYYY-MM
-                        
+                        const dStr = dObj.toISOString().split('T')[0];
+                        const ymStr = dStr.substring(0, 7);
                         map[dStr] = lastValid;
                         map[ymStr] = lastValid; 
                     }
@@ -1032,10 +996,11 @@
             }
         }
 
-        // 원본 데이터에 환율 곱하기
         function applyFxToData(data, fxMap) {
             if(!fxMap || !data || !data.indicators) return data;
-            const q = data.indicators.quote[0], ts = data.timestamp;
+            // 데이터를 Deep Copy 하여 캐시 오염 방지
+            const clonedData = JSON.parse(JSON.stringify(data));
+            const q = clonedData.indicators.quote[0], ts = clonedData.timestamp;
             let lastFx = 1300;
             for(let i=0; i<ts.length; i++) {
                 const dObj = new Date(ts[i]*1000);
@@ -1052,21 +1017,28 @@
                     if(q.low && q.low[i] != null) q.low[i] *= lastFx;
                 }
             }
-            return data;
+            return clonedData;
         }
 
-        // 모든 주식/크립토 API 요청을 처리하는 중앙 통제 함수 (환율 자동 적용)
         async function fetchStockData(ticker, interval, range, isCrypto = false) {
+            // 중복 호출 방지를 위한 캐싱 (1분)
+            const cacheKey = `${ticker}_${interval}_${range}_${currentCurrency}`;
+            const now = Date.now();
+            if (reqCache.has(cacheKey) && now - reqCache.get(cacheKey).time < 60000) {
+                return reqCache.get(cacheKey).data;
+            }
+
             const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=${interval}&range=${range}`);
             const json = await res.json();
             if(!json.chart || !json.chart.result) throw new Error("API Data Format Error");
-            const data = json.chart.result[0];
+            let data = json.chart.result[0];
             
-            // 현재 모드가 KRW 이고 환율 티커가 아니라면 환율 적용
             if (currentCurrency === 'KRW' && ticker !== 'KRW=X') {
                 const fxMap = await getFxMap(interval, range);
-                applyFxToData(data, fxMap);
+                data = applyFxToData(data, fxMap);
             }
+            
+            reqCache.set(cacheKey, { time: now, data: data });
             return data;
         }
 
@@ -1106,7 +1078,6 @@
             }
         };
 
-        // 주식 차트 관련 함수
         function toggleMA(p) { maSettings[p] = !maSettings[p]; updateMAButtons(); if (globalChartData) renderDashboard(globalTicker, globalChartData); }
         function updateMAButtons() { Object.keys(maSettings).forEach(p => { const b = document.getElementById(`btn-ma-${p}`); if(b) { if(maSettings[p]) b.classList.add('active'); else b.classList.remove('active'); }}); }
         function changeInterval(i, r, l) { 
@@ -1116,7 +1087,6 @@
             loadData(globalTicker, i, r); 
         }
 
-        // 크립토 차트 관련 함수
         function toggleCryptoMA(p) { cryptoMaSettings[p] = !cryptoMaSettings[p]; updateCryptoMAButtons(); if (globalCryptoChartData) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData); }
         function updateCryptoMAButtons() { Object.keys(cryptoMaSettings).forEach(p => { const b = document.getElementById(`crypto-btn-ma-${p}`); if(b) { if(cryptoMaSettings[p]) b.classList.add('active'); else b.classList.remove('active'); }}); }
         function changeCryptoInterval(i, r, l) { 
@@ -1127,7 +1097,7 @@
         }
 
         // ==========================================
-        // 뷰 1: 주식 종목 분석 차트 
+        // 뷰 1: 주식 종목 분석 
         // ==========================================
         async function loadData(ticker, interval = currentInterval, range = currentRange) {
             if (abortController) abortController.abort();
@@ -1137,7 +1107,6 @@
             
             try {
                 const reqInterval = interval === '1y' ? '1mo' : interval;
-                // fetchStockData 함수를 사용하여 환율까지 자동 적용
                 const d = await fetchStockData(ticker, reqInterval, range);
                 
                 globalChartData = d; globalTicker = ticker;
@@ -1190,7 +1159,6 @@
             }
 
             const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9);
-            const stoch = Indicator.stochastic(kData, 14, 3);
             const bb = Indicator.bollinger(closes, 20, 2);
             const last = closes.length - 1;
             
@@ -1235,7 +1203,7 @@
                         let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
                         params.forEach(p => {
                             if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]); // ECharts data: [idx, open, close, low, high]
+                                let open = formatPriceStr(p.data[1]);
                                 let close = formatPriceStr(p.data[2]);
                                 result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
                             } else {
@@ -1259,7 +1227,6 @@
 
         async function calculateTriplePerspectiveDecision(ticker) {
             try {
-                // fetchStockData로 환율이 적용된 최신 데이터를 가져옴
                 const [dData, wData] = await Promise.all([
                     fetchStockData(ticker, '1d', '2y'),
                     fetchStockData(ticker, '1wk', 'max')
@@ -1327,7 +1294,7 @@
         }
 
         // ==========================================
-        // 뷰 3: 크립토 종목 분석 차트 
+        // 뷰 3: 크립토 분석 
         // ==========================================
         function updateCryptoStatus(t, c) { 
             const label = document.getElementById('crypto-conn-label');
@@ -1393,7 +1360,6 @@
             }
 
             const rsi = Indicator.rsi(closes, 14), ma120 = Indicator.sma(closes, 120), macd = Indicator.macd(closes, 12, 26, 9);
-            const stoch = Indicator.stochastic(kData, 14, 3);
             const bb = Indicator.bollinger(closes, 20, 2);
             const last = closes.length - 1;
             
@@ -1548,14 +1514,13 @@
         }
 
         // ==========================================
-        // 뷰 4: 포트폴리오 차트 및 라이브 엔진
+        // 뷰 4: 포트폴리오 차트 및 엔진
         // ==========================================
-        // 환율 변환 데이터 반환기
         const getAdjustedSimData = (key) => {
             const data = pfSimData[key];
             if (currentCurrency === 'USD') return data;
             
-            const fxBase = fxSimData[0]; // 2000년 기준
+            const fxBase = fxSimData[0]; 
             return data.map((val, idx) => {
                 const fxRatio = fxSimData[idx] ? (fxSimData[idx] / fxBase) : 1;
                 return val * fxRatio;
@@ -1605,7 +1570,6 @@
             setTimeout(() => pfChart.resize(), 100);
         }
 
-        // 모달 띄우기 및 정보 세팅 (설명 렌더링 수정 포함)
         function showPfDetail(pfKey) {
             currentPfKey = pfKey; const data = pfDetails[pfKey];
             if(!data) return;
@@ -1637,7 +1601,8 @@
                 liveArea.style.display = 'none';
             }
 
-            requestAnimationFrame(() => {
+            // 모달 오픈 직후 차트 리사이즈 보정
+            setTimeout(() => {
                 if(!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
                 pfModalChart.clear();
 
@@ -1691,7 +1656,7 @@
                     }, true);
                     pfPieChart.resize();
                 }
-            });
+            }, 50);
         }
 
         async function comparePortfolioStock() {
@@ -1701,7 +1666,6 @@
 
             btn.innerText = '검색중...';
             try {
-                // 비교 종목도 환율을 적용받기 위해 fetchStockData 사용
                 const d = await fetchStockData(ticker, '1mo', 'max');
 
                 let { dates, closes } = extractCleanData(d);
@@ -1762,14 +1726,12 @@
                 const dataMap = {};
                 let unifiedMonths = new Set();
                 
-                // 직렬 다운로드로 API 과부하 100% 차단
                 for(let i=0; i<tickers.length; i++) {
                     const t = tickers[i];
                     document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t} 데이터`;
                     
                     if(i > 0) await new Promise(r => setTimeout(r, 1000));
                     
-                    // fetchStockData로 환율 자동 적용
                     const d = await fetchStockData(t, '1mo', '2y');
                     let { dates, closes } = extractCleanData(d);
                     
@@ -1915,7 +1877,6 @@
                         row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
                     }
 
-                    // 월간 실제 수익률 및 SPY/QQQ 벤치마크 계산
                     let actualRetHtml = '<td class="text-gray-400">--</td>';
                     let benchRetHtml = '<td class="text-gray-400 bg-black/10">-- / --</td>';
                     
@@ -1933,7 +1894,6 @@
                             actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
                         }
 
-                        // SPY / QQQ 벤치마크 계산
                         const spy0 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i]] : null;
                         const spy1 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i+1]] : null;
                         const qqq0 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i]] : null;
@@ -1985,6 +1945,7 @@
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
                 
+                // 주식 폼 이벤트
                 const form = document.getElementById('search-form');
                 if(form) {
                     form.onsubmit = (e) => { 
@@ -1994,7 +1955,16 @@
                     };
                 }
 
-                // 글로벌 통화 버튼 초기화
+                // 크립토 폼 이벤트 추가 (새로고침 버그 수정)
+                const cryptoForm = document.getElementById('crypto-search-form');
+                if(cryptoForm) {
+                    cryptoForm.onsubmit = (e) => {
+                        e.preventDefault();
+                        const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase();
+                        if(t) loadCryptoData(t);
+                    };
+                }
+
                 const btn = document.getElementById('currency-toggle');
                 if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
                 
