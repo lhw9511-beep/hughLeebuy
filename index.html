@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" class="theme-green">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -50,14 +50,6 @@
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.1);
         }
-        .theme-purple {
-            --bg-color: #171026;
-            --panel-color: rgba(37, 26, 58, 0.8);
-            --modal-bg: #251a3a;
-            --text-main: #f3e8ff;
-            --text-muted: #a855f7;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
         .theme-green {
             --bg-color: #022c22;
             --panel-color: rgba(6, 78, 59, 0.8);
@@ -67,389 +59,252 @@
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .status-STRONG-BUY { color: #10B981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
-        .status-BUY { color: #34D399; }
-        .status-HOLD { color: var(--text-muted); }
-        .status-BYE { color: #F87171; }
-        .status-STRONG-BYE { color: #EF4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
-
-        html { font-size: 16px; transition: font-size 0.2s ease; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; transition: background-color 0.3s ease; }
         .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); }
-        
-        .chart-container { height: 400px; width: 100%; display: block; }
+        .chart-container { height: 400px; width: 100%; }
         @media (min-width: 1024px) { .chart-container { height: 500px; } }
-        .portfolio-chart-container { height: 350px; width: 100%; display: block; }
-        .pie-container { height: 250px; width: 100%; display: block; }
-        .pf-modal-chart-container { height: 280px; width: 100%; display: block; }
+        .portfolio-chart-container { height: 350px; width: 100%; }
         
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); }
-        
-        .chip-btn { padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 800; border-radius: 0.5rem; background: rgba(0,0,0,0.1); color: var(--text-muted); border: 1px solid var(--border-color); transition: all 0.2s; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
-        .chip-btn:hover { border-color: #3B82F6; color: var(--text-main); }
+        .chip-btn { padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 800; border-radius: 0.5rem; background: rgba(0,0,0,0.1); color: var(--text-muted); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
         .chip-btn.active { background-color: #3B82F6; border-color: #3B82F6; color: white; }
 
-        .setting-btn { border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); padding: 0.4rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: bold; flex: 1; text-align: center; cursor: pointer; transition: all 0.2s; }
-        .setting-btn.active { background: #3B82F6; color: white; border-color: #3B82F6; }
-
-        #loading-overlay, #crypto-loading-overlay { display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 50; align-items: center; justify-content: center; border-radius: 1rem; flex-direction: column; }
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 1rem; }
-        .modal-content { max-width: 500px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-        .modal-content-large { max-width: 900px; } 
-        
-        .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
+        .modal-content { max-width: 500px; width: 100%; background: var(--modal-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; }
+        .modal-content-large { max-width: 900px; }
 
-        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; }
-        .stat-box:hover { border-color: #3B82F6; background: rgba(0,0,0,0.1); }
-        .stat-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 900; margin-top: 4px; text-align: center;}
+        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 0.5rem; text-align: center; cursor: pointer; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 900; margin-top: 4px; }
         
-        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.75rem; border: 1px solid transparent; text-align: center; background: rgba(0,0,0,0.1); }
-        .perspective-col:hover { background: rgba(0,0,0,0.2); transform: translateY(-2px); border-color: #3B82F6; }
+        .main-tab-btn { padding: 0.6rem 1rem; font-weight: 900; font-size: 0.85rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; }
+        .main-tab-btn.active { color: var(--text-main); border-bottom-color: #3B82F6; }
 
-        .rule-list { list-style-type: none; padding-left: 0; margin-top: 10px; }
-        .rule-list li { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: flex-start; line-height: 1.5; }
-        .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 1px; font-size: 0.8rem; }
-        .rule-highlight { color: var(--text-main); font-weight: 800; background: rgba(59, 130, 246, 0.2); padding: 3px 6px; border-radius: 6px; margin-right: 6px; display: inline-block; margin-bottom: 4px; border: 1px solid rgba(59, 130, 246, 0.4); word-break: keep-all; }
-        
-        #error-log-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; border-radius: 8px; padding: 8px; margin-top: 8px; font-family: monospace; font-size: 0.65rem; color: #FCA5A5; max-height: 100px; overflow-y: auto; word-break: break-all; }
+        .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; cursor: pointer; display: flex; flex-direction: column; min-height: 120px; }
+        .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); transition: all 0.2s; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
+<body>
 
-    <!-- 포트폴리오 상세 모달 -->
-    <div id="pf-detail-modal" class="modal-overlay" onclick="closePfDetailModal()">
-        <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
-                <div><h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3></div>
-                <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+    <!-- [HTML Structure] -->
+    <header class="glass rounded-2xl m-2 md:m-4">
+        <div class="flex justify-between items-center p-3 md:p-4">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="location.reload()">
+                <div class="bg-accent p-1.5 rounded-lg shadow-md"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg></div>
+                <h1 class="text-xl md:text-2xl font-black italic text-themeText">BUY <span class="text-accent">or BYE</span></h1>
             </div>
-            <div class="py-2">
-                <div id="pf-modal-desc" class="text-[0.75rem] md:text-[0.8rem] text-themeMuted mb-4 leading-relaxed bg-themeBorder/10 p-4 md:p-5 rounded-xl border border-themeBorder shadow-inner"></div>
-                <div class="flex flex-row gap-2 md:gap-4 mb-4">
-                    <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
-                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">CAGR(연평균)</p>
-                        <p id="pf-modal-cagr" class="text-lg md:text-xl font-black text-up">0%</p>
-                    </div>
-                    <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
-                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">MDD(최대낙폭)</p>
-                        <p id="pf-modal-mdd" class="text-lg md:text-xl font-black text-down">0%</p>
-                    </div>
+            <div class="flex items-center gap-2 md:gap-4">
+                <button id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-black/20 border border-accent/40 rounded-xl text-themeText font-black text-sm w-20 shadow-inner">USD</button>
+                <div class="hidden md:flex items-center">
+                    <button onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">주식 분석</button>
+                    <button onclick="switchMainTab('crypto')" id="tab-btn-crypto" class="main-tab-btn">크립토 분석</button>
+                    <button onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오</button>
                 </div>
-                <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
-                <div id="pf-modal-pie-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-themeBorder mb-4 hidden relative overflow-hidden">
-                    <div id="pf-pie-chart" class="pie-container"></div>
-                </div>
-                <div id="pf-modal-live-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
-                    <div class="p-3 border-b border-themeBorder flex flex-col md:flex-row md:justify-between md:items-center bg-black/20 gap-3">
-                        <div class="flex items-center gap-2">
-                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                            <span class="text-sm font-black text-themeText">Live Strategy Engine</span>
-                        </div>
-                        <label class="flex items-center gap-2 cursor-pointer bg-themeBorder/50 px-3 py-1.5 rounded-lg border border-themeBorder hover:bg-themeBorder transition justify-center md:justify-end">
-                            <input type="checkbox" id="toggle-proof" class="w-4 h-4 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
-                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 및 원데이터 증명 보기</span>
-                        </label>
-                    </div>
-                    <div id="pf-live-summary" class="flex-col m-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex" style="display: none;">
-                        <div class="flex items-center justify-between">
-                            <p class="text-[0.65rem] md:text-xs font-black text-emerald-500 uppercase tracking-widest">실시간 운용 성과 (최근 12개월)</p>
-                            <p id="pf-live-summary-cagr" class="text-2xl font-black text-themeText">--</p>
-                        </div>
-                        <p class="text-[0.65rem] font-bold text-themeMuted text-right mt-1">기간 내 최대낙폭(MDD): <span id="pf-live-summary-mdd" class="text-themeText">--</span></p>
-                    </div>
-                    <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
-                        <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
-                        <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
-                    </div>
-                    <div id="pf-live-content" class="hidden overflow-x-auto custom-scroll p-1">
-                        <table class="calc-table" id="pf-live-table"></table>
-                    </div>
-                </div>
-                <div class="bg-[var(--modal-bg)] p-4 md:p-5 rounded-xl border border-themeBorder">
-                    <p class="text-[0.8rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-3">알고리즘 및 규칙</p>
-                    <ul id="pf-modal-rules" class="rule-list"></ul>
-                </div>
-            </div>
-            <div class="mt-4 flex justify-end">
-                <button type="button" onclick="closePfDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
+                <button onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 rounded-xl text-rose-500 font-bold w-10">!</button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- 기타 모달들 -->
-    <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()"><div class="modal-content" onclick="event.stopPropagation()"><div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3"><h3 id="info-title" class="text-lg font-black text-themeText">지표 설명</h3><button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button></div><p id="info-body" class="text-sm text-themeMuted leading-relaxed py-2"></p></div></div>
-    <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()"><div class="modal-content" onclick="event.stopPropagation()"><div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3"><div><h3 id="modal-title" class="text-xl font-black text-themeText uppercase italic">Detail View</h3></div><button type="button" onclick="closeDetailModal()" class="text-themeMuted p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button></div><div id="modal-body" class="space-y-4 text-sm text-themeText py-2"></div></div></div>
-    <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()"><div class="modal-content" onclick="event.stopPropagation()"><div class="flex justify-between items-start mb-4 border-b border-rose-500 pb-3"><h3 class="text-lg font-black text-rose-500">Error Log</h3><button type="button" onclick="closeErrorModal()" class="text-themeMuted p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button></div><textarea id="error-log-text" class="w-full h-32 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.65rem] font-mono p-2 rounded-lg outline-none resize-none" readonly></textarea><div class="mt-4 flex gap-2 justify-end"><button type="button" onclick="copyErrorLog()" id="btn-copy-error" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black">복사</button><button type="button" onclick="closeErrorModal()" class="bg-themeBorder text-themeText px-4 py-2 rounded-xl text-sm font-black transition border border-white/5">닫기</button></div></div></div>
-
-    <!-- 메인 대시보드 래퍼 -->
-    <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
-        <header class="glass rounded-2xl shadow-sm overflow-hidden">
-            <div class="flex justify-between items-center p-3 md:p-4">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
-                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40 flex items-center justify-center"><svg class="icon-lg text-white" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg></div>
-                    <h1 class="text-xl md:text-2xl font-black italic text-themeText tracking-tighter ml-1">BUY <span class="text-accent">or BYE</span></h1>
+    <main class="max-w-[1400px] mx-auto w-full p-2 md:p-4">
+        <div id="view-dashboard" class="flex flex-col space-y-4">
+            <form id="search-form" class="flex w-full"><input type="text" id="ticker-input" class="flex-grow bg-themePanel border border-themeBorder text-themeText rounded-l-xl px-4 py-3 uppercase outline-none focus:border-accent font-black shadow-inner" value="SPY"><button type="submit" class="bg-accent text-white px-6 rounded-r-xl font-black">분석</button></form>
+            <div class="flex items-center gap-2 px-2"><span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span><span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted uppercase">WAITING</span></div>
+            <div class="glass rounded-2xl p-5 flex flex-col shadow-xl relative min-h-[500px]">
+                <div id="loading-overlay" class="absolute inset-0 bg-black/60 z-50 flex flex-col items-center justify-center rounded-2xl hidden"><div class="animate-spin rounded-full h-10 w-10 border-t-2 border-accent mb-3"></div><p class="text-xs font-black text-accent uppercase">Loading...</p></div>
+                <div class="flex justify-between mb-4 border-b border-themeBorder pb-3">
+                    <h2 id="display-ticker" class="text-3xl font-black text-themeText uppercase italic">---</h2>
+                    <div id="live-price" class="text-2xl font-black text-themeText">---</div>
                 </div>
-                <div class="flex items-center gap-2 md:gap-4">
-                    <button type="button" id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-[var(--modal-bg)] border border-accent/40 rounded-xl text-themeText font-black text-sm hover:bg-accent hover:text-white transition shadow-sm shadow-accent/20 w-20 text-center">USD</button>
-                    <div class="hidden md:flex items-center">
-                        <button type="button" onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">종목 AI 분석</button>
-                        <button type="button" onclick="switchMainTab('crypto')" id="tab-btn-crypto" class="main-tab-btn">크립토 분석</button>
-                        <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오</button>
-                    </div>
-                    <button type="button" onclick="openErrorModal()" id="btn-show-error" class="hidden p-2 bg-rose-500/20 border border-rose-500/50 rounded-xl text-rose-500"><svg class="icon-md" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></button>
-                    <button type="button" onclick="openSettingsModal()" class="p-2 bg-[var(--modal-bg)] border border-themeBorder rounded-xl text-themeMuted hover:text-accent"><svg class="icon-md" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg></button>
-                </div>
+                <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
-            <div class="md:hidden flex border-t border-themeBorder bg-black/10">
-                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 active text-sm py-2">주식</button>
-                <button type="button" onclick="switchMainTab('crypto')" id="mob-tab-btn-crypto" class="main-tab-btn flex-1 text-sm py-2">크립토</button>
-                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 text-sm py-2">포트</button>
-            </div>
-        </header>
-
-        <div id="view-dashboard" class="flex flex-col space-y-3 md:space-y-4">
-            <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
-                <form id="search-form" class="flex w-full sm:flex-grow"><input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="주식 심볼"><button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button></form>
-                <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2"><span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span><span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span></div>
-            </div>
-            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]"><div id="loading-overlay"><div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div></div><div class="flex flex-col lg:flex-row justify-between mb-4 border-b border-themeBorder pb-3 gap-3"><div><h2 id="display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter">---</h2><div id="live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div></div></div><div id="chart-main" class="chart-container flex-grow"></div></div>
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4"><div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl border-t-4 border-t-accent"><div class="grid grid-cols-3 gap-2 flex-grow mb-2"><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('short')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span><div id="st-signal-text" class="text-sm font-black italic">WAIT</div></div><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('mid')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span><div id="mt-signal-text" class="text-sm font-black italic">WAIT</div></div><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('long')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span><div id="lt-signal-text" class="text-sm font-black italic">WAIT</div></div></div></div><div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col"><div class="grid grid-cols-5 gap-2 h-full mb-3"><div class="stat-box"><p class="stat-label">이격도</p><p id="val-ma-dist" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">RSI</p><p id="val-rsi-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">MACD</p><p id="val-macd-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">BB밴드</p><p id="val-bb-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">Stoch</p><p id="val-stoch-main" class="stat-value text-themeText">---</p></div></div><div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[120px]"></div></div></div>
         </div>
 
-        <div id="view-crypto" class="hidden flex-col space-y-3 md:space-y-4">
-            <!-- Crypto View (Same Structure) -->
-            <div class="flex gap-2 mb-1 overflow-x-auto custom-scroll pb-1"><button type="button" onclick="loadCryptoData('BTC-USD')" class="chip-btn bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/30">Bitcoin (BTC)</button><button type="button" onclick="loadCryptoData('ETH-USD')" class="chip-btn bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border-indigo-500/30">Ethereum (ETH)</button></div>
-            <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full"><form id="crypto-search-form" class="flex w-full sm:flex-grow"><input type="text" id="crypto-ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="BTC-USD"><button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석</button></form><div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2"><span id="crypto-status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span><span id="crypto-conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span></div></div>
-            <div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl relative min-h-[400px]"><div id="crypto-loading-overlay"><div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div></div><div class="flex flex-col lg:flex-row justify-between mb-4 border-b border-themeBorder pb-3 gap-3"><div><h2 id="crypto-display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter">---</h2><div id="crypto-live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div></div></div><div id="crypto-chart-main" class="chart-container flex-grow"></div></div>
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4"><div class="glass rounded-2xl p-3 md:p-5 flex flex-col shadow-xl border-t-4 border-t-accent"><div class="grid grid-cols-3 gap-2 flex-grow mb-2"><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('short')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span><div id="crypto-st-signal-text" class="text-sm font-black italic">WAIT</div></div><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('mid')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span><div id="crypto-mt-signal-text" class="text-sm font-black italic">WAIT</div></div><div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('long')"><span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span><div id="crypto-lt-signal-text" class="text-sm font-black italic">WAIT</div></div></div></div><div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col"><div class="grid grid-cols-5 gap-2 h-full mb-3"><div class="stat-box"><p class="stat-label">이격도</p><p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">RSI</p><p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">MACD</p><p id="crypto-val-macd-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">BB밴드</p><p id="crypto-val-bb-main" class="stat-value text-themeText">---</p></div><div class="stat-box"><p class="stat-label">Stoch</p><p id="crypto-val-stoch-main" class="stat-value text-themeText">---</p></div></div><div id="crypto-reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[120px]"></div></div></div>
+        <div id="view-crypto" class="hidden flex-col space-y-4">
+            <form id="crypto-search-form" class="flex w-full"><input type="text" id="crypto-ticker-input" class="flex-grow bg-themePanel border border-themeBorder text-themeText rounded-l-xl px-4 py-3 uppercase outline-none font-black shadow-inner" value="BTC-USD"><button type="submit" class="bg-accent text-white px-6 rounded-r-xl font-black">분석</button></form>
+            <div id="crypto-chart-main" class="chart-container glass rounded-2xl p-5"></div>
         </div>
 
         <div id="view-portfolio" class="hidden flex-col space-y-4">
-            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
-                <h2 class="text-base md:text-lg font-black text-themeText mb-3 border-b border-themeBorder pb-2">정적 자산배분 (Static)</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div class="pf-card" onclick="showPfDetail('6040')"><h3 class="font-black text-themeText text-sm mb-1">60/40 Portfolio</h3><p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">미국 주식 60% + 중기채 40%</p><div class="flex justify-between border-t border-themeBorder pt-2 mt-auto"><span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-6040" class="text-up ml-1">--%</span></span><span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-6040" class="text-down ml-1">--%</span></span></div></div>
-                    <div class="pf-card" onclick="showPfDetail('permanent')"><h3 class="font-black text-themeText text-sm mb-1">Permanent</h3><p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식/장기채/금/현금 25%</p><div class="flex justify-between border-t border-themeBorder pt-2 mt-auto"><span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-permanent" class="text-up ml-1">--%</span></span><span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-permanent" class="text-down ml-1">--%</span></span></div></div>
-                    <div class="pf-card" onclick="showPfDetail('allweather')"><h3 class="font-black text-themeText text-sm mb-1">All-Weather</h3><p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">사계절 대응 전략</p><div class="flex justify-between border-t border-themeBorder pt-2 mt-auto"><span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-allweather" class="text-up ml-1">--%</span></span><span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-allweather" class="text-down ml-1">--%</span></span></div></div>
-                </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="pf-card" onclick="showPfDetail('6040')"><h3 class="font-black text-sm">60/40</h3><div class="mt-auto border-t border-themeBorder pt-2 text-[0.65rem] font-bold"><p>CAGR: <span id="card-cagr-6040">--</span></p><p>MDD: <span id="card-mdd-6040">--</span></p></div></div>
+                <div class="pf-card" onclick="showPfDetail('baa')"><h3 class="font-black text-sm">BAA (Bold)</h3><div class="mt-auto border-t border-themeBorder pt-2 text-[0.65rem] font-bold"><p>CAGR: <span id="card-cagr-baa">--</span></p><p>MDD: <span id="card-mdd-baa">--</span></p></div></div>
             </div>
-            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-accent">
-                <h2 class="text-base md:text-lg font-black text-themeText mb-3 border-b border-themeBorder pb-2">동적 자산배분 (Dynamic)</h2>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div class="pf-card" onclick="showPfDetail('dual')"><h3 class="font-black text-themeText text-xs md:text-sm mb-1">Dual Momentum</h3><div class="mt-auto pt-2 border-t border-themeBorder flex flex-col"><span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-dual" class="text-up ml-1">--%</span></span><span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-dual" class="text-down ml-1">--%</span></span></div></div>
-                    <div class="pf-card" onclick="showPfDetail('vaa')"><h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3><div class="mt-auto pt-2 border-t border-themeBorder flex flex-col"><span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-vaa" class="text-up ml-1">--%</span></span><span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-vaa" class="text-down ml-1">--%</span></span></div></div>
-                    <div class="pf-card" onclick="showPfDetail('daa')"><h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3><div class="mt-auto pt-2 border-t border-themeBorder flex flex-col"><span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-daa" class="text-up ml-1">--%</span></span><span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-daa" class="text-down ml-1">--%</span></span></div></div>
-                    <div class="pf-card" onclick="showPfDetail('baa')"><h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3><div class="mt-auto pt-2 border-t border-themeBorder flex flex-col"><span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-baa" class="text-up ml-1">--%</span></span><span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-baa" class="text-down ml-1">--%</span></span></div></div>
-                </div>
-            </div>
-            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full"><h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">역사적 백테스트 시뮬레이션</h3><div id="chart-portfolio" class="portfolio-chart-container w-full"></div></div>
+            <div class="glass p-5 rounded-2xl"><div id="chart-portfolio" class="portfolio-chart-container w-full"></div></div>
         </div>
-    </div>
+    </main>
+
+    <!-- 에러 모달 -->
+    <div id="error-modal" class="modal-overlay" onclick="this.style.display='none'"><div class="modal-content"><h3 class="text-lg font-black text-rose-500 mb-4">Error Log</h3><textarea id="error-log-text" class="w-full h-40 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.7rem] font-mono p-2 rounded-lg" readonly></textarea></div></div>
 
     <script>
-        // --- ⚙️ 전역 설정 ---
+        // ==========================================
+        // 🚀 1. 전역 변수 및 상수 (Hoisting 방지)
+        // ==========================================
         const API_BASE_URL = 'https://buy-or-bye.onrender.com';
         let errorLogs = [];
-        
-        function safeStorageGet(key, defaultVal) { try { return localStorage.getItem(key) || defaultVal; } catch(e) { return defaultVal; } }
-        function safeStorageSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+        let myChart = null, cryptoChart = null, pfChart = null;
+        let globalChartData = null, globalTicker = "SPY", globalCryptoTicker = "BTC-USD";
+        let currentInterval = '1d', currentRange = '1y';
+        let currentCurrency = localStorage.getItem('dashboardCurrency') || 'USD';
+        let fxCache = {};
 
-        let currentCurrency = safeStorageGet('dashboardCurrency', 'USD');
-        const savedTheme = safeStorageGet('dashboardTheme', 'theme-green');
-        const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
-        let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
-        
-        let myChart = null, cryptoChart = null, pfChart = null, pfPieChart = null, pfModalChart = null; 
-        let globalChartData = null, globalTicker = "SPY", globalCryptoChartData = null, globalCryptoTicker = "BTC-USD";
-        let maSettings = { 20: true, 50: true, 120: true, 200: true }, cryptoMaSettings = { 20: true, 50: true, 120: true, 200: true };
-        let fxCache = {}, analysisDetails = { short: {}, mid: {}, long: {} }, cryptoAnalysisDetails = { short: {}, mid: {}, long: {} };
-        let currentPfKey = '', abortController = null, cryptoAbortController = null;
+        // ==========================================
+        // 🚀 2. 필수 유틸리티 함수 (최상단 정의)
+        // ==========================================
+        function logError(msg, err) {
+            console.error(msg, err);
+            const time = new Date().toLocaleTimeString();
+            errorLogs.unshift(`[${time}] ${msg}: ${err?.message || err}\n`);
+            document.getElementById('btn-show-error')?.classList.remove('hidden');
+            updateStatus("ERROR", "bg-rose-500");
+        }
 
-        // --- 📊 데이터 상수 ---
+        function updateStatus(t, c) {
+            const l = document.getElementById('conn-label'), d = document.getElementById('status-dot');
+            if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; }
+        }
+
+        function setTheme(t) {
+            try {
+                document.documentElement.className = t;
+                localStorage.setItem('dashboardTheme', t);
+                document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.id === `btn-${t}`));
+                if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
+            } catch(e) { console.warn("setTheme failed", e); }
+        }
+
+        async function fetchWithRetry(url, options = {}, maxRetries = 2) {
+            for (let i = 0; i <= maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return response;
+                    await new Promise(res => setTimeout(res, 1000 * (i + 1)));
+                } catch (err) {
+                    if (i === maxRetries) throw err;
+                }
+            }
+        }
+
+        // ==========================================
+        // 🚀 3. 데이터 및 퀀트 엔진
+        // ==========================================
         const pfSimData = {
             years: ["2000","2002","2004","2006","2008","2010","2012","2014","2016","2018","2020","2022","2024", "2025", "2026"],
             'spy': [100, 88, 68, 87, 96, 100, 115, 121, 75, 93, 107, 109, 126, 166, 185],
             '6040': [100, 93, 82, 97, 104, 107, 118, 123, 90, 105, 116, 120, 131, 155, 168],
-            'permanent': [100, 102, 105, 110, 113, 116, 123, 130, 125, 133, 142, 150, 155, 152, 162],
-            'allweather': [100, 103, 105, 115, 121, 125, 134, 142, 130, 145, 158, 170, 178, 172, 185],
-            'dual': [100, 105, 110, 112, 125, 135, 150, 165, 160, 180, 205, 215, 235, 280, 305],
-            'vaa': [100, 108, 115, 118, 135, 148, 170, 185, 180, 210, 240, 255, 275, 320, 350],
-            'daa': [100, 105, 112, 115, 130, 142, 160, 175, 170, 195, 225, 235, 255, 290, 320],
             'baa': [100, 110, 118, 122, 140, 155, 180, 195, 195, 230, 270, 285, 310, 370, 400]
         };
-        const fxSimData = [1130, 1290, 1186, 1192, 1145, 1013, 929, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1330, 1400, 1450];
-        const pfSimYears = [...pfSimData.years];
+        const fxSimData = [1130, 1290, 1186, 1192, 1145, 1013, 929, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207];
 
-        const pfDetails = {
-            '6040': { title: '60/40 Portfolio', type: 'static', rules: ['주식 60% + 채권 40%', '연 1회 리밸런싱'], allocation: [{value:60, name:'SPY'},{value:40, name:'IEF'}] },
-            'permanent': { title: '영구 포트폴리오', type: 'static', rules: ['주식 25%/장기채 25%/금 25%/현금 25%'], allocation: [{value:25, name:'SPY'},{value:25, name:'TLT'},{value:25, name:'GLD'},{value:25, name:'BIL'}] },
-            'allweather': { title: 'All-Weather', type: 'static', rules: ['레이 달리오 리스크 패리티'], allocation: [{value:30, name:'SPY'},{value:40, name:'TLT'},{value:15, name:'IEF'},{value:7.5, name:'GLD'},{value:7.5, name:'DBC'}] },
-            'dual': { title: '듀얼 모멘텀', type: 'dynamic', rules: ['12개월 모멘텀', '상대+절대'] },
-            'vaa': { title: 'VAA', type: 'dynamic', rules: ['공격/수비 13612 가중치'] },
-            'daa': { title: 'DAA', type: 'dynamic', rules: ['카나리아 2개(VWO, BND)'] },
-            'baa': { title: 'BAA', type: 'dynamic', rules: ['카나리아 4개(SPY, VEA, VWO, BND)'] }
+        const getAdjustedSimData = (k) => {
+            let d = pfSimData[k]; if (currentCurrency === 'USD') return d;
+            let fx0 = fxSimData[0]; return d.map((v, i) => v * (fxSimData[i] / fx0));
         };
 
-        // --- 🛠️ 헬퍼 ---
-        function logError(msg, err) { const time = new Date().toLocaleTimeString(); let e = err?.message || String(err); errorLogs.unshift(`[${time}] ${msg}\n${e}\n`); document.getElementById('btn-show-error')?.classList.remove('hidden'); }
-        function getCurrSymbol() { return currentCurrency === 'USD' ? '$' : '₩'; }
-        function calcMDDArray(arr) { let mdd = []; let peak = arr[0]; for(let v of arr) { if(v > peak) peak = v; mdd.push(parseFloat(((v - peak) / peak * 100).toFixed(2))); } return mdd; }
-        const getAdjustedSimData = (k) => { let d = pfSimData[k]; if (currentCurrency === 'USD') return d; let fx0 = fxSimData[0]; return d.map((v, i) => v * (fxSimData[i] / fx0)); };
+        function extractCleanData(data) {
+            const q = data.indicators.quote[0], ts = data.timestamp;
+            let dates = [], kData = [], closes = [];
+            ts.forEach((t, i) => {
+                if (q.close[i]) {
+                    dates.push(new Date(t * 1000).toISOString().split('T')[0]);
+                    kData.push([q.open[i], q.close[i], q.low[i], q.high[i]]);
+                    closes.push(q.close[i]);
+                }
+            });
+            return { dates, kData, closes };
+        }
 
-        // --- 📈 차트 엔진 ---
+        // ==========================================
+        // 🚀 4. 화면 렌더링 및 통신 로직
+        // ==========================================
+        async function loadData(ticker) {
+            const loader = document.getElementById('loading-overlay');
+            if(loader) loader.style.display = 'flex';
+            try {
+                const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=${currentInterval}&range=${currentRange}`);
+                const json = await res.json();
+                const d = json.chart.result[0];
+                globalChartData = d; globalTicker = ticker;
+                renderDashboard(ticker, d);
+                updateStatus("LIVE", "bg-emerald-500");
+            } catch(e) { logError("LoadData Failed", e); }
+            finally { if(loader) loader.style.display = 'none'; }
+        }
+
         function renderDashboard(ticker, data) {
-            if(!myChart || !data) return;
-            let { dates, kData, closes } = extractCleanData(data);
-            const style = getComputedStyle(document.documentElement), textMuted = style.getPropertyValue('--text-muted').trim();
-            const macd = Indicator.macd(closes, 12, 26, 9);
+            if(!myChart) return;
+            const { dates, kData, closes } = extractCleanData(data);
             myChart.setOption({
-                backgroundColor:'transparent', tooltip:{trigger:'axis', formatter: (p) => { 
-                    let r = `<b>${p[0].axisValue}</b><br/>`;
-                    p.forEach(x => { 
-                        let v = x.value !== undefined ? (x.value.value !== undefined ? x.value.value : x.value) : x.data;
-                        if(x.seriesType==='candlestick') r += `${x.marker} 종가: ${getCurrSymbol()}${formatPriceStr(x.data[2])}<br/>`;
-                        else r += `${x.marker} ${x.seriesName}: ${isNaN(v) ? '--' : Number(v).toFixed(2)}<br/>`;
-                    }); return r; 
-                }},
-                grid:[{left:'5%',right:'5%',top:'5%',height:'60%'},{left:'5%',right:'5%',top:'75%',height:'15%'}],
-                xAxis:[{type:'category',data:dates,axisLabel:{show:false}},{type:'category',gridIndex:1,data:dates,axisLabel:{color:textMuted,fontSize:10}}],
-                yAxis:[{scale:true},{gridIndex:1,show:false}],
-                series:[
-                    {name:'Price',type:'candlestick',data:kData,itemStyle:{color:'#26A69A',color0:'#EF5350'}},
-                    {name:'MACD',type:'bar',xAxisIndex:1,yAxisIndex:1,data:macd.hist.map(v=>({value:v,itemStyle:{color:v>0?'#26A69A':'#EF5350'}}))}
-                ]
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: dates },
+                yAxis: { scale: true },
+                series: [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350' } }]
             }, true);
         }
 
-        function renderCryptoDashboard(ticker, data) {
-            if(!cryptoChart || !data) return;
-            let { dates, kData, closes } = extractCleanData(data);
-            const macd = Indicator.macd(closes, 12, 26, 9);
-            cryptoChart.setOption({
-                backgroundColor:'transparent', tooltip:{trigger:'axis'},
-                grid:[{left:'5%',right:'5%',top:'5%',height:'60%'},{left:'5%',right:'5%',top:'75%',height:'15%'}],
-                xAxis:[{type:'category',data:dates,axisLabel:{show:false}},{type:'category',gridIndex:1,data:dates}],
-                yAxis:[{scale:true},{gridIndex:1,show:false}],
-                series:[
-                    {name:'Price',type:'candlestick',data:kData},
-                    {name:'MACD',type:'bar',xAxisIndex:1,yAxisIndex:1,data:macd.hist.map(v=>({value:v,itemStyle:{color:v>0?'#26A69A':'#EF5350'}}))}
-                ]
-            }, true);
+        function toggleCurrency() {
+            currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
+            localStorage.setItem('dashboardCurrency', currentCurrency);
+            document.getElementById('currency-toggle').innerText = currentCurrency;
+            loadData(globalTicker);
+            renderPortfolioChart();
+            updatePfCardMetrics();
+        }
+
+        function switchMainTab(t) {
+            ['dashboard', 'crypto', 'portfolio'].forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.style.display = (v === t ? 'flex' : 'none');
+                document.getElementById(`tab-btn-${v}`)?.classList.toggle('active', v === t);
+            });
+            if(t === 'portfolio') renderPortfolioChart();
         }
 
         function renderPortfolioChart() {
             if(!pfChart) return;
-            const style = getComputedStyle(document.documentElement), textMuted = style.getPropertyValue('--text-muted').trim();
-            const spyData = getAdjustedSimData('spy'), baaData = getAdjustedSimData('baa');
+            const spy = getAdjustedSimData('spy'), baa = getAdjustedSimData('baa');
             pfChart.setOption({
-                backgroundColor:'transparent', tooltip:{trigger:'axis'},
-                legend:{data:['SPY','BAA','MDD(BAA)'], textStyle:{color:textMuted}},
-                xAxis:{type:'category',data:pfSimYears,axisLabel:{color:textMuted}},
-                yAxis:[{type:'value'},{type:'value',min:-60,max:0,position:'right'}],
-                series:[
-                    {name:'SPY',type:'line',data:spyData,smooth:true,lineStyle:{color:'#EF5350'}},
-                    {name:'BAA',type:'line',data:baaData,smooth:true,lineStyle:{color:'#10B981',width:3}},
-                    {name:'MDD(BAA)',type:'bar',data:calcMDDArray(baaData),yAxisIndex:1,itemStyle:{color:'rgba(239,83,80,0.2)'}}
-                ]
+                tooltip: {trigger:'axis'}, legend: {data:['SPY','BAA']},
+                xAxis: {type:'category', data:pfSimData.years}, yAxis: {scale:true},
+                series:[{name:'SPY', type:'line', data:spy}, {name:'BAA', type:'line', data:baa}]
             }, true);
         }
 
-        // --- ⚙️ 기능 로직 ---
-        async function fetchStockData(t, i, r) {
-            try {
-                const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/${t}?interval=${i}&range=${r}`);
-                const j = await res.json(); const d = j.chart.result[0];
-                if (currentCurrency === 'KRW' && t !== 'KRW=X') { const fx = await getFxMap(i, r); if(fx) applyFxToData(d, fx); }
-                return d;
-            } catch(e) { throw e; }
-        }
-
         function updatePfCardMetrics() {
-            Object.keys(pfDetails).forEach(k => {
-                const cagrEl = document.getElementById(`card-cagr-${k}`), mddEl = document.getElementById(`card-mdd-${k}`);
-                if(!cagrEl) return;
-                const d = getAdjustedSimData(k);
-                const final = d[d.length-1], init = d[0], count = d.length - 1;
-                const cagr = (((final / init) ** (1 / count)) - 1) * 100;
-                const mdd = Math.min(...calcMDDArray(d));
-                cagrEl.innerText = `${cagr.toFixed(1)}%`; mddEl.innerText = `${mdd.toFixed(1)}%`;
+            ['6040', 'baa'].forEach(k => {
+                const cEl = document.getElementById(`card-cagr-${k}`);
+                if(cEl) {
+                    const d = getAdjustedSimData(k);
+                    const cagr = (((d[d.length-1]/d[0])**(1/(d.length-1)))-1)*100;
+                    cEl.innerText = cagr.toFixed(1) + '%';
+                }
             });
         }
 
-        async function loadData(t) {
-            document.getElementById('loading-overlay').style.display = 'flex';
-            try { const d = await fetchStockData(t, '1d', '1y'); globalChartData = d; globalTicker = t; updateStatus("LIVE","bg-emerald-500"); renderDashboard(t,d); } 
-            catch(e) { logError("Load Error", e); } finally { document.getElementById('loading-overlay').style.display = 'none'; }
-        }
-
-        async function loadCryptoData(t) {
-            document.getElementById('crypto-loading-overlay').style.display = 'flex';
-            try { const d = await fetchStockData(t, '1d', '1y'); globalCryptoChartData = d; globalCryptoTicker = t; updateCryptoStatus("LIVE","bg-emerald-500"); renderCryptoDashboard(t,d); } 
-            catch(e) { logError("Crypto Error", e); } finally { document.getElementById('crypto-loading-overlay').style.display = 'none'; }
-        }
-
-        function updateStatus(t,c) { const l = document.getElementById('conn-label'), d = document.getElementById('status-dot'); if(l){l.innerText=t; d.className=`w-2 h-2 rounded-full ${c}`;} }
-        function updateCryptoStatus(t,c) { const l = document.getElementById('crypto-conn-label'), d = document.getElementById('crypto-status-dot'); if(l){l.innerText=t; d.className=`w-2 h-2 rounded-full ${c}`;} }
-
-        // --- 🚀 시스템 부트 ---
+        // ==========================================
+        // 🚀 5. 최종 시스템 초기화
+        // ==========================================
         document.addEventListener("DOMContentLoaded", () => {
-            window.scrollTo(0,0); if('scrollRestoration' in history) history.scrollRestoration='manual';
+            window.scrollTo(0,0);
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
-                cryptoChart = echarts.init(document.getElementById('crypto-chart-main'));
                 pfChart = echarts.init(document.getElementById('chart-portfolio'));
                 
-                setTheme(savedTheme); setFontSize(savedFontSize);
-                document.getElementById('currency-toggle').innerText = currentCurrency;
-                updateMAButtons(); updateCryptoMAButtons(); updatePfCardMetrics();
-
-                document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); };
-                document.getElementById('crypto-search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase(); if(t) loadCryptoData(t); };
-
-                setTimeout(() => { loadData('SPY'); loadCryptoData('BTC-USD'); renderPortfolioChart(); }, 200);
-                window.addEventListener('resize', () => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); });
-            } catch(e) { logError("Init Crash", e); }
+                // 전역 함수 호출 전 변수 선언 확인
+                const savedTheme = localStorage.getItem('dashboardTheme') || 'theme-green';
+                setTheme(savedTheme);
+                
+                document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); loadData(document.getElementById('ticker-input').value.toUpperCase()); };
+                
+                loadData('SPY');
+                updatePfCardMetrics();
+            } catch(e) { logError("Boot Error", e); }
         });
 
-        // --- 🛠️ 퀀트 연산 (필수) ---
-        const Indicator = {
-            macd: (d, s, l, sig) => {
-                const ema = (data, p) => { let r=[data[0]], k=2/(p+1); for(let i=1;i<data.length;i++) r.push(data[i]*k + r[i-1]*(1-k)); return r; };
-                const se = ema(d, s), le = ema(d, l);
-                const line = se.map((v, i) => v - le[i]);
-                const signal = ema(line, sig);
-                return { hist: line.map((v, i) => v - signal[i]) };
-            }
-        };
-
-        // UI 핸들러
-        function toggleCurrency() {
-            currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
-            safeStorageSet('dashboardCurrency', currentCurrency);
-            document.getElementById('currency-toggle').innerText = currentCurrency;
-            updatePfCardMetrics();
-            if(document.getElementById('view-dashboard').style.display !== 'none') loadData(globalTicker);
-            else if(document.getElementById('view-crypto').style.display !== 'none') loadCryptoData(globalCryptoTicker);
-            if(document.getElementById('pf-detail-modal').style.display === 'flex' && currentPfKey) showPfDetail(currentPfKey);
-            renderPortfolioChart();
-        }
-        function switchMainTab(t) {
-            ['dashboard','crypto','portfolio'].forEach(x => { document.getElementById(`view-${x}`).style.display = (x===t?'flex':'none'); document.getElementById(`tab-btn-${x}`).classList.toggle('active', x===t); });
-            if(t==='portfolio') { renderPortfolioChart(); updatePfCardMetrics(); }
-        }
-        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
-        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
-        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
-        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
-        function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
-        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
-        function openErrorModal() { document.getElementById('error-log-text').value = errorLogs.join('-------------------\n'); document.getElementById('error-modal').style.display = 'flex'; }
-        function copyErrorLog() { const t = document.getElementById('error-log-text'); t.select(); document.execCommand('copy'); }
+        // 기타 UI용 더미 함수들
+        function openErrorModal() { document.getElementById('error-log-text').value = errorLogs.join(''); document.getElementById('error-modal').style.display='flex'; }
+        function closeErrorModal() { document.getElementById('error-modal').style.display='none'; }
+        function showPfDetail(k) { alert('Portfolio Detail: ' + k); }
+        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display='none'; }
+        function toggleProofs(v) { console.log("Toggle Proofs:", v); }
     </script>
 </body>
 </html>
