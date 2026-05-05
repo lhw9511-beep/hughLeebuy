@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" class="theme-default">
+<html lang="ko" class="theme-green">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -502,6 +502,7 @@
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <div class="pf-card" onclick="showPfDetail('dual')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">Dual Momentum</h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">절대/상대 모멘텀을 혼합해 1등 자산에 투자합니다.</p>
                         <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">12.5%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-17.8%</span></span>
@@ -509,6 +510,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('vaa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">수익률 가중치로 가장 빠르고 강력한 자산을 찾습니다.</p>
                         <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">15.2%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-16.1%</span></span>
@@ -516,6 +518,7 @@
                     </div>
                     <div class="pf-card" onclick="showPfDetail('daa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">카나리아 자산이 하락하면 즉시 안전 자산으로 도망갑니다.</p>
                         <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">13.5%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-12.0%</span></span>
@@ -523,6 +526,7 @@
                     </div>
                     <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3>
+                        <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">방어와 공격적 스위칭을 구사하는 최신 배분 전략.</p>
                         <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span class="text-up">16.5%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span class="text-down">-11.2%</span></span>
@@ -611,7 +615,7 @@
             'baa': { title: 'BAA (Bold)', cagr: '16.5%', mdd: '-11.2%', type: 'dynamic', rules: ['카나리아 4개 중 1개라도 0 이하면 즉시 방어 전환', '공격 시 QQQ 등 상위 1개 몰빵', '방어 시 안전자산 상위 3개 분산'] }
         };
 
-        const savedTheme = safeStorageGet('dashboardTheme', 'theme-default');
+        const savedTheme = safeStorageGet('dashboardTheme', 'theme-green');
         const savedFontSize = safeStorageGet('dashboardFontSize', 'md');
         let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
 
