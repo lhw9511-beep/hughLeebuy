@@ -120,14 +120,14 @@
         
         #error-log-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; border-radius: 8px; padding: 8px; margin-top: 8px; font-family: monospace; font-size: 0.65rem; color: #FCA5A5; max-height: 100px; overflow-y: auto; word-break: break-all; }
         
-        /* 모드 토글 스위치 CSS */
-        .mode-toggle { position: relative; display: inline-block; width: 110px; height: 32px; }
+        /* 모드 토글 스위치 CSS (개선됨) */
+        .mode-toggle { position: relative; display: inline-flex; width: 130px; height: 34px; }
         .mode-toggle input { opacity: 0; width: 0; height: 0; }
-        .mode-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color); transition: .4s; border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 0.65rem; font-weight: 900; color: var(--text-muted); }
-        .mode-slider:before { position: absolute; content: ""; height: 24px; width: 50px; left: 3px; bottom: 3px; background-color: #3B82F6; transition: .4s; border-radius: 34px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .mode-toggle input:checked + .mode-slider:before { transform: translateX(52px); background-color: #10B981; }
-        .mode-text-left { z-index: 10; transition: color 0.3s; color: white; }
-        .mode-text-right { z-index: 10; transition: color 0.3s; }
+        .mode-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color); transition: .4s; border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 0.7rem; font-weight: 900; color: var(--text-muted); }
+        .mode-slider:before { position: absolute; content: ""; height: 26px; width: 60px; left: 3px; bottom: 3px; background-color: #3B82F6; transition: .4s cubic-bezier(0.4, 0.0, 0.2, 1); border-radius: 34px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .mode-toggle input:checked + .mode-slider:before { transform: translateX(62px); background-color: #10B981; }
+        .mode-text-left { z-index: 10; transition: color 0.3s; color: white; width: 50%; text-align: center; }
+        .mode-text-right { z-index: 10; transition: color 0.3s; width: 50%; text-align: center; }
         .mode-toggle input:checked + .mode-slider .mode-text-left { color: var(--text-muted); }
         .mode-toggle input:checked + .mode-slider .mode-text-right { color: white; }
     </style>
@@ -351,7 +351,7 @@
                 
                 <div class="flex items-center gap-2 md:gap-4">
                     <!-- 초보/전문가 모드 토글 -->
-                    <label class="mode-toggle hidden sm:inline-block">
+                    <label class="mode-toggle hidden sm:inline-flex">
                         <input type="checkbox" id="mode-switch" onchange="toggleMode()">
                         <span class="mode-slider">
                             <span class="mode-text-left">전문가</span>
@@ -377,9 +377,9 @@
             
             <div class="sm:hidden px-3 pb-2 flex justify-end">
                  <!-- 모바일용 초보/전문가 모드 토글 -->
-                 <label class="mode-toggle inline-block w-full text-center">
+                 <label class="mode-toggle inline-flex w-full text-center !w-full">
                     <input type="checkbox" id="mob-mode-switch" onchange="document.getElementById('mode-switch').click();">
-                    <span class="mode-slider !w-full justify-center gap-10">
+                    <span class="mode-slider justify-center">
                         <span class="mode-text-left">전문가 모드</span>
                         <span class="mode-text-right">초보 모드</span>
                     </span>
@@ -482,7 +482,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3">
+                    <div id="stock-expert-indicators" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
                         <div class="stat-box" onclick="openStatInfo('vix', 'stock')">
                             <div class="weight-badge">9.0</div>
                             <p class="stat-label" id="label-stock-vix">VIX 지수</p>
@@ -622,7 +622,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3">
+                    <div id="crypto-expert-indicators" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
                         <div class="stat-box" onclick="openStatInfo('vol', 'crypto')">
                             <div class="weight-badge">9.0</div>
                             <p class="stat-label" id="label-crypto-vol">변동성</p>
@@ -809,8 +809,8 @@
                 beginner: '다른 사람들이 얼마나 욕심을 내고 있는지 0부터 100까지 점수로 보여줘요.\n\n• 남들이 너무 욕심낼 때(점수가 높을 때)는 팔 준비를 하고, 남들이 무서워할 때(점수가 낮을 때) 사는 게 좋아요.'
             },
             dist: {
-                expert: '현재가와 120일 이평선 간의 거리(%)입니다.\n\n• 신뢰도 가중치: 8.0 / 10\n(트렌드 팔로잉의 핵심이 되는 장기 추세 방어 지표입니다.)\n\n• 0% 초과: 상승 추세 (매수)\n• 0% 미만: 하락 역배열 (매도)',
-                beginner: '최근 6개월(120일) 평균 가격보다 지금 가격이 위에 있는지 아래에 있는지 봐요.\n\n• + (플러스)면 상승 썰매를 탄 거예요. (계속 오르는 중)\n• - (마이너스)면 하락 썰매를 탄 거예요. (위험하니 조심!)'
+                expert: '현재가와 기준 이평선(단기 20일, 중기 50일, 장기 120일) 간의 거리(%)입니다.\n\n• 신뢰도 가중치: 8.0 / 10\n(트렌드 팔로잉의 핵심이 되는 추세 방어 지표입니다.)\n\n• 0% 초과: 상승 추세 (매수)\n• 0% 미만: 하락 역배열 (매도)',
+                beginner: '주요 평균 가격(20일/50일/120일)보다 지금 가격이 위에 있는지 아래에 있는지 봐요.\n\n• + (플러스)면 상승 썰매를 탄 거예요. (계속 오르는 중)\n• - (마이너스)면 하락 썰매를 탄 거예요. (위험하니 조심!)'
             },
             macd: {
                 expert: '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 신뢰도 가중치: 7.0 / 10\n(추세 전환 포착에 강하지만 횡보장에서 거짓 신호가 발생할 수 있습니다.)',
@@ -869,7 +869,7 @@
 
         const fxSimData = [1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
 
-        const pfDetails = { /* 포트폴리오 디테일 설명은 동일하게 생략 */
+        const pfDetails = { 
             '6040': { title: '60/40 전략', type: 'static', desc: '주식 60%, 채권 40%', rules: [], allocation: [] },
             'permanent': { title: '영구 포트폴리오', type: 'static', desc: '', rules: [], allocation: [] },
             'allweather': { title: '올웨더 전략', type: 'static', desc: '', rules: [], allocation: [] },
@@ -890,6 +890,13 @@
             if(mobCheckbox) mobCheckbox.checked = isBeginnerMode;
 
             updateTerminologyUI();
+            
+            // ★ 초보 모드일 경우 복잡한 전광판(7개 지표) 숨기기
+            const stockIndicators = document.getElementById('stock-expert-indicators');
+            if (stockIndicators) stockIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
+            
+            const cryptoIndicators = document.getElementById('crypto-expert-indicators');
+            if (cryptoIndicators) cryptoIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
             
             // 데이터 재분석을 통해 브리핑 문구 등을 갱신
             if (globalTicker && globalChartData) {
@@ -922,7 +929,7 @@
             const cStoch = document.getElementById('label-crypto-stoch'); if(cStoch) cStoch.innerText = TERMS.stoch[mode];
         }
 
-        // 인포 모달 띄우기 함수 변경
+        // 인포 모달 띄우기 함수
         window.openStatInfo = function(type, market) {
             const mode = isBeginnerMode ? 'beginner' : 'expert';
             const title = TERMS[type][mode];
@@ -1752,6 +1759,9 @@
                     fetchStockData(ticker, '1mo', '10y', marketType === 'crypto')
                 ]);
 
+                const dailyClean = extractCleanData(dData);
+                const dailyCloses = dailyClean.closes;
+
                 const analyze = (data, timeHorizon, periods) => {
                     let { kData, closes } = extractCleanData(data);
                     if(closes.length < periods.ma) return { status:"WAIT", score: 0, pct: 50, breakdown: [], maxScore: 0 };
@@ -1761,11 +1771,15 @@
                     const rsi = rsiArr[last] || 50;
                     const macdHist = Indicator.macd(closes, 12, 26, 9).hist;
                     const macd = macdHist[last] || 0;
-                    const sma = Indicator.sma(closes, periods.ma)[last] || closes[last];
                     const stochK = Indicator.stochastic(kData, periods.stoch, 3).k;
                     const stoch = stochK[last] || 50;
                     const bb = Indicator.bollinger(closes, periods.ma, 2);
-                    const dist = ((closes[last] - sma) / sma) * 100;
+                    
+                    // 핵심 수정: DIST(이격도)는 무조건 일봉 기준(20/50/120) 사용
+                    const dLast = dailyCloses.length - 1;
+                    const distSmaArray = Indicator.sma(dailyCloses, periods.distSma);
+                    const currentDistSma = distSmaArray[dLast] || dailyCloses[dLast];
+                    const dist = ((dailyCloses[dLast] - currentDistSma) / currentDistSma) * 100;
                     
                     let bbStr = "MID";
                     if(bb.upper[last] !== null && closes[last] >= bb.upper[last] * 0.98) bbStr = "UPPER";
@@ -1824,7 +1838,6 @@
 
                     const pct = Math.max(0, Math.min(100, 50 + (diff / maxScore) * 50));
 
-                    // 동적 리포트(Advice) 생성 - 초보/전문가 분기
                     let advice = "";
                     let buyReasons = breakdown.filter(b => b.sig === 'BUY').sort((a,b) => parseFloat(b.val) - parseFloat(a.val));
                     let sellReasons = breakdown.filter(b => b.sig === 'SELL').sort((a,b) => parseFloat(a.val) - parseFloat(b.val));
@@ -1866,9 +1879,9 @@
                     return { status: st, buyScore, sellScore, diff, pct, maxScore, breakdown, advice };
                 };
 
-                const stRes = analyze(dData, 'short', { ma: 20, rsi: 14, stoch: 14 });
-                const mtRes = analyze(wData, 'mid', { ma: 10, rsi: 14, stoch: 14 });
-                const ltRes = analyze(mData, 'long', { ma: 10, rsi: 14, stoch: 14 });
+                const stRes = analyze(dData, 'short', { ma: 20, distSma: 20, rsi: 14, stoch: 14 });
+                const mtRes = analyze(wData, 'mid', { ma: 10, distSma: 50, rsi: 14, stoch: 14 });
+                const ltRes = analyze(mData, 'long', { ma: 10, distSma: 120, rsi: 14, stoch: 14 });
 
                 const updateUI = (prefix) => {
                     const targetDetails = prefix === 'stock' ? analysisDetails : cryptoAnalysisDetails;
@@ -1912,18 +1925,16 @@
 
                 updateUI(marketType);
 
-                const dailyClean = extractCleanData(dData);
-                const closes = dailyClean.closes;
-                const len = closes.length;
+                const len = dailyCloses.length;
                 if(len === 0) return;
                 
-                const mainSma120 = Indicator.sma(closes, 120);
-                const lastCl = closes[len - 1];
+                const mainSma120 = Indicator.sma(dailyCloses, 120);
+                const lastCl = dailyCloses[len - 1];
                 const lastSma120 = mainSma120[len - 1];
                 const dist120 = lastSma120 ? ((lastCl - lastSma120) / lastSma120 * 100).toFixed(2) : 0;
                 
-                const rsiArr = Indicator.rsi(closes, 14);
-                const macdArr = Indicator.macd(closes, 12, 26, 9).hist;
+                const rsiArr = Indicator.rsi(dailyCloses, 14);
+                const macdArr = Indicator.macd(dailyCloses, 12, 26, 9).hist;
                 const stochArr = Indicator.stochastic(dailyClean.kData, 14, 3).k;
 
                 const lastRsi = rsiArr[len - 1] ?? 50;
@@ -2039,7 +2050,6 @@
             summaryMdd.className = `text-sm font-bold ml-1 text-themeMuted`;
         };
 
-        // ... (나머지 runLiveCalc, comparePortfolioStock 등 함수는 기존과 동일) ...
         async function comparePortfolioStock() {
             const ticker = document.getElementById('pf-compare-input').value.trim().toUpperCase();
             const btn = document.getElementById('pf-compare-btn');
@@ -2121,6 +2131,12 @@
                 const mobModeSwitch = document.getElementById('mob-mode-switch');
                 if (mobModeSwitch) mobModeSwitch.checked = isBeginnerMode;
                 updateTerminologyUI();
+
+                const stockIndicators = document.getElementById('stock-expert-indicators');
+                if (stockIndicators) stockIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
+                
+                const cryptoIndicators = document.getElementById('crypto-expert-indicators');
+                if (cryptoIndicators) cryptoIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
 
                 const currentTheme = safeStorageGet('dashboardTheme', 'theme-green');
                 const currentFont = safeStorageGet('dashboardFontSize', 'md');
