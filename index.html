@@ -264,6 +264,35 @@
 
                 <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
 
+                <!-- 자산 배분 비율 (파이 차트 - Static 전용) -->
+                <div id="pf-modal-pie-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-themeBorder mb-4 hidden relative overflow-hidden">
+                    <div class="absolute top-2 left-3 text-[0.65rem] font-black text-themeMuted tracking-widest z-10">자산 배분 비율</div>
+                    <div id="pf-pie-chart" class="pie-container"></div>
+                </div>
+
+                <!-- 라이브 엔진 영역 (Dynamic 전용) -->
+                <div id="pf-modal-live-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
+                    <div class="p-3 border-b border-themeBorder flex flex-col md:flex-row md:justify-between md:items-center bg-black/20 gap-3">
+                        <div class="flex items-center gap-2">
+                            <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            <span class="text-sm font-black text-themeText">Live Strategy Engine</span>
+                        </div>
+                        <label class="flex items-center gap-2 cursor-pointer bg-themeBorder/50 px-3 py-1.5 rounded-lg border border-themeBorder hover:bg-themeBorder transition justify-center md:justify-end">
+                            <input type="checkbox" id="toggle-proof" class="w-4 h-4 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
+                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 및 원데이터 증명 보기</span>
+                        </label>
+                    </div>
+
+                    <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
+                        <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
+                        <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
+                    </div>
+                    <div id="pf-live-content" class="hidden overflow-x-auto custom-scroll p-1">
+                        <table class="calc-table" id="pf-live-table"></table>
+                    </div>
+                </div>
+
+                <!-- 과거 성과 시뮬레이션 표 -->
                 <div id="pf-historical-section" class="mb-4 bg-[var(--bg-color)] rounded-xl border border-themeBorder p-3 md:p-4">
                     <p class="text-[0.7rem] font-black text-themeText uppercase mb-2 flex items-center gap-2">
                         <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
@@ -277,6 +306,15 @@
                             <tbody id="pf-historical-tbody"></tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- 운용 알고리즘 및 규칙 -->
+                <div class="bg-[var(--modal-bg)] p-4 md:p-5 rounded-xl border border-themeBorder mb-2">
+                    <p class="text-[0.8rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-3">
+                        <svg class="icon-md mr-1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                        운용 알고리즘 및 규칙
+                    </p>
+                    <ul id="pf-modal-rules" class="rule-list"></ul>
                 </div>
             </div>
             <div class="mt-4 flex justify-end">
@@ -776,7 +814,6 @@
             }
         };
 
-        // 이평선 돌파(DIST)의 점수 상향 적용
         const WEIGHT_MATRIX = {
             stock: {
                 short: { VIX: 9, FNG: 8.5, RSI: 8, STOCH: 6, MACD: 5, DIST: 8, BB: 6 },
@@ -810,14 +847,74 @@
         };
         const fxSimData = [1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
 
+        // 💡 첫 번째 코드의 rules 및 allocation 상세 내용 복원
         const pfDetails = { 
-            '6040': { title: '60/40 전략', type: 'static', desc: '전통적이고 검증된 투자 방식으로, 주식의 수익성과 채권의 안정성을 6:4로 결합한 포트폴리오입니다.', rules: [], allocation: [] },
-            'permanent': { title: '영구 포트폴리오', type: 'static', desc: '주식, 채권, 현금, 금에 25%씩 동일하게 배분하여 모든 경제 상황(인플레이션, 디플레이션, 경제성장, 침체)에 대비합니다.', rules: [], allocation: [] },
-            'allweather': { title: '올웨더 전략', type: 'static', desc: '레이 달리오가 고안한 전략으로, 계절(경제 상황)에 상관없이 꾸준히 안정적인 수익을 내도록 설계되었습니다.', rules: [], allocation: [] },
-            'dual': { title: '듀얼 모멘텀', type: 'dynamic', desc: '절대 모멘텀과 상대 모멘텀을 결합하여, 상승장에서는 가장 강한 자산에 투자하고 하락장에서는 안전 자산으로 도피합니다.', rules: [] },
-            'vaa': { title: 'VAA 전략', type: 'dynamic', desc: '공격형 자산과 수비형 자산을 나누어 최근 1개월 모멘텀을 매우 민감하게 반영하여 빠르게 스위칭하는 전략입니다.', rules: [] },
-            'daa': { title: 'DAA 전략', type: 'dynamic', desc: '카나리아 자산(위험 감지기)을 사용하여 폭락장을 사전에 감지하고 현금/채권으로 방어하는 전략입니다.', rules: [] },
-            'baa': { title: 'BAA 전략', type: 'dynamic', desc: 'DAA를 한층 더 발전시켜 공격형 자산과 방어형 자산의 모멘텀을 다각도로 분석하여 수익률과 방어력을 극대화한 최신 전략입니다.', rules: [] }
+            '6040': { 
+                title: '60/40 전략', type: 'static', 
+                desc: '가장 고전적이고 검증된 패시브 전략입니다. 경제 성장기에는 주식이, 침체기에는 채권이 방어하여 꾸준한 우상향을 그립니다.',
+                rules: [
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.</div>'
+                ], 
+                allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] 
+            },
+            'permanent': { 
+                title: '영구 포트폴리오', type: 'static', 
+                desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절(성장, 침체, 인플레이션, 디플레이션) 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
+                rules: [
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%</div>',
+                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.</div>'
+                ], 
+                allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] 
+            },
+            'allweather': { 
+                title: '올웨더 전략', type: 'static', 
+                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 포트폴리오 전체에 미치는 변동성(리스크)을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.',
+                rules: [
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%</div>',
+                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.</div>'
+                ], 
+                allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] 
+            },
+            'dual': { 
+                title: '듀얼 모멘텀', type: 'dynamic', 
+                desc: 'Gary Antonacci가 발표한 동적 자산배분의 고전입니다. 자산이 과거 대비 상승장인지 파악하는 <b>절대 모멘텀</b>과, 여러 자산 중 어느 것이 더 강한지 파악하는 <b>상대 모멘텀</b>을 결합하여 하락장을 피하고 상승장에 올라탑니다.',
+                rules: [
+                    '<div class="flex-1"><span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span></div>',
+                    '<div class="flex-1"><span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.</div>'
+                ] 
+            },
+            'vaa': { 
+                title: 'VAA 전략', type: 'dynamic', 
+                desc: 'Wouter Keller 박사가 개발한 극강의 방어형 모멘텀 전략입니다. 시장이 꺾이는 순간을 귀신같이 포착하기 위해 과거 1개월 단기 수익률에 무려 12배의 압도적인 가중치를 두어 <b>번개처럼 빠른 스위칭</b>을 목표로 합니다.',
+                rules: [
+                    '<div class="flex-1"><span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span></div>',
+                    '<div class="flex-1"><span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span></div>',
+                    '<div class="flex-1"><span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 점수를 계산합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 점수가 <b>모두 0 이상</b>이면, 점수가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">수비 모드:</span> 단 1개라도 점수가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 점수 1위 자산으로 <strong>100% 전액 대피</strong>합니다.</div>'
+                ] 
+            },
+            'daa': { 
+                title: 'DAA 전략', type: 'dynamic', 
+                desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기에 가장 먼저 타격을 받는 <b>탄광 속 카나리아(Canary) 자산</b>을 도입하여, 평소엔 주식 비중을 유지하면서 위험 시점에만 효과적으로 도망갑니다.',
+                rules: [
+                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span></div>',
+                    '<div class="flex-1"><span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)</div>',
+                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 점수(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.</div>',
+                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.</div>'
+                ] 
+            },
+            'baa': { 
+                title: 'BAA 전략', type: 'dynamic', 
+                desc: '현존하는 최고 수준의 최신 동적 자산배분 모델입니다. 2022년 주식/채권 동반 폭락장에서도 훌륭한 방어력을 증명했습니다. 방어력을 한층 더 끌어올리고, 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화합니다.',
+                rules: [
+                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.</div>',
+                    '<div class="flex-1"><span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 점수(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 특정 채권 시장 붕괴 리스크까지 차단합니다.</div>'
+                ] 
+            }
         };
 
         // ★ 모드 전환 함수
@@ -919,6 +1016,14 @@
             if (currentPfKey) showPfDetail(currentPfKey); 
         }
 
+        // 증명 보기 토글 함수 (추가)
+        function toggleProofs(show) {
+            document.querySelectorAll('.proof-row').forEach(row => {
+                if(show) row.classList.add('show');
+                else row.classList.remove('show');
+            });
+        }
+
         // ==========================================
         // 📈 2. 차트 렌더링 및 모달 컨트롤 함수
         // ==========================================
@@ -955,7 +1060,7 @@
             document.getElementById('info-modal').style.display = 'flex';
         }
 
-        // 포트폴리오 디테일 모달 함수 누락 복구
+        // 💡 수정된 포트폴리오 디테일 모달 함수 (라이브 엔진/파이 차트 통합)
         function showPfDetail(key) {
             currentPfKey = key;
             const modal = document.getElementById('pf-detail-modal');
@@ -965,7 +1070,7 @@
             if (!detail) return;
 
             document.getElementById('pf-modal-title').innerText = detail.title;
-            document.getElementById('pf-modal-desc').innerText = detail.desc || '상세 설명이 제공되지 않습니다.';
+            document.getElementById('pf-modal-desc').innerHTML = detail.desc || '상세 설명이 제공되지 않습니다.';
 
             const dataArr = getAdjustedSimData(key);
             const years = parseInt(pfSimYears[pfSimYears.length - 1]) - parseInt(pfSimYears[0]);
@@ -985,6 +1090,26 @@
             document.getElementById('pf-modal-mar').innerText = mar.toFixed(2);
             document.getElementById('pf-modal-mar').style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6');
 
+            // 운용 규칙 렌더링
+            const rulesEl = document.getElementById('pf-modal-rules');
+            if (rulesEl && detail.rules) {
+                rulesEl.innerHTML = detail.rules.map(r => `<li><div class="flex-1">${r}</div></li>`).join('');
+            }
+
+            // 동적/정적 판단하여 UI 전환 및 라이브 계산 실행
+            const pieArea = document.getElementById('pf-modal-pie-area');
+            const liveArea = document.getElementById('pf-modal-live-area');
+
+            if(detail.type === 'dynamic') {
+                if(pieArea) pieArea.style.display = 'none';
+                if(liveArea) {
+                    liveArea.style.display = 'block';
+                    runLiveCalc(key);
+                }
+            } else {
+                if(liveArea) liveArea.style.display = 'none';
+            }
+
             const tbody = document.getElementById('pf-historical-tbody');
             let rows = '';
             for(let i=0; i<pfSimYears.length; i++) {
@@ -996,28 +1121,301 @@
                     <td class="${rtnColor}">${yrRtn > 0 ? '+' : ''}${yrRtn.toFixed(2)}%</td>
                 </tr>`;
             }
-            tbody.innerHTML = rows;
-
-            if (!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
-            const styleColor = getComputedStyle(document.documentElement);
-            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-            
-            pfModalChart.setOption({
-                tooltip: { trigger: 'axis' },
-                grid: { left: '3%', right: '3%', top: '10%', bottom: '5%', containLabel: true },
-                xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
-                yAxis: [
-                    { type: 'value', axisLabel: { color: chartTextColor }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
-                    { type: 'value', min: -60, max: 0, position: 'right', axisLabel: { formatter: '{value}%', color: chartTextColor }, splitLine: { show: false } }
-                ],
-                series: [
-                    { name: 'MDD', type: 'bar', data: mdds, yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.3)' } },
-                    { name: detail.title, type: 'line', data: dataArr, smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false }
-                ]
-            }, true);
+            if(tbody) tbody.innerHTML = rows;
 
             modal.style.display = 'flex';
-            setTimeout(() => pfModalChart.resize(), 100);
+
+            requestAnimationFrame(() => {
+                if (!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
+                pfModalChart.clear();
+                
+                const styleColor = getComputedStyle(document.documentElement);
+                const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+                const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+
+                pfModalChart.setOption({
+                    backgroundColor: 'transparent',
+                    tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 11 },
+                        formatter: function (params) {
+                            let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}년</div>`;
+                            params.forEach(p => {
+                                let val = p.value !== undefined ? p.value : p.data;
+                                if (val === null || val === undefined || isNaN(val)) return;
+                                let unit = p.seriesName.includes('MDD') ? '%' : '';
+                                result += `${p.marker} ${p.seriesName}: <b>${Number(val).toFixed(2)}${unit}</b><br/>`;
+                            });
+                            return result;
+                        }
+                    },
+                    legend: { data: [detail.title, 'MDD'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
+                    grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
+                    xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
+                    yAxis: [
+                        { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
+                        { type: 'value', min: -60, max: 0, position: 'right', splitLine: { show: false }, axisLabel: { formatter: '{value}%', color: chartTextColor, fontSize: 9 } }
+                    ],
+                    series: [
+                        { name: `MDD`, type: 'bar', data: mdds, yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
+                        { name: detail.title, type: 'line', data: dataArr, smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 }
+                    ]
+                }, true);
+                pfModalChart.resize();
+
+                // 정적 배분 비율 파이 차트
+                if(detail.type === 'static' && detail.allocation && pieArea) {
+                    pieArea.style.display = 'block';
+                    if(!pfPieChart) pfPieChart = echarts.init(document.getElementById('pf-pie-chart'));
+                    const textColor = styleColor.getPropertyValue('--text-main').trim() || '#fff';
+                    
+                    pfPieChart.setOption({
+                        backgroundColor: 'transparent',
+                        tooltip: { trigger: 'item', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 12 }, formatter: '{b}: <b>{c}%</b>' },
+                        color: ['#EF5350', '#3B82F6', '#EAB308', '#9CA3AF', '#A855F7'],
+                        series: [{
+                            type: 'pie', radius: ['40%', '75%'], avoidLabelOverlap: true, center: ['50%', '55%'],
+                            itemStyle: { borderRadius: 4, borderColor: 'var(--bg-color)', borderWidth: 2 },
+                            label: { show: true, color: textColor, fontSize: 10, formatter: '{b}\n{c}%' },
+                            data: detail.allocation
+                        }]
+                    }, true);
+                    pfPieChart.resize();
+                }
+            });
+        }
+
+        // 💡 라이브 엔진 계산 함수 (첫 번째 코드 복원)
+        async function runLiveCalc(pfKey) {
+            const area = document.getElementById('pf-modal-live-area');
+            const loading = document.getElementById('pf-live-loading');
+            const content = document.getElementById('pf-live-content');
+            const tbody = document.getElementById('pf-live-table');
+            const toggleBox = document.getElementById('toggle-proof');
+            
+            if(!area) return;
+            area.style.display = 'block';
+            loading.style.display = 'flex';
+            content.style.display = 'none';
+            tbody.innerHTML = '';
+            if(toggleBox) toggleBox.checked = false;
+
+            try {
+                let tickers = [];
+                let colCount = 7;
+                if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'QQQ']; colCount = 7; } 
+                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY', 'QQQ']; colCount = 8; } 
+                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
+                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
+
+                const dataMap = {};
+                let unifiedMonths = new Set();
+                
+                for(let i=0; i<tickers.length; i++) {
+                    const t = tickers[i];
+                    document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t} 데이터`;
+                    
+                    if(i > 0) await new Promise(r => setTimeout(r, 1000));
+                    
+                    const d = await fetchStockData(t, '1mo', '2y');
+                    let { dates, closes } = extractCleanData(d);
+                    
+                    dataMap[t] = {};
+                    for(let j=0; j<dates.length; j++) {
+                        const dStr = dates[j].substring(0, 7);
+                        dataMap[t][dStr] = closes[j];
+                        unifiedMonths.add(dStr);
+                    }
+                }
+
+                const sortedMonths = Array.from(unifiedMonths).sort();
+                let html = '<thead><tr><th class="text-left">투자 월</th>';
+                if(pfKey === 'dual') html += `<th>SPY 12M수익</th><th>VEA 12M수익</th><th>BIL 12M수익</th>`;
+                else if(pfKey === 'vaa') html += `<th>SPY 점수</th><th>VEA 점수</th><th>VWO 점수</th><th>AGG 점수</th>`;
+                else if(pfKey === 'daa') html += `<th>VWO 점수</th><th>BND 점수</th><th>위험 여부</th>`;
+                else if(pfKey === 'baa') html += `<th>최저 카나리아</th><th>안전 대피 여부</th>`;
+                html += `<th>월간 수익률</th><th>SPY / QQQ</th><th class="text-right">투자 비중</th></tr></thead><tbody>`;
+
+                const getSignal = (idx) => {
+                    if(idx - 12 < 0) return null;
+                    let result = { assets: [], text: '', proofs: [], color: '' };
+                    const currYM = sortedMonths[idx];
+                    
+                    const calcScore = (t) => {
+                        const m1YM = sortedMonths[idx-1], m3YM = sortedMonths[idx-3], m6YM = sortedMonths[idx-6], m12YM = sortedMonths[idx-12];
+                        const P0 = dataMap[t][currYM], P1 = m1YM ? dataMap[t][m1YM] : null, P3 = m3YM ? dataMap[t][m3YM] : null, P6 = m6YM ? dataMap[t][m6YM] : null, P12 = m12YM ? dataMap[t][m12YM] : null;
+
+                        if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `<span class="text-rose-400">[${t}] 과거 데이터 부족</span>` };
+
+                        const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
+                        const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
+                        
+                        const proof = `
+                            <div class="mb-2 pb-2 border-b border-themeBorder/50">
+                                <span class="text-accent font-bold">[${t}] 모멘텀 계산:</span><br>
+                                <span class="text-[0.6rem] leading-relaxed">
+                                • 1M 수익: ${(r1*100).toFixed(2)}% × 12 = ${(r1*12*100).toFixed(2)}<br>
+                                • 3M 수익: ${(r3*100).toFixed(2)}% × 4 = ${(r3*4*100).toFixed(2)}<br>
+                                • 6M 수익: ${(r6*100).toFixed(2)}% × 2 = ${(r6*2*100).toFixed(2)}<br>
+                                • 12M 수익: ${(r12*100).toFixed(2)}% × 1 = ${(r12*100).toFixed(2)}
+                                </span><br>
+                                <span class="text-white font-bold">👉 가중 합산 스코어: ${score.toFixed(2)}</span>
+                            </div>`;
+                        return { score, proof };
+                    };
+
+                    const calcRet = (t) => {
+                        const m12YM = sortedMonths[idx-12];
+                        const P0 = dataMap[t][currYM], P12 = m12YM ? dataMap[t][m12YM] : null;
+                        
+                        if(!P0 || !P12) return { ret: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
+                        const ret = (P0/P12 - 1) * 100;
+                        const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) ${getCurrSymbol()}${formatPriceStr(P0)} / 과거(${m12YM}) ${getCurrSymbol()}${formatPriceStr(P12)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
+                        return { ret, proof };
+                    };
+
+                    if(pfKey === 'dual') {
+                        const s = calcRet('SPY'), v = calcRet('VEA'), b = calcRet('BIL');
+                        result.proofs.push(s.proof, v.proof, b.proof);
+                        result.raw = { s, v, b };
+                        if(s.ret === -999 || v.ret === -999 || b.ret === -999) return null;
+                        
+                        if(s.ret < b.ret && v.ret < b.ret) { result.assets=[{t:'AGG', w:1}]; result.text='AGG 100%'; result.color='text-gray-400'; }
+                        else if(s.ret > v.ret) { result.assets=[{t:'SPY', w:1}]; result.text='SPY 100%'; result.color='text-up'; }
+                        else { result.assets=[{t:'VEA', w:1}]; result.text='VEA 100%'; result.color='text-accent'; }
+                    }
+                    else if(pfKey === 'vaa') {
+                        const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), as=calcScore('AGG');
+                        result.proofs.push(ss.proof, vs.proof, vws.proof, as.proof);
+                        result.raw = { ss, vs, vws, as };
+                        if(ss.score===-999) return null;
+                        
+                        if(ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) {
+                            const m = Math.max(ss.score, vs.score, vws.score, as.score);
+                            const t = ss.score===m?'SPY':(vs.score===m?'VEA':(vws.score===m?'VWO':'AGG'));
+                            result.assets=[{t, w:1}]; result.text=`${t} 100% (공격)`; result.color='text-up';
+                        } else {
+                            const lq=calcScore('LQD'), ie=calcScore('IEF'), sh=calcScore('SHY');
+                            result.proofs.push(lq.proof, ie.proof, sh.proof);
+                            const m = Math.max(lq.score, ie.score, sh.score);
+                            const t = lq.score===m?'LQD':(ie.score===m?'IEF':'SHY');
+                            result.assets=[{t, w:1}]; result.text=`${t} 100% (방어)`; result.color='text-gray-400';
+                        }
+                    }
+                    else if(pfKey === 'daa') {
+                        const vws=calcScore('VWO'), bns=calcScore('BND');
+                        result.proofs.push(vws.proof, bns.proof);
+                        result.raw = { vws, bns };
+                        if(vws.score===-999) return null;
+                        
+                        if(vws.score>0 && bns.score>0) {
+                            result.assets=[{t:'SPY', w:0.5}, {t:'VEA', w:0.5}]; result.text='SPY 50%, VEA 50%'; result.color='text-up';
+                        } else {
+                            result.assets=[{t:'SHY', w:1}]; result.text='SHY 100% (방어)'; result.color='text-gray-400';
+                        }
+                    }
+                    else if(pfKey === 'baa') {
+                        const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), bns=calcScore('BND');
+                        result.proofs.push(ss.proof, vs.proof, vws.proof, bns.proof);
+                        result.raw = { ss, vs, vws, bns };
+                        if(ss.score===-999) return null;
+                        
+                        const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
+                        if(minS > 0) {
+                            result.assets=[{t:'QQQ', w:1}]; result.text='QQQ 100% (공격)'; result.color='text-up';
+                        } else {
+                            result.assets=[{t:'BIL', w:0.333}, {t:'IEF', w:0.333}, {t:'TLT', w:0.333}]; result.text='BIL 33%, IEF 33%, TLT 33%'; result.color='text-gray-400';
+                        }
+                    }
+                    return result;
+                };
+
+                const len = sortedMonths.length;
+                for(let i = len - 1; i >= len - 12; i--) {
+                    if(i - 12 < 0) break;
+                    
+                    const sig = getSignal(i);
+                    if(!sig) continue;
+
+                    const [yy, mm] = sortedMonths[i].split('-');
+                    const ymLabel = `${yy.substring(2)}년 ${parseInt(mm)}월`;
+                    
+                    let row = `<tr><td class="text-left font-bold text-accent whitespace-nowrap">${ymLabel}</td>`;
+                    
+                    if(pfKey === 'dual') {
+                        const { s, v, b } = sig.raw;
+                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td><td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td><td class="text-gray-400">+${b.ret.toFixed(2)}%</td>`;
+                    }
+                    else if(pfKey === 'vaa') {
+                        const { ss, vs, vws, as } = sig.raw;
+                        row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td><td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td><td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td>`;
+                    }
+                    else if(pfKey === 'daa') {
+                        const { vws, bns } = sig.raw;
+                        let def = (vws.score <= 0 || bns.score <= 0) ? 'YES (위험)' : 'NO (안전)';
+                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
+                    }
+                    else if(pfKey === 'baa') {
+                        const { ss, vs, vws, bns } = sig.raw;
+                        const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
+                        let def = minS <= 0 ? 'YES (대피 발동)' : 'NO (안전)';
+                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
+                    }
+
+                    let actualRetHtml = '<td class="text-gray-400">--</td>';
+                    let benchRetHtml = '<td class="text-gray-400 bg-black/10">-- / --</td>';
+                    
+                    if (i < len - 1) { 
+                        let monRet = 0;
+                        let hasData = true;
+                        for(let asset of sig.assets) {
+                            const p0 = dataMap[asset.t][sortedMonths[i]];
+                            const p1 = dataMap[asset.t][sortedMonths[i+1]]; 
+                            if(p0 && p1) { monRet += asset.w * (p1 / p0 - 1); } 
+                            else { hasData = false; }
+                        }
+                        if(hasData) {
+                            const retPct = monRet * 100;
+                            actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
+                        }
+
+                        const spy0 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i]] : null;
+                        const spy1 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i+1]] : null;
+                        const qqq0 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i]] : null;
+                        const qqq1 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i+1]] : null;
+                        
+                        let spyStr = '--', qqqStr = '--';
+                        if(spy0 && spy1) {
+                            const spyPct = (spy1/spy0 - 1) * 100;
+                            spyStr = `<span class="${spyPct > 0 ? 'text-up' : (spyPct < 0 ? 'text-down' : 'text-themeMuted')}">${spyPct > 0 ? '+' : ''}${spyPct.toFixed(2)}%</span>`;
+                        }
+                        if(qqq0 && qqq1) {
+                            const qqqPct = (qqq1/qqq0 - 1) * 100;
+                            qqqStr = `<span class="${qqqPct > 0 ? 'text-up' : (qqqPct < 0 ? 'text-down' : 'text-themeMuted')}">${qqqPct > 0 ? '+' : ''}${qqqPct.toFixed(2)}%</span>`;
+                        }
+                        benchRetHtml = `<td class="text-[0.65rem] font-bold whitespace-nowrap bg-black/10">S: ${spyStr} / Q: ${qqqStr}</td>`;
+
+                    } else {
+                        actualRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold">진행중</td>';
+                        benchRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold bg-black/10">진행중</td>';
+                    }
+
+                    row += actualRetHtml + benchRetHtml;
+                    row += `<td class="text-right font-black ${sig.color}">${sig.text}</td></tr>`;
+                    
+                    const proofHtml = sig.proofs.map(p => `<div>${p}</div>`).join('');
+                    row += `<tr class="proof-row"><td colspan="${colCount}" class="proof-cell"><div class="proof-box">${proofHtml}</div></td></tr>`;
+                    html += row;
+                }
+                
+                html += `</tbody>`;
+                tbody.innerHTML = html;
+
+                loading.style.display = 'none';
+                content.style.display = 'block';
+
+            } catch (error) {
+                logError(`Live Engine Failed (${pfKey})`, error);
+                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드에 실패했습니다.<br>우측 상단 [!] 버튼을 확인하세요.</p>`;
+            }
         }
 
         function updateMAButtons() {
@@ -1283,16 +1681,6 @@
             return stdDev * Math.sqrt(365) * 100;
         }
 
-        const getAdjustedSimData = (key) => {
-            const data = pfSimData[key];
-            if (currentCurrency === 'USD') return data;
-            const fxBase = fxSimData[0]; 
-            return data.map((val, idx) => {
-                const fxRatio = fxSimData[idx] ? (fxSimData[idx] / fxBase) : 1;
-                return val * fxRatio;
-            });
-        };
-
         async function fetchWithRetry(url, options = {}, maxRetries = 2) {
             let delay = 1500;
             for (let i = 0; i <= maxRetries; i++) {
@@ -1402,7 +1790,7 @@
             } else if (type === 'VOL') {
                 if (val < 40) { sig = 'BUY'; text = isBeginnerMode ? '조용함 (살 타이밍)' : '안정 (매수)'; color = 'var(--up)'; }
                 else if (val > 80) { sig = 'SELL'; text = isBeginnerMode ? '너무 요동침 (위험)' : '위험 (매도)'; color = 'var(--down)'; }
-            } else if (type === 'DIST') { // 이동평균선 돌파(이격도)
+            } else if (type === 'DIST') { 
                 if (val > 0) { sig = 'BUY'; text = isBeginnerMode ? '상승 썰매 타는중 (좋음)' : '상승 추세 (매수)'; color = 'var(--up)'; }
                 else if (val < 0) { sig = 'SELL'; text = isBeginnerMode ? '하락 썰매 타는중 (나쁨)' : '하락 추세 (매도)'; color = 'var(--down)'; }
             } else if (type === 'RSI') { 
@@ -1950,126 +2338,6 @@
         }
 
         // ==========================================
-        // 📊 포트폴리오 엔진 및 렌더링
-        // ==========================================
-        function initPortfolioChart() {
-            if(!document.getElementById('chart-portfolio')) return;
-            pfChart = echarts.init(document.getElementById('chart-portfolio'));
-            renderPortfolioChart();
-        }
-
-        function renderPortfolioChart() {
-            if(!pfChart) return;
-            const styleColor = getComputedStyle(document.documentElement);
-            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-
-            pfChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 },
-                    formatter: function (params) {
-                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}년</div>`;
-                        params.forEach(p => {
-                            let val = p.value !== undefined ? p.value : p.data;
-                            if (val === null || val === undefined || isNaN(val)) return;
-                            let unit = p.seriesName.includes('MDD') ? '%' : '';
-                            result += `${p.marker} ${p.seriesName}: <b>${Number(val).toFixed(2)}${unit}</b><br/>`;
-                        });
-                        return result;
-                    }
-                },
-                legend: { data: ['S&P 500 (SPY)', 'All-Weather', 'BAA (Bold)', 'MDD (BAA)'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
-                grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
-                xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
-                yAxis: [
-                    { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
-                    { type: 'value', min: -60, max: 0, position: 'right', splitLine: { show: false }, axisLabel: { formatter: '{value}%', color: chartTextColor, fontSize: 9 } }
-                ],
-                series: [
-                    { name: 'MDD (BAA)', type: 'bar', data: calcMDDArray(getAdjustedSimData('baa')), yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
-                    { name: 'S&P 500 (SPY)', type: 'line', data: getAdjustedSimData('spy'), smooth: true, lineStyle: { color: '#EF5350', width: 2 }, showSymbol: false },
-                    { name: 'All-Weather', type: 'line', data: getAdjustedSimData('allweather'), smooth: true, lineStyle: { color: '#3B82F6', width: 2 }, showSymbol: false },
-                    { name: 'BAA (Bold)', type: 'line', data: getAdjustedSimData('baa'), smooth: true, lineStyle: { color: '#10B981', width: 3 }, showSymbol: false, z: 10 }
-                ]
-            }, true);
-            setTimeout(() => pfChart.resize(), 100);
-        }
-
-        function updatePfCardMetrics() {
-            const years = parseInt(pfSimYears[pfSimYears.length - 1]) - parseInt(pfSimYears[0]);
-            
-            Object.keys(pfDetails).forEach(key => {
-                const cagrEl = document.getElementById(`card-cagr-${key}`);
-                const mddEl = document.getElementById(`card-mdd-${key}`);
-                const marEl = document.getElementById(`card-mar-${key}`);
-                if(!cagrEl || !mddEl) return;
-
-                const dataArr = getAdjustedSimData(key);
-                const baseVal = dataArr[0], finalVal = dataArr[dataArr.length - 1];
-                
-                let cagr = (((finalVal / baseVal) ** (1 / years)) - 1) * 100;
-                let mdds = calcMDDArray(dataArr);
-                let minMdd = Math.min(...mdds);
-                let mar = Math.abs(minMdd) > 0 ? (cagr / Math.abs(minMdd)) : 0;
-
-                cagrEl.innerText = `${cagr.toFixed(1)}%`;
-                cagrEl.className = cagr > 0 ? "text-up ml-1" : "text-down ml-1";
-                
-                mddEl.innerText = `${minMdd.toFixed(1)}%`;
-                mddEl.className = minMdd < -5 ? "text-down ml-1" : "text-up ml-1";
-
-                if (marEl) {
-                    marEl.innerText = isBeginnerMode ? `가성비 ${mar.toFixed(2)}` : `MAR ${mar.toFixed(2)}`;
-                    marEl.style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6');
-                    marEl.style.borderColor = mar > 1.0 ? 'rgba(16, 185, 129, 0.3)' : (mar < 0.5 ? 'rgba(239, 83, 80, 0.3)' : 'rgba(59, 130, 246, 0.3)');
-                    marEl.style.background = mar > 1.0 ? 'rgba(16, 185, 129, 0.1)' : (mar < 0.5 ? 'rgba(239, 83, 80, 0.1)' : 'rgba(59, 130, 246, 0.1)');
-                }
-            });
-        }
-
-        async function comparePortfolioStock() {
-            const ticker = document.getElementById('pf-compare-input').value.trim().toUpperCase();
-            const btn = document.getElementById('pf-compare-btn');
-            if(!ticker || !currentPfKey || !pfModalChart) return;
-
-            btn.innerText = '검색중...';
-            try {
-                const d = await fetchStockData(ticker, '1mo', 'max');
-
-                let { dates, closes } = extractCleanData(d);
-                let yearlyData = {};
-                for(let i=0; i<dates.length; i++){
-                    if(closes[i] != null) yearlyData[dates[i].substring(0, 4)] = closes[i];
-                }
-                
-                let compData = [], basePrice = null; 
-                pfSimYears.forEach(yr => {
-                    if(yearlyData[yr]) {
-                        if(basePrice === null) basePrice = yearlyData[yr];
-                        compData.push((yearlyData[yr] / basePrice) * 100);
-                    } else compData.push(null);
-                });
-
-                const styleColor = getComputedStyle(document.documentElement);
-                const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-                
-                pfModalChart.setOption({
-                    legend: { data: [pfDetails[currentPfKey].title, ticker, 'MDD'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
-                    series: [
-                        { name: `MDD`, type: 'bar', data: calcMDDArray(getAdjustedSimData(currentPfKey)), yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
-                        { name: pfDetails[currentPfKey].title, type: 'line', data: getAdjustedSimData(currentPfKey), smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 },
-                        { name: ticker, type: 'line', data: compData, smooth: true, lineStyle: { color: '#EAB308', width: 2, type: 'dashed' }, connectNulls: true, showSymbol: false, z: 5 }
-                    ]
-                });
-                btn.innerText = '완료'; setTimeout(() => btn.innerText = '비교', 2000);
-            } catch(e) {
-                logError(`Compare Failed for ${ticker}`, e);
-                btn.innerText = '오류'; btn.classList.add('bg-rose-500');
-                setTimeout(() => { btn.innerText = '비교'; btn.classList.remove('bg-rose-500'); }, 2000);
-            }
-        }
-
-        // ==========================================
         // 🚀 6. 초기화
         // ==========================================
         document.addEventListener("DOMContentLoaded", () => {
@@ -2138,3 +2406,4 @@
     </script>
 </body>
 </html>
+```
