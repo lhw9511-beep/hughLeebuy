@@ -74,13 +74,17 @@
         .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
 
-        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; }
+        .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; position: relative;}
         .stat-box:hover { border-color: #3B82F6; background: rgba(0,0,0,0.1); }
         .stat-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 4px; }
         .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 900; margin-top: 4px; text-align: center; display:flex; flex-direction:column; align-items:center; line-height:1.2;}
         
-        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.75rem; border: 1px solid transparent; text-align: center; background: rgba(0,0,0,0.1); }
-        .perspective-col:hover { background: rgba(0,0,0,0.2); transform: translateY(-2px); border-color: #3B82F6; }
+        .weight-badge { position: absolute; top: -6px; right: -6px; font-size: 0.5rem; font-weight: 900; background: #374151; color: #fff; padding: 2px 4px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); z-index: 5;}
+
+        .perspective-col { cursor: pointer; transition: all 0.2s; border-radius: 12px; padding: 0.75rem; border: 1px solid var(--border-color); text-align: center; background: rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center;}
+        .perspective-col:hover { background: rgba(0,0,0,0.3); transform: translateY(-2px); border-color: #3B82F6; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .score-bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+        .score-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease, background-color 0.5s ease; }
 
         .signal-badge { font-weight: 900; font-size: 0.6rem; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; white-space: nowrap; }
         .signal-up { background-color: rgba(38, 166, 154, 0.2); color: #26A69A; }
@@ -94,8 +98,9 @@
         .main-tab-btn.active { color: var(--text-main); border-bottom-color: #3B82F6; }
         .main-tab-btn:hover { color: var(--text-main); }
 
-        .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column; min-height: 120px;}
+        .pf-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column; min-height: 120px; position: relative;}
         .pf-card:hover { border-color: #3B82F6; transform: translateY(-3px); box-shadow: 0 10px 20px -10px rgba(59,130,246,0.3); }
+        .mar-badge { position: absolute; top: 12px; right: 12px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #3B82F6; font-size: 0.55rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; }
         
         .calc-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
         .calc-table th { font-size: 0.6rem; color: var(--text-muted); text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
@@ -164,7 +169,7 @@
 
     <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-start mb-4 border-b border-rose-500/30 pb-3">
+            <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
                 <h3 class="text-lg font-black text-rose-500 flex items-center">
                     <svg class="icon-md mr-2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     에러 로그 (Debug)
@@ -232,6 +237,11 @@
                         <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">통화 환산 MDD</p>
                         <p id="pf-modal-mdd" class="text-lg md:text-xl font-black text-down">0%</p>
                     </div>
+                    <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-accent text-white text-[0.5rem] font-bold px-1 py-0.5 rounded-bl">Risk-Adjusted</div>
+                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">MAR 비율</p>
+                        <p id="pf-modal-mar" class="text-lg md:text-xl font-black text-themeText">0.0</p>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
@@ -241,7 +251,6 @@
 
                 <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
 
-                <!-- 구간 수익률 검증 테이블 영역 -->
                 <div id="pf-historical-section" class="mb-4 bg-[var(--bg-color)] rounded-xl border border-themeBorder p-3 md:p-4">
                     <p class="text-[0.7rem] font-black text-themeText uppercase mb-2 flex items-center gap-2">
                         <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
@@ -412,20 +421,23 @@
                     </div>
                     
                     <div class="grid grid-cols-3 gap-2 flex-grow mb-2">
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('short')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span>
-                            <div id="st-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showDetail('short')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1 uppercase tracking-widest">Short-Term</span>
+                            <div id="st-signal-text" class="text-sm md:text-base font-black italic mb-1">WAIT</div>
+                            <div class="score-bar-bg"><div id="st-score-bar" class="score-bar-fill bg-gray-500" style="width:50%"></div></div>
                         </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('mid')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span>
-                            <div id="mt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showDetail('mid')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1 uppercase tracking-widest">Mid-Term</span>
+                            <div id="mt-signal-text" class="text-sm md:text-base font-black italic mb-1">WAIT</div>
+                            <div class="score-bar-bg"><div id="mt-score-bar" class="score-bar-fill bg-gray-500" style="width:50%"></div></div>
                         </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showDetail('long')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span>
-                            <div id="lt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showDetail('long')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1 uppercase tracking-widest">Long-Term</span>
+                            <div id="lt-signal-text" class="text-sm md:text-base font-black italic mb-1">WAIT</div>
+                            <div class="score-bar-bg"><div id="lt-score-bar" class="score-bar-fill bg-gray-500" style="width:50%"></div></div>
                         </div>
                     </div>
-                    <p class="text-[0.55rem] text-themeMuted text-center">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
+                    <p class="text-[0.55rem] text-themeMuted text-center mt-1">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
                 </div>
 
                 <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
@@ -434,37 +446,44 @@
                             <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                             <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">마크로 & 기술 지표 리포트</p>
                         </div>
-                        <div id="stock-signal-summary" class="text-[0.6rem] font-bold">
-                            <span class="text-themeMuted">계산 대기 중...</span>
+                        <div id="stock-signal-summary" class="text-[0.6rem] font-bold flex items-center bg-black/20 px-2 py-1 rounded">
+                            <span class="text-themeMuted">AI 신뢰도 가중치 계산 중...</span>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3">
-                        <div class="stat-box" onclick="showInfo('VIX (변동성 지수)', 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다. 역사적 장기 평균은 약 19.5입니다.\n\n• 25 이상 (공포): 시장에 피가 낭자할 때로, 역사적으로 최고의 매수 기회입니다.\n• 15 이하 (탐욕/안일함): 시장이 과열되고 방심할 때로, 하락 반전을 주의해야 합니다.')">
+                        <div class="stat-box" onclick="showInfo('VIX (변동성 지수)', 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다.\n\n• 신뢰도 가중치: 9.0 / 10\n(역사적으로 극단적 공포에서의 역발상 매수는 가장 높은 승률을 자랑합니다.)\n\n• 25 이상: 적극 매수 기회\n• 15 이하: 안일함 (조정 주의)')">
+                            <div class="weight-badge">9.0</div>
                             <p class="stat-label">VIX 지수</p>
                             <p id="val-vix" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('공포탐욕지수 (Fear & Greed)', '시장 심리를 0에서 100까지의 수치로 나타냅니다. (VIX, RSI 모멘텀 기반 산출)\n\n• 0~45 (공포): 대중이 두려워하며 투매할 때로, 훌륭한 매수 기회입니다.\n• 55~100 (탐욕): 대중이 환호하며 추격 매수할 때로, 익절 및 매도 주의가 필요합니다.')">
+                        <div class="stat-box" onclick="showInfo('공포탐욕지수 (Fear & Greed)', '군중 심리를 수치화한 지표입니다.\n\n• 신뢰도 가중치: 8.5 / 10\n(VIX와 함께 군중 심리의 역발상 투자는 확률 높은 트레이딩 기법입니다.)\n\n• 0~45: 극단적 공포 (매수)\n• 55~100: 탐욕 (매도 주의)')">
+                            <div class="weight-badge">8.5</div>
                             <p class="stat-label">공포/탐욕</p>
                             <p id="val-fng" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일 이동평균선 간의 거리(%)입니다.\n\n• 0% 초과: 120일선 위에서 상승 추세를 유지중이므로 긍정적입니다.\n• 0% 미만: 120일선 아래의 역배열이므로 추세 이탈로 해석합니다.')">
+                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일선 간의 거리(%)입니다.\n\n• 신뢰도 가중치: 8.0 / 10\n(멥 파버의 논문 등 트렌드 팔로잉의 핵심이 되는 장기 추세 방어 지표입니다.)\n\n• 0% 초과: 상승 추세 (매수)\n• 0% 미만: 하락 역배열 (매도)')">
+                            <div class="weight-badge">8.0</div>
                             <p class="stat-label">이격도</p>
                             <p id="val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '추세의 강도를 의미합니다.\n\n• 40 미만: 단기 과매도 상태로 반등(매수) 가능성이 큽니다.\n• 60 초과: 단기 과매수 상태로 하락(매도) 가능성이 큽니다.')">
-                            <p class="stat-label">RSI</p>
-                            <p id="val-rsi-main" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산. 히스토그램이 양수(+)면 상승, 음수(-)면 하락 에너지입니다.')">
+                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 신뢰도 가중치: 7.0 / 10\n(추세 전환 포착에 강하지만 횡보장에서 거짓 신호가 발생할 수 있습니다.)')">
+                            <div class="weight-badge">7.0</div>
                             <p class="stat-label">MACD</p>
                             <p id="val-macd-main" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '상단 돌파 시 단기 과열, 하단 이탈 시 침체 및 지지를 의미합니다.')">
+                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '추세의 단기 과열 강도를 의미합니다.\n\n• 신뢰도 가중치: 6.5 / 10\n(강한 상승장에서는 과매수 상태를 오래 유지하므로 섣부른 매도를 유발할 수 있습니다.)')">
+                            <div class="weight-badge">6.5</div>
+                            <p class="stat-label">RSI</p>
+                            <p id="val-rsi-main" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '가격 변동성 기반의 밴드입니다.\n\n• 신뢰도 가중치: 6.0 / 10\n(밴드 하단 지지 및 상단 저항에 유용하나 밴드를 타고 흐르는 현상에 주의해야 합니다.)')">
+                            <div class="weight-badge">6.0</div>
                             <p class="stat-label">BB밴드</p>
                             <p id="val-bb-main" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '최근 기간 중 현재 위치.\n\n• 20 미만: 완전한 바닥권(매수)\n• 80 초과: 완전한 과열권(매도)')">
+                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '최근 기간 중 현재 가격 위치를 나타냅니다.\n\n• 신뢰도 가중치: 5.0 / 10\n(가장 민감하고 반응이 빠르지만, 그만큼 가짜 신호(False Signal)가 매우 많습니다.)')">
+                            <div class="weight-badge">5.0</div>
                             <p class="stat-label">Stoch</p>
                             <p id="val-stoch-main" class="stat-value text-themeText">---</p>
                         </div>
@@ -543,20 +562,23 @@
                     </div>
                     
                     <div class="grid grid-cols-3 gap-2 flex-grow mb-2">
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('short')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">SHORT</span>
-                            <div id="crypto-st-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showCryptoDetail('short')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1 uppercase tracking-widest">Short-Term</span>
+                            <div id="crypto-st-signal-text" class="text-sm md:text-base font-black italic mb-1">WAIT</div>
+                            <div class="score-bar-bg"><div id="crypto-st-score-bar" class="score-bar-fill bg-gray-500" style="width:50%"></div></div>
                         </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('mid')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">MID</span>
-                            <div id="crypto-mt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showCryptoDetail('mid')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1 uppercase tracking-widest">Mid-Term</span>
+                            <div id="crypto-mt-signal-text" class="text-sm md:text-base font-black italic mb-1">WAIT</div>
+                            <div class="score-bar-bg"><div id="crypto-mt-score-bar" class="score-bar-fill bg-gray-500" style="width:50%"></div></div>
                         </div>
-                        <div class="perspective-col border border-themeBorder rounded-xl p-3" onclick="showCryptoDetail('long')">
-                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1">LONG</span>
-                            <div id="crypto-lt-signal-text" class="text-sm md:text-base font-black italic">WAIT</div>
+                        <div class="perspective-col" onclick="showCryptoDetail('long')">
+                            <span class="text-[0.5rem] font-bold text-themeMuted block mb-1 uppercase tracking-widest">Long-Term</span>
+                            <div id="crypto-lt-signal-text" class="text-sm md:text-base font-black italic mb-1">WAIT</div>
+                            <div class="score-bar-bg"><div id="crypto-lt-score-bar" class="score-bar-fill bg-gray-500" style="width:50%"></div></div>
                         </div>
                     </div>
-                    <p class="text-[0.55rem] text-themeMuted text-center">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
+                    <p class="text-[0.55rem] text-themeMuted text-center mt-1">박스를 터치하면 상세 전략을 볼 수 있습니다.</p>
                 </div>
 
                 <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
@@ -565,37 +587,44 @@
                             <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                             <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">마크로 & 기술 지표 리포트</p>
                         </div>
-                        <div id="crypto-signal-summary" class="text-[0.6rem] font-bold">
-                            <span class="text-themeMuted">계산 대기 중...</span>
+                        <div id="crypto-signal-summary" class="text-[0.6rem] font-bold flex items-center bg-black/20 px-2 py-1 rounded">
+                            <span class="text-themeMuted">AI 신뢰도 가중치 계산 중...</span>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3">
-                        <div class="stat-box" onclick="showInfo('연환산 변동성 (Volatility)', '최근 30일 기준 자산의 연환산 변동성입니다.\n\n• 40% 미만: 시세가 안정화되어 안전한 매수 구간입니다.\n• 80% 초과: 변동성이 극도로 커져 위험(매도) 관리가 필요합니다.')">
+                        <div class="stat-box" onclick="showInfo('연환산 변동성 (Volatility)', '최근 30일 기준 자산의 연환산 변동성입니다.\n\n• 신뢰도 가중치: 9.0 / 10\n(코인 시장에서 극단적 변동성은 바닥 매수 기회 또는 상투의 신호입니다.)')">
+                            <div class="weight-badge">9.0</div>
                             <p class="stat-label">변동성</p>
                             <p id="crypto-val-vol" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('크립토 공포탐욕지수', '가상화폐 시장의 심리를 0(극단적 공포)에서 100(극단적 탐욕)으로 나타냅니다. (alternative.me API 연동)\n\n• 0~45 (공포): 대중이 투매할 때로, 매수 기회입니다.\n• 55~100 (탐욕): 대중이 추격 매수할 때로, 익절 및 매도 주의가 필요합니다.')">
+                        <div class="stat-box" onclick="showInfo('크립토 공포탐욕지수', '가상화폐 시장의 심리를 0(극단적 공포)에서 100(극단적 탐욕)으로 나타냅니다. (alternative.me API 연동)\n\n• 신뢰도 가중치: 8.5 / 10\n(대중이 투매할 때 사고, 환호할 때 파는 강력한 역발상 지표입니다.)')">
+                            <div class="weight-badge">8.5</div>
                             <p class="stat-label">공포/탐욕</p>
                             <p id="crypto-val-fng" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일 이동평균선 간의 거리(%)입니다.\n\n• 0% 초과: 120일선 위에서 상승 추세를 유지중이므로 긍정적입니다.\n• 0% 미만: 120일선 아래의 역배열이므로 추세 이탈로 해석합니다.')">
+                        <div class="stat-box" onclick="showInfo('이격도 (Disparity)', '현재가와 120일선 간의 거리(%)입니다.\n\n• 신뢰도 가중치: 8.0 / 10\n(장기 추세가 살아있는지 판단하는 강력한 방어 기제입니다.)')">
+                            <div class="weight-badge">8.0</div>
                             <p class="stat-label">이격도</p>
                             <p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '추세의 강도를 의미합니다.\n\n• 40 미만: 단기 과매도 상태로 반등(매수) 가능성이 큽니다.\n• 60 초과: 단기 과매수 상태로 하락(매도) 가능성이 큽니다.')">
-                            <p class="stat-label">RSI</p>
-                            <p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p>
-                        </div>
-                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산. 히스토그램이 양수(+)면 상승, 음수(-)면 하락 에너지입니다.')">
+                        <div class="stat-box" onclick="showInfo('MACD', '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 신뢰도 가중치: 7.0 / 10')">
+                            <div class="weight-badge">7.0</div>
                             <p class="stat-label">MACD</p>
                             <p id="crypto-val-macd-main" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '상단 돌파 시 단기 과열, 하단 이탈 시 침체 및 지지를 의미합니다.')">
+                        <div class="stat-box" onclick="showInfo('RSI (상대강도지수)', '추세의 단기 과열 강도를 의미합니다.\n\n• 신뢰도 가중치: 6.5 / 10')">
+                            <div class="weight-badge">6.5</div>
+                            <p class="stat-label">RSI</p>
+                            <p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="showInfo('볼린저 밴드 (BB)', '가격 변동성 기반의 밴드입니다.\n\n• 신뢰도 가중치: 6.0 / 10')">
+                            <div class="weight-badge">6.0</div>
                             <p class="stat-label">BB밴드</p>
                             <p id="crypto-val-bb-main" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '최근 기간 중 현재 위치.\n\n• 20 미만: 완전한 바닥권(매수)\n• 80 초과: 완전한 과열권(매도)')">
+                        <div class="stat-box" onclick="showInfo('스토캐스틱 (%K)', '최근 기간 중 현재 위치.\n\n• 신뢰도 가중치: 5.0 / 10\n(가장 민감하고 속임수가 많아 낮은 가중치가 적용됩니다.)')">
+                            <div class="weight-badge">5.0</div>
                             <p class="stat-label">Stoch</p>
                             <p id="crypto-val-stoch-main" class="stat-value text-themeText">---</p>
                         </div>
@@ -622,6 +651,7 @@
                             <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-6040" class="text-up ml-1">--%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-6040" class="text-down ml-1">--%</span></span>
                         </div>
+                        <div id="card-mar-6040" class="mar-badge">MAR --</div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('permanent')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">Permanent <span class="text-[0.55rem] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">Safe</span></h3>
@@ -630,6 +660,7 @@
                             <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-permanent" class="text-up ml-1">--%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-permanent" class="text-down ml-1">--%</span></span>
                         </div>
+                        <div id="card-mar-permanent" class="mar-badge">MAR --</div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('allweather')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">All-Weather <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Famous</span></h3>
@@ -638,6 +669,7 @@
                             <span class="text-xs font-bold text-themeText">CAGR <span id="card-cagr-allweather" class="text-up ml-1">--%</span></span>
                             <span class="text-xs font-bold text-themeText">MDD <span id="card-mdd-allweather" class="text-down ml-1">--%</span></span>
                         </div>
+                        <div id="card-mar-allweather" class="mar-badge">MAR --</div>
                     </div>
                 </div>
             </div>
@@ -655,6 +687,7 @@
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-dual" class="text-up ml-1">--%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-dual" class="text-down ml-1">--%</span></span>
                         </div>
+                        <div id="card-mar-dual" class="mar-badge">MAR --</div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('vaa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA</h3>
@@ -663,6 +696,7 @@
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-vaa" class="text-up ml-1">--%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-vaa" class="text-down ml-1">--%</span></span>
                         </div>
+                        <div id="card-mar-vaa" class="mar-badge">MAR --</div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('daa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA</h3>
@@ -671,6 +705,7 @@
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-daa" class="text-up ml-1">--%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-daa" class="text-down ml-1">--%</span></span>
                         </div>
+                        <div id="card-mar-daa" class="mar-badge">MAR --</div>
                     </div>
                     <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA (Bold)</h3>
@@ -679,6 +714,7 @@
                             <span class="text-[0.6rem] font-bold text-themeText">CAGR <span id="card-cagr-baa" class="text-up ml-1">--%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">MDD <span id="card-mdd-baa" class="text-down ml-1">--%</span></span>
                         </div>
+                        <div id="card-mar-baa" class="mar-badge">MAR --</div>
                     </div>
                 </div>
             </div>
@@ -690,7 +726,7 @@
         </div>
 
         <div class="text-center mt-2 pb-6">
-            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data (Base 100)</p>
+            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data (Base 100) | Risk-Adjusted Model (MAR)</p>
         </div>
     </div>
 
@@ -719,16 +755,27 @@
         let analysisDetails = { short: {}, mid: {}, long: {} };
         let cryptoAnalysisDetails = { short: {}, mid: {}, long: {} };
 
-        // 의견 종합 관리를 위한 상태 객체
-        let stockSignals = { vix: 'WAIT', fng: 'WAIT', dist: 'WAIT', rsi: 'WAIT', macd: 'WAIT', bb: 'WAIT', stoch: 'WAIT' };
-        let cryptoSignals = { vol: 'WAIT', fng: 'WAIT', dist: 'WAIT', rsi: 'WAIT', macd: 'WAIT', bb: 'WAIT', stoch: 'WAIT' };
+        // 🧠 금융공학 기반 기간별(Time-Horizon) 가중치 매트릭스
+        const WEIGHT_MATRIX = {
+            stock: {
+                short: { VIX: 9, FNG: 8.5, RSI: 8, STOCH: 6, MACD: 5, DIST: 4, BB: 6 },
+                mid:   { VIX: 5, FNG: 5,   RSI: 5, STOCH: 2, MACD: 9, DIST: 8, BB: 4 },
+                long:  { VIX: 2, FNG: 3,   RSI: 4, STOCH: 1, MACD: 7, DIST: 9, BB: 2 }
+            },
+            crypto: {
+                short: { VOL: 9, FNG: 8.5, RSI: 8, STOCH: 6, MACD: 5, DIST: 4, BB: 6 },
+                mid:   { VOL: 5, FNG: 5,   RSI: 5, STOCH: 2, MACD: 9, DIST: 8, BB: 4 },
+                long:  { VOL: 2, FNG: 3,   RSI: 4, STOCH: 1, MACD: 7, DIST: 9, BB: 2 }
+            }
+        };
 
-        // 마크로 데이터 캐싱
+        let stockSignals = { vix: {sig:'WAIT', w:0}, fng: {sig:'WAIT', w:0}, dist: {sig:'WAIT', w:0}, rsi: {sig:'WAIT', w:0}, macd: {sig:'WAIT', w:0}, bb: {sig:'WAIT', w:0}, stoch: {sig:'WAIT', w:0} };
+        let cryptoSignals = { vol: {sig:'WAIT', w:0}, fng: {sig:'WAIT', w:0}, dist: {sig:'WAIT', w:0}, rsi: {sig:'WAIT', w:0}, macd: {sig:'WAIT', w:0}, bb: {sig:'WAIT', w:0}, stoch: {sig:'WAIT', w:0} };
+
         let globalVix = null;
         let globalFng = null;
         let globalCryptoFng = null;
 
-        // 역사적 현실성을 반영한 백테스트 시뮬레이션 배열 (2000~2026, 27개 데이터 포인트)
         const pfSimYears = ["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024", "2025", "2026"];
         
         const pfSimData = {
@@ -742,7 +789,6 @@
             'baa': [100, 125, 155, 210, 250, 295, 365, 430, 405, 535, 645, 685, 810, 1050, 1250, 1300, 1450, 1750, 1680, 2200, 2750, 3250, 2850, 3650, 4850, 5850, 6850]
         };
 
-        // 환율 변동 모의 데이터 (27 포인트 일치)
         const fxSimData = [1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
 
         const pfDetails = {
@@ -854,76 +900,7 @@
             if (globalCryptoTicker) loadCryptoData(globalCryptoTicker);
             updatePfCardMetrics();
             if (pfChart) renderPortfolioChart();
-            if (currentPfKey) showPfDetail(currentPfKey); // 모달 내 테이블 리렌더링
-        }
-
-        function showPfDetail(key) {
-            currentPfKey = key;
-            const details = pfDetails[key];
-            if(!details) return;
-
-            document.getElementById('pf-modal-title').innerHTML = `${details.title} <span class="text-[0.6rem] bg-accent/20 text-accent px-2 py-1 rounded-full ml-2 align-middle uppercase">${details.type}</span>`;
-            document.getElementById('pf-modal-desc').innerHTML = details.desc;
-            document.getElementById('pf-modal-rules').innerHTML = details.rules.map(r => `<li>${r}</li>`).join('');
-            document.getElementById('pf-detail-modal').style.display = 'flex';
-
-            if (!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
-            if (!pfPieChart) pfPieChart = echarts.init(document.getElementById('pf-pie-chart'));
-
-            const cagrEl = document.getElementById(`card-cagr-${key}`);
-            const mddEl = document.getElementById(`card-mdd-${key}`);
-            document.getElementById('pf-modal-cagr').innerText = cagrEl ? cagrEl.innerText : '0%';
-            document.getElementById('pf-modal-mdd').innerText = mddEl ? mddEl.innerText : '0%';
-
-            // 역사적 백테스트 구간 수익률 테이블 생성
-            const simYears = pfSimYears;
-            const simData = getAdjustedSimData(key);
-            let histHtml = '';
-            for(let i = simYears.length - 1; i >= 0; i--) {
-                const val = simData[i];
-                const prevVal = i > 0 ? simData[i-1] : 100;
-                const ret = i === 0 ? 0 : ((val / prevVal) - 1) * 100;
-                const colorClass = ret > 0 ? 'text-up' : (ret < 0 ? 'text-down' : 'text-themeMuted');
-                
-                histHtml += `<tr>
-                    <td class="text-accent font-bold">${simYears[i]}년</td>
-                    <td class="font-mono text-themeText">${formatPriceStr(val)}</td>
-                    <td class="font-mono font-bold ${colorClass}">${ret > 0 ? '+' : ''}${ret.toFixed(2)}%</td>
-                </tr>`;
-            }
-            document.getElementById('pf-historical-tbody').innerHTML = histHtml;
-
-            const styleColor = getComputedStyle(document.documentElement);
-            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-
-            pfModalChart.setOption({
-                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 } },
-                legend: { data: [details.title, 'MDD'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
-                grid: { left: '3%', right: '3%', bottom: '5%', top: '25%', containLabel: true },
-                xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
-                yAxis: [
-                    { type: 'value', axisLabel: { color: chartTextColor }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
-                    { type: 'value', min: -60, max: 0, position: 'right', axisLabel: { formatter: '{value}%', color: chartTextColor }, splitLine: { show: false } }
-                ],
-                series: [
-                    { name: 'MDD', type: 'bar', data: calcMDDArray(getAdjustedSimData(key)), yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' } },
-                    { name: details.title, type: 'line', data: getAdjustedSimData(key), smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false }
-                ]
-            }, true);
-            setTimeout(() => pfModalChart.resize(), 50);
-
-            if (details.type === 'static' && details.allocation) {
-                document.getElementById('pf-modal-pie-area').style.display = 'block';
-                document.getElementById('pf-modal-live-area').style.display = 'none';
-                pfPieChart.setOption({
-                    tooltip: { trigger: 'item', formatter: '{b}: {c}%' },
-                    series: [{ type: 'pie', radius: ['40%', '70%'], itemStyle: { borderRadius: 10, borderColor: '#000', borderWidth: 2 }, label: { color: chartTextColor }, data: details.allocation }]
-                });
-                setTimeout(() => pfPieChart.resize(), 50);
-            } else {
-                document.getElementById('pf-modal-pie-area').style.display = 'none';
-                runLiveCalc(key);
-            }
+            if (currentPfKey) showPfDetail(currentPfKey); 
         }
 
         // ==========================================
@@ -999,20 +976,61 @@
             loadCryptoData(globalCryptoTicker, i, r); 
         }
 
+        function generateDetailModalHTML(d) {
+            let breakdownHtml = d.breakdown.map(b => `
+                <div class="flex justify-between items-center text-[0.65rem] border-b border-themeBorder/50 py-1.5 last:border-0">
+                    <span class="text-themeText font-bold w-16">${b.name}</span>
+                    <span class="w-20 text-center ${b.sig === 'BUY' ? 'text-up' : (b.sig === 'SELL' ? 'text-down' : 'text-themeMuted')}">${b.sig === 'BUY' ? '매수' : (b.sig === 'SELL' ? '매도' : '중립')}</span>
+                    <span class="w-12 text-right font-mono font-bold ${b.val.includes('+') ? 'text-up' : (b.val.includes('-') ? 'text-down' : 'text-themeMuted')}">${b.val}</span>
+                </div>
+            `).join('');
+
+            return `
+                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center">
+                    <span class="text-3xl font-black italic status-${d.status.replace(/ /g, '-')} uppercase">${d.status}</span>
+                    <div class="flex justify-center gap-3 mt-2 text-[0.7rem] font-black">
+                        <span class="text-up">매수 파워: ${d.buyScore.toFixed(1)}</span>
+                        <span class="text-themeBorder">|</span>
+                        <span class="text-down">매도 파워: ${d.sellScore.toFixed(1)}</span>
+                    </div>
+                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
+                </div>
+
+                <details class="mt-4 bg-black/20 rounded-xl border border-themeBorder overflow-hidden group cursor-pointer">
+                    <summary class="p-3 text-[0.7rem] font-bold text-themeText flex justify-between items-center outline-none list-none [&::-webkit-details-marker]:hidden">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-accent transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            상세 점수 산출식 보기
+                        </span>
+                        <span class="text-themeMuted text-[0.6rem] font-black">기준 총점: ${d.maxScore.toFixed(1)}점</span>
+                    </summary>
+                    <div class="p-3 pt-0 bg-[var(--modal-bg)] border-t border-themeBorder/50">
+                        <div class="flex justify-between items-center text-[0.6rem] font-black text-themeMuted border-b border-themeBorder pb-2 mb-1 mt-2 uppercase tracking-widest">
+                            <span class="w-16">지표</span>
+                            <span class="w-20 text-center">판단</span>
+                            <span class="w-12 text-right">가중치 점수</span>
+                        </div>
+                        ${breakdownHtml}
+                        <div class="mt-2 pt-2 border-t border-themeBorder flex justify-between items-center text-xs font-black">
+                            <span class="text-themeText">최종 격차 (Buy - Sell)</span>
+                            <span class="${d.diff > 0 ? 'text-up' : (d.diff < 0 ? 'text-down' : 'text-themeMuted')} text-sm">${d.diff > 0 ? '+' : ''}${d.diff.toFixed(1)}점</span>
+                        </div>
+                    </div>
+                </details>
+
+                <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder mt-4">
+                    <p class="text-[11px] font-black text-emerald-500 mb-2">전략적 조언</p>
+                    <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
+                </div>
+            `;
+        }
+
         function showDetail(p) {
             const m = document.getElementById('detail-modal');
             const d = analysisDetails[p];
             if (!d || !d.status) return;
             document.getElementById('modal-title').innerText = `${p.toUpperCase()} View`;
-            document.getElementById('modal-body').innerHTML = `
-                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center">
-                    <span class="text-3xl font-black italic status-${d.status.replace(/ /g, '-')} uppercase">${d.status}</span>
-                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
-                </div>
-                <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder mt-4">
-                    <p class="text-[11px] font-black text-emerald-500 mb-2">전략적 조언</p>
-                    <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
-                </div>`;
+            document.getElementById('modal-body').innerHTML = generateDetailModalHTML(d);
             m.style.display = 'flex';
         }
 
@@ -1021,15 +1039,7 @@
             const d = cryptoAnalysisDetails[p];
             if (!d || !d.status) return;
             document.getElementById('modal-title').innerText = `CRYPTO ${p.toUpperCase()} View`;
-            document.getElementById('modal-body').innerHTML = `
-                <div class="bg-[var(--border-color)] p-4 rounded-xl text-center">
-                    <span class="text-3xl font-black italic status-${d.status.replace(/ /g, '-')} uppercase">${d.status}</span>
-                    <p class="text-xs text-themeMuted mt-2">${d.summary}</p>
-                </div>
-                <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder mt-4">
-                    <p class="text-[11px] font-black text-emerald-500 mb-2">전략적 조언</p>
-                    <p class="text-xs text-themeMuted leading-relaxed">${d.advice}</p>
-                </div>`;
+            document.getElementById('modal-body').innerHTML = generateDetailModalHTML(d);
             m.style.display = 'flex';
         }
 
@@ -1282,11 +1292,12 @@
         }
 
         // ==========================================
-        // 📊 4. 마크로 데이터 파이프라인 (역발상 투자 논리 반영)
+        // 📊 4. 마크로 데이터 파이프라인 (역발상 및 가중치 논리 반영)
         // ==========================================
 
-        function getIndicatorStatus(type, val) {
+        function getIndicatorStatus(type, val, marketType = 'stock', timeHorizon = 'short') {
             let sig = 'NEUTRAL', text = '중립', color = 'var(--text-muted)';
+            const weight = WEIGHT_MATRIX[marketType][timeHorizon][type] || 0;
             
             if (type === 'VIX') {
                 if (val >= 25) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; }
@@ -1313,15 +1324,16 @@
                 if (val < 20) { sig = 'BUY'; text = '바닥 (매수)'; color = 'var(--up)'; }
                 else if (val > 80) { sig = 'SELL'; text = '과열 (매도)'; color = 'var(--down)'; }
             }
-            return { sig, text, color };
+            return { sig, text, color, weight };
         }
 
         function renderIndicatorUI(id, valStr, type, val, marketType) {
             const el = document.getElementById(id);
-            const st = getIndicatorStatus(type, val);
+            // UI Report is heavily based on short-term view
+            const st = getIndicatorStatus(type, val, marketType, 'short');
             
-            if (marketType === 'stock') stockSignals[type.toLowerCase()] = st.sig;
-            else if (marketType === 'crypto') cryptoSignals[type.toLowerCase()] = st.sig;
+            if (marketType === 'stock') stockSignals[type.toLowerCase()] = { sig: st.sig, w: st.weight };
+            else if (marketType === 'crypto') cryptoSignals[type.toLowerCase()] = { sig: st.sig, w: st.weight };
             
             if (el) {
                 el.innerHTML = `<span class="text-lg">${valStr}</span><span class="text-[0.6rem] block mt-1" style="color:${st.color}">${st.text}</span>`;
@@ -1332,18 +1344,36 @@
 
         function updateSummaryUI(type) {
             const signals = type === 'stock' ? stockSignals : cryptoSignals;
-            let buy = 0, sell = 0, neu = 0;
+            let buyScore = 0, sellScore = 0;
             
             Object.values(signals).forEach(s => {
-                if (s === 'BUY') buy++;
-                else if (s === 'SELL') sell++;
-                else if (s === 'NEUTRAL') neu++;
-                else if (s === 'WAIT') neu++; 
+                if (s.sig === 'BUY') buyScore += s.w;
+                else if (s.sig === 'SELL') sellScore += s.w;
             });
             
+            let finalVerdict = "관망 (HOLD)";
+            let finalColor = "text-themeMuted";
+            let diff = buyScore - sellScore;
+
+            if (diff >= 15) { finalVerdict = "강력 매수 (STRONG BUY)"; finalColor = "text-up"; }
+            else if (diff > 5) { finalVerdict = "분할 매수 (BUY)"; finalColor = "text-emerald-400"; }
+            else if (diff <= -15) { finalVerdict = "적극 매도 (STRONG BYE)"; finalColor = "text-rose-600"; }
+            else if (diff < -5) { finalVerdict = "분할 매도 (BYE)"; finalColor = "text-down"; }
+
             const el = document.getElementById(`${type}-signal-summary`);
             if(el) {
-                el.innerHTML = `<span class="text-up font-black">매수 ${buy}</span> <span class="text-themeBorder mx-1">|</span> <span class="text-themeMuted font-black">중립 ${neu}</span> <span class="text-themeBorder mx-1">|</span> <span class="text-down font-black">매도 ${sell}</span>`;
+                el.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center text-[0.65rem] bg-black/40 px-2 py-1 rounded gap-1.5 shadow-inner">
+                            <span class="text-up font-black">매수 파워: ${buyScore.toFixed(1)}</span>
+                            <span class="text-themeBorder">|</span>
+                            <span class="text-down font-black">매도 파워: ${sellScore.toFixed(1)}</span>
+                        </div>
+                        <div class="text-[0.7rem] font-black uppercase ${finalColor} bg-black/20 px-2 py-1 rounded border border-themeBorder">
+                            AI 종합: ${finalVerdict}
+                        </div>
+                    </div>
+                `;
             }
         }
 
@@ -1399,7 +1429,7 @@
                 updateStatus("LIVE DATA", "bg-emerald-500");
                 renderDashboard(ticker, d);
                 
-                calculateTriplePerspectiveDecision(ticker).catch(e => logError("Triple Calc Error", e));
+                calculateTriplePerspectiveDecision(ticker, 'stock').catch(e => logError("Triple Calc Error", e));
 
             } catch (e) { 
                 if (e.name !== 'AbortError') {
@@ -1435,7 +1465,7 @@
                 updateCryptoStatus("LIVE DATA", "bg-emerald-500");
                 renderCryptoDashboard(ticker, d);
                 
-                calculateCryptoTriplePerspectiveDecision(ticker).catch(e => logError("Crypto Triple Calc Error", e));
+                calculateTriplePerspectiveDecision(ticker, 'crypto').catch(e => logError("Crypto Triple Calc Error", e));
 
             } catch (e) { 
                 if (e.name !== 'AbortError') {
@@ -1631,16 +1661,18 @@
             requestAnimationFrame(() => cryptoChart.resize());
         }
 
-        async function calculateTriplePerspectiveDecision(ticker) {
+        async function calculateTriplePerspectiveDecision(ticker, marketType = 'stock') {
             try {
-                const [dData, wData] = await Promise.all([
-                    fetchStockData(ticker, '1d', '2y'),
-                    fetchStockData(ticker, '1wk', 'max')
+                // 단기(일봉), 중기(주봉), 장기(월봉) 데이터 병렬 호출
+                const [dData, wData, mData] = await Promise.all([
+                    fetchStockData(ticker, '1d', '2y', marketType === 'crypto'),
+                    fetchStockData(ticker, '1wk', '5y', marketType === 'crypto'),
+                    fetchStockData(ticker, '1mo', '10y', marketType === 'crypto')
                 ]);
 
-                const analyze = (data, weight, periods) => {
+                const analyze = (data, timeHorizon, periods) => {
                     let { kData, closes } = extractCleanData(data);
-                    if(closes.length < periods.ma) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
+                    if(closes.length < periods.ma) return { status:"WAIT", score: 0, pct: 50, breakdown: [], maxScore: 0 };
                     
                     const last = closes.length - 1;
                     const rsi = Indicator.rsi(closes, periods.rsi)[last] || 50;
@@ -1650,110 +1682,131 @@
                     const bb = Indicator.bollinger(closes, periods.ma, 2);
                     const dist = ((closes[last] - sma) / sma) * 100;
                     
-                    let buy = 0, sell = 0;
-                    if (closes[last] > sma) buy += weight.ma; else sell += weight.ma;
-                    if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
-                    if (macd > 0) buy += weight.macd; else sell += weight.macd;
-                    if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
-                    
                     let bbStr = "MID";
-                    if(bb.upper[last] !== null && closes[last] >= bb.upper[last] * 0.98) { bbStr = "UPPER"; sell += 0.5; }
-                    else if(bb.lower[last] !== null && closes[last] <= bb.lower[last] * 1.02) { bbStr = "LOWER"; buy += 0.5; }
+                    if(bb.upper[last] !== null && closes[last] >= bb.upper[last] * 0.98) bbStr = "UPPER";
+                    else if(bb.lower[last] !== null && closes[last] <= bb.lower[last] * 1.02) bbStr = "LOWER";
+
+                    // 현재 타임호라이즌(short/mid/long)에 맞는 가중치 행렬 및 동적 최대점수 로드
+                    const weights = WEIGHT_MATRIX[marketType][timeHorizon];
+                    const maxScore = Object.values(weights).reduce((a, b) => a + b, 0); 
                     
-                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
+                    // 각 지표의 개별 시그널 추출
+                    const sigs = {
+                        dist: getIndicatorStatus('DIST', dist, marketType, timeHorizon),
+                        rsi: getIndicatorStatus('RSI', rsi, marketType, timeHorizon),
+                        macd: getIndicatorStatus('MACD', macd, marketType, timeHorizon),
+                        stoch: getIndicatorStatus('STOCH', stoch, marketType, timeHorizon),
+                        bb: getIndicatorStatus('BB', bbStr, marketType, timeHorizon),
+                        macro: marketType === 'stock' ? 
+                               getIndicatorStatus('VIX', globalVix || 20, marketType, timeHorizon) : 
+                               getIndicatorStatus('VOL', calcVolatility(closes), marketType, timeHorizon),
+                        fng: getIndicatorStatus('FNG', marketType === 'stock' ? (globalFng||50) : (globalCryptoFng||50), marketType, timeHorizon)
+                    };
 
-                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1), bbStr: bbStr };
+                    let buyScore = 0;
+                    let sellScore = 0;
+                    let breakdown = [];
+
+                    const addScore = (name, s) => {
+                        if (s.sig === 'BUY') { 
+                            buyScore += s.weight; 
+                            breakdown.push({name, sig: 'BUY', val: `+${s.weight.toFixed(1)}`}); 
+                        }
+                        else if (s.sig === 'SELL') { 
+                            sellScore += s.weight; 
+                            breakdown.push({name, sig: 'SELL', val: `-${s.weight.toFixed(1)}`}); 
+                        }
+                        else { 
+                            breakdown.push({name, sig: 'NEUTRAL', val: `0.0`}); 
+                        }
+                    };
+
+                    addScore(marketType === 'stock' ? 'VIX' : 'VOL', sigs.macro);
+                    addScore('FNG', sigs.fng);
+                    addScore('DIST', sigs.dist);
+                    addScore('RSI', sigs.rsi);
+                    addScore('MACD', sigs.macd);
+                    addScore('STOCH', sigs.stoch);
+                    addScore('BB', sigs.bb);
+
+                    const diff = buyScore - sellScore;
+                    let st = "HOLD"; 
+                    if (diff >= 15) st = "STRONG BUY";
+                    else if (diff > 5) st = "BUY";
+                    else if (diff <= -15) st = "STRONG BYE";
+                    else if (diff < -5) st = "BYE";
+
+                    // 프로그레스 바를 위한 0~100 환산 (0점 = 50%, 동적 maxScore 적용)
+                    const pct = Math.max(0, Math.min(100, 50 + (diff / maxScore) * 50));
+
+                    return { status: st, buyScore, sellScore, diff, pct, maxScore, breakdown };
                 };
 
-                const st = analyze(dData, { ma: 0.5, rsi: 1.8, macd: 1.5 }, { ma: 20, rsi: 9, stoch: 10 });
-                const mt = analyze(dData, { ma: 1.5, rsi: 1.0, macd: 1.2 }, { ma: 60, rsi: 14, stoch: 14 });
-                const lt = analyze(wData, { ma: 3.0, rsi: 0.5, macd: 0.5 }, { ma: 40, rsi: 14, stoch: 14 });
+                // 단기(일봉 20일 기준), 중기(주봉 10주 기준), 장기(월봉 10개월 기준)
+                const stRes = analyze(dData, 'short', { ma: 20, rsi: 14, stoch: 14 });
+                const mtRes = analyze(wData, 'mid', { ma: 10, rsi: 14, stoch: 14 });
+                const ltRes = analyze(mData, 'long', { ma: 10, rsi: 14, stoch: 14 });
                 
-                analysisDetails = { 
-                    short: {...st, summary: "20일선 및 단기 모멘텀 지표를 분석한 결과입니다.", advice: "단기 스윙 포지션에 적합합니다." }, 
-                    mid: {...mt, summary: "60일 중기 이평선과 추세를 분석한 결과입니다.", advice: "일봉과 주봉의 방향 일치 여부를 파악하세요." }, 
-                    long: {...lt, summary: "주봉 40주선 기반의 장기 사이클입니다.", advice: "장기 우상향 시 하락 노이즈는 매수 기회입니다." } 
+                const summaries = {
+                    short: { s: "단기 모멘텀(일봉) 및 심리 지표 기반", a: "심리와 과열/침체 지표 가중치가 높게 반영되었습니다." },
+                    mid: { s: "중기 추세(주봉) 및 모멘텀 기반", a: "MACD 등 중기 방향성 지표 가중치가 높게 반영되었습니다." },
+                    long: { s: "장기 사이클(월봉) 및 평균 회귀 기반", a: "장기 이동평균선 기반의 트렌드 팔로잉 가중치가 가장 높습니다." }
                 };
-                
-                const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm md:text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
-                up('st-signal-text', st); up('mt-signal-text', mt); up('lt-signal-text', lt);
-                
+
+                const updateUI = (prefix) => {
+                    const targetDetails = prefix === 'stock' ? analysisDetails : cryptoAnalysisDetails;
+                    targetDetails.short = {...stRes, summary: summaries.short.s, advice: summaries.short.a};
+                    targetDetails.mid = {...mtRes, summary: summaries.mid.s, advice: summaries.mid.a};
+                    targetDetails.long = {...ltRes, summary: summaries.long.s, advice: summaries.long.a};
+
+                    const upBox = (id, res, barId) => { 
+                        const el = document.getElementById(id); 
+                        const bar = document.getElementById(barId);
+                        if(el) { 
+                            el.innerText = res.status; 
+                            el.className = `text-sm md:text-base font-black italic status-${res.status.replace(/ /g, '-')} uppercase mb-1`; 
+                        }
+                        if(bar) {
+                            bar.style.width = `${res.pct}%`;
+                            if (res.status.includes('BUY')) bar.style.backgroundColor = '#26A69A';
+                            else if (res.status.includes('BYE')) bar.style.backgroundColor = '#EF5350';
+                            else bar.style.backgroundColor = '#9CA3AF';
+                        }
+                    };
+
+                    if(prefix === 'stock') {
+                        upBox('st-signal-text', stRes, 'st-score-bar'); 
+                        upBox('mt-signal-text', mtRes, 'mt-score-bar'); 
+                        upBox('lt-signal-text', ltRes, 'lt-score-bar');
+                    } else {
+                        upBox('crypto-st-signal-text', stRes, 'crypto-st-score-bar'); 
+                        upBox('crypto-mt-signal-text', mtRes, 'crypto-mt-score-bar'); 
+                        upBox('crypto-lt-signal-text', ltRes, 'crypto-lt-score-bar');
+                    }
+                };
+
+                updateUI(marketType);
+
+                // UI 지표 업데이트 (메인 리포트는 단기 기반)
                 const dailyClean = extractCleanData(dData);
                 const mainSma120 = Indicator.sma(dailyClean.closes, 120);
                 const lastCl = dailyClean.closes[dailyClean.closes.length-1];
                 const dist120 = mainSma120[mainSma120.length-1] ? ((lastCl - mainSma120[mainSma120.length-1]) / mainSma120[mainSma120.length-1] * 100).toFixed(2) : 0;
                 
-                renderIndicatorUI('val-ma-dist', `${dist120>0?'+':''}${dist120}%`, 'DIST', parseFloat(dist120), 'stock');
-                renderIndicatorUI('val-rsi-main', mt.rsi, 'RSI', parseFloat(mt.rsi), 'stock'); 
-                renderIndicatorUI('val-macd-main', mt.macd, 'MACD', parseFloat(mt.macd), 'stock'); 
-                renderIndicatorUI('val-stoch-main', mt.stoch, 'STOCH', parseFloat(mt.stoch), 'stock');
-                renderIndicatorUI('val-bb-main', mt.bbStr, 'BB', mt.bbStr, 'stock');
+                if (marketType === 'stock') {
+                    renderIndicatorUI('val-ma-dist', `${dist120>0?'+':''}${dist120}%`, 'DIST', parseFloat(dist120), 'stock');
+                    renderIndicatorUI('val-rsi-main', stRes.rsi || Indicator.rsi(dailyClean.closes, 14)[lastCl] || 50, 'RSI', parseFloat(Indicator.rsi(dailyClean.closes, 14).pop()), 'stock'); 
+                    renderIndicatorUI('val-macd-main', Indicator.macd(dailyClean.closes, 12, 26, 9).hist.pop().toFixed(2), 'MACD', parseFloat(Indicator.macd(dailyClean.closes, 12, 26, 9).hist.pop()), 'stock'); 
+                    renderIndicatorUI('val-stoch-main', Indicator.stochastic(dailyClean.kData, 14, 3).k.pop().toFixed(1), 'STOCH', parseFloat(Indicator.stochastic(dailyClean.kData, 14, 3).k.pop()), 'stock');
+                } else {
+                    renderIndicatorUI('crypto-val-ma-dist', `${dist120>0?'+':''}${dist120}%`, 'DIST', parseFloat(dist120), 'crypto');
+                    renderIndicatorUI('crypto-val-rsi-main', stRes.rsi || Indicator.rsi(dailyClean.closes, 14)[lastCl] || 50, 'RSI', parseFloat(Indicator.rsi(dailyClean.closes, 14).pop()), 'crypto'); 
+                    renderIndicatorUI('crypto-val-macd-main', Indicator.macd(dailyClean.closes, 12, 26, 9).hist.pop().toFixed(2), 'MACD', parseFloat(Indicator.macd(dailyClean.closes, 12, 26, 9).hist.pop()), 'crypto'); 
+                    renderIndicatorUI('crypto-val-stoch-main', Indicator.stochastic(dailyClean.kData, 14, 3).k.pop().toFixed(1), 'STOCH', parseFloat(Indicator.stochastic(dailyClean.kData, 14, 3).k.pop()), 'crypto');
+                }
 
             } catch (e) {
                 logError("Calculate Signals Error", e);
-            }
-        }
-
-        async function calculateCryptoTriplePerspectiveDecision(ticker) {
-            try {
-                const [dData, wData] = await Promise.all([
-                    fetchStockData(ticker, '1d', '2y', true),
-                    fetchStockData(ticker, '1wk', 'max', true)
-                ]);
-
-                const analyze = (data, weight, periods) => {
-                    let { kData, closes } = extractCleanData(data);
-                    if(closes.length < periods.ma) return { status:"WAIT", maDist:"0", rsi:"0", macd:"0", stoch:"0", bbStr:"-" };
-                    
-                    const last = closes.length - 1;
-                    const rsi = Indicator.rsi(closes, periods.rsi)[last] || 50;
-                    const macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0;
-                    const sma = Indicator.sma(closes, periods.ma)[last] || closes[last];
-                    const stoch = Indicator.stochastic(kData, periods.stoch, 3).k[last] || 50;
-                    const bb = Indicator.bollinger(closes, periods.ma, 2);
-                    const dist = ((closes[last] - sma) / sma) * 100;
-                    
-                    let buy = 0, sell = 0;
-                    if (closes[last] > sma) buy += weight.ma; else sell += weight.ma;
-                    if (rsi < 35) buy += weight.rsi; else if (rsi > 65) sell += weight.rsi;
-                    if (macd > 0) buy += weight.macd; else sell += weight.macd;
-                    if (stoch < 20) buy += 0.5; else if (stoch > 80) sell += 0.5;
-                    
-                    let bbStr = "MID";
-                    if(bb.upper[last] !== null && closes[last] >= bb.upper[last] * 0.98) { bbStr = "UPPER"; sell += 0.5; }
-                    else if(bb.lower[last] !== null && closes[last] <= bb.lower[last] * 1.02) { bbStr = "LOWER"; buy += 0.5; }
-                    
-                    let st = "HOLD"; if (buy > sell + 0.5) st = "BUY"; if (buy > sell + 1.5) st = "STRONG BUY"; if (sell > buy + 0.5) st = "BYE"; if (sell > buy + 1.5) st = "STRONG BYE";
-
-                    return { status: st, maDist: dist.toFixed(2), rsi: rsi.toFixed(1), macd: macd.toFixed(3), stoch: stoch.toFixed(1), bbStr: bbStr };
-                };
-
-                const st = analyze(dData, { ma: 0.5, rsi: 1.8, macd: 1.5 }, { ma: 20, rsi: 9, stoch: 10 });
-                const mt = analyze(dData, { ma: 1.5, rsi: 1.0, macd: 1.2 }, { ma: 60, rsi: 14, stoch: 14 });
-                const lt = analyze(wData, { ma: 3.0, rsi: 0.5, macd: 0.5 }, { ma: 40, rsi: 14, stoch: 14 });
-                
-                cryptoAnalysisDetails = { 
-                    short: {...st, summary: "20일선 및 단기 모멘텀 지표를 분석한 결과입니다.", advice: "코인 시장 특유의 급격한 단기 변동성에 주의하세요." }, 
-                    mid: {...mt, summary: "60일 중기 이평선과 추세를 분석한 결과입니다.", advice: "일봉 추세와 주봉 추세가 일치할 때 진입하는 것이 안전합니다." }, 
-                    long: {...lt, summary: "주봉 40주선 기반의 장기 사이클입니다.", advice: "장기 추세가 무너진 상태라면 섣부른 매수(물타기)를 자제하세요." } 
-                };
-                
-                const up = (id, r) => { const el = document.getElementById(id); if(el) { el.innerText = r.status; el.className = `text-sm md:text-base font-black italic status-${r.status.replace(/ /g, '-')} uppercase`; } };
-                up('crypto-st-signal-text', st); up('crypto-mt-signal-text', mt); up('crypto-lt-signal-text', lt);
-                
-                const dailyClean = extractCleanData(dData);
-                const mainSma120 = Indicator.sma(dailyClean.closes, 120);
-                const lastCl = dailyClean.closes[dailyClean.closes.length-1];
-                const dist120 = mainSma120[mainSma120.length-1] ? ((lastCl - mainSma120[mainSma120.length-1]) / mainSma120[mainSma120.length-1] * 100).toFixed(2) : 0;
-                
-                renderIndicatorUI('crypto-val-ma-dist', `${dist120>0?'+':''}${dist120}%`, 'DIST', parseFloat(dist120), 'crypto');
-                renderIndicatorUI('crypto-val-rsi-main', mt.rsi, 'RSI', parseFloat(mt.rsi), 'crypto'); 
-                renderIndicatorUI('crypto-val-macd-main', mt.macd, 'MACD', parseFloat(mt.macd), 'crypto'); 
-                renderIndicatorUI('crypto-val-stoch-main', mt.stoch, 'STOCH', parseFloat(mt.stoch), 'crypto');
-                renderIndicatorUI('crypto-val-bb-main', mt.bbStr, 'BB', mt.bbStr, 'crypto');
-
-            } catch (e) {
-                logError("Crypto Calculate Signals Error", e);
             }
         }
 
@@ -1809,6 +1862,7 @@
             Object.keys(pfDetails).forEach(key => {
                 const cagrEl = document.getElementById(`card-cagr-${key}`);
                 const mddEl = document.getElementById(`card-mdd-${key}`);
+                const marEl = document.getElementById(`card-mar-${key}`);
                 if(!cagrEl || !mddEl) return;
 
                 const dataArr = getAdjustedSimData(key);
@@ -1817,12 +1871,20 @@
                 let cagr = (((finalVal / baseVal) ** (1 / years)) - 1) * 100;
                 let mdds = calcMDDArray(dataArr);
                 let minMdd = Math.min(...mdds);
+                let mar = Math.abs(minMdd) > 0 ? (cagr / Math.abs(minMdd)) : 0;
 
                 cagrEl.innerText = `${cagr.toFixed(1)}%`;
                 cagrEl.className = cagr > 0 ? "text-up ml-1" : "text-down ml-1";
                 
                 mddEl.innerText = `${minMdd.toFixed(1)}%`;
                 mddEl.className = minMdd < -5 ? "text-down ml-1" : "text-up ml-1";
+
+                if (marEl) {
+                    marEl.innerText = `MAR ${mar.toFixed(2)}`;
+                    marEl.style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6');
+                    marEl.style.borderColor = mar > 1.0 ? 'rgba(16, 185, 129, 0.3)' : (mar < 0.5 ? 'rgba(239, 83, 80, 0.3)' : 'rgba(59, 130, 246, 0.3)');
+                    marEl.style.background = mar > 1.0 ? 'rgba(16, 185, 129, 0.1)' : (mar < 0.5 ? 'rgba(239, 83, 80, 0.1)' : 'rgba(59, 130, 246, 0.1)');
+                }
             });
         }
 
