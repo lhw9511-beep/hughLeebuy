@@ -917,6 +917,151 @@
             }
         };
 
+        // ==========================================
+        // 💡 포트폴리오 백테스트 필수 함수 (통합 완료)
+        // ==========================================
+        function getAdjustedSimData(key) {
+            const baseData = pfSimData[key];
+            if (!baseData) return [];
+            if (currentCurrency === 'KRW') {
+                return baseData.map((val, i) => val * (fxSimData[i] / fxSimData[0]));
+            }
+            return baseData;
+        }
+
+        function updatePfCardMetrics() {
+            Object.keys(pfDetails).forEach(key => {
+                const dataArr = getAdjustedSimData(key);
+                if (!dataArr || dataArr.length === 0) return;
+                
+                const years = parseInt(pfSimYears[pfSimYears.length - 1]) - parseInt(pfSimYears[0]);
+                const baseVal = dataArr[0], finalVal = dataArr[dataArr.length - 1];
+                let cagr = (((finalVal / baseVal) ** (1 / years)) - 1) * 100;
+                let mdds = calcMDDArray(dataArr);
+                let minMdd = Math.min(...mdds);
+                let mar = Math.abs(minMdd) > 0 ? (cagr / Math.abs(minMdd)) : 0;
+
+                const cagrEl = document.getElementById(`card-cagr-${key}`);
+                const mddEl = document.getElementById(`card-mdd-${key}`);
+                const marEl = document.getElementById(`card-mar-${key}`);
+
+                if (cagrEl) {
+                    cagrEl.innerText = `${cagr.toFixed(1)}%`;
+                    cagrEl.className = cagr > 0 ? "text-up ml-1" : "text-down ml-1";
+                }
+                if (mddEl) {
+                    mddEl.innerText = `${minMdd.toFixed(1)}%`;
+                    mddEl.className = minMdd < -5 ? "text-down ml-1" : "text-up ml-1";
+                }
+                if (marEl) {
+                    marEl.innerText = `가성비 ${mar.toFixed(2)}`;
+                    marEl.style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6');
+                }
+            });
+        }
+
+        function initPortfolioChart() {
+            if (!pfChart) {
+                pfChart = echarts.init(document.getElementById('chart-portfolio'));
+            }
+            renderPortfolioChart();
+        }
+
+        function renderPortfolioChart() {
+            if (!pfChart) return;
+            const styleColor = getComputedStyle(document.documentElement);
+            const textColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+            const splitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+
+            const seriesData = Object.keys(pfDetails).map(key => ({
+                name: pfDetails[key].title,
+                type: 'line',
+                data: getAdjustedSimData(key),
+                smooth: true,
+                showSymbol: false,
+                lineStyle: { width: key === 'baa' ? 3 : 2 }
+            }));
+            
+            seriesData.push({
+                name: 'S&P 500 (기준)',
+                type: 'line',
+                data: getAdjustedSimData('spy'),
+                smooth: true,
+                showSymbol: false,
+                lineStyle: { width: 2, type: 'dashed', color: textColor },
+                itemStyle: { color: textColor }
+            });
+
+            pfChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: splitColor, textStyle: { color: '#fff', fontSize: 11 } },
+                legend: { type: 'scroll', textStyle: { color: textColor, fontSize: 11 }, top: 0 },
+                grid: { left: '3%', right: '4%', bottom: '5%', top: '15%', containLabel: true },
+                xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: textColor } },
+                yAxis: { type: 'value', scale: true, splitLine: { lineStyle: { color: splitColor, type: 'dashed' } }, axisLabel: { color: textColor } },
+                series: seriesData
+            }, true);
+        }
+
+        async function comparePortfolioStock() {
+            const input = document.getElementById('pf-compare-input');
+            const ticker = input.value.trim().toUpperCase();
+            if (!ticker) return;
+
+            const btn = document.getElementById('pf-compare-btn');
+            btn.innerText = '로딩중...';
+            btn.disabled = true;
+
+            try {
+                const d = await fetchStockData(ticker, '1mo', 'max');
+                let { dates, closes } = extractCleanData(d);
+                
+                let yearlyData = {};
+                for(let i=0; i<dates.length; i++) {
+                    const y = dates[i].substring(0,4);
+                    yearlyData[y] = closes[i];
+                }
+
+                let compArr = [];
+                let basePrice = null;
+                
+                for(let y of pfSimYears) {
+                    if(yearlyData[y]) {
+                        if(basePrice === null) basePrice = yearlyData[y];
+                        compArr.push((yearlyData[y] / basePrice) * 100);
+                    } else {
+                        if(compArr.length > 0) compArr.push(compArr[compArr.length-1]);
+                        else compArr.push(null);
+                    }
+                }
+
+                if (currentCurrency === 'KRW') {
+                    compArr = compArr.map((val, i) => val === null ? null : val * (fxSimData[i] / fxSimData[0]));
+                }
+
+                const option = pfModalChart.getOption();
+                option.series = option.series.filter(s => s.name !== ticker); 
+                if(!option.legend[0].data.includes(ticker)) option.legend[0].data.push(ticker);
+                
+                option.series.push({
+                    name: ticker,
+                    type: 'line',
+                    data: compArr,
+                    smooth: true,
+                    lineStyle: { width: 2, type: 'dashed', color: '#EAB308' },
+                    itemStyle: { color: '#EAB308' },
+                    showSymbol: false
+                });
+
+                pfModalChart.setOption(option, true);
+            } catch (e) {
+                alert('종목 데이터를 불러오지 못했습니다.');
+            } finally {
+                btn.innerText = '차트 비교';
+                btn.disabled = false;
+            }
+        }
+
         // ★ 모드 전환 함수
         function toggleMode(el) {
             isBeginnerMode = el.checked;
