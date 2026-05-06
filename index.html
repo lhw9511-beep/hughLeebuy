@@ -771,12 +771,12 @@
         const TERMS = {
             vix: { expert: 'VIX 지수', beginner: '시장 불안감 (VIX 지수)' },
             fng: { expert: '공포/탐욕', beginner: '대중의 심리' },
-            dist: { expert: '이동평균선 돌파', beginner: '이동평균선 (상승장/하락장)' }, // 이격도 -> 이동평균선
+            dist: { expert: '이동평균선 돌파', beginner: '이동평균선 (상승장/하락장)' },
             macd: { expert: 'MACD', beginner: '단기 흐름 (방향타)' },
             rsi: { expert: 'RSI', beginner: '단기 과열도 (체력)' },
             bb: { expert: 'BB밴드', beginner: '가격 저항선 (천장/바닥)' },
             stoch: { expert: 'Stoch', beginner: '단기 바닥찾기 (타이밍)' },
-            vol: { expert: '크립토 VIX 지수', beginner: '코인 VIX 지수 (불안감)' } // 변동성 -> VIX 지수
+            vol: { expert: '크립토 VIX 지수', beginner: '코인 VIX 지수 (불안감)' }
         };
 
         const DESCRIPTIONS = {
@@ -847,7 +847,6 @@
         };
         const fxSimData = [1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
 
-        // 💡 첫 번째 코드의 rules 및 allocation 상세 내용 복원
         const pfDetails = { 
             '6040': { 
                 title: '60/40 전략', type: 'static', 
@@ -918,7 +917,7 @@
         };
 
         // ==========================================
-        // 💡 포트폴리오 백테스트 필수 함수 (통합 완료)
+        // 💡 포트폴리오 백테스트 필수 함수
         // ==========================================
         function getAdjustedSimData(key) {
             const baseData = pfSimData[key];
@@ -1035,8 +1034,14 @@
                     }
                 }
 
+                // 수정됨: 종목 상장 연도 환율을 기준으로 해야 오차가 없음
+                let fxBase = null;
                 if (currentCurrency === 'KRW') {
-                    compArr = compArr.map((val, i) => val === null ? null : val * (fxSimData[i] / fxSimData[0]));
+                    compArr = compArr.map((val, i) => {
+                        if (val === null) return null;
+                        if (fxBase === null) fxBase = fxSimData[i];
+                        return val * (fxSimData[i] / fxBase);
+                    });
                 }
 
                 const option = pfModalChart.getOption();
@@ -1066,7 +1071,6 @@
         function toggleMode(el) {
             isBeginnerMode = el.checked;
             
-            // 데스크탑과 모바일 스위치 상태 동기화
             const deskSwitch = document.getElementById('mode-switch');
             const mobSwitch = document.getElementById('mob-mode-switch');
             if (deskSwitch) deskSwitch.checked = isBeginnerMode;
@@ -1075,15 +1079,15 @@
             safeStorageSet('dashboardMode', isBeginnerMode ? 'beginner' : 'expert');
             updateTerminologyUI();
             
-            // ★ 초보 모드일 경우 복잡한 전광판(7개 지표) 숨기기
             const stockIndicators = document.getElementById('stock-expert-indicators');
             if (stockIndicators) stockIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
             
             const cryptoIndicators = document.getElementById('crypto-expert-indicators');
             if (cryptoIndicators) cryptoIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
             
-            if (globalTicker && globalChartData) calculateTriplePerspectiveDecision(globalTicker, 'stock');
-            if (globalCryptoTicker && globalCryptoChartData) calculateTriplePerspectiveDecision(globalCryptoTicker, 'crypto');
+            // 수정됨: 비동기 에러 발생 시 보호 처리 추가
+            if (globalTicker && globalChartData) calculateTriplePerspectiveDecision(globalTicker, 'stock').catch(e => logError("Triple Calc Error", e));
+            if (globalCryptoTicker && globalCryptoChartData) calculateTriplePerspectiveDecision(globalCryptoTicker, 'crypto').catch(e => logError("Crypto Triple Calc Error", e));
         }
 
         function updateTerminologyUI() {
@@ -1161,7 +1165,6 @@
             if (currentPfKey) showPfDetail(currentPfKey); 
         }
 
-        // 증명 보기 토글 함수 (추가)
         function toggleProofs(show) {
             document.querySelectorAll('.proof-row').forEach(row => {
                 if(show) row.classList.add('show');
@@ -1205,7 +1208,6 @@
             document.getElementById('info-modal').style.display = 'flex';
         }
 
-        // 💡 수정된 포트폴리오 디테일 모달 함수 (라이브 엔진/파이 차트 통합)
         function showPfDetail(key) {
             currentPfKey = key;
             const modal = document.getElementById('pf-detail-modal');
@@ -1235,13 +1237,11 @@
             document.getElementById('pf-modal-mar').innerText = mar.toFixed(2);
             document.getElementById('pf-modal-mar').style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6');
 
-            // 운용 규칙 렌더링
             const rulesEl = document.getElementById('pf-modal-rules');
             if (rulesEl && detail.rules) {
                 rulesEl.innerHTML = detail.rules.map(r => `<li><div class="flex-1">${r}</div></li>`).join('');
             }
 
-            // 동적/정적 판단하여 UI 전환 및 라이브 계산 실행
             const pieArea = document.getElementById('pf-modal-pie-area');
             const liveArea = document.getElementById('pf-modal-live-area');
 
@@ -1306,7 +1306,6 @@
                 }, true);
                 pfModalChart.resize();
 
-                // 정적 배분 비율 파이 차트
                 if(detail.type === 'static' && detail.allocation && pieArea) {
                     pieArea.style.display = 'block';
                     if(!pfPieChart) pfPieChart = echarts.init(document.getElementById('pf-pie-chart'));
@@ -1328,7 +1327,6 @@
             });
         }
 
-        // 💡 라이브 엔진 계산 함수 (첫 번째 코드 복원)
         async function runLiveCalc(pfKey) {
             const area = document.getElementById('pf-modal-live-area');
             const loading = document.getElementById('pf-live-loading');
@@ -2551,4 +2549,3 @@
     </script>
 </body>
 </html>
-```
