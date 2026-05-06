@@ -118,7 +118,6 @@
         .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 1px; font-size: 0.8rem; }
         .rule-highlight { color: var(--text-main); font-weight: 800; background: rgba(59, 130, 246, 0.2); padding: 3px 6px; border-radius: 6px; margin-right: 6px; display: inline-block; margin-bottom: 4px; border: 1px solid rgba(59, 130, 246, 0.4); word-break: keep-all; }
         
-        /* 모드 토글 스위치 디자인 개선 */
         .mode-toggle-wrap { position: relative; display: inline-flex; height: 34px; background: rgba(0,0,0,0.5); border-radius: 17px; border: 1px solid var(--border-color); cursor: pointer; align-items: center; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
         .mode-toggle-wrap input { display: none; }
         .mode-slider-bg { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); background: #3B82F6; border-radius: 15px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), background-color 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
@@ -127,7 +126,6 @@
         .mode-toggle-wrap input:not(:checked) ~ .text-expert { color: #ffffff; }
         .mode-toggle-wrap input:checked ~ .text-beginner { color: #ffffff; }
 
-        /* Accordion (Details) 애니메이션 스타일 */
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
         details[open] summary ~ * { animation: sweep .3s ease-in-out; }
@@ -136,10 +134,8 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
-    <!-- 설정 모달 등 기존 모달 영역 생략 없이 유지 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <!-- ... 기존 코드 유지 ... -->
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
                 <h3 class="text-lg font-black text-themeText flex items-center">
                     <svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -182,7 +178,6 @@
     </div>
 
     <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()">
-        <!-- 기존 에러모달 -->
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
                 <h3 class="text-lg font-black text-rose-500 flex items-center">에러 로그 (Debug)</h3>
@@ -197,7 +192,6 @@
     </div>
 
     <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()">
-        <!-- 기존 인포모달 -->
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
                 <h3 id="info-title" class="text-lg font-black text-themeText flex items-center">지표 설명</h3>
@@ -211,7 +205,6 @@
     </div>
 
     <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()">
-        <!-- 기존 상세모달 -->
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
                 <div>
@@ -228,7 +221,6 @@
     </div>
 
     <div id="pf-detail-modal" class="modal-overlay" onclick="closePfDetailModal()">
-        <!-- 기존 포폴 상세모달 -->
         <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
                 <h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
@@ -251,7 +243,7 @@
                         <p id="pf-modal-mar" class="text-lg md:text-xl font-black text-themeText">0.0</p>
                     </div>
                 </div>
-                <!-- 하단 차트 및 테이블 영역 생략 없이 원본과 동일하게 유지되는 부분입니다 (스크립트에서 렌더링) -->
+                
                 <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
                     <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-3 py-2 uppercase outline-none text-xs md:text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교할 주식 심볼">
                     <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="bg-accent text-white px-4 py-2 rounded-lg font-black text-xs md:text-sm hover:bg-blue-600 transition shrink-0">차트 비교</button>
@@ -327,7 +319,6 @@
                         <button type="button" onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">종목 AI 분석</button>
                         <button type="button" onclick="switchMainTab('crypto')" id="tab-btn-crypto" class="main-tab-btn">코인 분석</button>
                         <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
-                        <!-- ★ BAA 심화 탭 버튼 추가 -->
                         <button type="button" onclick="switchMainTab('baa')" id="tab-btn-baa" class="main-tab-btn flex items-center gap-1"><span class="text-orange-500">🔥</span> BAA 레버리지 심화</button>
                     </div>
                     
@@ -355,9 +346,8 @@
             </div>
         </header>
 
-        <!-- 기존 View: Dashboard (주식 분석) -->
+        <!-- View: Dashboard (주식 분석) -->
         <div id="view-dashboard" class="flex flex-col space-y-3 md:space-y-4">
-            <!-- (기존 내용 그대로 생략 없이 유지됨 - 앞서 작성된 코드와 100% 동일하므로 공간 절약을 위해 내부 내용만 주석처리, 실제로는 모두 있어야함) -->
             <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
                 <form id="search-form" class="flex w-full sm:flex-grow">
                     <input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="주식 심볼 (예: QQQ, AAPL)">
@@ -487,7 +477,7 @@
             </div>
         </div>
 
-        <!-- 기존 View: Crypto (코인 분석) -->
+        <!-- View: Crypto (코인 분석) -->
         <div id="view-crypto" class="hidden flex-col space-y-3 md:space-y-4">
             <div class="flex gap-2 mb-1 overflow-x-auto custom-scroll pb-1">
                 <button type="button" onclick="loadCryptoData('BTC-USD')" class="chip-btn bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/30">비트코인 (BTC)</button>
@@ -628,7 +618,7 @@
             </div>
         </div>
 
-        <!-- 기존 View: Portfolio (백테스트) -->
+        <!-- View: Portfolio (백테스트) -->
         <div id="view-portfolio" class="hidden flex-col space-y-4">
             
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
@@ -718,10 +708,9 @@
             </div>
         </div>
 
-        <!-- ★ 새로 추가된 View: BAA 심화 (레버리지) -->
+        <!-- View: BAA 심화 (레버리지) -->
         <div id="view-baa" class="hidden flex-col space-y-4">
             
-            <!-- 상단 헤더 카드 -->
             <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-orange-500 relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                     <svg class="w-24 h-24 text-orange-500" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -733,7 +722,6 @@
                     폭락장은 피하고, 폭등장은 나스닥 몰빵으로 먹는 <strong class="text-themeText">가장 극단적이고 완성된 형태</strong>의 동적 자산배분입니다.
                 </p>
 
-                <!-- 아코디언 메뉴들 (깔끔한 UI) -->
                 <div class="space-y-2 relative z-10">
                     <details class="group bg-black/20 rounded-xl border border-themeBorder overflow-hidden">
                         <summary class="p-3 text-sm font-bold text-themeText cursor-pointer flex justify-between items-center outline-none hover:bg-white/5 transition">
@@ -763,7 +751,6 @@
                 </div>
             </div>
 
-            <!-- 실시간 시그널 카드 -->
             <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-accent">
                 <div class="flex justify-between items-center mb-4 border-b border-themeBorder pb-2">
                     <h3 class="text-base font-black text-themeText">📡 이번 달 BAA 투자 시그널</h3>
@@ -806,7 +793,6 @@
                 </div>
             </div>
 
-            <!-- 레버리지 백테스트 시뮬레이션 -->
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-purple-500">
                 <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
                     <h2 class="text-base md:text-lg font-black text-themeText">레버리지 적용 백테스트 (2000~2026)</h2>
@@ -835,7 +821,6 @@
 
                 <div id="chart-baa-leverage" class="portfolio-chart-container w-full bg-themeBg/50 rounded-xl border border-themeBorder"></div>
                 
-                <!-- 레버리지 경고문 -->
                 <div class="mt-4 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-start gap-3">
                     <svg class="icon-lg text-rose-500 shrink-0 mt-0.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     <div>
@@ -855,9 +840,6 @@
     </div>
 
     <script>
-        // ==========================================
-        // 🚀 1. 전역 변수 및 헬퍼 함수
-        // ==========================================
         const API_BASE_URL = 'https://buy-or-bye.onrender.com';
         let errorLogs = [];
         
@@ -868,7 +850,6 @@
         let maSettings = { 20: true, 50: true, 120: true, 200: true };
         let cryptoMaSettings = { 20: true, 50: true, 120: true, 200: true };
         
-        // ★ 차트 인스턴스에 baaChart 추가
         let myChart = null, cryptoChart = null, pfChart = null, pfModalChart = null, pfPieChart = null, baaChart = null;
         let globalChartData = null, globalTicker = "SPY", globalCryptoChartData = null, globalCryptoTicker = "BTC-USD";
         let currentPfKey = '';
@@ -958,7 +939,6 @@
         };
         const fxSimData = [1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
 
-        // ★ BAA 레버리지 시뮬레이션용 데이터 (변동성/비용을 고려하여 나스닥 지수 기반으로 추산된 값)
         const baaLevSimData = {
             'baa_qqq': pfSimData['baa'], 
             'baa_qld': [100, 135, 180, 280, 360, 460, 610, 780, 710, 1050, 1350, 1450, 1850, 2650, 3350, 3500, 4100, 5300, 4900, 7200, 9800, 12500, 9800, 13500, 18500, 23500, 28000],
@@ -1034,9 +1014,6 @@
             }
         };
 
-        // ==========================================
-        // 💡 포트폴리오 백테스트 & BAA 특화 함수
-        // ==========================================
         function getAdjustedSimData(key, isBaaLev = false) {
             const baseData = isBaaLev ? baaLevSimData[key] : pfSimData[key];
             if (!baseData) return [];
@@ -1120,7 +1097,6 @@
             }, true);
         }
 
-        // ★ BAA 레버리지 차트 초기화 및 렌더링
         function initBaaChart() {
             if (!baaChart) {
                 baaChart = echarts.init(document.getElementById('chart-baa-leverage'));
@@ -1144,7 +1120,7 @@
                 legend: { data: ['BAA (1배)', 'BAA (2배 QLD)', 'BAA (3배 TQQQ)'], textStyle: { color: textColor, fontSize: 11 }, top: 0 },
                 grid: { left: '4%', right: '4%', bottom: '5%', top: '15%', containLabel: true },
                 xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: textColor } },
-                yAxis: { type: 'log', scale: true, splitLine: { lineStyle: { color: splitColor, type: 'dashed' } }, axisLabel: { color: textColor, formatter: '{value}' } }, // 로그 스케일로 보기 편하게
+                yAxis: { type: 'log', scale: true, splitLine: { lineStyle: { color: splitColor, type: 'dashed' } }, axisLabel: { color: textColor, formatter: '{value}' } },
                 series: [
                     { name: 'BAA (1배)', type: 'line', data: s_qqq, smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#3B82F6' }, itemStyle: {color: '#3B82F6'} },
                     { name: 'BAA (2배 QLD)', type: 'line', data: s_qld, smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#A855F7' }, itemStyle: {color: '#A855F7'} },
@@ -1153,7 +1129,6 @@
             }, true);
         }
 
-        // ★ 실시간 BAA 상태 체크 엔진 (API 호출)
         async function runBaaLiveCheck() {
             const idle = document.getElementById('baa-live-idle');
             const loading = document.getElementById('baa-live-loading');
@@ -1169,7 +1144,9 @@
 
             try {
                 for (let ticker of canaries) {
-                    const d = await fetchStockData(ticker, '1mo', '2y');
+                    // ★ 핵심 수정: 환율 왜곡(KRW)이 적용되면 모멘텀 점수가 틀려짐.
+                    // 무조건 자산 고유가(USD)로만 계산하도록 ignoreFx=true 파라미터 전달.
+                    const d = await fetchStockData(ticker, '1mo', '2y', false, true);
                     const { dates, closes } = extractCleanData(d);
                     
                     if (closes.length < 13) throw new Error("Data not enough");
@@ -1203,13 +1180,11 @@
                 const boxEl = document.getElementById('baa-decision-box');
 
                 if (minScore > 0) {
-                    // 모두 통과 (공격)
                     titleEl.innerText = "🟢 공격 모드 (나스닥 몰빵)";
                     titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-up";
                     descEl.innerHTML = "모든 카나리아 자산의 점수가 0을 초과했습니다.<br>현재는 극단적 상승을 노리기 위해 <strong>QQQ(또는 QLD, TQQQ) 100%</strong> 비중을 가져가야 할 시기입니다.";
                     boxEl.style.borderColor = "#26A69A";
                 } else {
-                    // 하나라도 실패 (방어)
                     titleEl.innerText = "🔴 방어 모드 (안전 자산 대피)";
                     titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-down";
                     descEl.innerHTML = `위험 신호 감지! ${failureCount}개의 카나리아가 죽었습니다 (점수 0 이하).<br>즉시 모든 주식을 팔고 가장 안전한 채권/현금 3종목에 <strong>33.3%씩 분산 대피</strong>해야 합니다.`;
@@ -1228,7 +1203,6 @@
         }
 
         async function comparePortfolioStock() {
-            // ... 기존 포폴 비교 코드 동일 ...
             const input = document.getElementById('pf-compare-input');
             const ticker = input.value.trim().toUpperCase();
             if (!ticker) return;
@@ -1292,7 +1266,6 @@
             }
         }
 
-        // ★ 모드 전환 함수
         function toggleMode(el) {
             isBeginnerMode = el.checked;
             
@@ -1386,7 +1359,7 @@
             if (globalCryptoTicker) loadCryptoData(globalCryptoTicker);
             updatePfCardMetrics();
             if (pfChart) renderPortfolioChart();
-            if (baaChart) renderBaaChart(); // BAA 차트 업데이트
+            if (baaChart) renderBaaChart(); 
             if (currentPfKey) showPfDetail(currentPfKey); 
         }
 
@@ -1397,9 +1370,6 @@
             });
         }
 
-        // ==========================================
-        // 📈 2. 차트 렌더링 및 모달 컨트롤 함수 (기존 내용 동일)
-        // ==========================================
         function updateStatus(t, c) { 
             const l = document.getElementById('conn-label'), d = document.getElementById('status-dot');
             if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; }
@@ -1434,7 +1404,6 @@
         }
 
         function showPfDetail(key) {
-            // ... 기존 포트폴리오 상세 표출 함수 (생략 없이 원본 동일 처리)
             currentPfKey = key;
             const modal = document.getElementById('pf-detail-modal');
             if (!modal) return;
@@ -1554,7 +1523,6 @@
         }
 
         async function runLiveCalc(pfKey) {
-            // ... 기존 동적 자산배분 라이브 엔진 로직 (원본 동일) ...
             const area = document.getElementById('pf-modal-live-area');
             const loading = document.getElementById('pf-live-loading');
             const content = document.getElementById('pf-live-content');
@@ -1585,7 +1553,8 @@
                     
                     if(i > 0) await new Promise(r => setTimeout(r, 1000));
                     
-                    const d = await fetchStockData(t, '1mo', '2y');
+                    // ★ 핵심 수정: 백테스트 시그널 점수도 순수 자산 가격(USD) 기반으로만 계산해야 오류 방지 (ignoreFx = true)
+                    const d = await fetchStockData(t, '1mo', '2y', false, true);
                     let { dates, closes } = extractCleanData(d);
                     
                     dataMap[t] = {};
@@ -1638,7 +1607,7 @@
                         
                         if(!P0 || !P12) return { ret: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
                         const ret = (P0/P12 - 1) * 100;
-                        const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) ${getCurrSymbol()}${formatPriceStr(P0)} / 과거(${m12YM}) ${getCurrSymbol()}${formatPriceStr(P12)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
+                        const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) $${formatPriceStr(P0)} / 과거(${m12YM}) $${formatPriceStr(P12)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
                         return { ret, proof };
                     };
 
@@ -1899,7 +1868,7 @@
                 if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
                 if (globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData);
                 if (pfChart) renderPortfolioChart(); 
-                if (baaChart) renderBaaChart(); // BAA 차트 업데이트 추가
+                if (baaChart) renderBaaChart(); 
             });
         }
 
@@ -1924,7 +1893,6 @@
             });
         }
 
-        // ★ 탭 전환 함수 업데이트
         function switchMainTab(tab) {
             document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
@@ -1933,7 +1901,7 @@
             document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
             document.getElementById('view-crypto').style.display = tab==='crypto' ? 'flex' : 'none';
             document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
-            document.getElementById('view-baa').style.display = tab==='baa' ? 'flex' : 'none'; // BAA 탭 노출
+            document.getElementById('view-baa').style.display = tab==='baa' ? 'flex' : 'none'; 
             
             setTimeout(() => {
                 if(tab === 'dashboard' && myChart) { myChart.resize(); } 
@@ -1952,9 +1920,6 @@
             }, 50);
         }
 
-        // ==========================================
-        // 🔬 3. 데이터 분석 엔진 (Indicators & API) (기존 내용 동일)
-        // ==========================================
         const Indicator = {
             sma: function(d, p) {
                 return d.map((_, i) => {
@@ -2020,13 +1985,18 @@
             }
         };
 
+        // ★ 핵심 버그 수정: 시간대 오프셋 이슈 완벽 해결
         function extractCleanData(data) {
             if(!data || !data.indicators || !data.indicators.quote || !data.indicators.quote[0]) return { dates:[], kData:[], closes:[] };
             const q = data.indicators.quote[0], ts = data.timestamp || [];
             let dates = [], kData = [], closes = [];
             for(let i=0; i<ts.length; i++) {
                 if (q.close && q.close[i] !== null && q.close[i] !== undefined) {
-                    dates.push(new Date(ts[i] * 1000).toISOString().split('T')[0]); 
+                    const dObj = new Date(ts[i] * 1000);
+                    const yyyy = dObj.getFullYear();
+                    const mm = String(dObj.getMonth() + 1).padStart(2, '0');
+                    const dd = String(dObj.getDate()).padStart(2, '0');
+                    dates.push(`${yyyy}-${mm}-${dd}`); 
                     kData.push([q.open[i]||q.close[i], q.close[i], q.low[i]||q.close[i], q.high[i]||q.close[i]]); 
                     closes.push(q.close[i]);
                 }
@@ -2131,8 +2101,9 @@
             return clonedData;
         }
 
-        async function fetchStockData(ticker, interval, range, isCrypto = false) {
-            const cacheKey = `${ticker}_${interval}_${range}_${currentCurrency}`;
+        // ★ 핵심 버그 수정: ignoreFx 파라미터 추가로 환율 왜곡 차단
+        async function fetchStockData(ticker, interval, range, isCrypto = false, ignoreFx = false) {
+            const cacheKey = `${ticker}_${interval}_${range}_${currentCurrency}_${ignoreFx}`;
             const now = Date.now();
             if (reqCache.has(cacheKey) && now - reqCache.get(cacheKey).time < 60000) {
                 return reqCache.get(cacheKey).data;
@@ -2142,7 +2113,7 @@
             if(!json.chart || !json.chart.result) throw new Error("API Data Format Error");
             let data = json.chart.result[0];
             
-            if (currentCurrency === 'KRW' && ticker !== 'KRW=X' && ticker !== '^VIX') {
+            if (!ignoreFx && currentCurrency === 'KRW' && ticker !== 'KRW=X' && ticker !== '^VIX') {
                 const fxMap = await getFxMap(interval, range);
                 data = applyFxToData(data, fxMap);
             }
@@ -2150,9 +2121,6 @@
             return data;
         }
 
-        // ==========================================
-        // 📊 4. 마크로 데이터 파이프라인 (역발상 및 가중치 논리 반영)
-        // ==========================================
         function getIndicatorStatus(type, val, marketType = 'stock', timeHorizon = 'short') {
             let sig = 'NEUTRAL', text = '중립', color = 'var(--text-muted)';
             const weight = WEIGHT_MATRIX[marketType][timeHorizon][type] || 0;
@@ -2297,9 +2265,6 @@
             } catch(e) { logError("Crypto Macro Error", e); }
         }
 
-        // ==========================================
-        // 📊 5. 데이터 로드 및 렌더링 파이프라인
-        // ==========================================
         async function loadData(ticker, interval = currentInterval, range = currentRange) {
             if (abortController) abortController.abort();
             abortController = new AbortController();
@@ -2713,9 +2678,6 @@
             }
         }
 
-        // ==========================================
-        // 🚀 6. 초기화
-        // ==========================================
         document.addEventListener("DOMContentLoaded", () => {
             window.scrollTo(0, 0);
             if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
