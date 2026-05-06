@@ -118,6 +118,7 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
+    <!-- 모달(환경설정, 에러, 인포, 전략상세) 영역 시작 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
@@ -312,6 +313,7 @@
             </div>
         </div>
     </div>
+    <!-- 모달 영역 끝 -->
 
     <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
         <header class="glass rounded-2xl shadow-sm overflow-hidden">
@@ -748,61 +750,61 @@
                 title: '60/40 포트폴리오', type: 'static', 
                 desc: '가장 고전적이고 검증된 패시브 전략입니다. 경제 성장기에는 주식이, 침체기에는 채권이 방어하여 꾸준한 우상향을 그립니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 종합채권(AGG 또는 BND) 40%</div>', 
                     '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.</div>'
                 ], 
-                allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] 
+                allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(AGG)'}] 
             },
             'permanent': { 
                 title: '영구 포트폴리오 (Permanent)', type: 'static', 
-                desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
+                desc: '해리 브라운(Harry Browne)이 고안한 모델로, 경제의 4가지 사계절(성장, 침체, 인플레이션, 디플레이션) 중 어떤 상황이 오더라도 최소 1개의 자산이 방어해 주는 포트폴리오입니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%</div>',
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 5% 이상 벗어나면 리밸런싱을 진행합니다.</div>'
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL/SHY) 25%</div>',
+                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 특정 자산이 타겟 비율에서 5% 이상 벗어나면 리밸런싱을 진행합니다.</div>'
                 ], 
                 allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] 
             },
             'allweather': { 
                 title: '올웨더 포트폴리오 (All-Weather)', type: 'static', 
-                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 미치는 리스크를 동일하게 맞추는 기법을 적용합니다.',
+                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오(Ray Dalio)가 고안한 전략으로, 각 자산군이 전체 포트폴리오에 미치는 리스크(변동성) 비중을 동일하게 맞추는 Risk Parity 기법을 적용합니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 주식 30%, 장기채 40%, 중기채 15%, 금 7.5%, 원자재 7.5%</div>',
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.</div>'
+                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 주식(SPY) 30%, 장기채(TLT) 40%, 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%</div>',
+                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1~2회 리밸런싱합니다.</div>'
                 ], 
                 allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] 
             },
             'dual': { 
-                title: '오리지널 듀얼 모멘텀', type: 'dynamic', 
-                desc: '절대/상대 모멘텀을 혼합하여 하락장을 피하고 상승장에 올라탑니다.',
+                title: '오리지널 듀얼 모멘텀 (GEM)', type: 'dynamic', 
+                desc: '게리 안토나치(Gary Antonacci)가 창시한 전략으로 절대 모멘텀과 상대 모멘텀을 혼합하여 하락장을 피하고 상승장에 올라탑니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 대상:</span> SPY(미국), VEA(선진국), BIL(현금), AGG(채권)</div>',
-                    '<div class="flex-1"><span class="rule-highlight">절대 모멘텀:</span> SPY와 VEA의 최근 12개월 수익률이 둘 다 BIL보다 낮으면 AGG로 100% 대피</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">상대 모멘텀:</span> SPY와 VEA 중 수익률이 더 높은 자산에 100% 몰빵 투자</div>'
+                    '<div class="flex-1"><span class="rule-highlight">투자 대상:</span> 미국 주식(SPY), 선진국 주식(VEA), 현금/초단기채(BIL), 미국 종합채권(AGG)</div>',
+                    '<div class="flex-1"><span class="rule-highlight">절대 모멘텀:</span> 미국 주식(SPY)의 최근 12개월 수익률이 현금(BIL)보다 낮으면 위험 장세로 판단하여 AGG에 100% 투자합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">상대 모멘텀:</span> SPY가 BIL보다 높으면 상승장으로 판단하며, 이때 SPY와 VEA 중 수익률이 더 높은 자산에 100% 몰빵 투자합니다.</div>'
                 ] 
             },
             'vaa': { 
                 title: 'VAA (Vigilant Asset Allocation)', type: 'dynamic', 
-                desc: '단기 수익률에 높은 가중치를 두어 번개처럼 빠른 스위칭을 목표로 합니다.',
+                desc: '바우터 켈러(Wouter Keller)가 고안. 최근 1개월 수익률에 가장 높은 가중치를 두어 번개처럼 빠른 스위칭을 목표로 하는 공격적인 동적 자산배분입니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">스코어 공식:</span> (1M 수익×12) + (3M 수익×4) + (6M 수익×2) + (12M 수익×1)</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 스코어가 모두 0 이상이면 1등 자산에 100% 투자</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드:</span> 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단해 수비 1위 자산으로 전액 대피</div>'
+                    '<div class="flex-1"><span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 공격 자산(SPY, VEA, VWO, AGG) 4개의 스코어가 모두 0 초과면 스코어 1위 공격 자산에 100% 투자합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">수비 모드:</span> 공격 자산 4개 중 단 1개라도 스코어가 0 이하면 폭락 조짐으로 판단해 수비 자산(SHY, IEF, LQD) 중 1위로 전액 대피합니다.</div>'
                 ] 
             },
             'daa': { 
                 title: 'DAA (Defensive Asset Allocation)', type: 'dynamic', 
-                desc: '글로벌 경제 위기에 가장 먼저 타격받는 카나리아 자산을 도입하여 위험 시점에만 도망갑니다.',
+                desc: '카나리아 자산(신흥국 주식, 미국 채권)을 도입하여 글로벌 경제 위기의 조짐이 보일 때만 비중을 조절하여 도망가는 전략입니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (대피):</span> 카나리아 자산(VWO, BND) 중 단 1개라도 0 이하라면 즉시 안전 자산 1위로 대피</div>',
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 둘 다 0 초과 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 투자</div>'
+                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산:</span> 신흥국 주식(VWO)과 미국 종합채권(BND)의 13612W 모멘텀 스코어를 계산합니다.</div>',
+                    '<div class="flex-1"><span class="rule-highlight">비중 조절 (Breadth):</span> 카나리아 2개가 모두 0을 초과하면 공격자산(SPY, VEA)에 50%씩 투자합니다. 1개가 0 이하면 공격자산 50%, 안전자산(SHY/IEF) 50%로 나눕니다. 2개가 모두 0 이하면 안전자산에 100% 대피합니다.</div>'
                 ] 
             },
             'baa': { 
                 title: 'BAA (Bold Asset Allocation)', type: 'dynamic', 
-                desc: '방어력을 끌어올리고 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화하는 최신 배분 전략입니다.',
+                desc: 'DAA와 VAA의 장점을 합친 2022년 최신 배분 전략. 방어력을 극대화하면서도 상승장에서는 나스닥(QQQ)을 편입하여 공격적인 수익을 취합니다.',
                 rules: [
-                    '<div class="flex-1"><span class="rule-highlight">카나리아 감시:</span> 4개 자산 모두 0보다 크면 시장이 극히 안전하다고 판단, QQQ에 100% 몰빵</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (헷지):</span> 단 1개라도 위험하면 BIL, IEF, TLT 등 안전 자산 상위 3개에 33.3%씩 분산 투자</div>'
+                    '<div class="flex-1"><span class="rule-highlight">카나리아 감시:</span> 카나리아 자산 4개(SPY, VEA, VWO, BND)의 스코어가 모두 0 초과면 시장이 극히 안전하다고 판단, QQQ에 100% 몰빵합니다.</div>', 
+                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 중 단 1개라도 스코어가 0 이하라면 위험장으로 판단, 7개의 방어 자산 중 모멘텀 스코어 상위 3개 자산(예: BIL, IEF, TLT 등)에 33.3%씩 분산 투자하여 리스크를 극도로 낮춥니다.</div>'
                 ] 
             }
         };
