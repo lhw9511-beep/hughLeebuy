@@ -880,7 +880,7 @@
         </div>
 
         <div class="text-center mt-2 pb-6">
-            <p class="text-[0.6rem] text-themeMuted">Data Source: Yahoo Finance API (AllOrigins Proxy) | Risk-Adjusted Model (MAR) | Free of Server Dependency</p>
+            <p class="text-[0.6rem] text-themeMuted">Data Source: Yahoo Finance API | Risk-Adjusted Model (MAR) | Free of Server Dependency</p>
         </div>
     </div>
 
@@ -991,7 +991,7 @@
             },
             'daa': { 
                 title: 'DAA 전략', type: 'dynamic', 
-                desc: '카나리아 자산을 도입하여 글로벌 경제 위기 조짐이 보일 때만 비중을 조절하여 도망갑니다.',
+                desc: '카나리아 자산을 도입하여 글로벌 경제 위기 조짐이 보일 때만 비중 조절을 하여 도망갑니다.',
                 rules: ['<div class="flex-1"><span class="rule-highlight">규칙:</span> VWO, BND(카나리아) 중 1개라도 무너지면 안전자산 비중을 높입니다.</div>'] 
             },
             'baa': { 
@@ -1129,48 +1129,48 @@
         };
 
         // ==========================================
-        // 🌐 3. 데이터 로딩 (야후 파이낸스 프록시)
+        // 🌐 3. 데이터 로딩 (다중 프록시 및 속도 최적화)
         // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
-            // 캐시 방지 처리 추가
-            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${intv}&range=${range}&_t=${Date.now()}`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+            const nocache = Date.now();
+            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${intv}&range=${range}&_t=${nocache}`;
+            
+            // 속도와 안정성을 위해 여러 프록시 서버를 순차적으로 시도 (Proxy Waterfall)
+            const proxies = [
+                `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`,
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`
+            ];
 
-            try {
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                const data = await response.json();
-                if (!data || !data.chart || !data.chart.result) throw new Error("Invalid format");
-                return data.chart.result[0];
-            } catch (error) {
-                console.warn(`[API FAIL] Falling back to Mock Data for ${ticker}. Error: ${error.message}`);
-                return generateMockData(ticker, intv, range);
+            let lastError = null;
+
+            for (const proxyUrl of proxies) {
+                try {
+                    // 제한 시간(Timeout) 5초 설정
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                    const response = await fetch(proxyUrl, { 
+                        cache: 'no-store',
+                        signal: controller.signal 
+                    });
+                    
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) throw new Error(`Proxy Error: ${response.status}`);
+                    
+                    const data = await response.json();
+                    if (!data || !data.chart || !data.chart.result) throw new Error("Invalid format");
+                    
+                    return data.chart.result[0];
+                } catch (error) {
+                    lastError = error;
+                    console.warn(`[API FAIL] Proxy failed: ${proxyUrl}. Trying next...`);
+                    continue; // 실패 시 다음 프록시 서버로 재시도
+                }
             }
-        }
 
-        function generateMockData(ticker, interval, range) {
-            let points = 250;
-            if (range === '1mo') points = 22; else if (range === '2y') points = 504; else if (range === '5y') points = 1260;
-            if (interval.includes('wk')) points = Math.floor(points / 5); if (interval.includes('mo')) points = Math.floor(points / 21);
-
-            const timestamp = [], open = [], high = [], low = [], close = [];
-            let currentPrice = ticker === '^VIX' ? 18 : (ticker.includes('BTC') ? 60000 : 400);
-            let volatility = ticker === '^VIX' ? 0.08 : (ticker.includes('BTC') ? 0.04 : 0.015);
-            let now = Math.floor(Date.now() / 1000);
-            let step = interval.includes('mo') ? 86400 * 30 : (interval.includes('wk') ? 86400 * 7 : 86400);
-
-            let startTime = now - (points * step);
-            for (let i = 0; i < points; i++) {
-                timestamp.push(startTime + (i * step));
-                let change = 1 + (Math.random() * volatility * 2 - volatility);
-                let o = currentPrice, c = o * change;
-                let h = Math.max(o, c) * (1 + Math.random() * volatility * 0.5);
-                let l = Math.min(o, c) * (1 - Math.random() * volatility * 0.5);
-                if(c<=0)c=1; if(l<=0)l=0.5;
-                open.push(o); close.push(c); high.push(h); low.push(l);
-                currentPrice = c;
-            }
-            return { timestamp, indicators: { quote: [{ open, close, high, low }] } };
+            // 모든 프록시가 실패했을 때 명확히 에러 처리 (가짜 데이터 사용 안함)
+            throw new Error(`데이터를 불러오지 못했습니다. (네트워크 지연): ${lastError.message}`);
         }
 
         async function fetchExchangeRate() {
@@ -1181,7 +1181,7 @@
                     currentExchangeRate = closes[closes.length - 1];
                 }
             } catch (error) {
-                console.warn(`[FX API FAIL] 환율 갱신 실패, 기본값 유지. Error: ${error.message}`);
+                console.warn(`[FX API FAIL] 환율 갱신 실패, 기존 값 사용.`);
             }
         }
 
@@ -1196,7 +1196,7 @@
                     throw new Error("Invalid FNG Data format");
                 }
             } catch (error) {
-                console.warn(`[Crypto FNG API FAIL] 코인 공포/탐욕 지수 실패, 기본값 50 유지. Error: ${error.message}`);
+                console.warn(`[Crypto FNG API FAIL] 코인 공포/탐욕 지수 실패, 기본값 50 유지.`);
                 globalCryptoFng = 50;
             }
         }
@@ -1394,8 +1394,9 @@
             if(closes.length === 0) return;
 
             document.getElementById('display-ticker').innerText = ticker;
-            // 일반 가격 노출 시엔 종가를 씀
-            const price = data.indicators.quote[0].close[closes.length-1] || closes[closes.length - 1]; 
+            
+            // 야후 파이낸스가 제공하는 '정확한 실시간 현재가(regularMarketPrice)'를 최우선으로 사용
+            let price = data.meta && data.meta.regularMarketPrice ? data.meta.regularMarketPrice : closes[closes.length - 1]; 
             
             let finalPrice = price;
             if(currentCurrency === 'KRW') finalPrice = price * currentExchangeRate;
@@ -1495,7 +1496,10 @@
             if(closes.length === 0) return;
 
             document.getElementById('crypto-display-ticker').innerText = ticker.replace('-USD', '');
-            const price = data.indicators.quote[0].close[closes.length-1] || closes[closes.length - 1]; 
+            
+            // 코인 역시 정확한 실시간 현재가(regularMarketPrice) 최우선 반영
+            let price = data.meta && data.meta.regularMarketPrice ? data.meta.regularMarketPrice : closes[closes.length - 1]; 
+            
             let finalPrice = price;
             if(currentCurrency === 'KRW') finalPrice = price * currentExchangeRate;
             document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
@@ -1868,7 +1872,6 @@
 
                 document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (병렬 처리)...`;
                 
-                // 병렬 데이터 페칭으로 속도 개선
                 const promises = tickers.map(t => fetchStockData(t, '1mo', '2y'));
                 const results = await Promise.all(promises);
                 
@@ -1983,14 +1986,12 @@
                 };
 
                 let actualCagrs = [];
-                // 최근 12개월(루프 역순)
                 for(let i = minLength - 1; i >= minLength - 12; i--) {
                     if(i - 12 < 0) break;
                     
                     const sig = getSignal(i);
                     if(!sig) continue;
 
-                    // 기준 날짜는 SPY를 사용
                     const [yy, mm] = dataMap['SPY'].dates[i].split('-');
                     const ymLabel = `${yy.substring(2)}년 ${parseInt(mm)}월`;
                     let row = `<tr><td class="text-left font-bold text-accent whitespace-nowrap">${ymLabel}</td>`;
@@ -2112,7 +2113,6 @@
             let minScore = 9999, failureCount = 0;
 
             try {
-                // 병렬 처리로 속도 대폭 개선
                 const promises = canaries.map(t => fetchStockData(t, '1mo', '2y'));
                 const results = await Promise.all(promises);
 
@@ -2122,7 +2122,6 @@
                     const ticker = canaries[i];
                     const { dates, closes } = extractCleanData(results[i]);
 
-                    // 문자열 매칭 대신 정확한 수학적 인덱싱 사용 (데이터 누락 에러 원천 차단)
                     const len = closes.length;
                     if(len < 13) throw new Error(`[${ticker}] 데이터 부족 (최소 13개월 필요, 현재 ${len}개월)`);
 
