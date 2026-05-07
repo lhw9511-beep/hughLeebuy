@@ -2241,7 +2241,211 @@
         // ==========================================
         // 🚀 8. 초기화 실행
         // ==========================================
-        document.addEventListener("DOMContentLoaded", () => {
+        function resetDashboard() { location.reload(); }
+
+function updateStatus(t, c) {
+    const l = document.getElementById('conn-label'), d = document.getElementById('status-dot');
+    if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; }
+}
+function updateCryptoStatus(t, c) {
+    const l = document.getElementById('crypto-conn-label'), d = document.getElementById('crypto-status-dot');
+    if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; }
+}
+
+function openErrorModal() {
+    document.getElementById('error-log-text').value = errorLogs.join('\n---\n') || '에러 없음';
+    document.getElementById('error-modal').style.display = 'flex';
+}
+function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
+function copyErrorLog() { const t = document.getElementById('error-log-text'); t.select(); document.execCommand('copy'); }
+function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
+function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
+function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
+function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
+
+function toggleCurrency() {
+    currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
+    safeStorageSet('dashboardCurrency', currentCurrency);
+    const btn = document.getElementById('currency-toggle');
+    if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
+    if(globalTicker) loadData(globalTicker);
+    if(globalCryptoTicker) loadCryptoData(globalCryptoTicker);
+    updatePfCardMetrics();
+    if(pfChart) renderPortfolioChart();
+    if(baaChart) renderBaaChart();
+}
+
+function toggleProofs(show) {
+    document.querySelectorAll('.proof-row').forEach(r => show ? r.classList.add('show') : r.classList.remove('show'));
+}
+
+function setTheme(t) {
+    document.documentElement.className = t;
+    safeStorageSet('dashboardTheme', t);
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-${t}`)?.classList.add('active');
+    requestAnimationFrame(() => {
+        if(globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
+        if(globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData);
+        if(pfChart) renderPortfolioChart();
+        if(baaChart) renderBaaChart();
+    });
+}
+
+function setFontSize(s) {
+    document.documentElement.style.fontSize = {sm:'14px', md:'16px', lg:'18px'}[s];
+    safeStorageSet('dashboardFontSize', s);
+    document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-font-${s}`)?.classList.add('active');
+    requestAnimationFrame(() => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); baaChart?.resize(); });
+}
+
+function setLineWidth(w) {
+    safeStorageSet('dashboardLineWidth', w);
+    document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-line-${w}`)?.classList.add('active');
+    if(globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
+    if(globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData);
+}
+
+function switchMainTab(tab) {
+    document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
+    document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
+    ['dashboard','crypto','portfolio','baa'].forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if(el) el.style.display = v === tab ? 'flex' : 'none';
+    });
+    setTimeout(() => {
+        if(tab === 'dashboard' && myChart) myChart.resize();
+        else if(tab === 'crypto') {
+            if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData(globalCryptoTicker); }
+            cryptoChart.resize();
+        }
+        else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart?.resize(); }
+        else if(tab === 'baa') { if(!baaChart) initBaaChart(); baaChart?.resize(); }
+    }, 50);
+}
+
+function toggleMA(p) { maSettings[p] = !maSettings[p]; updateMAButtons(); if(globalChartData) renderDashboard(globalTicker, globalChartData); }
+function toggleCryptoMA(p) { cryptoMaSettings[p] = !cryptoMaSettings[p]; updateCryptoMAButtons(); if(globalCryptoChartData) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData); }
+
+function updateMAButtons() {
+    Object.keys(maSettings).forEach(p => {
+        const b = document.getElementById(`btn-ma-${p}`);
+        if(b) maSettings[p] ? b.classList.add('active') : b.classList.remove('active');
+    });
+}
+function updateCryptoMAButtons() {
+    Object.keys(cryptoMaSettings).forEach(p => {
+        const b = document.getElementById(`crypto-btn-ma-${p}`);
+        if(b) cryptoMaSettings[p] ? b.classList.add('active') : b.classList.remove('active');
+    });
+}
+
+function changeInterval(i, r, l) {
+    currentInterval = i; currentRange = r;
+    document.querySelectorAll('#view-dashboard .range-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`range-${l}`)?.classList.add('active');
+    loadData(globalTicker, i, r);
+}
+function changeCryptoInterval(i, r, l) {
+    currentCryptoInterval = i; currentCryptoRange = r;
+    document.querySelectorAll('#view-crypto .range-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`crypto-range-${l}`)?.classList.add('active');
+    loadCryptoData(globalCryptoTicker, i, r);
+}
+
+function showDetail(p) {
+    const d = analysisDetails[p];
+    if(!d || !d.status) return;
+    document.getElementById('modal-title').innerText = p === 'short' ? '단기 흐름' : (p === 'mid' ? '중기 흐름' : '장기 흐름');
+    document.getElementById('modal-period').innerText = d.summary || '---';
+    let html = `<div class="p-4 bg-black/20 rounded-xl border border-themeBorder text-center mb-4">
+        <span class="text-2xl font-black status-${d.status.replace(/ /g,'-')}">${d.status}</span>
+        <div class="flex justify-center gap-4 mt-2 text-xs font-black">
+            <span class="text-up">매수: ${d.buyScore?.toFixed(1)}</span>
+            <span class="text-down">매도: ${d.sellScore?.toFixed(1)}</span>
+        </div></div>`;
+    if(d.breakdown) {
+        html += d.breakdown.map(b => `<div class="flex justify-between text-xs border-b border-themeBorder/30 py-1.5">
+            <span class="text-themeText font-bold">${b.name}</span>
+            <span class="${b.sig==='BUY'?'text-up':b.sig==='SELL'?'text-down':'text-themeMuted'} font-bold">${b.val}</span></div>`).join('');
+    }
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('detail-modal').style.display = 'flex';
+}
+
+function showCryptoDetail(p) {
+    const d = cryptoAnalysisDetails[p];
+    if(!d || !d.status) return;
+    document.getElementById('modal-title').innerText = `코인 ${p === 'short' ? '단기' : p === 'mid' ? '중기' : '장기'} 흐름`;
+    document.getElementById('modal-period').innerText = d.summary || '---';
+    let html = `<div class="p-4 bg-black/20 rounded-xl border border-themeBorder text-center mb-4">
+        <span class="text-2xl font-black status-${d.status.replace(/ /g,'-')}">${d.status}</span>
+        <div class="flex justify-center gap-4 mt-2 text-xs font-black">
+            <span class="text-up">매수: ${d.buyScore?.toFixed(1)}</span>
+            <span class="text-down">매도: ${d.sellScore?.toFixed(1)}</span>
+        </div></div>`;
+    if(d.breakdown) {
+        html += d.breakdown.map(b => `<div class="flex justify-between text-xs border-b border-themeBorder/30 py-1.5">
+            <span class="text-themeText font-bold">${b.name}</span>
+            <span class="${b.sig==='BUY'?'text-up':b.sig==='SELL'?'text-down':'text-themeMuted'} font-bold">${b.val}</span></div>`).join('');
+    }
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('detail-modal').style.display = 'flex';
+}
+
+function showPfDetail(key) {
+    currentPfKey = key;
+    const detail = pfDetails[key];
+    if(!detail) return;
+    document.getElementById('pf-modal-title').innerText = detail.title;
+    document.getElementById('pf-modal-desc').innerHTML = detail.desc || '';
+    const dataArr = getAdjustedSimData(key);
+    const years = parseInt(pfSimYears[pfSimYears.length-1]) - parseInt(pfSimYears[0]);
+    const cagr = (((dataArr[dataArr.length-1]/dataArr[0])**(1/years))-1)*100;
+    const mdds = calcMDDArray(dataArr);
+    const minMdd = Math.min(...mdds);
+    const mar = Math.abs(minMdd) > 0 ? cagr/Math.abs(minMdd) : 0;
+    document.getElementById('pf-modal-cagr').innerText = `${cagr.toFixed(1)}%`;
+    document.getElementById('pf-modal-mdd').innerText = `${minMdd.toFixed(1)}%`;
+    document.getElementById('pf-modal-mar').innerText = mar.toFixed(2);
+    const rulesEl = document.getElementById('pf-modal-rules');
+    if(rulesEl && detail.rules) rulesEl.innerHTML = detail.rules.map(r=>`<li>${r}</li>`).join('');
+    const tbody = document.getElementById('pf-historical-tbody');
+    if(tbody) tbody.innerHTML = pfSimYears.map((y,i) => {
+        const ret = i===0 ? 0 : (dataArr[i]-dataArr[i-1])/dataArr[i-1]*100;
+        return `<tr><td>${y}</td><td>${dataArr[i].toFixed(1)}</td><td class="${ret>0?'text-up':ret<0?'text-down':''}">${ret>0?'+':''}${ret.toFixed(2)}%</td></tr>`;
+    }).join('');
+    const pieArea = document.getElementById('pf-modal-pie-area');
+    const liveArea = document.getElementById('pf-modal-live-area');
+    if(detail.type === 'dynamic') {
+        if(pieArea) pieArea.style.display = 'none';
+        if(liveArea) { liveArea.style.display = 'block'; runLiveCalc(key); }
+    } else {
+        if(liveArea) liveArea.style.display = 'none';
+        if(pieArea && detail.allocation) pieArea.style.display = 'block';
+    }
+    document.getElementById('pf-detail-modal').style.display = 'flex';
+    requestAnimationFrame(() => {
+        if(!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
+        pfModalChart.clear();
+        const sc = getComputedStyle(document.documentElement);
+        const tc = sc.getPropertyValue('--text-muted').trim()||'#9CA3AF';
+        const bc = sc.getPropertyValue('--border-color').trim()||'rgba(255,255,255,0.1)';
+        pfModalChart.setOption({ backgroundColor:'transparent', tooltip:{trigger:'axis',backgroundColor:'rgba(0,0,0,0.8)',textStyle:{color:'#fff',fontSize:11}},
+            legend:{data:[detail.title,'MDD'],textStyle:{color:tc,fontSize:10},top:5},
+            grid:{left:'3%',right:'3%',top:'15%',bottom:'5%',containLabel:true},
+            xAxis:{type:'category',data:pfSimYears,axisLabel:{color:tc}},
+            yAxis:[{type:'value',splitLine:{lineStyle:{color:bc,type:'dashed'}},axisLabel:{color:tc}},{type:'value',min:-60,max:0,position:'right',splitLine:{show:false},axisLabel:{formatter:'{value}%',color:tc,fontSize:9}}],
+            series:[{name:'MDD',type:'bar',data:mdds,yAxisIndex:1,itemStyle:{color:'rgba(239,83,80,0.25)'},barWidth:'60%'},{name:detail.title,type:'line',data:dataArr,smooth:true,lineStyle:{color:'#3B82F6',width:3},showSymbol:false}]
+        }, true);
+        pfModalChart.resize();
+    });
+}
+document.addEventListener("DOMContentLoaded", () => {
             window.scrollTo(0, 0);
             if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             
