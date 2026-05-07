@@ -389,7 +389,7 @@
                                 <button type="button" onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉 (1년)</button>
                                 <button type="button" onclick="changeInterval('1wk', '2y', 'W')" id="range-W" class="chip-btn range-btn">주봉 (2년)</button>
                                 <button type="button" onclick="changeInterval('1mo', '5y', 'M')" id="range-M" class="chip-btn range-btn">월봉 (5년)</button>
-                                <button type="button" onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">연봉 (전체)</button>
+                                <button type="button" onclick="changeInterval('3mo', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">분기봉 (전체)</button>
                             </div>
                         </div>
                         <div class="expert-only flex items-center gap-2 overflow-x-auto custom-scroll pb-1" id="ui-ma-toggles">
@@ -539,7 +539,7 @@
                                 <button type="button" onclick="changeCryptoInterval('1d', '1y', 'D')" id="crypto-range-D" class="chip-btn range-btn active">일봉 (1년)</button>
                                 <button type="button" onclick="changeCryptoInterval('1wk', '2y', 'W')" id="crypto-range-W" class="chip-btn range-btn">주봉 (2년)</button>
                                 <button type="button" onclick="changeCryptoInterval('1mo', '5y', 'M')" id="crypto-range-M" class="chip-btn range-btn">월봉 (5년)</button>
-                                <button type="button" onclick="changeCryptoInterval('1y', 'max', 'Y')" id="crypto-range-Y" class="chip-btn range-btn">연봉 (전체)</button>
+                                <button type="button" onclick="changeCryptoInterval('3mo', 'max', 'Y')" id="crypto-range-Y" class="chip-btn range-btn">분기봉 (전체)</button>
                             </div>
                         </div>
                         <div class="expert-only flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
@@ -893,7 +893,7 @@
 
         const DESCRIPTIONS = {
             vix: { expert: 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다.\n\n• 신뢰도 가중치: 9.0 / 10', beginner: '주식 시장의 일기예보 같은 거예요.\n\n폭풍우가 치면(사람들이 공포에 질림) 쌀 때 살 수 있는 좋은 기회예요!' },
-            fng: { expert: '군중 심리를 수치화한 지표입니다.\n\n• 신뢰도 가중치: 8.5 / 10', beginner: '다른 사람들이 얼마나 욕심을 내고 있는지 보여줘요.\n\n남들이 욕심낼 때는 팔고, 무서워할 때 사는 게 좋아요.' },
+            fng: { expert: '군중 심리를 수치화한 지표입니다.\n\n• 신뢰도 가중치: 8.5 / 10', beginner: '다른 사람들이 얼마나 욕심을 내고 있는지 보여줘요.\n\n남들이 욕심낼 때는 팔고, 무서워할 때 사는 단서가 돼요.' },
             dist: { expert: '현재가가 주요 이동평균선을 돌파했는지 나타냅니다.\n\n• 신뢰도 가중치: 최상', beginner: '주요 평균 가격 위로 주가가 올라탔는지 확인해요.\n\n선 위로 올라타면 계속 오르는 중이라는 뜻이에요.' },
             macd: { expert: '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 신뢰도 가중치: 7.0 / 10', beginner: '자동차의 엑셀과 브레이크 같아요.\n\n엑셀을 밟아서 오르는 힘이 세지는 중인지 확인해요.' },
             rsi: { expert: '추세의 단기 과열 강도를 의미합니다.\n\n• 신뢰도 가중치: 6.5 / 10', beginner: '단기적으로 얼마나 달렸는지 체력을 보여줘요.\n\n너무 많이 달려서 숨이 차면 쉬어갈 확률이 높아요.' },
@@ -1192,31 +1192,66 @@
             }, true);
         }
 
+        // ==========================================
+        // 🚀 실제 야후 파이낸스 API 연동 코드로 교체된 부분
+        // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false, ignoreFx = false) {
-            // Mock API Data Generation for demonstration
-            let dates = [], opens = [], highs = [], lows = [], closes = [], volumes = [];
-            let basePrice = isCrypto ? (ticker.includes('BTC') ? 60000 : 3000) : (ticker === 'SPY' ? 500 : 150);
-            let days = range === '1y' ? 250 : range === '2y' ? 500 : range === '5y' ? 1250 : 2500;
-            if (intv === '1wk') days = Math.floor(days / 5);
-            if (intv === '1mo') days = Math.floor(days / 20);
+            // 야후 파이낸스 API URL 구성 (기존 코드의 interval과 range 파라미터가 야후 파이낸스와 정확히 일치함)
+            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${intv}&range=${range}`;
+            
+            // 브라우저에서 직접 외부 API 호출 시 발생하는 CORS 에러를 막기 위한 무료 프록시 사용
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
 
-            let now = new Date();
-            for (let i = days; i >= 0; i--) {
-                let d = new Date(now);
-                if (intv === '1d') d.setDate(d.getDate() - i);
-                else if (intv === '1wk') d.setDate(d.getDate() - i*7);
-                else if (intv === '1mo') d.setMonth(d.getMonth() - i);
+            try {
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error(`야후 파이낸스 API 호출 실패: ${response.status}`);
+                const data = await response.json();
                 
-                dates.push(d.toISOString().split('T')[0]);
-                let r = (Math.random() - 0.48) * 0.05;
-                basePrice = basePrice * (1 + r);
-                let o = basePrice * (1 + (Math.random()-0.5)*0.01);
-                let h = Math.max(basePrice, o) * (1 + Math.random()*0.02);
-                let l = Math.min(basePrice, o) * (1 - Math.random()*0.02);
-                opens.push(o); highs.push(h); lows.push(l); closes.push(basePrice);
-                volumes.push(Math.floor(Math.random() * 10000000));
+                const result = data.chart.result[0];
+                const timestamps = result.timestamp;
+                const quote = result.indicators.quote[0];
+                
+                // 타임스탬프(초)를 YYYY-MM-DD 포맷으로 변환
+                const dates = timestamps.map(ts => {
+                    const d = new Date(ts * 1000);
+                    return d.toISOString().split('T')[0];
+                });
+
+                // 야후 파이낸스는 간혹 중간에 거래정지 등으로 null 값을 반환하는 경우가 있어 이를 보정
+                let lastValidClose = 0;
+                const cleanOpens = [], cleanHighs = [], cleanLows = [], cleanCloses = [], cleanVols = [];
+                
+                for(let i=0; i < quote.close.length; i++) {
+                    let c = quote.close[i];
+                    if (c !== null && c !== undefined) {
+                        lastValidClose = c;
+                    } else {
+                        c = lastValidClose; // null일 경우 이전 종가로 채움
+                    }
+                    cleanCloses.push(c);
+                    cleanOpens.push(quote.open[i] || c);
+                    cleanHighs.push(quote.high[i] || c);
+                    cleanLows.push(quote.low[i] || c);
+                    cleanVols.push(quote.volume[i] || 0);
+                }
+
+                // 기존 로직이 기대하는 JSON 형태로 반환
+                return { 
+                    timestamp: dates, 
+                    indicators: { 
+                        quote: [{ 
+                            open: cleanOpens, 
+                            high: cleanHighs, 
+                            low: cleanLows, 
+                            close: cleanCloses, 
+                            volume: cleanVols 
+                        }] 
+                    } 
+                };
+            } catch (error) {
+                console.error(`[${ticker}] 데이터 로딩 에러:`, error);
+                throw error;
             }
-            return { timestamp: dates, indicators: { quote: [{ open: opens, high: highs, low: lows, close: closes, volume: volumes }] } };
         }
 
         function extractCleanData(data) {
@@ -1427,7 +1462,7 @@
         }
 
         // ==========================================
-        // 🚀 BAA 시뮬레이터 및 계산
+        // 🚀 BAA 시뮬레이터 및 계산 (이제 진짜 데이터 사용!)
         // ==========================================
         function initBaaChart() {
             if (!baaChart) baaChart = echarts.init(document.getElementById('chart-baa-leverage'));
@@ -1467,11 +1502,12 @@
 
             try {
                 for (let ticker of canaries) {
+                    // 이제 위에서 변경한 야후 파이낸스 실제 코드로 데이터 통신 (1mo=월봉, 2y=최근 2년치)
                     const d = await fetchStockData(ticker, '1mo', '2y', false, true);
                     const { dates, closes } = extractCleanData(d);
                     dataMap[ticker] = {};
                     for(let j=0; j<dates.length; j++) {
-                        const dStr = dates[j].substring(0, 7);
+                        const dStr = dates[j].substring(0, 7); // YYYY-MM
                         dataMap[ticker][dStr] = closes[j];
                         unifiedMonths.add(dStr);
                     }
@@ -1546,7 +1582,7 @@
             } catch (error) {
                 logError("BAA Live Check Error", error);
                 loading.style.display = 'none'; idle.style.display = 'block';
-                idle.innerHTML = '<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다.</p>';
+                idle.innerHTML = '<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다. 무료 서버를 이용하므로 잠시 후 다시 시도해주세요.</p>';
             }
         }
 
