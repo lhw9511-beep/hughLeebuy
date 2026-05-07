@@ -139,7 +139,6 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
-    <!-- 모달 영역 시작 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
@@ -305,7 +304,6 @@
             </div>
         </div>
     </div>
-    <!-- 모달 영역 끝 -->
 
     <!-- 메인 레이아웃 시작 -->
     <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
@@ -438,7 +436,7 @@
                 </div>
 
                 <!-- 초보자 전용 큼직한 요약 카드 -->
-                <div class="beginner-only glass rounded-2xl p-6 xl:col-span-1 shadow-xl border-t-4 border-t-accent text-center flex-col justify-center items-center h-full">
+                <div class="beginner-only glass rounded-2xl p-6 xl:col-span-1 shadow-xl border-t-4 border-t-accent flex flex-col justify-center items-center h-full text-center">
                     <p class="text-xs font-black text-themeMuted mb-2">지금 사도 될까요?</p>
                     <div id="beginner-summary-text" class="text-3xl font-black text-themeText mb-4 break-keep">AI 분석 중...</div>
                     <p id="beginner-summary-desc" class="text-sm text-themeMuted leading-relaxed bg-black/20 p-4 rounded-xl border border-themeBorder break-keep w-full">데이터를 불러오고 있습니다.</p>
@@ -589,7 +587,7 @@
                 </div>
 
                 <!-- 초보자 전용 요약 카드 (코인) -->
-                <div class="beginner-only glass rounded-2xl p-6 xl:col-span-1 shadow-xl border-t-4 border-t-accent text-center flex-col justify-center items-center h-full">
+                <div class="beginner-only glass rounded-2xl p-6 xl:col-span-1 shadow-xl border-t-4 border-t-accent flex flex-col justify-center items-center h-full text-center">
                     <p class="text-xs font-black text-themeMuted mb-2">지금 사도 될까요?</p>
                     <div id="crypto-beginner-summary-text" class="text-3xl font-black text-themeText mb-4 break-keep">AI 분석 중...</div>
                     <p id="crypto-beginner-summary-desc" class="text-sm text-themeMuted leading-relaxed bg-black/20 p-4 rounded-xl border border-themeBorder break-keep w-full">데이터를 불러오고 있습니다.</p>
