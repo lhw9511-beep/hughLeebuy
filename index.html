@@ -901,6 +901,7 @@
         // 🚀 1. 전역 변수 및 상수 (1번 + 2번 혼합)
         // ==========================================
         let errorLogs = [];
+        let currentExchangeRate = 1350; // 실시간 환율을 담을 변수 추가
         
         let currentCurrency = safeStorageGet('dashboardCurrency', 'USD');
         let currentInterval = '1d', currentRange = '1y';
@@ -1183,8 +1184,39 @@
             return { timestamp, indicators: { quote: [{ open, close, high, low }] } };
         }
 
+        async function fetchExchangeRate() {
+            try {
+                // KRW=X (원달러 환율) API 연동
+                const data = await fetchStockData('KRW=X', '1d', '5d'); 
+                const { closes } = extractCleanData(data);
+                if (closes && closes.length > 0) {
+                    currentExchangeRate = closes[closes.length - 1];
+                }
+            } catch (error) {
+                console.warn(`[FX API FAIL] 환율 갱신 실패, 기본값 유지. Error: ${error.message}`);
+            }
+        }
+
+        async function fetchCryptoMacroData() {
+            try {
+                const response = await fetch('https://api.alternative.me/fng/');
+                if (!response.ok) throw new Error(`Crypto FNG API Error: ${response.status}`);
+                const data = await response.json();
+                if (data && data.data && data.data[0]) {
+                    globalCryptoFng = parseInt(data.data[0].value);
+                } else {
+                    throw new Error("Invalid FNG Data format");
+                }
+            } catch (error) {
+                console.warn(`[Crypto FNG API FAIL] 코인 공포/탐욕 지수 실패, 기본값 50 유지. Error: ${error.message}`);
+                globalCryptoFng = 50;
+            }
+        }
+
         async function fetchMacroData() {
             try {
+                await fetchExchangeRate(); // 환율 갱신 추가
+
                 const vixData = await fetchStockData('^VIX', '1d', '3mo');
                 const vixCloses = extractCleanData(vixData).closes;
                 globalVix = vixCloses[vixCloses.length - 1];
@@ -1342,8 +1374,7 @@
             if(searchInput) searchInput.value = ticker;
 
             try {
-                // Mock FNG for Crypto
-                globalCryptoFng = Math.floor(Math.random() * 60) + 20;
+                await fetchCryptoMacroData(); // API 연동으로 가져오기
                 renderIndicatorUI('crypto-val-fng', globalCryptoFng, 'FNG', globalCryptoFng, 'crypto');
 
                 const reqInterval = interval === '1y' ? '1mo' : interval;
@@ -1379,7 +1410,7 @@
             
             // 환율 적용 로직
             let finalPrice = price;
-            if(currentCurrency === 'KRW') finalPrice = price * 1350; // Mock rate for standalone
+            if(currentCurrency === 'KRW') finalPrice = price * currentExchangeRate; // 실시간 환율 적용
             
             document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
             
@@ -1448,8 +1479,8 @@
                         let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
                         params.forEach(p => {
                             if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]* (currentCurrency==='KRW'?1350:1));
-                                let close = formatPriceStr(p.data[2]* (currentCurrency==='KRW'?1350:1));
+                                let open = formatPriceStr(p.data[1]* (currentCurrency==='KRW'?currentExchangeRate:1));
+                                let close = formatPriceStr(p.data[2]* (currentCurrency==='KRW'?currentExchangeRate:1));
                                 result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
                             } else {
                                 let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
@@ -1478,11 +1509,11 @@
             document.getElementById('crypto-display-ticker').innerText = ticker.replace('-USD', '');
             const price = closes[closes.length - 1];
             let finalPrice = price;
-            if(currentCurrency === 'KRW') finalPrice = price * 1350;
+            if(currentCurrency === 'KRW') finalPrice = price * currentExchangeRate; // 실시간 환율 적용
             document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
             
             const vol = calcVolatility(closes);
-            renderIndicatorUI('crypto-val-vol', vol.toFixed(1) + '%', 'VOL', vol, 'crypto');
+            renderIndicatorUI('crypto-val-vol', vol.toFixed(1) + '%', 'VOL', vol, 'crypto'); // 대문자 VOL 유지 확인됨
 
             const rsiArr = Indicator.rsi(closes, 14); const rsi = rsiArr[rsiArr.length - 1] || 50;
             const ma120Arr = Indicator.sma(closes, 120); const ma120 = ma120Arr[ma120Arr.length - 1];
@@ -1535,8 +1566,8 @@
                         let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
                         params.forEach(p => {
                             if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]* (currentCurrency==='KRW'?1350:1));
-                                let close = formatPriceStr(p.data[2]* (currentCurrency==='KRW'?1350:1));
+                                let open = formatPriceStr(p.data[1]* (currentCurrency==='KRW'?currentExchangeRate:1));
+                                let close = formatPriceStr(p.data[2]* (currentCurrency==='KRW'?currentExchangeRate:1));
                                 result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
                             } else {
                                 let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
@@ -2267,3 +2298,4 @@
     </script>
 </body>
 </html>
+```
