@@ -118,6 +118,8 @@
         .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 1px; font-size: 0.8rem; }
         .rule-highlight { color: var(--text-main); font-weight: 800; background: rgba(59, 130, 246, 0.2); padding: 3px 6px; border-radius: 6px; margin-right: 6px; display: inline-block; margin-bottom: 4px; border: 1px solid rgba(59, 130, 246, 0.4); word-break: keep-all; }
         
+        #error-log-box { display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; border-radius: 8px; padding: 8px; margin-top: 8px; font-family: monospace; font-size: 0.65rem; color: #FCA5A5; max-height: 100px; overflow-y: auto; word-break: break-all; }
+        
         .mode-toggle-wrap { position: relative; display: inline-flex; height: 34px; background: rgba(0,0,0,0.5); border-radius: 17px; border: 1px solid var(--border-color); cursor: pointer; align-items: center; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
         .mode-toggle-wrap input { display: none; }
         .mode-slider-bg { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); background: #3B82F6; border-radius: 15px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), background-color 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
@@ -126,14 +128,16 @@
         .mode-toggle-wrap input:not(:checked) ~ .text-expert { color: #ffffff; }
         .mode-toggle-wrap input:checked ~ .text-beginner { color: #ffffff; }
 
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
-        details[open] summary ~ * { animation: sweep .3s ease-in-out; }
-        @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
+        /* 초보/전문가 모드 화면 전환용 클래스 */
+        body.beginner-mode .expert-only { display: none !important; }
+        body:not(.beginner-mode) .beginner-only { display: none !important; }
+        body.beginner-mode .beginner-only { display: block; }
+        .beginner-only { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
+    <!-- 모달 영역 시작 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
@@ -177,24 +181,32 @@
         </div>
     </div>
 
+    <!-- 에러 모달 -->
     <div id="error-modal" class="modal-overlay" onclick="closeErrorModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
-                <h3 class="text-lg font-black text-rose-500 flex items-center">에러 로그 (Debug)</h3>
+                <h3 class="text-lg font-black text-rose-500 flex items-center">
+                    <svg class="icon-md mr-2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    에러 로그 (Debug)
+                </h3>
                 <button type="button" onclick="closeErrorModal()" class="text-themeMuted hover:text-rose-500 p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             <textarea id="error-log-text" class="w-full h-32 bg-black/50 border border-rose-500/50 text-rose-400 text-[0.65rem] font-mono p-2 rounded-lg outline-none resize-none" readonly></textarea>
             <div class="mt-4 flex gap-2 justify-end">
-                <button type="button" onclick="copyErrorLog()" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black hover:bg-rose-700 transition">복사하기</button>
+                <button type="button" onclick="copyErrorLog()" id="btn-copy-error" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-sm font-black hover:bg-rose-700 transition">복사하기</button>
                 <button type="button" onclick="closeErrorModal()" class="bg-themeBorder text-themeText px-4 py-2 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
             </div>
         </div>
     </div>
 
+    <!-- 인포 모달 -->
     <div id="info-modal" class="modal-overlay" onclick="closeInfoModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
-                <h3 id="info-title" class="text-lg font-black text-themeText flex items-center">지표 설명</h3>
+                <h3 id="info-title" class="text-lg font-black text-themeText flex items-center">
+                    <svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
+                    지표 설명
+                </h3>
                 <button type="button" onclick="closeInfoModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             <p id="info-body" class="text-sm text-themeText leading-relaxed py-2 whitespace-pre-wrap"></p>
@@ -204,6 +216,7 @@
         </div>
     </div>
 
+    <!-- AI 상세 모달 -->
     <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-4 border-b border-themeBorder pb-3">
@@ -220,50 +233,63 @@
         </div>
     </div>
 
+    <!-- 포트폴리오 모달 -->
     <div id="pf-detail-modal" class="modal-overlay" onclick="closePfDetailModal()">
         <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
             <div class="flex justify-between items-start mb-2 border-b border-themeBorder pb-4">
-                <h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
+                <div>
+                    <h3 id="pf-modal-title" class="text-xl md:text-2xl font-black text-themeText flex items-center gap-2">포트폴리오</h3>
+                </div>
                 <button type="button" onclick="closePfDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
+            
             <div class="py-2">
                 <div id="pf-modal-desc" class="text-[0.75rem] md:text-[0.8rem] text-themeMuted mb-4 leading-relaxed bg-themeBorder/10 p-4 md:p-5 rounded-xl border border-themeBorder shadow-inner"></div>
+
                 <div class="flex flex-row gap-2 md:gap-4 mb-4">
                     <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
-                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">연평균 수익률</p>
+                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1" id="pf-modal-label-cagr">연평균 수익률</p>
                         <p id="pf-modal-cagr" class="text-lg md:text-xl font-black text-up">0%</p>
                     </div>
                     <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder">
-                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">최대 손실폭</p>
+                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1" id="pf-modal-label-mdd">최대 손실폭 (MDD)</p>
                         <p id="pf-modal-mdd" class="text-lg md:text-xl font-black text-down">0%</p>
                     </div>
                     <div class="flex-1 bg-themeBorder/30 p-2 md:p-4 rounded-xl text-center border border-themeBorder relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-accent text-white text-[0.5rem] font-bold px-1 py-0.5 rounded-bl">가성비</div>
-                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1">MAR</p>
+                        <div class="absolute top-0 right-0 bg-accent text-white text-[0.5rem] font-bold px-1 py-0.5 rounded-bl">안정성 지표</div>
+                        <p class="text-[0.6rem] md:text-[0.65rem] text-themeMuted font-black uppercase mb-1" id="pf-modal-label-mar">가성비 (MAR)</p>
                         <p id="pf-modal-mar" class="text-lg md:text-xl font-black text-themeText">0.0</p>
                     </div>
                 </div>
-                
-                <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
-                    <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-3 py-2 uppercase outline-none text-xs md:text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교할 주식 심볼">
-                    <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="bg-accent text-white px-4 py-2 rounded-lg font-black text-xs md:text-sm hover:bg-blue-600 transition shrink-0">차트 비교</button>
+
+                <div class="expert-only">
+                    <div class="flex items-center gap-2 mb-4 bg-themeBorder/20 p-2 rounded-xl border border-themeBorder">
+                        <input type="text" id="pf-compare-input" class="w-full bg-[var(--modal-bg)] text-themeText px-3 py-2 uppercase outline-none text-xs md:text-sm font-bold border border-themeBorder rounded-lg focus:border-accent" placeholder="비교할 주식 심볼 (예: QQQ)">
+                        <button type="button" id="pf-compare-btn" onclick="comparePortfolioStock()" class="bg-accent text-white px-4 py-2 rounded-lg font-black text-xs md:text-sm hover:bg-blue-600 transition shrink-0 shadow-lg shadow-accent/30">차트 비교</button>
+                    </div>
                 </div>
+
                 <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
+
+                <!-- 자산 배분 비율 (파이 차트 - Static 전용) -->
                 <div id="pf-modal-pie-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-themeBorder mb-4 hidden relative overflow-hidden">
                     <div class="absolute top-2 left-3 text-[0.65rem] font-black text-themeMuted tracking-widest z-10">자산 배분 비율</div>
                     <div id="pf-pie-chart" class="pie-container"></div>
                 </div>
-                <div id="pf-modal-live-area" class="w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
+
+                <!-- 라이브 엔진 영역 (Dynamic 전용) -->
+                <div id="pf-modal-live-area" class="expert-only w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
                     <div class="p-3 border-b border-themeBorder flex flex-col md:flex-row md:justify-between md:items-center bg-black/20 gap-3">
                         <div class="flex items-center gap-2">
                             <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                             <span class="text-sm font-black text-themeText">Live Strategy Engine</span>
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer bg-themeBorder/50 px-3 py-1.5 rounded-lg border border-themeBorder hover:bg-themeBorder transition justify-center md:justify-end">
-                            <input type="checkbox" id="toggle-proof" class="w-4 h-4 rounded text-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
-                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 및 데이터 증명</span>
+                            <input type="checkbox" id="toggle-proof" class="w-4 h-4 rounded text-accent focus:ring-accent bg-themeBorder border-gray-600" onchange="toggleProofs(this.checked)">
+                            <span class="text-[0.65rem] font-black text-themeText uppercase">계산 과정 및 원데이터 증명 보기</span>
                         </label>
                     </div>
+
                     <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
                         <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
                         <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
@@ -272,17 +298,29 @@
                         <table class="calc-table" id="pf-live-table"></table>
                     </div>
                 </div>
-                <div id="pf-historical-section" class="mb-4 bg-[var(--bg-color)] rounded-xl border border-themeBorder p-3 md:p-4">
-                    <p class="text-[0.7rem] font-black text-themeText uppercase mb-2">과거 성과 시뮬레이션</p>
+
+                <!-- 과거 성과 시뮬레이션 표 -->
+                <div id="pf-historical-section" class="expert-only mb-4 bg-[var(--bg-color)] rounded-xl border border-themeBorder p-3 md:p-4">
+                    <p class="text-[0.7rem] font-black text-themeText uppercase mb-2 flex items-center gap-2">
+                        <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
+                        과거 성과 시뮬레이션 (2000~2026)
+                    </p>
                     <div class="overflow-y-auto custom-scroll max-h-[160px]">
                         <table class="calc-table w-full">
-                            <thead class="sticky top-0 bg-[var(--bg-color)] z-10"><tr><th>연도</th><th>누적 자산</th><th>구간 수익률</th></tr></thead>
+                            <thead class="sticky top-0 bg-[var(--bg-color)] z-10">
+                                <tr><th>연도</th><th>누적 자산 (Base 100)</th><th>구간 수익률</th></tr>
+                            </thead>
                             <tbody id="pf-historical-tbody"></tbody>
                         </table>
                     </div>
                 </div>
+
+                <!-- 운용 알고리즘 및 규칙 -->
                 <div class="bg-[var(--modal-bg)] p-4 md:p-5 rounded-xl border border-themeBorder mb-2">
-                    <p class="text-[0.8rem] font-black text-accent border-b border-themeBorder pb-2 mb-3">운용 알고리즘 및 규칙</p>
+                    <p class="text-[0.8rem] font-black text-accent flex items-center border-b border-themeBorder pb-2 mb-3">
+                        <svg class="icon-md mr-1.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                        운용 알고리즘 및 규칙
+                    </p>
                     <ul id="pf-modal-rules" class="rule-list"></ul>
                 </div>
             </div>
@@ -291,19 +329,20 @@
             </div>
         </div>
     </div>
+    <!-- 모달 영역 끝 -->
 
-    <!-- 메인 레이아웃 시작 -->
     <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
         <header class="glass rounded-2xl shadow-sm overflow-hidden">
             <div class="flex justify-between items-center p-3 md:p-4">
                 <div class="flex items-center gap-2 cursor-pointer" onclick="resetDashboard()">
-                    <div class="bg-accent p-1.5 rounded-lg shadow-md flex items-center justify-center">
+                    <div class="bg-accent p-1.5 rounded-lg shadow-md shadow-accent/40 flex items-center justify-center">
                         <svg class="icon-lg text-white" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
                     </div>
                     <h1 class="text-xl md:text-2xl font-black italic text-themeText tracking-tighter ml-1">BUY <span class="text-accent">or BYE</span></h1>
                 </div>
                 
                 <div class="flex items-center gap-2 md:gap-4">
+                    <!-- 초보/전문가 모드 데스크탑 토글 -->
                     <label class="mode-toggle-wrap hidden sm:inline-flex w-[140px]">
                         <input type="checkbox" id="mode-switch" onchange="toggleMode(this)">
                         <div class="mode-slider-bg"></div>
@@ -311,15 +350,14 @@
                         <span class="mode-text text-beginner">초보</span>
                     </label>
 
-                    <button type="button" id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-[var(--modal-bg)] border border-accent/40 rounded-xl text-themeText font-black text-sm hover:bg-accent hover:text-white transition shadow-sm w-20 text-center">
+                    <button type="button" id="currency-toggle" onclick="toggleCurrency()" class="p-2 bg-[var(--modal-bg)] border border-accent/40 rounded-xl text-themeText font-black text-sm hover:bg-accent hover:text-white transition shadow-sm shadow-accent/20 w-20 text-center">
                         USD
                     </button>
 
-                    <div class="hidden md:flex items-center overflow-x-auto custom-scroll">
+                    <div class="hidden md:flex items-center">
                         <button type="button" onclick="switchMainTab('dashboard')" id="tab-btn-dashboard" class="main-tab-btn active">종목 AI 분석</button>
                         <button type="button" onclick="switchMainTab('crypto')" id="tab-btn-crypto" class="main-tab-btn">코인 분석</button>
-                        <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오 백테스트</button>
-                        <button type="button" onclick="switchMainTab('baa')" id="tab-btn-baa" class="main-tab-btn flex items-center gap-1"><span class="text-orange-500">🔥</span> BAA 레버리지 심화</button>
+                        <button type="button" onclick="switchMainTab('portfolio')" id="tab-btn-portfolio" class="main-tab-btn">포트폴리오</button>
                     </div>
                     
                     <button type="button" onclick="openSettingsModal()" class="p-2 bg-[var(--modal-bg)] border border-themeBorder rounded-xl text-themeMuted hover:text-accent transition shadow-sm">
@@ -329,6 +367,7 @@
             </div>
             
             <div class="sm:hidden px-3 pb-2 flex justify-end">
+                 <!-- 모바일용 초보/전문가 모드 토글 -->
                  <label class="mode-toggle-wrap inline-flex sm:hidden w-full">
                     <input type="checkbox" id="mob-mode-switch" onchange="toggleMode(this)">
                     <div class="mode-slider-bg"></div>
@@ -337,16 +376,13 @@
                 </label>
             </div>
 
-            <!-- 모바일용 탭 -->
-            <div class="md:hidden flex border-t border-themeBorder bg-black/10 overflow-x-auto custom-scroll">
-                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 min-w-[80px] text-center text-sm py-2 active">주식</button>
-                <button type="button" onclick="switchMainTab('crypto')" id="mob-tab-btn-crypto" class="main-tab-btn flex-1 min-w-[80px] text-center text-sm py-2">코인</button>
-                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 min-w-[100px] text-center text-sm py-2">포트폴리오</button>
-                <button type="button" onclick="switchMainTab('baa')" id="mob-tab-btn-baa" class="main-tab-btn flex-1 min-w-[100px] text-center text-sm py-2">🔥 BAA심화</button>
+            <div class="md:hidden flex border-t border-themeBorder bg-black/10">
+                <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 active text-center text-sm py-2">주식</button>
+                <button type="button" onclick="switchMainTab('crypto')" id="mob-tab-btn-crypto" class="main-tab-btn flex-1 text-center text-sm py-2">코인</button>
+                <button type="button" onclick="switchMainTab('portfolio')" id="mob-tab-btn-portfolio" class="main-tab-btn flex-1 text-center text-sm py-2">포트폴리오</button>
             </div>
         </header>
 
-        <!-- View: Dashboard (주식 분석) -->
         <div id="view-dashboard" class="flex flex-col space-y-3 md:space-y-4">
             <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
                 <form id="search-form" class="flex w-full sm:flex-grow">
@@ -364,13 +400,15 @@
                     <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
                     <p id="loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">데이터를 불러오는 중입니다...</p>
                 </div>
+                
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-3 md:pb-4 gap-3">
                     <div>
                         <h2 id="display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
                         <div id="live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
                     </div>
+                    
                     <div class="flex flex-col w-full lg:w-auto gap-2">
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1 expert-only">
                             <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">차트 기간</span>
                             <div class="flex gap-1">
                                 <button type="button" onclick="changeInterval('1d', '1y', 'D')" id="range-D" class="chip-btn range-btn active">일봉 (1년)</button>
@@ -379,7 +417,7 @@
                                 <button type="button" onclick="changeInterval('1y', 'max', 'Y')" id="range-Y" class="chip-btn range-btn">연봉 (전체)</button>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1" id="ui-ma-toggles">
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1 expert-only" id="ui-ma-toggles">
                             <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">평균선</span>
                             <div class="flex gap-1">
                                 <button type="button" onclick="toggleMA(20)" id="btn-ma-20" class="chip-btn active">20일</button>
@@ -390,11 +428,12 @@
                         </div>
                     </div>
                 </div>
+
                 <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
 
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
-                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
+                <div class="expert-only glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
                     <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
                         <div class="flex items-center gap-2">
                             <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -422,8 +461,15 @@
                     <p class="text-[0.55rem] text-themeMuted text-center mt-1">박스를 터치하면 AI가 작성한 상세 브리핑을 볼 수 있어요!</p>
                 </div>
 
+                <!-- 초보자 전용 큼직한 요약 카드 -->
+                <div class="beginner-only glass rounded-2xl p-6 xl:col-span-1 shadow-xl border-t-4 border-t-accent text-center flex flex-col justify-center items-center h-full">
+                    <p class="text-xs font-black text-themeMuted mb-2">지금 사도 될까요?</p>
+                    <div id="beginner-summary-text" class="text-3xl font-black text-themeText mb-4 break-keep">AI 분석 중...</div>
+                    <p id="beginner-summary-desc" class="text-sm text-themeMuted leading-relaxed bg-black/20 p-4 rounded-xl border border-themeBorder break-keep w-full">데이터를 불러오고 있습니다.</p>
+                </div>
+
                 <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
-                    <div class="flex justify-between items-end mb-3 border-b border-themeBorder pb-2">
+                    <div class="expert-only flex justify-between items-end mb-3 border-b border-themeBorder pb-2">
                         <div class="flex items-center gap-2">
                             <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                             <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">세부 데이터 전광판</p>
@@ -433,7 +479,8 @@
                         </div>
                     </div>
                     
-                    <div id="stock-expert-indicators" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
+                    <!-- 전문가 모드일 때만 보이는 7개 지표 -->
+                    <div id="stock-expert-indicators" class="expert-only grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
                         <div class="stat-box" onclick="openStatInfo('vix', 'stock')">
                             <div class="weight-badge">9.0</div>
                             <p class="stat-label" id="label-stock-vix">VIX 지수</p>
@@ -470,14 +517,15 @@
                             <p id="val-stoch-main" class="stat-value text-themeText">---</p>
                         </div>
                     </div>
-                    <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[150px] md:max-h-[200px]">
+
+                    <!-- 초보/전문가 공통으로 보는 AI 해석 요약 (안에 아코디언으로 수식 포함) -->
+                    <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[300px] md:max-h-[350px]">
                         <p class="text-xs text-themeMuted text-center py-6">분석 대기 중...</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- View: Crypto (코인 분석) -->
         <div id="view-crypto" class="hidden flex-col space-y-3 md:space-y-4">
             <div class="flex gap-2 mb-1 overflow-x-auto custom-scroll pb-1">
                 <button type="button" onclick="loadCryptoData('BTC-USD')" class="chip-btn bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/30">비트코인 (BTC)</button>
@@ -510,7 +558,7 @@
                     </div>
                     
                     <div class="flex flex-col w-full lg:w-auto gap-2">
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1 expert-only">
                             <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">차트 기간</span>
                             <div class="flex gap-1">
                                 <button type="button" onclick="changeCryptoInterval('1d', '1y', 'D')" id="crypto-range-D" class="chip-btn range-btn active">일봉 (1년)</button>
@@ -519,7 +567,7 @@
                                 <button type="button" onclick="changeCryptoInterval('1y', 'max', 'Y')" id="crypto-range-Y" class="chip-btn range-btn">연봉 (전체)</button>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
+                        <div class="flex items-center gap-2 overflow-x-auto custom-scroll pb-1 expert-only">
                             <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">평균선</span>
                             <div class="flex gap-1">
                                 <button type="button" onclick="toggleCryptoMA(20)" id="crypto-btn-ma-20" class="chip-btn active">20일</button>
@@ -535,7 +583,7 @@
             </div>
 
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
-                <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
+                <div class="expert-only glass rounded-2xl p-3 md:p-5 xl:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
                     <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
                         <div class="flex items-center gap-2">
                             <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -563,8 +611,15 @@
                     <p class="text-[0.55rem] text-themeMuted text-center mt-1">박스를 터치하면 AI가 작성한 상세 브리핑을 볼 수 있어요!</p>
                 </div>
 
+                <!-- 초보자 전용 요약 카드 (코인) -->
+                <div class="beginner-only glass rounded-2xl p-6 xl:col-span-1 shadow-xl border-t-4 border-t-accent text-center flex flex-col justify-center items-center h-full">
+                    <p class="text-xs font-black text-themeMuted mb-2">지금 사도 될까요?</p>
+                    <div id="crypto-beginner-summary-text" class="text-3xl font-black text-themeText mb-4 break-keep">AI 분석 중...</div>
+                    <p id="crypto-beginner-summary-desc" class="text-sm text-themeMuted leading-relaxed bg-black/20 p-4 rounded-xl border border-themeBorder break-keep w-full">데이터를 불러오고 있습니다.</p>
+                </div>
+
                 <div class="glass rounded-2xl p-3 md:p-5 xl:col-span-2 shadow-xl border-t-4 border-t-emerald-500 flex flex-col">
-                    <div class="flex justify-between items-end mb-3 border-b border-themeBorder pb-2">
+                    <div class="expert-only flex justify-between items-end mb-3 border-b border-themeBorder pb-2">
                         <div class="flex items-center gap-2">
                             <svg class="icon-sm text-emerald-500" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                             <p class="text-themeText text-[0.6rem] md:text-[0.65rem] font-black uppercase tracking-widest">세부 데이터 전광판</p>
@@ -574,7 +629,7 @@
                         </div>
                     </div>
                     
-                    <div id="crypto-expert-indicators" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
+                    <div id="crypto-expert-indicators" class="expert-only grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
                         <div class="stat-box" onclick="openStatInfo('vol', 'crypto')">
                             <div class="weight-badge">9.0</div>
                             <p class="stat-label" id="label-crypto-vol">VIX 지수</p>
@@ -611,14 +666,14 @@
                             <p id="crypto-val-stoch-main" class="stat-value text-themeText">---</p>
                         </div>
                     </div>
-                    <div id="crypto-reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[150px] md:max-h-[200px]">
+                    
+                    <div id="crypto-reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[300px] md:max-h-[350px]">
                         <p class="text-xs text-themeMuted text-center py-6">분석 대기 중...</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- View: Portfolio (백테스트) -->
         <div id="view-portfolio" class="hidden flex-col space-y-4">
             
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
@@ -630,29 +685,29 @@
                     <div class="pf-card" onclick="showPfDetail('6040')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">60/40 전략 <span class="text-[0.55rem] bg-gray-500/20 text-gray-400 px-2 py-1 rounded">기본</span></h3>
                         <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식에 60%, 채권에 40%를 나눠 담아요.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                        <div class="expert-only flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">연평균 <span id="card-cagr-6040" class="text-up ml-1">--%</span></span>
                             <span class="text-xs font-bold text-themeText">최대손실 <span id="card-mdd-6040" class="text-down ml-1">--%</span></span>
                         </div>
-                        <div id="card-mar-6040" class="mar-badge">가성비 --</div>
+                        <div id="card-mar-6040" class="mar-badge expert-only">가성비 --</div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('permanent')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">영구 포트폴리오 <span class="text-[0.55rem] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">안전</span></h3>
                         <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">주식, 채권, 금, 현금을 25%씩 똑같이 나눠요.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                        <div class="expert-only flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">연평균 <span id="card-cagr-permanent" class="text-up ml-1">--%</span></span>
                             <span class="text-xs font-bold text-themeText">최대손실 <span id="card-mdd-permanent" class="text-down ml-1">--%</span></span>
                         </div>
-                        <div id="card-mar-permanent" class="mar-badge">가성비 --</div>
+                        <div id="card-mar-permanent" class="mar-badge expert-only">가성비 --</div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('allweather')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">올웨더 전략 <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">유명함</span></h3>
                         <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">사계절 어떤 경제 상황이 와도 끄떡없게 설계됐어요.</p>
-                        <div class="flex justify-between border-t border-themeBorder pt-2 mt-auto">
+                        <div class="expert-only flex justify-between border-t border-themeBorder pt-2 mt-auto">
                             <span class="text-xs font-bold text-themeText">연평균 <span id="card-cagr-allweather" class="text-up ml-1">--%</span></span>
                             <span class="text-xs font-bold text-themeText">최대손실 <span id="card-mdd-allweather" class="text-down ml-1">--%</span></span>
                         </div>
-                        <div id="card-mar-allweather" class="mar-badge">가성비 --</div>
+                        <div id="card-mar-allweather" class="mar-badge expert-only">가성비 --</div>
                     </div>
                 </div>
             </div>
@@ -666,170 +721,57 @@
                     <div class="pf-card" onclick="showPfDetail('dual')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">듀얼 모멘텀</h3>
                         <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">요즘 가장 잘 나가는 1등 자산에만 투자해요.</p>
-                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                        <div class="expert-only mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">연평균 <span id="card-cagr-dual" class="text-up ml-1">--%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">최대손실 <span id="card-mdd-dual" class="text-down ml-1">--%</span></span>
                         </div>
-                        <div id="card-mar-dual" class="mar-badge">가성비 --</div>
+                        <div id="card-mar-dual" class="mar-badge expert-only">가성비 --</div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('vaa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA 전략</h3>
                         <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">최근 1달 수익을 가장 중요하게 보고 빠르게 갈아타요.</p>
-                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                        <div class="expert-only mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">연평균 <span id="card-cagr-vaa" class="text-up ml-1">--%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">최대손실 <span id="card-mdd-vaa" class="text-down ml-1">--%</span></span>
                         </div>
-                        <div id="card-mar-vaa" class="mar-badge">가성비 --</div>
+                        <div id="card-mar-vaa" class="mar-badge expert-only">가성비 --</div>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('daa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA 전략</h3>
                         <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">광부의 카나리아처럼 위험 신호가 오면 바로 도망가요.</p>
-                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                        <div class="expert-only mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">연평균 <span id="card-cagr-daa" class="text-up ml-1">--%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">최대손실 <span id="card-mdd-daa" class="text-down ml-1">--%</span></span>
                         </div>
-                        <div id="card-mar-daa" class="mar-badge">가성비 --</div>
+                        <div id="card-mar-daa" class="mar-badge expert-only">가성비 --</div>
                     </div>
                     <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA 전략</h3>
                         <p class="text-[0.6rem] text-themeMuted mb-2 flex-grow">방어는 철저하게, 공격은 화끈하게 하는 최신 기술이에요.</p>
-                        <div class="mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
+                        <div class="expert-only mt-auto pt-2 border-t border-themeBorder flex flex-col xl:flex-row xl:justify-between">
                             <span class="text-[0.6rem] font-bold text-themeText">연평균 <span id="card-cagr-baa" class="text-up ml-1">--%</span></span>
                             <span class="text-[0.6rem] font-bold text-themeText">최대손실 <span id="card-mdd-baa" class="text-down ml-1">--%</span></span>
                         </div>
-                        <div id="card-mar-baa" class="mar-badge">가성비 --</div>
+                        <div id="card-mar-baa" class="mar-badge expert-only">가성비 --</div>
                     </div>
                 </div>
             </div>
 
-            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
+            <div class="expert-only glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
                 <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">과거 모의 투자 결과 그래프 (시작점 100 기준)</h3>
                 <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
             </div>
         </div>
 
-        <!-- View: BAA 심화 (레버리지) -->
-        <div id="view-baa" class="hidden flex-col space-y-4">
-            
-            <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-orange-500 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                    <svg class="w-24 h-24 text-orange-500" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <h2 class="text-2xl md:text-3xl font-black text-themeText tracking-tight mb-2">
-                    <span class="text-orange-500">BAA</span> (Bold Asset Allocation)
-                </h2>
-                <p class="text-sm text-themeMuted mb-4">
-                    폭락장은 피하고, 폭등장은 나스닥 몰빵으로 먹는 <strong class="text-themeText">가장 극단적이고 완성된 형태</strong>의 동적 자산배분입니다.
-                </p>
-
-                <div class="space-y-2 relative z-10">
-                    <details class="group bg-black/20 rounded-xl border border-themeBorder overflow-hidden">
-                        <summary class="p-3 text-sm font-bold text-themeText cursor-pointer flex justify-between items-center outline-none hover:bg-white/5 transition">
-                            <span>🤔 도대체 BAA가 뭔가요?</span>
-                            <svg class="w-4 h-4 text-themeMuted transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                        <div class="p-4 pt-0 border-t border-themeBorder/50 text-[0.8rem] text-themeMuted leading-relaxed bg-[var(--modal-bg)]">
-                            Keller와 Keuning이 2022년에 발표한 최신 전략입니다. 기존의 모멘텀 전략들이 채권 폭락(2022년)을 방어하지 못하는 것을 보고, <strong class="text-themeText">카나리아(감시용) 자산 4개</strong>를 두어 단 하나라도 하락 신호가 뜨면 즉시 가장 안전한 현금성 자산 3개로 피신하도록 설계되었습니다. <br><br>반대로 모든 카나리아가 "안전하다"고 지저귀면, 주저 없이 나스닥(QQQ) 같은 가장 공격적인 자산 1곳에 100% 몰빵하여 수익을 폭발시킵니다.
-                        </div>
-                    </details>
-                    
-                    <details class="group bg-black/20 rounded-xl border border-themeBorder overflow-hidden">
-                        <summary class="p-3 text-sm font-bold text-themeText cursor-pointer flex justify-between items-center outline-none hover:bg-white/5 transition">
-                            <span>📜 정확한 투자 규칙 (룰)</span>
-                            <svg class="w-4 h-4 text-themeMuted transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                        <div class="p-4 pt-0 border-t border-themeBorder/50 text-[0.8rem] text-themeMuted leading-relaxed bg-[var(--modal-bg)]">
-                            <ol class="list-decimal pl-4 space-y-2 mt-2">
-                                <li>매월 말일, 4개의 카나리아 자산 <strong class="text-themeText">(SPY, VEA, VWO, BND)</strong>의 모멘텀 점수를 계산합니다.<br>
-                                    <span class="text-[0.7rem] bg-black/30 px-2 py-1 rounded inline-block mt-1">* 모멘텀 점수 = (1개월 수익률×12) + (3개월×4) + (6개월×2) + (12개월×1)</span>
-                                </li>
-                                <li><strong>공격 모드:</strong> 카나리아 4개의 점수가 모두 0 초과라면 극히 안전한 상승장입니다. 이때는 나스닥 <strong class="text-accent">(QQQ)에 100% 투자</strong>합니다.</li>
-                                <li><strong>방어 모드:</strong> 카나리아 중 단 1개라도 점수가 0 이하라면 폭락 전조증상입니다. 즉시 방어 자산 유니버스 <strong class="text-themeText">(TIP, DBC, BIL, IEF, TLT, LQD, BND)</strong> 중 가장 점수가 높은 3개 자산을 골라 <strong>33.3%씩 분산 투자</strong>하여 웅크립니다.</li>
-                            </ol>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-accent">
-                <div class="flex justify-between items-center mb-4 border-b border-themeBorder pb-2">
-                    <h3 class="text-base font-black text-themeText">📡 이번 달 BAA 투자 시그널</h3>
-                    <button type="button" onclick="runBaaLiveCheck()" class="bg-accent/20 text-accent px-3 py-1.5 rounded-lg text-xs font-black hover:bg-accent hover:text-white transition border border-accent/40">최신 데이터 다시 계산</button>
-                </div>
-                
-                <div id="baa-live-loading" class="hidden flex-col items-center justify-center py-6">
-                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
-                    <p class="text-[0.7rem] font-bold text-accent uppercase tracking-widest text-center">실시간 주가 데이터를 바탕으로 카나리아 생존 여부를 판단 중입니다...</p>
-                </div>
-
-                <div id="baa-live-result" class="hidden">
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                        <div id="canary-SPY" class="bg-black/20 p-3 rounded-xl border border-themeBorder text-center cursor-pointer hover:border-accent transition group" onclick="showBaaProof('SPY')">
-                            <span class="text-[0.6rem] font-bold text-themeMuted uppercase flex items-center justify-center gap-1">미국 주식 (SPY) <svg class="w-3 h-3 text-accent opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></span>
-                            <div class="text-lg font-black mt-1 canary-score">--</div>
-                        </div>
-                        <div id="canary-VEA" class="bg-black/20 p-3 rounded-xl border border-themeBorder text-center cursor-pointer hover:border-accent transition group" onclick="showBaaProof('VEA')">
-                            <span class="text-[0.6rem] font-bold text-themeMuted uppercase flex items-center justify-center gap-1">선진국 주식 (VEA) <svg class="w-3 h-3 text-accent opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></span>
-                            <div class="text-lg font-black mt-1 canary-score">--</div>
-                        </div>
-                        <div id="canary-VWO" class="bg-black/20 p-3 rounded-xl border border-themeBorder text-center cursor-pointer hover:border-accent transition group" onclick="showBaaProof('VWO')">
-                            <span class="text-[0.6rem] font-bold text-themeMuted uppercase flex items-center justify-center gap-1">신흥국 주식 (VWO) <svg class="w-3 h-3 text-accent opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></span>
-                            <div class="text-lg font-black mt-1 canary-score">--</div>
-                        </div>
-                        <div id="canary-BND" class="bg-black/20 p-3 rounded-xl border border-themeBorder text-center cursor-pointer hover:border-accent transition group" onclick="showBaaProof('BND')">
-                            <span class="text-[0.6rem] font-bold text-themeMuted uppercase flex items-center justify-center gap-1">미국 종합채 (BND) <svg class="w-3 h-3 text-accent opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></span>
-                            <div class="text-lg font-black mt-1 canary-score">--</div>
-                        </div>
-                    </div>
-                    <p class="text-[0.6rem] text-themeMuted text-center mb-4 uppercase tracking-widest">박스를 클릭하면 상세 계산 증명(Proof)을 볼 수 있습니다.</p>
-                    
-                    <div id="baa-decision-box" class="p-5 rounded-xl border border-themeBorder text-center bg-[var(--modal-bg)] shadow-inner">
-                        <p class="text-[0.7rem] font-bold text-themeMuted uppercase tracking-widest mb-1">AI 판독 결과</p>
-                        <h2 id="baa-decision-title" class="text-2xl md:text-3xl font-black mb-2">---</h2>
-                        <p id="baa-decision-desc" class="text-[0.8rem] text-themeText font-bold">---</p>
-                    </div>
-                </div>
-                <div id="baa-live-idle" class="py-6 text-center">
-                    <p class="text-sm text-themeMuted">우측 상단의 버튼을 눌러 현재 시점의 BAA 시그널을 확인하세요.</p>
-                </div>
-            </div>
-
-            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-purple-500">
-                <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
-                    <h2 class="text-base md:text-lg font-black text-themeText">레버리지 적용 백테스트 (2000~2026)</h2>
-                </div>
-                <p class="text-[0.7rem] text-themeMuted mb-4">
-                    BAA 전략은 하락장을 기가 막히게 피하기 때문에, <strong>공격 시점에 2배(QLD), 3배(TQQQ) 레버리지</strong>를 쓰면 어떻게 될까? 하는 아이디어에서 출발한 시뮬레이션입니다. (과거 나스닥 지수 기반으로 변동성 끌림 및 롤오버 비용을 보수적으로 반영하여 추정한 데이터입니다.)
-                </p>
-                
-                <div class="grid grid-cols-3 gap-2 mb-4">
-                    <div class="bg-black/20 p-3 rounded-xl border border-blue-500/30 text-center">
-                        <span class="text-[0.65rem] font-bold text-themeMuted uppercase block mb-1">BAA 기본 (QQQ)</span>
-                        <div class="text-blue-400 font-black text-sm md:text-base">CAGR 17.5%</div>
-                        <div class="text-[0.6rem] text-gray-400 mt-1">MDD -15.2%</div>
-                    </div>
-                    <div class="bg-black/20 p-3 rounded-xl border border-purple-500/30 text-center">
-                        <span class="text-[0.65rem] font-bold text-themeMuted uppercase block mb-1">BAA 2배 (QLD)</span>
-                        <div class="text-purple-400 font-black text-sm md:text-base">CAGR 24.8%</div>
-                        <div class="text-[0.6rem] text-gray-400 mt-1">MDD -25.8%</div>
-                    </div>
-                    <div class="bg-black/20 p-3 rounded-xl border border-orange-500/30 text-center">
-                        <span class="text-[0.65rem] font-bold text-themeMuted uppercase block mb-1">BAA 3배 (TQQQ)</span>
-                        <div class="text-orange-400 font-black text-sm md:text-base">CAGR 31.2%</div>
-                        <div class="text-[0.6rem] text-rose-400 mt-1">MDD -42.5%</div>
-                    </div>
-                </div>
-
-                <div id="chart-baa-leverage" class="portfolio-chart-container w-full bg-themeBg/50 rounded-xl border border-themeBorder"></div>
-            </div>
-        </div>
-
         <div class="text-center mt-2 pb-6">
-            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API | Simulated Backtest Data (Base 100) | Risk-Adjusted Model (MAR)</p>
+            <p class="text-[0.6rem] text-themeMuted">Data Provider: Yahoo Finance API, Alternative.me | Risk-Adjusted Model (MAR)</p>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // 🚀 1. 전역 변수 및 헬퍼 함수
+        // ==========================================
         const API_BASE_URL = 'https://buy-or-bye.onrender.com';
         let errorLogs = [];
         
@@ -840,7 +782,7 @@
         let maSettings = { 20: true, 50: true, 120: true, 200: true };
         let cryptoMaSettings = { 20: true, 50: true, 120: true, 200: true };
         
-        let myChart = null, cryptoChart = null, pfChart = null, pfModalChart = null, pfPieChart = null, baaChart = null;
+        let myChart = null, cryptoChart = null, pfChart = null, pfModalChart = null, pfPieChart = null;
         let globalChartData = null, globalTicker = "SPY", globalCryptoChartData = null, globalCryptoTicker = "BTC-USD";
         let currentPfKey = '';
         
@@ -848,70 +790,39 @@
         let analysisDetails = { short: {}, mid: {}, long: {} };
         let cryptoAnalysisDetails = { short: {}, mid: {}, long: {} };
 
+        // ★ 초보/전문가 모드 전역 변수
         let isBeginnerMode = false;
-        let baaProofs = {}; // BAA 상세 계산 증명 보관용
 
         const TERMS = {
-            vix: { expert: 'VIX 지수', beginner: '시장 불안감 (VIX 지수)' },
+            vix: { expert: 'VIX 지수', beginner: '시장 불안감 (VIX)' },
             fng: { expert: '공포/탐욕', beginner: '대중의 심리' },
-            dist: { expert: '이동평균선 돌파', beginner: '이동평균선 (상승장/하락장)' },
-            macd: { expert: 'MACD', beginner: '단기 흐름 (방향타)' },
-            rsi: { expert: 'RSI', beginner: '단기 과열도 (체력)' },
-            bb: { expert: 'BB밴드', beginner: '가격 저항선 (천장/바닥)' },
-            stoch: { expert: 'Stoch', beginner: '단기 바닥찾기 (타이밍)' },
-            vol: { expert: '크립토 VIX 지수', beginner: '코인 VIX 지수 (불안감)' }
+            dist: { expert: '이동평균선 돌파', beginner: '이동평균선 (흐름)' },
+            macd: { expert: 'MACD', beginner: '단기 방향타' },
+            rsi: { expert: 'RSI', beginner: '단기 체력' },
+            bb: { expert: 'BB밴드', beginner: '가격 저항선' },
+            stoch: { expert: 'Stoch', beginner: '단기 타이밍' },
+            vol: { expert: '크립토 VIX', beginner: '코인 불안감' }
         };
 
         const DESCRIPTIONS = {
-            vix: {
-                expert: 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다.\n\n• 신뢰도 가중치: 9.0 / 10\n(역사적으로 극단적 공포에서의 역발상 매수는 가장 높은 승률을 자랑합니다.)\n\n• 25 이상: 적극 매수 기회\n• 15 이하: 안일함 (조정 주의)',
-                beginner: '주식 시장의 일기예보 같은 거예요.\n\n• 점수가 높으면? 폭풍우(사람들이 공포에 질림) ➜ 쌀 때 살 수 있는 좋은 기회예요!\n• 점수가 낮으면? 아주 맑음(사람들이 안심함) ➜ 너무 맑을 때 소나기(주가 하락)가 올 수 있으니 조심해야 해요!'
-            },
-            fng: {
-                expert: '군중 심리를 수치화한 지표입니다.\n\n• 신뢰도 가중치: 8.5 / 10\n(VIX와 함께 군중 심리의 역발상 투자는 확률 높은 트레이딩 기법입니다.)\n\n• 0~45: 극단적 공포 (매수)\n• 55~100: 탐욕 (매도 주의)',
-                beginner: '다른 사람들이 얼마나 욕심을 내고 있는지 0부터 100까지 점수로 보여줘요.\n\n• 남들이 너무 욕심낼 때(점수가 높을 때)는 팔 준비를 하고, 남들이 무서워할 때(점수가 낮을 때) 사는 게 좋아요.'
-            },
-            dist: {
-                expert: '현재가가 주요 이동평균선(단기 20일, 중기 50일, 장기 120일)을 돌파했는지 나타냅니다.\n\n• 신뢰도 가중치: 가중치 최상단 반영 (추세 팔로잉의 핵심)\n\n• 상향 돌파: 상승 추세 (강력 매수)\n• 하향 이탈: 하락 역배열 (적극 매도)',
-                beginner: '주요 평균 가격(20일/50일/120일) 위로 주가가 올라탔는지 확인해요.\n\n• 선 위로 올라타면: 상승 썰매를 탄 거예요. (계속 오르는 중)\n• 선 아래로 떨어지면: 하락 썰매를 탄 거예요. (위험하니 조심!)'
-            },
-            macd: {
-                expert: '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 신뢰도 가중치: 7.0 / 10\n(추세 전환 포착에 강하지만 횡보장에서 거짓 신호가 발생할 수 있습니다.)',
-                beginner: '자동차의 엑셀과 브레이크 같아요.\n\n• + 점수면 엑셀을 밟아서 오르는 힘이 세지는 중이고,\n• - 점수면 브레이크를 밟아서 오르는 힘이 줄어들거나 꺾이는 중이에요.'
-            },
-            rsi: {
-                expert: '추세의 단기 과열 강도를 의미합니다.\n\n• 신뢰도 가중치: 6.5 / 10\n(강한 상승장에서는 과매수 상태를 오래 유지하므로 섣부른 매도를 유발할 수 있습니다.)',
-                beginner: '단기적으로 얼마나 달렸는지 체력을 보여줘요.\n\n• 70 이상: 너무 많이 달려서 숨이 차요 (쉬어갈 확률 높음)\n• 30 이하: 푹 쉬어서 다시 뛸 체력이 꽉 찼어요 (오를 확률 높음)'
-            },
-            bb: {
-                expert: '가격 변동성 기반의 밴드입니다.\n\n• 신뢰도 가중치: 6.0 / 10\n(밴드 하단 지지 및 상단 저항에 유용하나 밴드를 타고 흐르는 현상에 주의해야 합니다.)',
-                beginner: '주가가 움직이는 도로의 차선 같아요.\n\n• 도로 윗선(천장)에 부딪히면 튕겨 내려올 수 있고,\n• 도로 아랫선(바닥)에 닿으면 다시 튕겨 올라갈 수 있어요.'
-            },
-            stoch: {
-                expert: '최근 기간 중 현재 가격 위치를 나타냅니다.\n\n• 신뢰도 가중치: 5.0 / 10\n(가장 민감하고 반응이 빠르지만, 가짜 신호가 많습니다.)',
-                beginner: '단기적으로 지금 가격이 바닥인지 꼭대기인지 알려줘요.\n반응이 엄청 빠르지만 가끔 틀릴 때도 있어요.'
-            },
-            vol: {
-                expert: '코인 시장의 공포/불안감을 나타내는 크립토 VIX(변동성) 지수입니다.\n\n• 신뢰도 가중치: 9.0 / 10\n(코인 시장에서 극단적 변동성은 바닥 매수 기회 또는 상투의 신호입니다.)',
-                beginner: '코인 시장의 VIX 지수예요. 가격이 위아래로 얼마나 미친 듯이 요동치는지 보여줘요.\n요동침이 멈추고 잠잠해지면 사기 좋은 타이밍이에요.'
-            }
+            vix: { expert: 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다.\n\n• 신뢰도 가중치: 9.0 / 10', beginner: '주식 시장의 일기예보 같은 거예요.\n\n폭풍우가 치면(사람들이 공포에 질림) 쌀 때 살 수 있는 좋은 기회예요!' },
+            fng: { expert: '군중 심리를 수치화한 지표입니다.\n\n• 신뢰도 가중치: 8.5 / 10', beginner: '다른 사람들이 얼마나 욕심을 내고 있는지 보여줘요.\n\n남들이 욕심낼 때는 팔고, 무서워할 때 사는 게 좋아요.' },
+            dist: { expert: '현재가가 주요 이동평균선을 돌파했는지 나타냅니다.\n\n• 신뢰도 가중치: 최상', beginner: '주요 평균 가격 위로 주가가 올라탔는지 확인해요.\n\n선 위로 올라타면 계속 오르는 중이라는 뜻이에요.' },
+            macd: { expert: '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 신뢰도 가중치: 7.0 / 10', beginner: '자동차의 엑셀과 브레이크 같아요.\n\n엑셀을 밟아서 오르는 힘이 세지는 중인지 확인해요.' },
+            rsi: { expert: '추세의 단기 과열 강도를 의미합니다.\n\n• 신뢰도 가중치: 6.5 / 10', beginner: '단기적으로 얼마나 달렸는지 체력을 보여줘요.\n\n너무 많이 달려서 숨이 차면 쉬어갈 확률이 높아요.' },
+            bb: { expert: '가격 변동성 기반의 밴드입니다.\n\n• 신뢰도 가중치: 6.0 / 10', beginner: '주가가 움직이는 도로의 차선 같아요.\n\n천장에 부딪히면 튕겨 내려올 수 있어요.' },
+            stoch: { expert: '최근 기간 중 현재 가격 위치를 나타냅니다.\n\n• 신뢰도 가중치: 5.0 / 10', beginner: '단기적으로 지금 가격이 바닥인지 꼭대기인지 알려줘요.' },
+            vol: { expert: '코인 시장의 공포/불안감을 나타내는 크립토 변동성입니다.\n\n• 신뢰도 가중치: 9.0 / 10', beginner: '코인 시장이 위아래로 얼마나 미친 듯이 요동치는지 보여줘요.' }
         };
 
         const WEIGHT_MATRIX = {
-            stock: {
-                short: { VIX: 9, FNG: 8.5, RSI: 8, STOCH: 6, MACD: 5, DIST: 8, BB: 6 },
-                mid:   { VIX: 5, FNG: 5,   RSI: 5, STOCH: 2, MACD: 9, DIST: 10, BB: 4 },
-                long:  { VIX: 2, FNG: 3,   RSI: 4, STOCH: 1, MACD: 7, DIST: 12, BB: 2 }
-            },
-            crypto: {
-                short: { VOL: 9, FNG: 8.5, RSI: 8, STOCH: 6, MACD: 5, DIST: 8, BB: 6 },
-                mid:   { VOL: 5, FNG: 5,   RSI: 5, STOCH: 2, MACD: 9, DIST: 10, BB: 4 },
-                long:  { VOL: 2, FNG: 3,   RSI: 4, STOCH: 1, MACD: 7, DIST: 12, BB: 2 }
-            }
+            stock: { short: { VIX: 9, FNG: 8.5, RSI: 8, STOCH: 6, MACD: 5, DIST: 8, BB: 6 }, mid: { VIX: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 9, DIST: 10, BB: 4 }, long: { VIX: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 7, DIST: 12, BB: 2 } },
+            crypto: { short: { VOL: 9, FNG: 8.5, RSI: 8, STOCH: 6, MACD: 5, DIST: 8, BB: 6 }, mid: { VOL: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 9, DIST: 10, BB: 4 }, long: { VOL: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 7, DIST: 12, BB: 2 } }
         };
 
-        let stockSignals = { vix: {sig:'WAIT', w:0}, fng: {sig:'WAIT', w:0}, dist: {sig:'WAIT', w:0}, rsi: {sig:'WAIT', w:0}, macd: {sig:'WAIT', w:0}, bb: {sig:'WAIT', w:0}, stoch: {sig:'WAIT', w:0} };
-        let cryptoSignals = { vol: {sig:'WAIT', w:0}, fng: {sig:'WAIT', w:0}, dist: {sig:'WAIT', w:0}, rsi: {sig:'WAIT', w:0}, macd: {sig:'WAIT', w:0}, bb: {sig:'WAIT', w:0}, stoch: {sig:'WAIT', w:0} };
+        // 데이터 저장소 확장: 값(val)과 수식(proof)을 저장하여 아코디언에서 보여줌
+        let stockSignals = { vix: {}, fng: {}, dist: {}, rsi: {}, macd: {}, bb: {}, stoch: {} };
+        let cryptoSignals = { vol: {}, fng: {}, dist: {}, rsi: {}, macd: {}, bb: {}, stoch: {} };
 
         let globalVix = null, globalFng = null, globalCryptoFng = null;
         let fxCache = {};
@@ -930,87 +841,51 @@
         };
         const fxSimData = [1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
 
-        const baaLevSimData = {
-            'baa_qqq': pfSimData['baa'], 
-            'baa_qld': [100, 135, 180, 280, 360, 460, 610, 780, 710, 1050, 1350, 1450, 1850, 2650, 3350, 3500, 4100, 5300, 4900, 7200, 9800, 12500, 9800, 13500, 18500, 23500, 28000],
-            'baa_tqqq': [100, 140, 200, 350, 480, 650, 950, 1280, 1100, 1750, 2350, 2550, 3500, 5500, 7200, 7500, 9200, 12500, 11000, 18000, 26000, 35000, 22000, 32000, 48000, 62000, 75000]
-        };
-
         const pfDetails = { 
             '6040': { 
                 title: '60/40 전략', type: 'static', 
                 desc: '가장 고전적이고 검증된 패시브 전략입니다. 경제 성장기에는 주식이, 침체기에는 채권이 방어하여 꾸준한 우상향을 그립니다.',
-                rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 정해진 비율을 상시 유지하며, 1년에 1회만 목표 비중으로 리밸런싱(재조정)합니다.</div>'
-                ], 
+                rules: [ '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 60%, 미국 중기채권(IEF) 40%</div>', '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 연 1회 목표 비중으로 리밸런싱합니다.</div>' ], 
                 allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] 
             },
             'permanent': { 
                 title: '영구 포트폴리오', type: 'static', 
-                desc: '해리 브라운이 고안한 모델로, 경제의 4가지 사계절(성장, 침체, 인플레이션, 디플레이션) 중 어느 하나가 오더라도 최소 1개의 자산이 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
-                rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 25%, 미국 장기채(TLT) 25%, 금(GLD) 25%, 현금(BIL) 25%</div>',
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 4개 자산 모두 25% 비율을 유지하며, 어느 한 자산의 비중이 목표치에서 5% 이상 벗어나면 리밸런싱을 진행합니다.</div>'
-                ], 
+                desc: '경제의 4가지 사계절 중 어느 하나가 오더라도 방어해 주는 "절대 잃지 않는" 개념의 포트폴리오입니다.',
+                rules: [ '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 주식 25%, 장기채 25%, 금 25%, 현금 25%</div>', '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 5% 이상 벗어나면 리밸런싱합니다.</div>' ], 
                 allocation: [{value: 25, name: '주식(SPY)'}, {value: 25, name: '장기채(TLT)'}, {value: 25, name: '금(GLD)'}, {value: 25, name: '현금(BIL)'}] 
             },
             'allweather': { 
                 title: '올웨더 전략', type: 'static', 
-                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 각 자산군이 포트폴리오 전체에 미치는 변동성(리스크)을 동일하게 맞추는 리스크 패리티 기법을 적용해 사계절 내내 안정적인 성과를 냅니다.',
-                rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 미국 주식(SPY) 30%, 미국 장기채(TLT) 40%, 미국 중기채(IEF) 15%, 금(GLD) 7.5%, 원자재(DBC) 7.5%</div>',
-                    '<div class="flex-1"><span class="rule-highlight">운용 방식:</span> 위 비율을 고정적으로 유지하며 연 1회 리밸런싱합니다.</div>'
-                ], 
+                desc: '세계 최대 헤지펀드 브릿지워터의 레이 달리오가 고안한 전략으로, 사계절 내내 안정적인 성과를 냅니다.',
+                rules: [ '<div class="flex-1"><span class="rule-highlight">투자 자산:</span> 주식 30%, 장기채 40%, 중기채 15%, 금 7.5%, 원자재 7.5%</div>' ], 
                 allocation: [{value: 30, name: '주식(SPY)'}, {value: 40, name: '장기채(TLT)'}, {value: 15, name: '중기채(IEF)'}, {value: 7.5, name: '금(GLD)'}, {value: 7.5, name: '원자재(DBC)'}] 
             },
             'dual': { 
                 title: '듀얼 모멘텀', type: 'dynamic', 
-                desc: 'Gary Antonacci가 발표한 동적 자산배분의 고전입니다. 자산이 과거 대비 상승장인지 파악하는 <b>절대 모멘텀</b>과, 여러 자산 중 어느 것이 더 강한지 파악하는 <b>상대 모멘텀</b>을 결합하여 하락장을 피하고 상승장에 올라탑니다.',
-                rules: [
-                    '<div class="flex-1"><span class="rule-highlight">투자 대상:</span> <span class="text-themeText">미국 주식(SPY), 선진국 주식(VEA), 초단기채(BIL), 종합채권(AGG)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">절대 모멘텀:</span> 매월 말 SPY와 VEA의 <b>최근 12개월 수익률</b>을 산출하여 둘 다 현금(BIL) 수익률보다 낮으면, 시장 침체로 판단해 <strong>종합채권(AGG) 100%</strong>로 대피합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">상대 모멘텀:</span> 절대 모멘텀 조건을 통과한 경우, SPY와 VEA 중 수익률이 더 높은 자산에 <strong>100% 몰빵 투자</strong>합니다.</div>'
-                ] 
+                desc: '자산이 상승장인지 파악하는 절대 모멘텀과, 여러 자산 중 어느 것이 더 강한지 파악하는 상대 모멘텀을 결합합니다.',
+                rules: [ '<div class="flex-1"><span class="rule-highlight">투자 대상:</span> 미국 주식, 선진국 주식, 초단기채, 종합채권</div>' ] 
             },
             'vaa': { 
                 title: 'VAA 전략', type: 'dynamic', 
-                desc: 'Wouter Keller 박사가 개발한 극강의 방어형 모멘텀 전략입니다. 시장이 꺾이는 순간을 귀신같이 포착하기 위해 과거 1개월 단기 수익률에 무려 12배의 압도적인 가중치를 두어 <b>번개처럼 빠른 스위칭</b>을 목표로 합니다.',
-                rules: [
-                    '<div class="flex-1"><span class="rule-highlight">공격 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), AGG(미국 종합채권)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">수비 자산(3개):</span> <span class="text-themeText">LQD(회사채), IEF(중기채), SHY(단기채)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">스코어 공식:</span> (1개월 수익×12) + (3개월 수익×4) + (6개월 수익×2) + (12개월 수익×1)로 각 자산의 점수를 계산합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 공격 자산 4개의 점수가 <b>모두 0 이상</b>이면, 점수가 가장 높은 공격 자산 1개에 <strong>100% 투자</strong>합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드:</span> 단 1개라도 점수가 0 이하면 폭락 조짐으로 판단, 수비 자산 중 점수 1위 자산으로 <strong>100% 전액 대피</strong>합니다.</div>'
-                ] 
+                desc: '시장이 꺾이는 순간을 포착하기 위해 과거 1개월 수익률에 12배의 가중치를 두어 번개처럼 스위칭합니다.',
+                rules: [ '<div class="flex-1"><span class="rule-highlight">공격/방어:</span> 조건 충족 시 가장 강한 1개 자산에 100% 투자. 위험 시 100% 현금성 대피.</div>' ] 
             },
             'daa': { 
                 title: 'DAA 전략', type: 'dynamic', 
-                desc: 'VAA 전략의 잦은 매매(휩쏘) 단점을 보완하기 위해 만들어졌습니다. 글로벌 경제 위기에 가장 먼저 타격을 받는 <b>탄광 속 카나리아(Canary) 자산</b>을 도입하여, 평소엔 주식 비중을 유지하면서 위험 시점에만 효과적으로 도망갑니다.',
-                rules: [
-                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(2개):</span> <span class="text-themeText">VWO(신흥국 주식), BND(미국 종합채권)</span></div>',
-                    '<div class="flex-1"><span class="rule-highlight">투자 유니버스:</span> 공격 자산(SPY, VEA), 수비 자산(SHY, IEF, LQD)</div>',
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (대피):</span> 매월 말 VWO와 BND의 모멘텀 점수(VAA와 동일한 13612 공식)를 계산하여 <b>단 1개라도 0 이하라면</b> 즉시 <strong>안전 자산 1위(SHY 등)로 100% 대피</strong>합니다.</div>',
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드:</span> 카나리아 2개가 <b>모두 0 초과</b> 시 시장이 안전하다고 판단, 공격 자산(SPY, VEA)에 절반씩 <strong>50% 비중으로 분산 투자</strong>합니다.</div>'
-                ] 
+                desc: '탄광 속 카나리아 자산을 도입하여 위험 시점에만 효과적으로 도망갑니다.',
+                rules: [ '<div class="flex-1"><span class="rule-highlight">카나리아:</span> VWO(신흥국), BND(종합채권) 2개 중 1개라도 무너지면 방어 모드 돌입.</div>' ] 
             },
             'baa': { 
                 title: 'BAA 전략', type: 'dynamic', 
-                desc: '현존하는 최고 수준의 최신 동적 자산배분 모델입니다. 2022년 주식/채권 동반 폭락장에서도 훌륭한 방어력을 증명했습니다. 방어력을 한층 더 끌어올리고, 공격 시에는 나스닥(QQQ)을 편입하여 수익률을 극대화합니다.',
-                rules: [
-                    '<div class="flex-1"><span class="rule-highlight">카나리아 자산(4개):</span> <span class="text-themeText">SPY(미국), VEA(선진국), VWO(신흥국), BND(종합채권)</span> 4개로 감시망을 대폭 넓혔습니다.</div>',
-                    '<div class="flex-1"><span class="rule-highlight">공격 모드 (Bold):</span> 카나리아 4개 모두 점수(13612 공식)가 0보다 크면 시장이 극히 안전하다고 판단, <span class="text-themeText">QQQ(나스닥)</span>와 같은 고수익 성장 자산 1개에 <strong>100% 몰빵</strong>하여 수익을 극대화합니다.</div>', 
-                    '<div class="flex-1"><span class="rule-highlight">수비 모드 (헷지):</span> 카나리아 4개 중 <b>단 1개라도 0 이하라면</b> 즉시 방어로 전환합니다. 방어 시 단일 자산에 몰빵하지 않고 <span class="text-themeText">BIL(초단기채), IEF(중기채), TLT(장기채)</span> 등 안전 자산 상위 3개에 <strong>33.3%씩 분산 투자</strong>하여 특정 채권 시장 붕괴 리스크까지 차단합니다.</div>'
-                ] 
+                desc: '현존 최고 수준의 방어력을 자랑하며, 공격 시 나스닥(QQQ)을 편입해 수익률을 극대화합니다.',
+                rules: [ '<div class="flex-1"><span class="rule-highlight">카나리아:</span> 4개 자산 모두 안전할 때만 QQQ 100% 몰빵. 위험시 3개 안전자산으로 분산 대피.</div>' ] 
             }
         };
 
-        function getAdjustedSimData(key, isBaaLev = false) {
-            const baseData = isBaaLev ? baaLevSimData[key] : pfSimData[key];
+        function getAdjustedSimData(key) {
+            const baseData = pfSimData[key];
             if (!baseData) return [];
-            if (currentCurrency === 'KRW') {
-                return baseData.map((val, i) => val * (fxSimData[i] / fxSimData[0]));
-            }
+            if (currentCurrency === 'KRW') return baseData.map((val, i) => val * (fxSimData[i] / fxSimData[0]));
             return baseData;
         }
 
@@ -1030,25 +905,14 @@
                 const mddEl = document.getElementById(`card-mdd-${key}`);
                 const marEl = document.getElementById(`card-mar-${key}`);
 
-                if (cagrEl) {
-                    cagrEl.innerText = `${cagr.toFixed(1)}%`;
-                    cagrEl.className = cagr > 0 ? "text-up ml-1" : "text-down ml-1";
-                }
-                if (mddEl) {
-                    mddEl.innerText = `${minMdd.toFixed(1)}%`;
-                    mddEl.className = minMdd < -5 ? "text-down ml-1" : "text-up ml-1";
-                }
-                if (marEl) {
-                    marEl.innerText = `가성비 ${mar.toFixed(2)}`;
-                    marEl.style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6');
-                }
+                if (cagrEl) { cagrEl.innerText = `${cagr.toFixed(1)}%`; cagrEl.className = cagr > 0 ? "text-up ml-1" : "text-down ml-1"; }
+                if (mddEl) { mddEl.innerText = `${minMdd.toFixed(1)}%`; mddEl.className = minMdd < -5 ? "text-down ml-1" : "text-up ml-1"; }
+                if (marEl) { marEl.innerText = `가성비 ${mar.toFixed(2)}`; marEl.style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6'); }
             });
         }
 
         function initPortfolioChart() {
-            if (!pfChart) {
-                pfChart = echarts.init(document.getElementById('chart-portfolio'));
-            }
+            if (!pfChart) pfChart = echarts.init(document.getElementById('chart-portfolio'));
             renderPortfolioChart();
         }
 
@@ -1059,22 +923,10 @@
             const splitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
 
             const seriesData = Object.keys(pfDetails).map(key => ({
-                name: pfDetails[key].title,
-                type: 'line',
-                data: getAdjustedSimData(key),
-                smooth: true,
-                showSymbol: false,
-                lineStyle: { width: key === 'baa' ? 3 : 2 }
+                name: pfDetails[key].title, type: 'line', data: getAdjustedSimData(key), smooth: true, showSymbol: false, lineStyle: { width: key === 'baa' ? 3 : 2 }
             }));
-            
             seriesData.push({
-                name: 'S&P 500 (기준)',
-                type: 'line',
-                data: getAdjustedSimData('spy'),
-                smooth: true,
-                showSymbol: false,
-                lineStyle: { width: 2, type: 'dashed', color: textColor },
-                itemStyle: { color: textColor }
+                name: 'S&P 500 (기준)', type: 'line', data: getAdjustedSimData('spy'), smooth: true, showSymbol: false, lineStyle: { width: 2, type: 'dashed', color: textColor }, itemStyle: { color: textColor }
             });
 
             pfChart.setOption({
@@ -1088,287 +940,68 @@
             }, true);
         }
 
-        function initBaaChart() {
-            if (!baaChart) {
-                baaChart = echarts.init(document.getElementById('chart-baa-leverage'));
-            }
-            renderBaaChart();
-        }
-
-        function renderBaaChart() {
-            if (!baaChart) return;
-            const styleColor = getComputedStyle(document.documentElement);
-            const textColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
-            const splitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
-
-            const s_qqq = getAdjustedSimData('baa_qqq', true);
-            const s_qld = getAdjustedSimData('baa_qld', true);
-            const s_tqqq = getAdjustedSimData('baa_tqqq', true);
-
-            baaChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: splitColor, textStyle: { color: '#fff', fontSize: 11 } },
-                legend: { data: ['BAA (1배)', 'BAA (2배 QLD)', 'BAA (3배 TQQQ)'], textStyle: { color: textColor, fontSize: 11 }, top: 0 },
-                grid: { left: '4%', right: '4%', bottom: '5%', top: '15%', containLabel: true },
-                xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: textColor } },
-                yAxis: { type: 'log', scale: true, splitLine: { lineStyle: { color: splitColor, type: 'dashed' } }, axisLabel: { color: textColor, formatter: '{value}' } },
-                series: [
-                    { name: 'BAA (1배)', type: 'line', data: s_qqq, smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#3B82F6' }, itemStyle: {color: '#3B82F6'} },
-                    { name: 'BAA (2배 QLD)', type: 'line', data: s_qld, smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#A855F7' }, itemStyle: {color: '#A855F7'} },
-                    { name: 'BAA (3배 TQQQ)', type: 'line', data: s_tqqq, smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#F97316' }, itemStyle: {color: '#F97316'} }
-                ]
-            }, true);
-        }
-
-        async function runBaaLiveCheck() {
-            const idle = document.getElementById('baa-live-idle');
-            const loading = document.getElementById('baa-live-loading');
-            const resultBox = document.getElementById('baa-live-result');
-            
-            idle.style.display = 'none';
-            resultBox.style.display = 'none';
-            loading.style.display = 'flex';
-
-            const canaries = ['SPY', 'VEA', 'VWO', 'BND'];
-            let minScore = 9999;
-            let failureCount = 0;
-            let dataMap = {};
-            let unifiedMonths = new Set();
-
-            try {
-                // 포트폴리오 Live Engine과 완전히 동일한 월별 그룹핑 방식 적용
-                for (let ticker of canaries) {
-                    const d = await fetchStockData(ticker, '1mo', '2y', false, true); // ignoreFx = true
-                    const { dates, closes } = extractCleanData(d);
-                    dataMap[ticker] = {};
-                    for(let j=0; j<dates.length; j++) {
-                        const dStr = dates[j].substring(0, 7);
-                        dataMap[ticker][dStr] = closes[j];
-                        unifiedMonths.add(dStr);
-                    }
-                }
-
-                const sortedMonths = Array.from(unifiedMonths).sort();
-                const idx = sortedMonths.length - 1; // 가장 최신 달
-
-                if(idx < 12) throw new Error("과거 12개월치 데이터가 부족합니다.");
-
-                const currYM = sortedMonths[idx];
-                const m1YM = sortedMonths[idx-1];
-                const m3YM = sortedMonths[idx-3];
-                const m6YM = sortedMonths[idx-6];
-                const m12YM = sortedMonths[idx-12];
-
-                baaProofs = {}; // 증명 초기화
-
-                for (let ticker of canaries) {
-                    const P0 = dataMap[ticker][currYM];
-                    const P1 = dataMap[ticker][m1YM];
-                    const P3 = dataMap[ticker][m3YM];
-                    const P6 = dataMap[ticker][m6YM];
-                    const P12 = dataMap[ticker][m12YM];
-                    
-                    if(!P0 || !P1 || !P3 || !P6 || !P12) throw new Error(`[${ticker}] 과거 데이터 누락`);
-                    
-                    const r1 = (P0/P1 - 1);
-                    const r3 = (P0/P3 - 1);
-                    const r6 = (P0/P6 - 1);
-                    const r12 = (P0/P12 - 1);
-
-                    const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
-                    
-                    if (score < minScore) minScore = score;
-                    if (score <= 0) failureCount++;
-
-                    // 증명용 HTML 생성 저장
-                    baaProofs[ticker] = `
-                        <div class="space-y-3 text-sm text-themeText">
-                            <div class="bg-black/20 p-3 rounded-xl border border-themeBorder flex justify-between items-center">
-                                <span class="font-bold text-themeMuted text-xs uppercase">기준월 (${currYM}) 종가</span>
-                                <span class="font-mono font-black text-accent text-lg">$${P0.toFixed(2)}</span>
-                            </div>
-                            <div class="bg-black/20 p-4 rounded-xl border border-themeBorder">
-                                <p class="text-accent text-xs font-black uppercase tracking-widest border-b border-themeBorder/50 pb-2 mb-3">기간별 모멘텀 기여도 산출</p>
-                                <ul class="space-y-3 font-mono text-[0.75rem]">
-                                    <li class="flex flex-col gap-1">
-                                        <div class="flex justify-between text-themeMuted">
-                                            <span>1개월 전 (${m1YM}) $${P1.toFixed(2)}</span>
-                                            <span>수익률 ${(r1*100).toFixed(2)}%</span>
-                                        </div>
-                                        <div class="flex justify-between bg-black/30 px-2 py-1.5 rounded">
-                                            <span class="text-[0.65rem] text-themeMuted">가중치 × 12</span>
-                                            <span class="${r1>0?'text-up':'text-down'} font-bold">${(r1*12*100).toFixed(2)}점</span>
-                                        </div>
-                                    </li>
-                                    <li class="flex flex-col gap-1">
-                                        <div class="flex justify-between text-themeMuted">
-                                            <span>3개월 전 (${m3YM}) $${P3.toFixed(2)}</span>
-                                            <span>수익률 ${(r3*100).toFixed(2)}%</span>
-                                        </div>
-                                        <div class="flex justify-between bg-black/30 px-2 py-1.5 rounded">
-                                            <span class="text-[0.65rem] text-themeMuted">가중치 × 4</span>
-                                            <span class="${r3>0?'text-up':'text-down'} font-bold">${(r3*4*100).toFixed(2)}점</span>
-                                        </div>
-                                    </li>
-                                    <li class="flex flex-col gap-1">
-                                        <div class="flex justify-between text-themeMuted">
-                                            <span>6개월 전 (${m6YM}) $${P6.toFixed(2)}</span>
-                                            <span>수익률 ${(r6*100).toFixed(2)}%</span>
-                                        </div>
-                                        <div class="flex justify-between bg-black/30 px-2 py-1.5 rounded">
-                                            <span class="text-[0.65rem] text-themeMuted">가중치 × 2</span>
-                                            <span class="${r6>0?'text-up':'text-down'} font-bold">${(r6*2*100).toFixed(2)}점</span>
-                                        </div>
-                                    </li>
-                                    <li class="flex flex-col gap-1">
-                                        <div class="flex justify-between text-themeMuted">
-                                            <span>12개월 전 (${m12YM}) $${P12.toFixed(2)}</span>
-                                            <span>수익률 ${(r12*100).toFixed(2)}%</span>
-                                        </div>
-                                        <div class="flex justify-between bg-black/30 px-2 py-1.5 rounded">
-                                            <span class="text-[0.65rem] text-themeMuted">가중치 × 1</span>
-                                            <span class="${r12>0?'text-up':'text-down'} font-bold">${(r12*100).toFixed(2)}점</span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="bg-black/40 p-4 rounded-xl border ${score>0?'border-up':'border-down'} text-center shadow-inner mt-2">
-                                <span class="text-[0.7rem] text-themeMuted font-black">최종 모멘텀 합산 스코어</span><br>
-                                <span class="text-3xl font-black ${score>0?'text-up':'text-down'} mt-1 block">${score.toFixed(2)} 점</span>
-                            </div>
-                        </div>
-                    `;
-
-                    const scoreEl = document.querySelector(`#canary-${ticker} .canary-score`);
-                    if (scoreEl) {
-                        scoreEl.innerText = score.toFixed(1);
-                        scoreEl.className = `text-lg font-black mt-1 canary-score ${score > 0 ? 'text-up' : 'text-down'}`;
-                    }
-                }
-
-                const titleEl = document.getElementById('baa-decision-title');
-                const descEl = document.getElementById('baa-decision-desc');
-                const boxEl = document.getElementById('baa-decision-box');
-
-                if (minScore > 0) {
-                    titleEl.innerText = "🟢 공격 모드 (나스닥 몰빵)";
-                    titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-up";
-                    descEl.innerHTML = "모든 카나리아 자산의 점수가 0을 초과했습니다.<br>현재는 극단적 상승을 노리기 위해 <strong>QQQ(또는 QLD, TQQQ) 100%</strong> 비중을 가져가야 할 시기입니다.";
-                    boxEl.style.borderColor = "#26A69A";
-                } else {
-                    titleEl.innerText = "🔴 방어 모드 (안전 자산 대피)";
-                    titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-down";
-                    descEl.innerHTML = `위험 신호 감지! ${failureCount}개의 카나리아가 죽었습니다 (점수 0 이하).<br>즉시 모든 주식을 팔고 가장 안전한 채권/현금 3종목에 <strong>33.3%씩 분산 대피</strong>해야 합니다.`;
-                    boxEl.style.borderColor = "#EF5350";
-                }
-
-                loading.style.display = 'none';
-                resultBox.style.display = 'block';
-
-            } catch (error) {
-                logError("BAA Live Check Error", error);
-                loading.style.display = 'none';
-                idle.style.display = 'block';
-                idle.innerHTML = '<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</p>';
-            }
-        }
-
-        function showBaaProof(ticker) {
-            if(!baaProofs[ticker]) return;
-            document.getElementById('modal-title').innerText = `${ticker} 모멘텀 계산 과정`;
-            document.getElementById('modal-period').innerText = 'BAA 카나리아 알고리즘 (13612 공식)';
-            document.getElementById('modal-body').innerHTML = baaProofs[ticker];
-            document.getElementById('detail-modal').style.display = 'flex';
-        }
-
         async function comparePortfolioStock() {
             const input = document.getElementById('pf-compare-input');
             const ticker = input.value.trim().toUpperCase();
             if (!ticker) return;
 
             const btn = document.getElementById('pf-compare-btn');
-            btn.innerText = '로딩중...';
-            btn.disabled = true;
+            btn.innerText = '로딩중...'; btn.disabled = true;
 
             try {
                 const d = await fetchStockData(ticker, '1mo', 'max');
                 let { dates, closes } = extractCleanData(d);
-                
                 let yearlyData = {};
-                for(let i=0; i<dates.length; i++) {
-                    const y = dates[i].substring(0,4);
-                    yearlyData[y] = closes[i];
-                }
+                for(let i=0; i<dates.length; i++) { yearlyData[dates[i].substring(0,4)] = closes[i]; }
 
-                let compArr = [];
-                let basePrice = null;
-                
+                let compArr = [], basePrice = null;
                 for(let y of pfSimYears) {
                     if(yearlyData[y]) {
                         if(basePrice === null) basePrice = yearlyData[y];
                         compArr.push((yearlyData[y] / basePrice) * 100);
                     } else {
-                        if(compArr.length > 0) compArr.push(compArr[compArr.length-1]);
-                        else compArr.push(null);
+                        compArr.push(compArr.length > 0 ? compArr[compArr.length-1] : null);
                     }
                 }
-
-                let fxBase = null;
-                if (currentCurrency === 'KRW') {
-                    compArr = compArr.map((val, i) => {
-                        if (val === null) return null;
-                        if (fxBase === null) fxBase = fxSimData[i];
-                        return val * (fxSimData[i] / fxBase);
-                    });
-                }
+                if (currentCurrency === 'KRW') compArr = compArr.map((val, i) => val === null ? null : val * (fxSimData[i] / fxSimData[0]));
 
                 const option = pfModalChart.getOption();
                 option.series = option.series.filter(s => s.name !== ticker); 
                 if(!option.legend[0].data.includes(ticker)) option.legend[0].data.push(ticker);
-                
-                option.series.push({
-                    name: ticker,
-                    type: 'line',
-                    data: compArr,
-                    smooth: true,
-                    lineStyle: { width: 2, type: 'dashed', color: '#EAB308' },
-                    itemStyle: { color: '#EAB308' },
-                    showSymbol: false
-                });
-
+                option.series.push({ name: ticker, type: 'line', data: compArr, smooth: true, lineStyle: { width: 2, type: 'dashed', color: '#EAB308' }, itemStyle: { color: '#EAB308' }, showSymbol: false });
                 pfModalChart.setOption(option, true);
-            } catch (e) {
-                alert('종목 데이터를 불러오지 못했습니다.');
-            } finally {
-                btn.innerText = '차트 비교';
-                btn.disabled = false;
-            }
+            } catch (e) { alert('종목 데이터를 불러오지 못했습니다.'); } 
+            finally { btn.innerText = '차트 비교'; btn.disabled = false; }
         }
 
+        // ★ 초보/전문가 모드 핵심 전환 함수
         function toggleMode(el) {
             isBeginnerMode = el.checked;
             
+            // UI 스위치 동기화
             const deskSwitch = document.getElementById('mode-switch');
             const mobSwitch = document.getElementById('mob-mode-switch');
             if (deskSwitch) deskSwitch.checked = isBeginnerMode;
             if (mobSwitch) mobSwitch.checked = isBeginnerMode;
 
+            // 바디 클래스 토글 (CSS로 show/hide 완벽 제어)
+            document.body.classList.toggle('beginner-mode', isBeginnerMode);
             safeStorageSet('dashboardMode', isBeginnerMode ? 'beginner' : 'expert');
+            
             updateTerminologyUI();
             
-            const stockIndicators = document.getElementById('stock-expert-indicators');
-            if (stockIndicators) stockIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
-            
-            const cryptoIndicators = document.getElementById('crypto-expert-indicators');
-            if (cryptoIndicators) cryptoIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
-            
-            if (globalTicker && globalChartData) calculateTriplePerspectiveDecision(globalTicker, 'stock').catch(e => logError("Triple Calc Error", e));
-            if (globalCryptoTicker && globalCryptoChartData) calculateTriplePerspectiveDecision(globalCryptoTicker, 'crypto').catch(e => logError("Crypto Triple Calc Error", e));
+            if (globalTicker && globalChartData) {
+                calculateTriplePerspectiveDecision(globalTicker, 'stock');
+                renderDashboard(globalTicker, globalChartData); // 차트 재렌더링 (초보자용 심플 차트 적용 위함)
+            }
+            if (globalCryptoTicker && globalCryptoChartData) {
+                calculateTriplePerspectiveDecision(globalCryptoTicker, 'crypto');
+                renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData);
+            }
         }
 
         function updateTerminologyUI() {
             const mode = isBeginnerMode ? 'beginner' : 'expert';
-            
             const sVix = document.getElementById('label-stock-vix'); if(sVix) sVix.innerText = TERMS.vix[mode];
             const sFng = document.getElementById('label-stock-fng'); if(sFng) sFng.innerText = TERMS.fng[mode];
             const sDist = document.getElementById('label-stock-dist'); if(sDist) sDist.innerText = TERMS.dist[mode];
@@ -1438,8 +1071,7 @@
             if (globalCryptoTicker) loadCryptoData(globalCryptoTicker);
             updatePfCardMetrics();
             if (pfChart) renderPortfolioChart();
-            if (baaChart) renderBaaChart(); 
-            if (currentPfKey) showPfDetail(currentPfKey); 
+            if (currentPfKey && document.getElementById('pf-detail-modal').style.display === 'flex') showPfDetail(currentPfKey); 
         }
 
         function toggleProofs(show) {
@@ -1449,6 +1081,9 @@
             });
         }
 
+        // ==========================================
+        // 📈 2. 차트 렌더링 및 모달 컨트롤 함수
+        // ==========================================
         function updateStatus(t, c) { 
             const l = document.getElementById('conn-label'), d = document.getElementById('status-dot');
             if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; }
@@ -1459,17 +1094,9 @@
             if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; }
         }
 
-        function openErrorModal() {
-            document.getElementById('error-log-text').value = errorLogs.join('\n-------------------\n') || '에러 로그가 없습니다.';
-            document.getElementById('error-modal').style.display = 'flex';
-        }
+        function openErrorModal() { document.getElementById('error-log-text').value = errorLogs.join('\n-------------------\n') || '에러 로그가 없습니다.'; document.getElementById('error-modal').style.display = 'flex'; }
         function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
-        
-        function copyErrorLog() {
-            const textArea = document.getElementById('error-log-text');
-            textArea.select(); document.execCommand('copy');
-        }
-
+        function copyErrorLog() { const textArea = document.getElementById('error-log-text'); textArea.select(); document.execCommand('copy'); }
         function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
         function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
         function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
@@ -1478,7 +1105,7 @@
 
         function showInfo(title, text) {
             document.getElementById('info-title').innerText = title;
-            document.getElementById('info-body').innerHTML = text; // innerHTML로 변경하여 모달 내부 태그 렌더링 지원
+            document.getElementById('info-body').innerText = text;
             document.getElementById('info-modal').style.display = 'flex';
         }
 
@@ -1486,7 +1113,6 @@
             currentPfKey = key;
             const modal = document.getElementById('pf-detail-modal');
             if (!modal) return;
-            
             const detail = pfDetails[key];
             if (!detail) return;
 
@@ -1496,7 +1122,6 @@
             const dataArr = getAdjustedSimData(key);
             const years = parseInt(pfSimYears[pfSimYears.length - 1]) - parseInt(pfSimYears[0]);
             const baseVal = dataArr[0], finalVal = dataArr[dataArr.length - 1];
-            
             let cagr = (((finalVal / baseVal) ** (1 / years)) - 1) * 100;
             let mdds = calcMDDArray(dataArr);
             let minMdd = Math.min(...mdds);
@@ -1504,43 +1129,34 @@
 
             document.getElementById('pf-modal-cagr').innerText = `${cagr.toFixed(1)}%`;
             document.getElementById('pf-modal-cagr').className = cagr > 0 ? "text-lg md:text-xl font-black text-up" : "text-lg md:text-xl font-black text-down";
-            
             document.getElementById('pf-modal-mdd').innerText = `${minMdd.toFixed(1)}%`;
             document.getElementById('pf-modal-mdd').className = minMdd < -5 ? "text-lg md:text-xl font-black text-down" : "text-lg md:text-xl font-black text-up";
-            
             document.getElementById('pf-modal-mar').innerText = mar.toFixed(2);
             document.getElementById('pf-modal-mar').style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6');
 
             const rulesEl = document.getElementById('pf-modal-rules');
-            if (rulesEl && detail.rules) {
-                rulesEl.innerHTML = detail.rules.map(r => `<li><div class="flex-1">${r}</div></li>`).join('');
-            }
+            if (rulesEl && detail.rules) rulesEl.innerHTML = detail.rules.map(r => `<li><div class="flex-1">${r}</div></li>`).join('');
 
             const pieArea = document.getElementById('pf-modal-pie-area');
             const liveArea = document.getElementById('pf-modal-live-area');
 
             if(detail.type === 'dynamic') {
                 if(pieArea) pieArea.style.display = 'none';
-                if(liveArea) {
-                    liveArea.style.display = 'block';
-                    runLiveCalc(key);
-                }
+                if(liveArea && !isBeginnerMode) { liveArea.style.display = 'block'; runLiveCalc(key); }
             } else {
                 if(liveArea) liveArea.style.display = 'none';
             }
 
             const tbody = document.getElementById('pf-historical-tbody');
-            let rows = '';
-            for(let i=0; i<pfSimYears.length; i++) {
-                let yrRtn = i === 0 ? 0 : ((dataArr[i] - dataArr[i-1])/dataArr[i-1]*100);
-                let rtnColor = yrRtn > 0 ? 'text-up' : (yrRtn < 0 ? 'text-down' : 'text-themeMuted');
-                rows += `<tr>
-                    <td>${pfSimYears[i]}</td>
-                    <td>${dataArr[i].toFixed(1)}</td>
-                    <td class="${rtnColor}">${yrRtn > 0 ? '+' : ''}${yrRtn.toFixed(2)}%</td>
-                </tr>`;
+            if (tbody) {
+                let rows = '';
+                for(let i=0; i<pfSimYears.length; i++) {
+                    let yrRtn = i === 0 ? 0 : ((dataArr[i] - dataArr[i-1])/dataArr[i-1]*100);
+                    let rtnColor = yrRtn > 0 ? 'text-up' : (yrRtn < 0 ? 'text-down' : 'text-themeMuted');
+                    rows += `<tr><td>${pfSimYears[i]}</td><td>${dataArr[i].toFixed(1)}</td><td class="${rtnColor}">${yrRtn > 0 ? '+' : ''}${yrRtn.toFixed(2)}%</td></tr>`;
+                }
+                tbody.innerHTML = rows;
             }
-            if(tbody) tbody.innerHTML = rows;
 
             modal.style.display = 'flex';
 
@@ -1584,7 +1200,6 @@
                     pieArea.style.display = 'block';
                     if(!pfPieChart) pfPieChart = echarts.init(document.getElementById('pf-pie-chart'));
                     const textColor = styleColor.getPropertyValue('--text-main').trim() || '#fff';
-                    
                     pfPieChart.setOption({
                         backgroundColor: 'transparent',
                         tooltip: { trigger: 'item', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 12 }, formatter: '{b}: <b>{c}%</b>' },
@@ -1609,32 +1224,23 @@
             const toggleBox = document.getElementById('toggle-proof');
             
             if(!area) return;
-            area.style.display = 'block';
-            loading.style.display = 'flex';
-            content.style.display = 'none';
-            tbody.innerHTML = '';
+            area.style.display = 'block'; loading.style.display = 'flex'; content.style.display = 'none'; tbody.innerHTML = '';
             if(toggleBox) toggleBox.checked = false;
 
             try {
-                let tickers = [];
-                let colCount = 7;
+                let tickers = []; let colCount = 7;
                 if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'QQQ']; colCount = 7; } 
                 else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY', 'QQQ']; colCount = 8; } 
                 else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
                 else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
 
-                const dataMap = {};
-                let unifiedMonths = new Set();
-                
+                const dataMap = {}; let unifiedMonths = new Set();
                 for(let i=0; i<tickers.length; i++) {
                     const t = tickers[i];
-                    document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t} 데이터`;
-                    
+                    document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t}`;
                     if(i > 0) await new Promise(r => setTimeout(r, 1000));
-                    
-                    const d = await fetchStockData(t, '1mo', '2y', false, true); // ignoreFx=true 유지
+                    const d = await fetchStockData(t, '1mo', '2y');
                     let { dates, closes } = extractCleanData(d);
-                    
                     dataMap[t] = {};
                     for(let j=0; j<dates.length; j++) {
                         const dStr = dates[j].substring(0, 7);
@@ -1664,15 +1270,14 @@
 
                         const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
                         const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
-                        
                         const proof = `
                             <div class="mb-2 pb-2 border-b border-themeBorder/50">
                                 <span class="text-accent font-bold">[${t}] 모멘텀 계산:</span><br>
                                 <span class="text-[0.6rem] leading-relaxed">
-                                • 1M 수익: ${(r1*100).toFixed(2)}% × 12 = ${(r1*12*100).toFixed(2)}<br>
-                                • 3M 수익: ${(r3*100).toFixed(2)}% × 4 = ${(r3*4*100).toFixed(2)}<br>
-                                • 6M 수익: ${(r6*100).toFixed(2)}% × 2 = ${(r6*2*100).toFixed(2)}<br>
-                                • 12M 수익: ${(r12*100).toFixed(2)}% × 1 = ${(r12*100).toFixed(2)}
+                                • 1M: ${(r1*100).toFixed(2)}% × 12 = ${(r1*12*100).toFixed(2)}<br>
+                                • 3M: ${(r3*100).toFixed(2)}% × 4 = ${(r3*4*100).toFixed(2)}<br>
+                                • 6M: ${(r6*100).toFixed(2)}% × 2 = ${(r6*2*100).toFixed(2)}<br>
+                                • 12M: ${(r12*100).toFixed(2)}% × 1 = ${(r12*100).toFixed(2)}
                                 </span><br>
                                 <span class="text-white font-bold">👉 가중 합산 스코어: ${score.toFixed(2)}</span>
                             </div>`;
@@ -1682,33 +1287,28 @@
                     const calcRet = (t) => {
                         const m12YM = sortedMonths[idx-12];
                         const P0 = dataMap[t][currYM], P12 = m12YM ? dataMap[t][m12YM] : null;
-                        
                         if(!P0 || !P12) return { ret: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
                         const ret = (P0/P12 - 1) * 100;
-                        const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) $${formatPriceStr(P0)} / 과거(${m12YM}) $${formatPriceStr(P12)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
+                        const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재(${currYM}) ${getCurrSymbol()}${formatPriceStr(P0)} / 과거(${m12YM}) ${getCurrSymbol()}${formatPriceStr(P12)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
                         return { ret, proof };
                     };
 
                     if(pfKey === 'dual') {
                         const s = calcRet('SPY'), v = calcRet('VEA'), b = calcRet('BIL');
-                        result.proofs.push(s.proof, v.proof, b.proof);
-                        result.raw = { s, v, b };
+                        result.proofs.push(s.proof, v.proof, b.proof); result.raw = { s, v, b };
                         if(s.ret === -999 || v.ret === -999 || b.ret === -999) return null;
-                        
                         if(s.ret < b.ret && v.ret < b.ret) { result.assets=[{t:'AGG', w:1}]; result.text='AGG 100%'; result.color='text-gray-400'; }
                         else if(s.ret > v.ret) { result.assets=[{t:'SPY', w:1}]; result.text='SPY 100%'; result.color='text-up'; }
                         else { result.assets=[{t:'VEA', w:1}]; result.text='VEA 100%'; result.color='text-accent'; }
                     }
                     else if(pfKey === 'vaa') {
                         const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), as=calcScore('AGG');
-                        result.proofs.push(ss.proof, vs.proof, vws.proof, as.proof);
-                        result.raw = { ss, vs, vws, as };
+                        result.proofs.push(ss.proof, vs.proof, vws.proof, as.proof); result.raw = { ss, vs, vws, as };
                         if(ss.score===-999) return null;
-                        
                         if(ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) {
                             const m = Math.max(ss.score, vs.score, vws.score, as.score);
                             const t = ss.score===m?'SPY':(vs.score===m?'VEA':(vws.score===m?'VWO':'AGG'));
-                            result.assets=[{t, w:1}]; result.text=`${t} 100% (공격)`; result.color='text-up';
+                            result.assets=[{t, w:1}]; result.text=`${t} 100%`; result.color='text-up';
                         } else {
                             const lq=calcScore('LQD'), ie=calcScore('IEF'), sh=calcScore('SHY');
                             result.proofs.push(lq.proof, ie.proof, sh.proof);
@@ -1719,28 +1319,18 @@
                     }
                     else if(pfKey === 'daa') {
                         const vws=calcScore('VWO'), bns=calcScore('BND');
-                        result.proofs.push(vws.proof, bns.proof);
-                        result.raw = { vws, bns };
+                        result.proofs.push(vws.proof, bns.proof); result.raw = { vws, bns };
                         if(vws.score===-999) return null;
-                        
-                        if(vws.score>0 && bns.score>0) {
-                            result.assets=[{t:'SPY', w:0.5}, {t:'VEA', w:0.5}]; result.text='SPY 50%, VEA 50%'; result.color='text-up';
-                        } else {
-                            result.assets=[{t:'SHY', w:1}]; result.text='SHY 100% (방어)'; result.color='text-gray-400';
-                        }
+                        if(vws.score>0 && bns.score>0) { result.assets=[{t:'SPY', w:0.5}, {t:'VEA', w:0.5}]; result.text='SPY 50, VEA 50'; result.color='text-up'; } 
+                        else { result.assets=[{t:'SHY', w:1}]; result.text='SHY 100% (대피)'; result.color='text-gray-400'; }
                     }
                     else if(pfKey === 'baa') {
                         const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), bns=calcScore('BND');
-                        result.proofs.push(ss.proof, vs.proof, vws.proof, bns.proof);
-                        result.raw = { ss, vs, vws, bns };
+                        result.proofs.push(ss.proof, vs.proof, vws.proof, bns.proof); result.raw = { ss, vs, vws, bns };
                         if(ss.score===-999) return null;
-                        
                         const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
-                        if(minS > 0) {
-                            result.assets=[{t:'QQQ', w:1}]; result.text='QQQ 100% (공격)'; result.color='text-up';
-                        } else {
-                            result.assets=[{t:'BIL', w:0.333}, {t:'IEF', w:0.333}, {t:'TLT', w:0.333}]; result.text='BIL 33%, IEF 33%, TLT 33%'; result.color='text-gray-400';
-                        }
+                        if(minS > 0) { result.assets=[{t:'QQQ', w:1}]; result.text='QQQ 100%'; result.color='text-up'; } 
+                        else { result.assets=[{t:'BIL', w:0.33}, {t:'IEF', w:0.33}, {t:'TLT', w:0.33}]; result.text='BIL,IEF,TLT 분산'; result.color='text-gray-400'; }
                     }
                     return result;
                 };
@@ -1748,90 +1338,64 @@
                 const len = sortedMonths.length;
                 for(let i = len - 1; i >= len - 12; i--) {
                     if(i - 12 < 0) break;
-                    
                     const sig = getSignal(i);
                     if(!sig) continue;
 
                     const [yy, mm] = sortedMonths[i].split('-');
-                    const ymLabel = `${yy.substring(2)}년 ${parseInt(mm)}월`;
-                    
-                    let row = `<tr><td class="text-left font-bold text-accent whitespace-nowrap">${ymLabel}</td>`;
+                    let row = `<tr><td class="text-left font-bold text-accent">${yy.substring(2)}년 ${parseInt(mm)}월</td>`;
                     
                     if(pfKey === 'dual') {
                         const { s, v, b } = sig.raw;
-                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td><td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td><td class="text-gray-400">+${b.ret.toFixed(2)}%</td>`;
-                    }
-                    else if(pfKey === 'vaa') {
+                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret.toFixed(2)}%</td><td class="${v.ret>0?'text-up':'text-down'}">${v.ret.toFixed(2)}%</td><td class="text-gray-400">${b.ret.toFixed(2)}%</td>`;
+                    } else if(pfKey === 'vaa') {
                         const { ss, vs, vws, as } = sig.raw;
                         row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td><td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td><td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td>`;
-                    }
-                    else if(pfKey === 'daa') {
+                    } else if(pfKey === 'daa') {
                         const { vws, bns } = sig.raw;
-                        let def = (vws.score <= 0 || bns.score <= 0) ? 'YES (위험)' : 'NO (안전)';
-                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
-                    }
-                    else if(pfKey === 'baa') {
+                        let def = (vws.score <= 0 || bns.score <= 0) ? 'YES' : 'NO';
+                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def==='YES'?'text-down':'text-up'}">${def}</td>`;
+                    } else if(pfKey === 'baa') {
                         const { ss, vs, vws, bns } = sig.raw;
                         const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
-                        let def = minS <= 0 ? 'YES (대피 발동)' : 'NO (안전)';
-                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
+                        let def = minS <= 0 ? 'YES' : 'NO';
+                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def==='YES'?'text-down':'text-up'}">${def}</td>`;
                     }
 
                     let actualRetHtml = '<td class="text-gray-400">--</td>';
-                    let benchRetHtml = '<td class="text-gray-400 bg-black/10">-- / --</td>';
+                    let benchRetHtml = '<td class="text-gray-400 bg-black/10">--</td>';
                     
                     if (i < len - 1) { 
-                        let monRet = 0;
-                        let hasData = true;
+                        let monRet = 0, hasData = true;
                         for(let asset of sig.assets) {
-                            const p0 = dataMap[asset.t][sortedMonths[i]];
-                            const p1 = dataMap[asset.t][sortedMonths[i+1]]; 
-                            if(p0 && p1) { monRet += asset.w * (p1 / p0 - 1); } 
-                            else { hasData = false; }
+                            const p0 = dataMap[asset.t][sortedMonths[i]], p1 = dataMap[asset.t][sortedMonths[i+1]]; 
+                            if(p0 && p1) monRet += asset.w * (p1 / p0 - 1); else hasData = false;
                         }
                         if(hasData) {
                             const retPct = monRet * 100;
-                            actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
+                            actualRetHtml = `<td class="${retPct>0?'text-up':'text-down'} font-bold">${retPct>0?'+':''}${retPct.toFixed(2)}%</td>`;
                         }
-
-                        const spy0 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i]] : null;
-                        const spy1 = dataMap['SPY'] ? dataMap['SPY'][sortedMonths[i+1]] : null;
-                        const qqq0 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i]] : null;
-                        const qqq1 = dataMap['QQQ'] ? dataMap['QQQ'][sortedMonths[i+1]] : null;
-                        
-                        let spyStr = '--', qqqStr = '--';
+                        const spy0 = dataMap['SPY']?.[sortedMonths[i]], spy1 = dataMap['SPY']?.[sortedMonths[i+1]];
                         if(spy0 && spy1) {
                             const spyPct = (spy1/spy0 - 1) * 100;
-                            spyStr = `<span class="${spyPct > 0 ? 'text-up' : (spyPct < 0 ? 'text-down' : 'text-themeMuted')}">${spyPct > 0 ? '+' : ''}${spyPct.toFixed(2)}%</span>`;
+                            benchRetHtml = `<td class="text-[0.65rem] font-bold bg-black/10 ${spyPct>0?'text-up':'text-down'}">S: ${spyPct>0?'+':''}${spyPct.toFixed(2)}%</td>`;
                         }
-                        if(qqq0 && qqq1) {
-                            const qqqPct = (qqq1/qqq0 - 1) * 100;
-                            qqqStr = `<span class="${qqqPct > 0 ? 'text-up' : (qqqPct < 0 ? 'text-down' : 'text-themeMuted')}">${qqqPct > 0 ? '+' : ''}${qqqPct.toFixed(2)}%</span>`;
-                        }
-                        benchRetHtml = `<td class="text-[0.65rem] font-bold whitespace-nowrap bg-black/10">S: ${spyStr} / Q: ${qqqStr}</td>`;
-
                     } else {
                         actualRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold">진행중</td>';
                         benchRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold bg-black/10">진행중</td>';
                     }
 
-                    row += actualRetHtml + benchRetHtml;
-                    row += `<td class="text-right font-black ${sig.color}">${sig.text}</td></tr>`;
-                    
+                    row += actualRetHtml + benchRetHtml + `<td class="text-right font-black ${sig.color}">${sig.text}</td></tr>`;
                     const proofHtml = sig.proofs.map(p => `<div>${p}</div>`).join('');
                     row += `<tr class="proof-row"><td colspan="${colCount}" class="proof-cell"><div class="proof-box">${proofHtml}</div></td></tr>`;
                     html += row;
                 }
                 
-                html += `</tbody>`;
-                tbody.innerHTML = html;
-
-                loading.style.display = 'none';
-                content.style.display = 'block';
+                tbody.innerHTML = html + `</tbody>`;
+                loading.style.display = 'none'; content.style.display = 'block';
 
             } catch (error) {
-                logError(`Live Engine Failed (${pfKey})`, error);
-                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드에 실패했습니다.<br>우측 상단 [!] 버튼을 확인하세요.</p>`;
+                logError(`Live Engine Failed`, error);
+                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터 로드 실패</p>`;
             }
         }
 
@@ -1884,7 +1448,6 @@
                         <span class="text-down">매도(부정) 파워: ${d.sellScore.toFixed(1)}점</span>
                     </div>
                 </div>
-
                 <details class="mt-4 bg-black/20 rounded-xl border border-themeBorder overflow-hidden group cursor-pointer">
                     <summary class="p-3 text-[0.7rem] font-bold text-themeText flex justify-between items-center outline-none list-none [&::-webkit-details-marker]:hidden">
                         <span class="flex items-center gap-2">
@@ -1906,12 +1469,8 @@
                         </div>
                     </div>
                 </details>
-
                 <div class="p-4 bg-[var(--modal-bg)] rounded-xl border border-themeBorder mt-4">
-                    <p class="text-[11px] font-black text-accent mb-3 flex items-center gap-1.5">
-                        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        AI 분석 최종 요약
-                    </p>
+                    <p class="text-[11px] font-black text-accent mb-3 flex items-center gap-1.5"><svg class="icon-sm" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>AI 분석 최종 요약</p>
                     <div class="text-[0.75rem] text-themeText leading-loose whitespace-pre-wrap">${d.advice}</div>
                 </div>
             `;
@@ -1921,9 +1480,8 @@
             const m = document.getElementById('detail-modal');
             const d = analysisDetails[p];
             if (!d || !d.status) return;
-            let periodText = p === 'short' ? '단기 흐름 (일봉 기준)' : (p === 'mid' ? '중기 흐름 (주봉 기준)' : '장기 대세 (월봉 기준)');
+            let periodText = p === 'short' ? '단기 흐름 (일봉)' : (p === 'mid' ? '중기 흐름 (주봉)' : '장기 대세 (월봉)');
             document.getElementById('modal-title').innerText = isBeginnerMode ? periodText : `${p.toUpperCase()} View`;
-            document.getElementById('modal-period').innerText = '---';
             document.getElementById('modal-body').innerHTML = generateDetailModalHTML(d);
             m.style.display = 'flex';
         }
@@ -1932,9 +1490,8 @@
             const m = document.getElementById('detail-modal');
             const d = cryptoAnalysisDetails[p];
             if (!d || !d.status) return;
-            let periodText = p === 'short' ? '단기 흐름 (일봉 기준)' : (p === 'mid' ? '중기 흐름 (주봉 기준)' : '장기 대세 (월봉 기준)');
+            let periodText = p === 'short' ? '단기 흐름 (일봉)' : (p === 'mid' ? '중기 흐름 (주봉)' : '장기 대세 (월봉)');
             document.getElementById('modal-title').innerText = isBeginnerMode ? `코인 ${periodText}` : `CRYPTO ${p.toUpperCase()} View`;
-            document.getElementById('modal-period').innerText = '---';
             document.getElementById('modal-body').innerHTML = generateDetailModalHTML(d);
             m.style.display = 'flex';
         }
@@ -1948,7 +1505,6 @@
                 if (globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
                 if (globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData);
                 if (pfChart) renderPortfolioChart(); 
-                if (baaChart) renderBaaChart(); 
             });
         }
 
@@ -1958,12 +1514,11 @@
             document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-font-${s}`)?.classList.add('active');
             requestAnimationFrame(() => {
-                myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize(); baaChart?.resize();
+                myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize();
             });
         }
 
         function setLineWidth(w) {
-            let chartLineWidth = w;
             safeStorageSet('dashboardLineWidth', w);
             document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-line-${w}`)?.classList.add('active');
@@ -1981,65 +1536,34 @@
             document.getElementById('view-dashboard').style.display = tab==='dashboard' ? 'flex' : 'none';
             document.getElementById('view-crypto').style.display = tab==='crypto' ? 'flex' : 'none';
             document.getElementById('view-portfolio').style.display = tab==='portfolio' ? 'flex' : 'none';
-            document.getElementById('view-baa').style.display = tab==='baa' ? 'flex' : 'none'; 
             
             setTimeout(() => {
                 if(tab === 'dashboard' && myChart) { myChart.resize(); } 
                 else if(tab === 'crypto') {
-                    if(!cryptoChart) {
-                        cryptoChart = echarts.init(document.getElementById('crypto-chart-main'));
-                        if (globalCryptoTicker) loadCryptoData(globalCryptoTicker);
-                    }
+                    if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); if (globalCryptoTicker) loadCryptoData(globalCryptoTicker); }
                     cryptoChart.resize(); 
                 }
                 else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart.resize(); }
-                else if(tab === 'baa') { 
-                    if(!baaChart) initBaaChart(); 
-                    baaChart.resize(); 
-                }
             }, 50);
         }
 
+        // ==========================================
+        // 🔬 3. 데이터 분석 엔진 (Indicators & API)
+        // ==========================================
         const Indicator = {
-            sma: function(d, p) {
-                return d.map((_, i) => {
-                    if (i < p - 1) return null;
-                    const slice = d.slice(i - p + 1, i + 1).filter(v => v !== null);
-                    return slice.length === p ? slice.reduce((a, b) => a + b) / p : null;
-                });
-            },
-            ema: function(d, p) { 
-                let r=Array(d.length).fill(null), k=2/(p+1), s=d.findIndex(v=>v!==null); 
-                if(s===-1)return r; r[s]=d[s]; 
-                for(let i=s+1;i<d.length;i++) r[i]=d[i]*k+r[i-1]*(1-k); 
-                return r; 
-            },
-            macd: function(d, s, l, sig) { 
-                const se=this.ema(d,s), le=this.ema(d,l);
-                const line=se.map((v,i)=>v===null||le[i]===null?null:v-le[i]); 
-                const signal = this.ema(line,sig);
-                return { hist: line.map((v,i)=>v===null||signal[i]===null?null:v-signal[i]) }; 
-            },
+            sma: function(d, p) { return d.map((_, i) => { if (i < p - 1) return null; const slice = d.slice(i - p + 1, i + 1).filter(v => v !== null); return slice.length === p ? slice.reduce((a, b) => a + b) / p : null; }); },
+            ema: function(d, p) { let r=Array(d.length).fill(null), k=2/(p+1), s=d.findIndex(v=>v!==null); if(s===-1)return r; r[s]=d[s]; for(let i=s+1;i<d.length;i++) r[i]=d[i]*k+r[i-1]*(1-k); return r; },
+            macd: function(d, s, l, sig) { const se=this.ema(d,s), le=this.ema(d,l); const line=se.map((v,i)=>v===null||le[i]===null?null:v-le[i]); const signal = this.ema(line,sig); return { hist: line.map((v,i)=>v===null||signal[i]===null?null:v-signal[i]) }; },
             rsi: function(d, p) { 
-                let r = Array(d.length).fill(null); 
-                if (d.length < p + 1) return r;
+                let r = Array(d.length).fill(null); if (d.length < p + 1) return r;
                 let gains = 0, losses = 0;
-                
-                for (let i = 1; i <= p; i++) {
-                    let diff = d[i] - d[i - 1];
-                    if (diff > 0) gains += diff;
-                    else losses -= diff;
-                }
-                let avgGain = gains / p;
-                let avgLoss = losses / p;
+                for (let i = 1; i <= p; i++) { let diff = d[i] - d[i - 1]; if (diff > 0) gains += diff; else losses -= diff; }
+                let avgGain = gains / p, avgLoss = losses / p;
                 r[p] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
-                
                 for (let i = p + 1; i < d.length; i++) {
                     let diff = d[i] - d[i - 1];
-                    let gain = diff > 0 ? diff : 0;
-                    let loss = diff < 0 ? -diff : 0;
-                    avgGain = (avgGain * (p - 1) + gain) / p;
-                    avgLoss = (avgLoss * (p - 1) + loss) / p;
+                    let gain = diff > 0 ? diff : 0, loss = diff < 0 ? -diff : 0;
+                    avgGain = (avgGain * (p - 1) + gain) / p; avgLoss = (avgLoss * (p - 1) + loss) / p;
                     r[i] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
                 }
                 return r; 
@@ -2047,8 +1571,7 @@
             bollinger: function(d, p, m) { 
                 const sma=this.sma(d,p), up=Array(d.length).fill(null), low=Array(d.length).fill(null); 
                 for(let i=p-1;i<d.length;i++){ 
-                    if(sma[i]===null)continue; 
-                    const sl=d.slice(i-p+1,i+1); 
+                    if(sma[i]===null)continue; const sl=d.slice(i-p+1,i+1); 
                     const v=sl.reduce((a,val)=>a+Math.pow(val-sma[i],2),0)/p; 
                     const sd=Math.sqrt(v); up[i]=sma[i]+(m*sd); low[i]=sma[i]-(m*sd); 
                 } 
@@ -2057,8 +1580,7 @@
             stochastic: function(k, p, s) { 
                 let r=Array(k.length).fill(null); 
                 for(let i=p-1;i<k.length;i++){ 
-                    const sl=k.slice(i-p+1,i+1); 
-                    const h=Math.max(...sl.map(d=>d[3])), l=Math.min(...sl.map(d=>d[2])); 
+                    const sl=k.slice(i-p+1,i+1); const h=Math.max(...sl.map(d=>d[3])), l=Math.min(...sl.map(d=>d[2])); 
                     r[i]=(h!==l)?((k[i][1]-l)/(h-l))*100:50; 
                 } 
                 return { k: r, d: this.sma(r, s) }; 
@@ -2071,11 +1593,7 @@
             let dates = [], kData = [], closes = [];
             for(let i=0; i<ts.length; i++) {
                 if (q.close && q.close[i] !== null && q.close[i] !== undefined) {
-                    const dObj = new Date(ts[i] * 1000);
-                    const yyyy = dObj.getFullYear();
-                    const mm = String(dObj.getMonth() + 1).padStart(2, '0');
-                    const dd = String(dObj.getDate()).padStart(2, '0');
-                    dates.push(`${yyyy}-${mm}-${dd}`); 
+                    dates.push(new Date(ts[i] * 1000).toISOString().split('T')[0]); 
                     kData.push([q.open[i]||q.close[i], q.close[i], q.low[i]||q.close[i], q.high[i]||q.close[i]]); 
                     closes.push(q.close[i]);
                 }
@@ -2084,27 +1602,18 @@
         }
 
         function calcMDDArray(arr) {
-            let mdd = [];
-            let peak = arr[0];
-            for(let i=0; i<arr.length; i++) {
-                if(arr[i] > peak) peak = arr[i];
-                let dd = (arr[i] - peak) / peak * 100;
-                mdd.push(parseFloat(dd.toFixed(2)));
-            }
+            let mdd = [], peak = arr[0];
+            for(let i=0; i<arr.length; i++) { if(arr[i] > peak) peak = arr[i]; mdd.push(parseFloat(((arr[i] - peak) / peak * 100).toFixed(2))); }
             return mdd;
         }
 
         function calcVolatility(closes) {
             if(closes.length < 30) return 0;
             const recent = closes.slice(-30);
-            let returns = [];
-            for(let i=1; i<recent.length; i++) {
-                returns.push((recent[i] - recent[i-1]) / recent[i-1]);
-            }
+            let returns = []; for(let i=1; i<recent.length; i++) returns.push((recent[i] - recent[i-1]) / recent[i-1]);
             const mean = returns.reduce((a,b)=>a+b, 0) / returns.length;
             const variance = returns.reduce((a,b)=>a + Math.pow(b-mean, 2), 0) / returns.length;
-            const stdDev = Math.sqrt(variance);
-            return stdDev * Math.sqrt(365) * 100;
+            return Math.sqrt(variance) * Math.sqrt(365) * 100;
         }
 
         async function fetchWithRetry(url, options = {}, maxRetries = 2) {
@@ -2113,18 +1622,9 @@
                 try {
                     const response = await fetch(url, options);
                     if (response.ok) return response;
-                    if (response.status === 429) {
-                        logError(`API 429 Limit: ${url}`);
-                        await new Promise(res => setTimeout(res, delay));
-                        delay *= 1.5;
-                        continue;
-                    }
+                    if (response.status === 429) { await new Promise(res => setTimeout(res, delay)); delay *= 1.5; continue; }
                     throw new Error(`HTTP ${response.status}`);
-                } catch (err) { 
-                    if (err.name === 'AbortError') throw err; 
-                    if (i === maxRetries) throw err; 
-                    await new Promise(res => setTimeout(res, delay)); 
-                }
+                } catch (err) { if (err.name === 'AbortError' || i === maxRetries) throw err; await new Promise(res => setTimeout(res, delay)); }
             }
             throw new Error(`Fetch failed: ${url}`);
         }
@@ -2134,28 +1634,17 @@
             if(fxCache[key]) return fxCache[key];
             try {
                 const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/KRW=X?interval=${interval}&range=${range}`);
-                const json = await res.json();
-                const data = json.chart.result[0];
-                let map = {};
-                const q = data.indicators.quote[0];
-                const ts = data.timestamp;
-                let lastValid = 1300; 
+                const data = (await res.json()).chart.result[0];
+                let map = {}; const q = data.indicators.quote[0], ts = data.timestamp; let lastValid = 1300; 
                 if (ts && q && q.close) {
                     for(let i=0; i<ts.length; i++) {
                         if(q.close[i]) lastValid = q.close[i];
-                        const dObj = new Date(ts[i]*1000);
-                        const dStr = dObj.toISOString().split('T')[0];
-                        const ymStr = dStr.substring(0, 7);
-                        map[dStr] = lastValid;
-                        map[ymStr] = lastValid; 
+                        const dStr = new Date(ts[i]*1000).toISOString().split('T')[0];
+                        map[dStr] = lastValid; map[dStr.substring(0, 7)] = lastValid; 
                     }
                 }
-                fxCache[key] = map;
-                return map;
-            } catch(e) {
-                console.error('FX Map Fetch Error:', e);
-                return null;
-            }
+                fxCache[key] = map; return map;
+            } catch(e) { return null; }
         }
 
         function applyFxToData(data, fxMap) {
@@ -2164,12 +1653,8 @@
             const q = clonedData.indicators.quote[0], ts = clonedData.timestamp;
             let lastFx = 1300;
             for(let i=0; i<ts.length; i++) {
-                const dObj = new Date(ts[i]*1000);
-                const dStr = dObj.toISOString().split('T')[0];
-                const ymStr = dStr.substring(0, 7);
-                if(fxMap[dStr]) lastFx = fxMap[dStr];
-                else if(fxMap[ymStr]) lastFx = fxMap[ymStr];
-
+                const dStr = new Date(ts[i]*1000).toISOString().split('T')[0];
+                if(fxMap[dStr]) lastFx = fxMap[dStr]; else if(fxMap[dStr.substring(0, 7)]) lastFx = fxMap[dStr.substring(0, 7)];
                 if(q.close[i] != null) {
                     q.close[i] *= lastFx;
                     if(q.open && q.open[i] != null) q.open[i] *= lastFx;
@@ -2180,63 +1665,71 @@
             return clonedData;
         }
 
-        async function fetchStockData(ticker, interval, range, isCrypto = false, ignoreFx = false) {
-            const cacheKey = `${ticker}_${interval}_${range}_${currentCurrency}_${ignoreFx}`;
+        async function fetchStockData(ticker, interval, range, isCrypto = false) {
+            const cacheKey = `${ticker}_${interval}_${range}_${currentCurrency}`;
             const now = Date.now();
-            if (reqCache.has(cacheKey) && now - reqCache.get(cacheKey).time < 60000) {
-                return reqCache.get(cacheKey).data;
-            }
+            if (reqCache.has(cacheKey) && now - reqCache.get(cacheKey).time < 60000) return reqCache.get(cacheKey).data;
             const res = await fetchWithRetry(`${API_BASE_URL}/api/stock/${ticker}?interval=${interval}&range=${range}`);
             const json = await res.json();
             if(!json.chart || !json.chart.result) throw new Error("API Data Format Error");
             let data = json.chart.result[0];
-            
-            if (!ignoreFx && currentCurrency === 'KRW' && ticker !== 'KRW=X' && ticker !== '^VIX') {
-                const fxMap = await getFxMap(interval, range);
-                data = applyFxToData(data, fxMap);
-            }
-            reqCache.set(cacheKey, { time: now, data: data });
-            return data;
+            if (currentCurrency === 'KRW' && ticker !== 'KRW=X' && ticker !== '^VIX') data = applyFxToData(data, await getFxMap(interval, range));
+            reqCache.set(cacheKey, { time: now, data: data }); return data;
         }
 
+        // ==========================================
+        // 📊 4. 마크로 데이터 파이프라인 (역발상 및 가중치 논리 반영)
+        // ==========================================
         function getIndicatorStatus(type, val, marketType = 'stock', timeHorizon = 'short') {
             let sig = 'NEUTRAL', text = '중립', color = 'var(--text-muted)';
             const weight = WEIGHT_MATRIX[marketType][timeHorizon][type] || 0;
             
             if (type === 'VIX') {
-                if (val >= 25) { sig = 'BUY'; text = isBeginnerMode ? '공포에 빠짐 (기회!)' : '공포 (매수)'; color = 'var(--up)'; }
-                else if (val <= 15) { sig = 'SELL'; text = isBeginnerMode ? '너무 안심함 (위험!)' : '탐욕 (매도)'; color = 'var(--down)'; }
+                if (val >= 25) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; } else if (val <= 15) { sig = 'SELL'; text = '탐욕 (매도)'; color = 'var(--down)'; }
             } else if (type === 'FNG') {
-                if (val <= 45) { sig = 'BUY'; text = isBeginnerMode ? '사람들이 무서워함 (기회)' : '공포 (매수)'; color = 'var(--up)'; }
-                else if (val >= 55) { sig = 'SELL'; text = isBeginnerMode ? '사람들이 욕심냄 (위험)' : '탐욕 (매도)'; color = 'var(--down)'; }
+                if (val <= 45) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; } else if (val >= 55) { sig = 'SELL'; text = '탐욕 (매도)'; color = 'var(--down)'; }
             } else if (type === 'VOL') {
-                if (val < 40) { sig = 'BUY'; text = isBeginnerMode ? '조용함 (살 타이밍)' : '안정 (매수)'; color = 'var(--up)'; }
-                else if (val > 80) { sig = 'SELL'; text = isBeginnerMode ? '너무 요동침 (위험)' : '위험 (매도)'; color = 'var(--down)'; }
+                if (val < 40) { sig = 'BUY'; text = '안정 (매수)'; color = 'var(--up)'; } else if (val > 80) { sig = 'SELL'; text = '위험 (매도)'; color = 'var(--down)'; }
             } else if (type === 'DIST') { 
-                if (val > 0) { sig = 'BUY'; text = isBeginnerMode ? '상승 썰매 타는중 (좋음)' : '상승 추세 (매수)'; color = 'var(--up)'; }
-                else if (val < 0) { sig = 'SELL'; text = isBeginnerMode ? '하락 썰매 타는중 (나쁨)' : '하락 추세 (매도)'; color = 'var(--down)'; }
+                if (val > 0) { sig = 'BUY'; text = '상승 추세 (매수)'; color = 'var(--up)'; } else if (val < 0) { sig = 'SELL'; text = '하락 추세 (매도)'; color = 'var(--down)'; }
             } else if (type === 'RSI') { 
-                if (val < 30) { sig = 'BUY'; text = isBeginnerMode ? '푹 쉬었음 (오를 가능성)' : '과매도 (매수)'; color = 'var(--up)'; }
-                else if (val > 70) { sig = 'SELL'; text = isBeginnerMode ? '너무 달려서 지침 (쉴 때)' : '과매수 (매도)'; color = 'var(--down)'; }
+                if (val < 30) { sig = 'BUY'; text = '과매도 (매수)'; color = 'var(--up)'; } else if (val > 70) { sig = 'SELL'; text = '과매수 (매도)'; color = 'var(--down)'; }
             } else if (type === 'MACD') {
-                if (val > 0) { sig = 'BUY'; text = isBeginnerMode ? '엑셀 밟는 중 (상승)' : '상승 전환 (매수)'; color = 'var(--up)'; }
-                else if (val < 0) { sig = 'SELL'; text = isBeginnerMode ? '브레이크 밟음 (하락)' : '하락 전환 (매도)'; color = 'var(--down)'; }
+                if (val > 0) { sig = 'BUY'; text = '상승 전환 (매수)'; color = 'var(--up)'; } else if (val < 0) { sig = 'SELL'; text = '하락 전환 (매도)'; color = 'var(--down)'; }
             } else if (type === 'BB') {
-                if (val === 'LOWER') { sig = 'BUY'; text = isBeginnerMode ? '바닥을 쳤음 (오를듯)' : '하단 지지 (매수)'; color = 'var(--up)'; }
-                else if (val === 'UPPER') { sig = 'SELL'; text = isBeginnerMode ? '천장에 부딪힘 (내릴듯)' : '상단 저항 (매도)'; color = 'var(--down)'; }
+                if (val === 'LOWER') { sig = 'BUY'; text = '하단 지지 (매수)'; color = 'var(--up)'; } else if (val === 'UPPER') { sig = 'SELL'; text = '상단 저항 (매도)'; color = 'var(--down)'; }
             } else if (type === 'STOCH') {
-                if (val < 20) { sig = 'BUY'; text = isBeginnerMode ? '단기 바닥 (줍줍)' : '바닥 (매수)'; color = 'var(--up)'; }
-                else if (val > 80) { sig = 'SELL'; text = isBeginnerMode ? '단기 꼭대기 (위험)' : '과열 (매도)'; color = 'var(--down)'; }
+                if (val < 20) { sig = 'BUY'; text = '바닥 (매수)'; color = 'var(--up)'; } else if (val > 80) { sig = 'SELL'; text = '과열 (매도)'; color = 'var(--down)'; }
             }
             return { sig, text, color, weight };
+        }
+
+        // 증명 내용(Proof) 생성을 위한 헬퍼 함수
+        function generateProof(type, val, market) {
+            if (type === 'vix') return `미국증시 30일 변동성(S&P500 기준)\n현재 VIX = ${val.toFixed(2)}`;
+            if (type === 'fng' && market === 'stock') {
+                // 주식 FNG는 VIX와 RSI 조합 계산임을 증명
+                let vScore = ((35 - globalVix) / 25) * 100; vScore = Math.max(0, Math.min(100, vScore));
+                return `AI 시뮬레이션 FNG 공식\n= (VIX점수 + S&P500 RSI점수)/2\n= (${vScore.toFixed(0)} + ${(globalFng*2 - vScore).toFixed(0)}) / 2\n= ${globalFng}`;
+            }
+            if (type === 'fng' && market === 'crypto') return `Crypto Fear & Greed Index API 사용\n현재 값 = ${val}`;
+            if (type === 'dist') return `이동평균선(120일) 이격도\n계산: ((현재가 - 120일평균)/120일평균)*100\n= ${val}%`;
+            if (type === 'rsi') return `14일 상대강도지수 (Relative Strength Index)\n현재 RSI = ${val.toFixed(2)}`;
+            if (type === 'macd') return `MACD 히스토그램 (단기-장기 이평선 차이)\n현재 값 = ${val.toFixed(2)}`;
+            if (type === 'bb') return `볼린저 밴드(20일, 표준편차2)\n현재 위치 = ${val}`;
+            if (type === 'stoch') return `스토캐스틱 K(14일)\n현재 값 = ${val.toFixed(2)}`;
+            if (type === 'vol') return `최근 30일 코인 가격 변동성 (연환산)\n현재 변동성 = ${val}`;
+            return '';
         }
 
         function renderIndicatorUI(id, valStr, type, val, marketType) {
             const el = document.getElementById(id);
             const st = getIndicatorStatus(type, val, marketType, 'short');
             
-            if (marketType === 'stock') stockSignals[type.toLowerCase()] = { sig: st.sig, w: st.weight };
-            else if (marketType === 'crypto') cryptoSignals[type.toLowerCase()] = { sig: st.sig, w: st.weight };
+            const proofTxt = generateProof(type.toLowerCase(), val, marketType);
+
+            if (marketType === 'stock') stockSignals[type.toLowerCase()] = { sig: st.sig, w: st.weight, val: valStr, proof: proofTxt };
+            else if (marketType === 'crypto') cryptoSignals[type.toLowerCase()] = { sig: st.sig, w: st.weight, val: valStr, proof: proofTxt };
             
             if (el) {
                 el.innerHTML = `<span class="text-lg">${valStr}</span><span class="text-[0.6rem] block mt-1" style="color:${st.color}">${st.text}</span>`;
@@ -2251,204 +1744,200 @@
             let reasoningList = [];
             
             Object.entries(signals).forEach(([key, s]) => {
-                const mode = isBeginnerMode ? 'beginner' : 'expert';
-                const label = TERMS[key][mode];
+                if (!s.sig) return; // 로딩 안된 상태 방지
+                const label = TERMS[key].expert; 
                 if (s.sig === 'BUY') {
                     buyScore += s.w;
-                    const desc = isBeginnerMode ? `긍정적인 신호가 나타나서 +${s.w.toFixed(1)}점 보너스를 줬어요!` : `상승 추세 감지<br><span class="text-up font-bold">가중치 +${s.w.toFixed(1)}점 부여</span>`;
-                    reasoningList.push({ type: 'up', t: label, d: desc, w: s.w });
+                    const desc = `상승 추세 감지<br><span class="text-up font-bold">가중치 +${s.w.toFixed(1)}점 부여</span>`;
+                    reasoningList.push({ type: 'up', t: label, d: desc, w: s.w, proof: s.proof });
                 }
                 else if (s.sig === 'SELL') {
                     sellScore += s.w;
-                    const desc = isBeginnerMode ? `위험한 조짐이 보여서 -${s.w.toFixed(1)}점 깎았어요!` : `하방/과열 압력 감지<br><span class="text-down font-bold">가중치 -${s.w.toFixed(1)}점 차감</span>`;
-                    reasoningList.push({ type: 'down', t: label, d: desc, w: s.w });
+                    const desc = `하방/과열 압력 감지<br><span class="text-down font-bold">가중치 -${s.w.toFixed(1)}점 차감</span>`;
+                    reasoningList.push({ type: 'down', t: label, d: desc, w: s.w, proof: s.proof });
                 }
             });
 
             reasoningList.sort((a, b) => b.w - a.w);
-            
-            let finalVerdict = isBeginnerMode ? "가만히 지켜보세요 (HOLD)" : "관망 (HOLD)";
-            let finalColor = "text-themeMuted";
             let diff = buyScore - sellScore;
+            
+            let finalVerdictExpert = "관망 (HOLD)"; let finalColor = "text-themeMuted";
+            let finalVerdictBeginner = "가만히 지켜보세요.";
+            
+            if (diff >= 15) { finalVerdictExpert = "강력 매수 (STRONG BUY)"; finalVerdictBeginner = "지금 당장 사도 좋아요!"; finalColor = "text-up"; }
+            else if (diff > 5) { finalVerdictExpert = "분할 매수 (BUY)"; finalVerdictBeginner = "조금씩 사보는 것도 좋아요."; finalColor = "text-emerald-400"; }
+            else if (diff <= -15) { finalVerdictExpert = "적극 매도 (STRONG BYE)"; finalVerdictBeginner = "위험해요! 당장 파세요!"; finalColor = "text-rose-600"; }
+            else if (diff < -5) { finalVerdictExpert = "분할 매도 (BYE)"; finalVerdictBeginner = "조금씩 팔면서 조심하세요."; finalColor = "text-down"; }
 
-            if (diff >= 15) { finalVerdict = isBeginnerMode ? "지금 당장 사세요! (STRONG BUY)" : "강력 매수 (STRONG BUY)"; finalColor = "text-up"; }
-            else if (diff > 5) { finalVerdict = isBeginnerMode ? "조금씩 사모으세요 (BUY)" : "분할 매수 (BUY)"; finalColor = "text-emerald-400"; }
-            else if (diff <= -15) { finalVerdict = isBeginnerMode ? "위험해요! 당장 파세요! (STRONG BYE)" : "적극 매도 (STRONG BYE)"; finalColor = "text-rose-600"; }
-            else if (diff < -5) { finalVerdict = isBeginnerMode ? "조금씩 팔면서 조심하세요 (BYE)" : "분할 매도 (BYE)"; finalColor = "text-down"; }
-
+            // 전문가용 요약 세팅
             const summaryEl = document.getElementById(`${type}-signal-summary`);
             if(summaryEl) {
                 summaryEl.innerHTML = `
                     <div class="flex items-center gap-3">
                         <div class="flex items-center text-[0.65rem] bg-black/40 px-2 py-1 rounded gap-1.5 shadow-inner">
-                            <span class="text-up font-black">${isBeginnerMode ? '긍정 점수' : '매수 파워'}: ${buyScore.toFixed(1)}</span>
-                            <span class="text-themeBorder">|</span>
-                            <span class="text-down font-black">${isBeginnerMode ? '위험 점수' : '매도 파워'}: ${sellScore.toFixed(1)}</span>
+                            <span class="text-up font-black">매수 파워: ${buyScore.toFixed(1)}</span><span class="text-themeBorder">|</span><span class="text-down font-black">매도 파워: ${sellScore.toFixed(1)}</span>
                         </div>
-                        <div class="text-[0.7rem] font-black uppercase ${finalColor} bg-black/20 px-2 py-1 rounded border border-themeBorder">
-                            AI 결론: ${finalVerdict}
-                        </div>
-                    </div>
-                `;
+                        <div class="text-[0.7rem] font-black uppercase ${finalColor} bg-black/20 px-2 py-1 rounded border border-themeBorder">AI 결론: ${finalVerdictExpert}</div>
+                    </div>`;
             }
 
+            // 전문가용 아코디언 추론 리스트
             const reasoningEl = document.getElementById(type === 'stock' ? 'reasoning-container' : 'crypto-reasoning-container');
             if (reasoningEl) {
                 if (reasoningList.length > 0) {
                     reasoningEl.innerHTML = reasoningList.map(i => `
-                        <div class="p-3 glass rounded-xl flex items-center justify-between border border-themeBorder mb-2">
-                            <div class="flex items-center gap-2">
-                                <span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'GOOD':'BAD'}</span>
-                                <p class="text-[0.65rem] font-black text-themeText">${i.t}</p>
+                        <div class="glass rounded-xl border border-themeBorder mb-2 overflow-hidden">
+                            <div class="p-3 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'GOOD':'BAD'}</span>
+                                    <p class="text-[0.65rem] font-black text-themeText">${i.t}</p>
+                                </div>
+                                <p class="text-[0.6rem] text-themeMuted text-right leading-tight">${i.d}</p>
                             </div>
-                            <p class="text-[0.6rem] text-themeMuted text-right leading-tight">${i.d}</p>
+                            <details class="bg-black/20 p-2 border-t border-themeBorder group">
+                                <summary class="text-[0.55rem] cursor-pointer outline-none font-bold text-accent flex items-center justify-between px-1">
+                                    <span>계산 근거 및 데이터 보기</span>
+                                    <svg class="w-3 h-3 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </summary>
+                                <div class="text-[0.55rem] text-themeMuted mt-2 font-mono whitespace-pre-wrap px-1">${i.proof}</div>
+                            </details>
                         </div>
                     `).join('');
                 } else {
-                    reasoningEl.innerHTML = `<p class="text-xs text-themeMuted text-center py-10">${isBeginnerMode ? '지금은 특별히 좋거나 나쁜 신호가 없어요.' : '특이 지표가 없습니다 (전부 중립 상태).'}</p>`;
+                    reasoningEl.innerHTML = `<p class="text-xs text-themeMuted text-center py-10">특이 지표가 없습니다 (전부 중립 상태).</p>`;
                 }
+            }
+
+            // 초보자용 빅 카드 세팅
+            const begTextId = type === 'stock' ? 'beginner-summary-text' : 'crypto-beginner-summary-text';
+            const begDescId = type === 'stock' ? 'beginner-summary-desc' : 'crypto-beginner-summary-desc';
+            const begTextEl = document.getElementById(begTextId);
+            const begDescEl = document.getElementById(begDescId);
+
+            if(begTextEl && begDescEl) {
+                begTextEl.innerText = finalVerdictBeginner;
+                begTextEl.className = `text-2xl md:text-3xl font-black mb-4 break-keep ${finalColor}`;
+                
+                let easyDesc = `AI가 복잡한 데이터를 다 계산해봤어요.<br>`;
+                if(diff > 0) easyDesc += `지금 시장은 긍정적인 신호가 더 많아요. (안전 점수: <span class="text-up font-bold">${diff.toFixed(1)}점</span> 높음)`;
+                else if(diff < 0) easyDesc += `지금 시장은 불안한 신호가 더 많아요. (위험 점수: <span class="text-down font-bold">${Math.abs(diff).toFixed(1)}점</span> 높음)`;
+                else easyDesc += `오를지 내릴지 방향이 확실하지 않아요.`;
+
+                begDescEl.innerHTML = easyDesc;
             }
         }
 
         async function fetchMacroData() {
             try {
                 const vixData = await fetchStockData('^VIX', '1d', '3mo');
-                const vixCloses = extractCleanData(vixData).closes;
-                globalVix = vixCloses[vixCloses.length - 1];
+                globalVix = extractCleanData(vixData).closes.pop();
 
                 const spyData = await fetchStockData('SPY', '1d', '3mo');
-                const spyCloses = extractCleanData(spyData).closes;
-                const spyRsiArr = Indicator.rsi(spyCloses, 14);
+                const spyRsiArr = Indicator.rsi(extractCleanData(spyData).closes, 14);
                 const spyRsi = spyRsiArr[spyRsiArr.length - 1] || 50; 
 
                 renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
 
-                let vixScore = ((35 - globalVix) / 25) * 100;
-                vixScore = Math.max(0, Math.min(100, vixScore));
-                let rsiScore = ((spyRsi - 30) / 40) * 100;
-                rsiScore = Math.max(0, Math.min(100, rsiScore));
+                let vixScore = ((35 - globalVix) / 25) * 100; vixScore = Math.max(0, Math.min(100, vixScore));
+                let rsiScore = ((spyRsi - 30) / 40) * 100; rsiScore = Math.max(0, Math.min(100, rsiScore));
                 
                 globalFng = Math.round((vixScore + rsiScore) / 2);
                 renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
-
             } catch(e) { logError("Macro Error", e); }
         }
 
         async function fetchCryptoMacroData() {
             try {
                 const fngRes = await fetchWithRetry('https://api.alternative.me/fng/');
-                const fngJson = await fngRes.json();
-                globalCryptoFng = parseInt(fngJson.data[0].value);
+                globalCryptoFng = parseInt((await fngRes.json()).data[0].value);
                 renderIndicatorUI('crypto-val-fng', globalCryptoFng, 'FNG', globalCryptoFng, 'crypto');
             } catch(e) { logError("Crypto Macro Error", e); }
         }
 
+        // ==========================================
+        // 📊 5. 데이터 로드 및 렌더링 파이프라인
+        // ==========================================
         async function loadData(ticker, interval = currentInterval, range = currentRange) {
-            if (abortController) abortController.abort();
-            abortController = new AbortController();
-            const loadingOverlay = document.getElementById('loading-overlay');
-            if(loadingOverlay) loadingOverlay.style.display = 'flex';
+            if (abortController) abortController.abort(); abortController = new AbortController();
+            const loadingOverlay = document.getElementById('loading-overlay'); if(loadingOverlay) loadingOverlay.style.display = 'flex';
             
             try {
                 fetchMacroData(); 
-
-                const reqInterval = interval === '1y' ? '1mo' : interval;
-                const d = await fetchStockData(ticker, reqInterval, range);
-                
+                const d = await fetchStockData(ticker, interval === '1y' ? '1mo' : interval, range);
                 globalChartData = d; globalTicker = ticker;
                 
                 updateStatus("LIVE DATA", "bg-emerald-500");
                 renderDashboard(ticker, d);
-                
-                calculateTriplePerspectiveDecision(ticker, 'stock').catch(e => logError("Triple Calc Error", e));
+                await calculateTriplePerspectiveDecision(ticker, 'stock');
 
             } catch (e) { 
                 if (e.name !== 'AbortError') {
-                    logError(`loadData failed for ${ticker}`, e);
-                    updateStatus("API ERROR", "bg-rose-500"); 
+                    logError(`loadData failed for ${ticker}`, e); updateStatus("API ERROR", "bg-rose-500"); 
                     if(myChart) myChart.clear();
-                    document.getElementById('display-ticker').innerText = "ERROR";
-                    document.getElementById('live-price').innerText = "---";
-                    document.getElementById('reasoning-container').innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.</p>';
+                    document.getElementById('display-ticker').innerText = "ERROR"; document.getElementById('live-price').innerText = "---";
+                    document.getElementById('reasoning-container').innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터 로드 실패</p>';
                 }
-            } finally { 
-                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
-            }
+            } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
         }
 
         async function loadCryptoData(ticker, interval = currentCryptoInterval, range = currentCryptoRange) {
-            if (cryptoAbortController) cryptoAbortController.abort();
-            cryptoAbortController = new AbortController();
-            const loadingOverlay = document.getElementById('crypto-loading-overlay');
-            if(loadingOverlay) loadingOverlay.style.display = 'flex';
-            
-            const searchInput = document.getElementById('crypto-ticker-input');
-            if(searchInput) searchInput.value = ticker;
+            if (cryptoAbortController) cryptoAbortController.abort(); cryptoAbortController = new AbortController();
+            const loadingOverlay = document.getElementById('crypto-loading-overlay'); if(loadingOverlay) loadingOverlay.style.display = 'flex';
+            const searchInput = document.getElementById('crypto-ticker-input'); if(searchInput) searchInput.value = ticker;
 
             try {
                 fetchCryptoMacroData();
-
-                const reqInterval = interval === '1y' ? '1mo' : interval;
-                const d = await fetchStockData(ticker, reqInterval, range, true);
-                
+                const d = await fetchStockData(ticker, interval === '1y' ? '1mo' : interval, range, true);
                 globalCryptoChartData = d; globalCryptoTicker = ticker;
                 
                 updateCryptoStatus("LIVE DATA", "bg-emerald-500");
                 renderCryptoDashboard(ticker, d);
-                
-                calculateTriplePerspectiveDecision(ticker, 'crypto').catch(e => logError("Crypto Triple Calc Error", e));
+                await calculateTriplePerspectiveDecision(ticker, 'crypto');
 
             } catch (e) { 
                 if (e.name !== 'AbortError') {
-                    logError(`loadCryptoData failed for ${ticker}`, e);
-                    updateCryptoStatus("API ERROR", "bg-rose-500"); 
+                    logError(`loadCryptoData failed for ${ticker}`, e); updateCryptoStatus("API ERROR", "bg-rose-500"); 
                     if(cryptoChart) cryptoChart.clear();
-                    document.getElementById('crypto-display-ticker').innerText = "ERROR";
-                    document.getElementById('crypto-live-price').innerText = "---";
+                    document.getElementById('crypto-display-ticker').innerText = "ERROR"; document.getElementById('crypto-live-price').innerText = "---";
                 }
-            } finally { 
-                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
-            }
+            } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
         }
 
         function renderDashboard(ticker, data) {
             if(!myChart || !data) return;
-            
             let { dates, kData, closes } = extractCleanData(data);
             if(closes.length === 0) return;
 
             document.getElementById('display-ticker').innerText = ticker;
-            const price = closes[closes.length - 1];
-            document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(price)}`;
+            document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(closes[closes.length - 1])}`;
             
             if (currentInterval === '1y') {
                 let yearly = {};
                 dates.forEach((date, i) => {
                     const year = date.split('-')[0];
-                    if (!yearly[year]) { yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] }; } 
+                    if (!yearly[year]) yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] };
                     else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); }
                 });
-                const sorted = Object.keys(yearly).sort();
-                dates = sorted; kData = sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]); closes = sorted.map(y => yearly[y].close);
+                dates = Object.keys(yearly).sort(); kData = dates.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]); closes = dates.map(y => yearly[y].close);
             }
 
-            const bb = Indicator.bollinger(closes, 20, 2);
-            const macdArr = Indicator.macd(closes, 12, 26, 9);
-            
             const styleColor = getComputedStyle(document.documentElement);
             const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
             const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+            const widthNum = parseFloat(safeStorageGet('dashboardLineWidth', '2'));
 
-            const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
             let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
-            
-            let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
-            const widthNum = parseFloat(chartLineWidth);
-            Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
-            
-            series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macdArr.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
+
+            // 초보자 모드에서는 복잡한 지표 선 모두 숨김
+            if (!isBeginnerMode) {
+                const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
+                Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
+                const bb = Indicator.bollinger(closes, 20, 2);
+                series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
+                series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
+                const macdArr = Indicator.macd(closes, 12, 26, 9);
+                series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macdArr.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
+            }
 
             myChart.setOption({
                 backgroundColor: 'transparent',
@@ -2457,37 +1946,37 @@
                         let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
                         params.forEach(p => {
                             if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]);
-                                let close = formatPriceStr(p.data[2]);
-                                result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
+                                result += `${p.marker} 시가: ${getCurrSymbol()}${formatPriceStr(p.data[1])}<br/>${p.marker} 종가: ${getCurrSymbol()}${formatPriceStr(p.data[2])}<br/>`;
                             } else {
                                 let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
-                                if (val === null || val === undefined || isNaN(val)) return;
-                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`;
+                                if (val !== null && val !== undefined && !isNaN(val)) result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`;
                             }
                         });
                         return result;
                     }
                 },
-                grid: [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
-                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
-                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
+                grid: isBeginnerMode 
+                    ? [ { left: '2%', right: '2%', top: '5%', bottom: '5%', containLabel: true } ]
+                    : [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
+                xAxis: isBeginnerMode 
+                    ? [ { type: 'category', data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ]
+                    : [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
+                yAxis: isBeginnerMode
+                    ? [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } } ]
+                    : [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
+                dataZoom: [{ type: 'inside', xAxisIndex: isBeginnerMode ? [0] : [0, 1], start: 70, end: 100 }],
                 series: series
             }, true);
-            
             requestAnimationFrame(() => myChart.resize());
         }
 
         function renderCryptoDashboard(ticker, data) {
             if(!cryptoChart || !data) return;
-            
             let { dates, kData, closes } = extractCleanData(data);
             if(closes.length === 0) return;
 
             document.getElementById('crypto-display-ticker').innerText = ticker.replace('-USD', '');
-            const price = closes[closes.length - 1];
-            document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(price)}`;
+            document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(closes[closes.length - 1])}`;
             
             const vol = calcVolatility(closes);
             renderIndicatorUI('crypto-val-vol', vol.toFixed(1) + '%', 'vol', vol, 'crypto');
@@ -2496,30 +1985,28 @@
                 let yearly = {};
                 dates.forEach((date, i) => {
                     const year = date.split('-')[0];
-                    if (!yearly[year]) { yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] }; } 
+                    if (!yearly[year]) yearly[year] = { open: kData[i][0], close: kData[i][1], low: kData[i][2], high: kData[i][3] };
                     else { yearly[year].close = kData[i][1]; yearly[year].high = Math.max(yearly[year].high, kData[i][3]); yearly[year].low = Math.min(yearly[year].low, kData[i][2]); }
                 });
-                const sorted = Object.keys(yearly).sort();
-                dates = sorted; kData = sorted.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]); closes = sorted.map(y => yearly[y].close);
+                dates = Object.keys(yearly).sort(); kData = dates.map(y => [yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]); closes = dates.map(y => yearly[y].close);
             }
 
-            const bb = Indicator.bollinger(closes, 20, 2);
-            const macdArr = Indicator.macd(closes, 12, 26, 9);
-            
             const styleColor = getComputedStyle(document.documentElement);
             const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
             const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+            const widthNum = parseFloat(safeStorageGet('dashboardLineWidth', '2'));
 
-            const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
             let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
-            
-            let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
-            const widthNum = parseFloat(chartLineWidth);
-            Object.keys(cryptoMaSettings).forEach(p => { if (cryptoMaSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
-            
-            series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
-            series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macdArr.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
+
+            if (!isBeginnerMode) {
+                const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
+                Object.keys(cryptoMaSettings).forEach(p => { if (cryptoMaSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
+                const bb = Indicator.bollinger(closes, 20, 2);
+                series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
+                series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
+                const macdArr = Indicator.macd(closes, 12, 26, 9);
+                series.push({ name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macdArr.hist.map(v => ({ value: v, itemStyle: { color: v > 0 ? '#26A69A' : '#EF5350' } })) });
+            }
 
             cryptoChart.setOption({
                 backgroundColor: 'transparent',
@@ -2528,25 +2015,27 @@
                         let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
                         params.forEach(p => {
                             if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]);
-                                let close = formatPriceStr(p.data[2]);
-                                result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
+                                result += `${p.marker} 시가: ${getCurrSymbol()}${formatPriceStr(p.data[1])}<br/>${p.marker} 종가: ${getCurrSymbol()}${formatPriceStr(p.data[2])}<br/>`;
                             } else {
                                 let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
-                                if (val === null || val === undefined || isNaN(val)) return;
-                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`;
+                                if (val !== null && val !== undefined && !isNaN(val)) result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`;
                             }
                         });
                         return result;
                     }
                 },
-                grid: [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
-                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
-                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }],
+                grid: isBeginnerMode 
+                    ? [ { left: '2%', right: '2%', top: '5%', bottom: '5%', containLabel: true } ]
+                    : [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
+                xAxis: isBeginnerMode 
+                    ? [ { type: 'category', data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ]
+                    : [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
+                yAxis: isBeginnerMode
+                    ? [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } } ]
+                    : [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
+                dataZoom: [{ type: 'inside', xAxisIndex: isBeginnerMode ? [0] : [0, 1], start: 70, end: 100 }],
                 series: series
             }, true);
-            
             requestAnimationFrame(() => cryptoChart.resize());
         }
 
@@ -2566,17 +2055,13 @@
                     if(closes.length < periods.ma) return { status:"WAIT", score: 0, pct: 50, breakdown: [], maxScore: 0 };
                     
                     const last = closes.length - 1;
-                    const rsiArr = Indicator.rsi(closes, periods.rsi);
-                    const rsi = rsiArr[last] || 50;
-                    const macdHist = Indicator.macd(closes, 12, 26, 9).hist;
-                    const macd = macdHist[last] || 0;
-                    const stochK = Indicator.stochastic(kData, periods.stoch, 3).k;
-                    const stoch = stochK[last] || 50;
+                    const rsi = Indicator.rsi(closes, periods.rsi)[last] || 50;
+                    const macd = Indicator.macd(closes, 12, 26, 9).hist[last] || 0;
+                    const stoch = Indicator.stochastic(kData, periods.stoch, 3).k[last] || 50;
                     const bb = Indicator.bollinger(closes, periods.ma, 2);
                     
                     const dLast = dailyCloses.length - 1;
-                    const distSmaArray = Indicator.sma(dailyCloses, periods.distSma);
-                    const currentDistSma = distSmaArray[dLast] || dailyCloses[dLast];
+                    const currentDistSma = Indicator.sma(dailyCloses, periods.distSma)[dLast] || dailyCloses[dLast];
                     const dist = ((dailyCloses[dLast] - currentDistSma) / currentDistSma) * 100;
                     
                     let bbStr = "MID";
@@ -2592,86 +2077,46 @@
                         macd: getIndicatorStatus('MACD', macd, marketType, timeHorizon),
                         stoch: getIndicatorStatus('STOCH', stoch, marketType, timeHorizon),
                         bb: getIndicatorStatus('BB', bbStr, marketType, timeHorizon),
-                        macro: marketType === 'stock' ? 
-                               getIndicatorStatus('VIX', globalVix || 20, marketType, timeHorizon) : 
-                               getIndicatorStatus('VOL', calcVolatility(closes), marketType, timeHorizon),
+                        macro: marketType === 'stock' ? getIndicatorStatus('VIX', globalVix || 20, marketType, timeHorizon) : getIndicatorStatus('VOL', calcVolatility(closes), marketType, timeHorizon),
                         fng: getIndicatorStatus('FNG', marketType === 'stock' ? (globalFng||50) : (globalCryptoFng||50), marketType, timeHorizon)
                     };
 
-                    let buyScore = 0;
-                    let sellScore = 0;
-                    let breakdown = [];
+                    let buyScore = 0, sellScore = 0, breakdown = [];
 
                     const addScore = (key, s) => {
-                        const mode = isBeginnerMode ? 'beginner' : 'expert';
-                        const label = TERMS[key.toLowerCase()] ? TERMS[key.toLowerCase()][mode] : key;
-
-                        if (s.sig === 'BUY') { 
-                            buyScore += s.weight; 
-                            breakdown.push({name: label, sig: 'BUY', val: `+${s.weight.toFixed(1)}`}); 
-                        }
-                        else if (s.sig === 'SELL') { 
-                            sellScore += s.weight; 
-                            breakdown.push({name: label, sig: 'SELL', val: `-${s.weight.toFixed(1)}`}); 
-                        }
-                        else { 
-                            breakdown.push({name: label, sig: 'NEUTRAL', val: `0.0`}); 
-                        }
+                        const label = TERMS[key.toLowerCase()] ? TERMS[key.toLowerCase()].expert : key;
+                        if (s.sig === 'BUY') { buyScore += s.weight; breakdown.push({name: label, sig: 'BUY', val: `+${s.weight.toFixed(1)}`}); }
+                        else if (s.sig === 'SELL') { sellScore += s.weight; breakdown.push({name: label, sig: 'SELL', val: `-${s.weight.toFixed(1)}`}); }
+                        else { breakdown.push({name: label, sig: 'NEUTRAL', val: `0.0`}); }
                     };
 
-                    addScore(marketType === 'stock' ? 'VIX' : 'VOL', sigs.macro);
-                    addScore('FNG', sigs.fng);
-                    addScore('DIST', sigs.dist);
-                    addScore('RSI', sigs.rsi);
-                    addScore('MACD', sigs.macd);
-                    addScore('STOCH', sigs.stoch);
-                    addScore('BB', sigs.bb);
+                    addScore(marketType === 'stock' ? 'VIX' : 'VOL', sigs.macro); addScore('FNG', sigs.fng);
+                    addScore('DIST', sigs.dist); addScore('RSI', sigs.rsi); addScore('MACD', sigs.macd);
+                    addScore('STOCH', sigs.stoch); addScore('BB', sigs.bb);
 
                     const diff = buyScore - sellScore;
                     let st = "HOLD"; 
-                    if (diff >= 15) st = "STRONG BUY";
-                    else if (diff > 5) st = "BUY";
-                    else if (diff <= -15) st = "STRONG BYE";
-                    else if (diff < -5) st = "BYE";
+                    if (diff >= 15) st = "STRONG BUY"; else if (diff > 5) st = "BUY"; else if (diff <= -15) st = "STRONG BYE"; else if (diff < -5) st = "BYE";
 
                     const pct = Math.max(0, Math.min(100, 50 + (diff / maxScore) * 50));
-
                     let advice = "";
                     let buyReasons = breakdown.filter(b => b.sig === 'BUY').sort((a,b) => parseFloat(b.val) - parseFloat(a.val));
                     let sellReasons = breakdown.filter(b => b.sig === 'SELL').sort((a,b) => parseFloat(a.val) - parseFloat(b.val));
 
                     if(isBeginnerMode) {
-                        advice += `AI가 분석해본 결과, 현재 긍정적인 점수(${buyScore.toFixed(1)}점)와 위험한 점수(${sellScore.toFixed(1)}점)를 비교해보니 ${diff > 0 ? '+' : ''}${diff.toFixed(1)}점이 나왔어요.\n`;
-                        if (buyReasons.length > 0) {
-                            advice += `\n🟢 [좋은 소식이에요!]\n${buyReasons.map(b => `• ${b.name} 지표가 좋아서 ${b.val}점을 줬어요.`).join('\n')}`;
-                        }
-                        if (sellReasons.length > 0) {
-                            advice += `\n\n🔴 [조심해야 해요!]\n${sellReasons.map(b => `• ${b.name} 지표가 좀 위험해 보여서 ${b.val}점을 깎았어요.`).join('\n')}`;
-                        }
-
-                        if (st.includes('BUY')) {
-                            advice += `\n\n💡 AI의 결론: 지금은 오를 확률이 훨씬 높으니까 조금씩 사보는 것도 좋아요!`;
-                        } else if (st.includes('BYE')) {
-                            advice += `\n\n💡 AI의 결론: 지금은 떨어질 위험이 높으니 안 사는 게 좋고, 가지고 있다면 파는 걸 고민해보세요!`;
-                        } else {
-                            advice += `\n\n💡 AI의 결론: 지금은 딱히 좋지도 나쁘지도 않아요. 당장 무리해서 투자하지 말고 조금만 더 지켜봐요.`;
-                        }
+                        advice += `긍정적인 점수(${buyScore.toFixed(1)}점)와 위험한 점수(${sellScore.toFixed(1)}점)를 비교해보니 ${diff > 0 ? '+' : ''}${diff.toFixed(1)}점이 나왔어요.\n`;
+                        if (buyReasons.length > 0) advice += `\n🟢 [좋은 소식이에요!]\n${buyReasons.map(b => `• ${b.name} 지표가 좋아서 ${b.val}점을 줬어요.`).join('\n')}`;
+                        if (sellReasons.length > 0) advice += `\n\n🔴 [조심해야 해요!]\n${sellReasons.map(b => `• ${b.name} 지표가 위험해 보여서 ${b.val}점을 깎았어요.`).join('\n')}`;
+                        if (st.includes('BUY')) advice += `\n\n💡 결론: 오를 확률이 더 높으니 조금씩 사보는 것도 좋아요!`;
+                        else if (st.includes('BYE')) advice += `\n\n💡 결론: 떨어질 위험이 높으니 조심하세요!`;
+                        else advice += `\n\n💡 결론: 당장 무리하지 말고 조금만 더 지켜보세요.`;
                     } else {
-                        advice += `AI 분석 결과, 합산 매수 파워(${buyScore.toFixed(1)}점)와 매도 파워(${sellScore.toFixed(1)}점)의 최종 넷 격차는 ${diff > 0 ? '+' : ''}${diff.toFixed(1)}점입니다.\n`;
-                        if (buyReasons.length > 0) {
-                            advice += `\n🟢 [매수 근거]\n${buyReasons.map(b => `- ${b.name} 지표가 긍정적 추세를 보이며 가중치 ${b.val}점을 기여했습니다.`).join('\n')}`;
-                        }
-                        if (sellReasons.length > 0) {
-                            advice += `\n\n🔴 [매도 근거]\n${sellReasons.map(b => `- ${b.name} 지표가 부정적(과열/하락) 추세를 보이며 가중치 ${b.val}점을 차감했습니다.`).join('\n')}`;
-                        }
-
-                        if (st.includes('BUY')) {
-                            advice += `\n\n💡 결론: 긍정적 지표의 가중치가 압도적이므로 현재 구간에서는 '${st}' (매수) 포지션이 유리하다고 판단됩니다.`;
-                        } else if (st.includes('BYE')) {
-                            advice += `\n\n💡 결론: 부정적 지표에 의한 하방 압력이 강하므로 '${st}' (매도/관망) 포지션을 권장하며 리스크 관리가 필요합니다.`;
-                        } else {
-                            advice += `\n\n💡 결론: 현재 매수와 매도 세력의 가중치가 팽팽하거나 뚜렷한 추세가 부재하므로 '${st}' (관망) 의견을 제시합니다.`;
-                        }
+                        advice += `합산 매수 파워(${buyScore.toFixed(1)}점)와 매도 파워(${sellScore.toFixed(1)}점)의 최종 격차는 ${diff > 0 ? '+' : ''}${diff.toFixed(1)}점입니다.\n`;
+                        if (buyReasons.length > 0) advice += `\n🟢 [매수 근거]\n${buyReasons.map(b => `- ${b.name} 지표가 긍정적 추세를 보이며 ${b.val}점을 기여했습니다.`).join('\n')}`;
+                        if (sellReasons.length > 0) advice += `\n\n🔴 [매도 근거]\n${sellReasons.map(b => `- ${b.name} 지표가 부정적(과열/하락) 추세를 보이며 ${b.val}점을 차감했습니다.`).join('\n')}`;
+                        if (st.includes('BUY')) advice += `\n\n💡 결론: 긍정적 지표 가중치가 압도적이므로 매수 포지션이 유리합니다.`;
+                        else if (st.includes('BYE')) advice += `\n\n💡 결론: 부정적 지표에 의한 하방 압력이 강하므로 리스크 관리가 필요합니다.`;
+                        else advice += `\n\n💡 결론: 매수/매도 가중치가 팽팽하므로 관망 의견을 제시합니다.`;
                     }
 
                     return { status: st, buyScore, sellScore, diff, pct, maxScore, breakdown, advice };
@@ -2681,141 +2126,69 @@
                 const mtRes = analyze(wData, 'mid', { ma: 10, distSma: 50, rsi: 14, stoch: 14 });
                 const ltRes = analyze(mData, 'long', { ma: 10, distSma: 120, rsi: 14, stoch: 14 });
 
-                const updateUI = (prefix) => {
-                    const targetDetails = prefix === 'stock' ? analysisDetails : cryptoAnalysisDetails;
-                    targetDetails.short = stRes;
-                    targetDetails.mid = mtRes;
-                    targetDetails.long = ltRes;
+                const targetDetails = marketType === 'stock' ? analysisDetails : cryptoAnalysisDetails;
+                targetDetails.short = stRes; targetDetails.mid = mtRes; targetDetails.long = ltRes;
 
-                    const upBox = (id, res, barId) => { 
-                        const el = document.getElementById(id); 
-                        const bar = document.getElementById(barId);
-                        if(el) { 
-                            let displaySt = res.status;
-                            if(isBeginnerMode) {
-                                if(res.status === 'STRONG BUY') displaySt = '적극 매수!';
-                                else if(res.status === 'BUY') displaySt = '조금씩 매수';
-                                else if(res.status === 'HOLD') displaySt = '가만히 대기';
-                                else if(res.status === 'BYE') displaySt = '조금씩 팔기';
-                                else if(res.status === 'STRONG BYE') displaySt = '다 팔고 도망!';
-                            }
-                            el.innerText = displaySt; 
-                            el.className = `text-sm md:text-base font-black italic status-${res.status.replace(/ /g, '-')} uppercase mb-1`; 
-                        }
-                        if(bar) {
-                            bar.style.width = `${res.pct}%`;
-                            if (res.status.includes('BUY')) bar.style.backgroundColor = '#26A69A';
-                            else if (res.status.includes('BYE')) bar.style.backgroundColor = '#EF5350';
-                            else bar.style.backgroundColor = '#9CA3AF';
-                        }
-                    };
-
-                    if(prefix === 'stock') {
-                        upBox('st-signal-text', stRes, 'st-score-bar'); 
-                        upBox('mt-signal-text', mtRes, 'mt-score-bar'); 
-                        upBox('lt-signal-text', ltRes, 'lt-score-bar');
-                    } else {
-                        upBox('crypto-st-signal-text', stRes, 'crypto-st-score-bar'); 
-                        upBox('crypto-mt-signal-text', mtRes, 'crypto-mt-score-bar'); 
-                        upBox('crypto-lt-signal-text', ltRes, 'crypto-lt-score-bar');
-                    }
+                const upBox = (id, res, barId) => { 
+                    const el = document.getElementById(id), bar = document.getElementById(barId);
+                    if(el) { el.innerText = res.status; el.className = `text-sm md:text-base font-black italic status-${res.status.replace(/ /g, '-')} uppercase mb-1`; }
+                    if(bar) { bar.style.width = `${res.pct}%`; bar.style.backgroundColor = res.status.includes('BUY') ? '#26A69A' : (res.status.includes('BYE') ? '#EF5350' : '#9CA3AF'); }
                 };
 
-                updateUI(marketType);
+                if(marketType === 'stock') { upBox('st-signal-text', stRes, 'st-score-bar'); upBox('mt-signal-text', mtRes, 'mt-score-bar'); upBox('lt-signal-text', ltRes, 'lt-score-bar'); } 
+                else { upBox('crypto-st-signal-text', stRes, 'crypto-st-score-bar'); upBox('crypto-mt-signal-text', mtRes, 'crypto-mt-score-bar'); upBox('crypto-lt-signal-text', ltRes, 'crypto-lt-score-bar'); }
 
                 const len = dailyCloses.length;
                 if(len === 0) return;
                 
-                const mainSma120 = Indicator.sma(dailyCloses, 120);
                 const lastCl = dailyCloses[len - 1];
-                const lastSma120 = mainSma120[len - 1];
+                const lastSma120 = Indicator.sma(dailyCloses, 120)[len - 1];
                 const dist120 = lastSma120 ? ((lastCl - lastSma120) / lastSma120 * 100).toFixed(2) : 0;
                 
-                const rsiArr = Indicator.rsi(dailyCloses, 14);
-                const macdArr = Indicator.macd(dailyCloses, 12, 26, 9).hist;
-                const stochArr = Indicator.stochastic(dailyClean.kData, 14, 3).k;
-
-                const lastRsi = rsiArr[len - 1] ?? 50;
-                const lastMacd = macdArr[len - 1] ?? 0;
-                const lastStoch = stochArr[len - 1] ?? 50;
+                const lastRsi = Indicator.rsi(dailyCloses, 14)[len - 1] ?? 50;
+                const lastMacd = Indicator.macd(dailyCloses, 12, 26, 9).hist[len - 1] ?? 0;
+                const lastStoch = Indicator.stochastic(dailyClean.kData, 14, 3).k[len - 1] ?? 50;
                 
-                if (marketType === 'stock') {
-                    renderIndicatorUI('val-ma-dist', `${dist120>0?'+':''}${dist120}%`, 'dist', parseFloat(dist120), 'stock');
-                    renderIndicatorUI('val-rsi-main', lastRsi.toFixed(1), 'rsi', lastRsi, 'stock'); 
-                    renderIndicatorUI('val-macd-main', lastMacd.toFixed(2), 'macd', lastMacd, 'stock'); 
-                    renderIndicatorUI('val-stoch-main', lastStoch.toFixed(1), 'stoch', lastStoch, 'stock');
-                } else {
-                    renderIndicatorUI('crypto-val-ma-dist', `${dist120>0?'+':''}${dist120}%`, 'dist', parseFloat(dist120), 'crypto');
-                    renderIndicatorUI('crypto-val-rsi-main', lastRsi.toFixed(1), 'rsi', lastRsi, 'crypto'); 
-                    renderIndicatorUI('crypto-val-macd-main', lastMacd.toFixed(2), 'macd', lastMacd, 'crypto'); 
-                    renderIndicatorUI('crypto-val-stoch-main', lastStoch.toFixed(1), 'stoch', lastStoch, 'crypto');
-                }
+                const p = marketType === 'stock' ? '' : 'crypto-';
+                renderIndicatorUI(`${p}val-ma-dist`, `${dist120>0?'+':''}${dist120}%`, 'dist', parseFloat(dist120), marketType);
+                renderIndicatorUI(`${p}val-rsi-main`, lastRsi.toFixed(1), 'rsi', lastRsi, marketType); 
+                renderIndicatorUI(`${p}val-macd-main`, lastMacd.toFixed(2), 'macd', lastMacd, marketType); 
+                renderIndicatorUI(`${p}val-stoch-main`, lastStoch.toFixed(1), 'stoch', lastStoch, marketType);
 
-            } catch (e) {
-                logError("Calculate Signals Error", e);
-            }
+            } catch (e) { logError("Calculate Signals Error", e); }
         }
 
+        // ==========================================
+        // 🚀 6. 초기화
+        // ==========================================
         document.addEventListener("DOMContentLoaded", () => {
-            window.scrollTo(0, 0);
-            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            window.scrollTo(0, 0); if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
                 
                 const form = document.getElementById('search-form');
-                if(form) {
-                    form.onsubmit = (e) => { 
-                        e.preventDefault(); 
-                        const t = document.getElementById('ticker-input').value.trim().toUpperCase(); 
-                        if(t) loadData(t); 
-                    };
-                }
+                if(form) form.onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); };
 
                 const cryptoForm = document.getElementById('crypto-search-form');
-                if(cryptoForm) {
-                    cryptoForm.onsubmit = (e) => {
-                        e.preventDefault();
-                        const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase();
-                        if(t) loadCryptoData(t);
-                    };
-                }
+                if(cryptoForm) cryptoForm.onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase(); if(t) loadCryptoData(t); };
 
                 const btn = document.getElementById('currency-toggle');
                 if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
                 
-                const savedMode = safeStorageGet('dashboardMode', 'expert');
-                isBeginnerMode = (savedMode === 'beginner');
-                const modeSwitch = document.getElementById('mode-switch');
-                if (modeSwitch) modeSwitch.checked = isBeginnerMode;
-                const mobModeSwitch = document.getElementById('mob-mode-switch');
-                if (mobModeSwitch) mobModeSwitch.checked = isBeginnerMode;
+                // 모드 초기화 적용
+                isBeginnerMode = (safeStorageGet('dashboardMode', 'expert') === 'beginner');
+                const deskSwitch = document.getElementById('mode-switch'); if (deskSwitch) deskSwitch.checked = isBeginnerMode;
+                const mobSwitch = document.getElementById('mob-mode-switch'); if (mobSwitch) mobSwitch.checked = isBeginnerMode;
+                document.body.classList.toggle('beginner-mode', isBeginnerMode);
                 updateTerminologyUI();
 
-                const stockIndicators = document.getElementById('stock-expert-indicators');
-                if (stockIndicators) stockIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
-                
-                const cryptoIndicators = document.getElementById('crypto-expert-indicators');
-                if (cryptoIndicators) cryptoIndicators.style.display = isBeginnerMode ? 'none' : 'grid';
+                setTheme(safeStorageGet('dashboardTheme', 'theme-green'));
+                setFontSize(safeStorageGet('dashboardFontSize', 'md'));
+                updateMAButtons(); updateCryptoMAButtons(); updatePfCardMetrics();
 
-                const currentTheme = safeStorageGet('dashboardTheme', 'theme-green');
-                const currentFont = safeStorageGet('dashboardFontSize', 'md');
-                
-                setTheme(currentTheme);
-                setFontSize(currentFont);
-                updateMAButtons();
-                updateCryptoMAButtons();
-                updatePfCardMetrics();
-
-                setTimeout(() => { 
-                    if(myChart) { myChart.resize(); loadData('SPY'); }
-                }, 150);
-                
-                window.addEventListener('resize', () => { 
-                    requestAnimationFrame(() => {
-                        myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize(); baaChart?.resize();
-                    });
-                });
+                setTimeout(() => { if(myChart) { myChart.resize(); loadData('SPY'); } }, 150);
+                window.addEventListener('resize', () => requestAnimationFrame(() => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize(); }));
             } catch(e) { logError("Init Crash", e); }
         });
     </script>
