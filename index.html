@@ -48,7 +48,6 @@
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); }
         
-        /* 반응형 차트 컨테이너 높이 개선 */
         .chart-container { height: 350px; width: 100%; display: block; }
         @media (min-width: 768px) { .chart-container { height: 450px; } }
         @media (min-width: 1024px) { .chart-container { height: 500px; } }
@@ -76,7 +75,6 @@
         .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .theme-btn.active { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
 
-        /* 지표 박스 반응형 및 넘침 방지 개선 */
         .stat-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;}
         .stat-box:hover { border-color: #3B82F6; background: rgba(0,0,0,0.1); }
         .stat-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 4px; text-align: center; word-break: keep-all; line-height: 1.2; }
@@ -122,7 +120,6 @@
         .rule-list li::before { content: '✓'; color: #3B82F6; margin-right: 10px; font-weight: bold; flex-shrink: 0; margin-top: 1px; font-size: 0.8rem; }
         .rule-highlight { color: var(--text-main); font-weight: 800; background: rgba(59, 130, 246, 0.2); padding: 3px 6px; border-radius: 6px; margin-right: 6px; display: inline-block; margin-bottom: 4px; border: 1px solid rgba(59, 130, 246, 0.4); word-break: keep-all; }
         
-        /* 토글 스위치 (초보/전문가) */
         .mode-toggle-wrap { position: relative; display: inline-flex; height: 34px; background: rgba(0,0,0,0.5); border-radius: 17px; border: 1px solid var(--border-color); cursor: pointer; align-items: center; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
         .mode-toggle-wrap input { display: none; }
         .mode-slider-bg { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); background: #3B82F6; border-radius: 15px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), background-color 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
@@ -136,10 +133,9 @@
         details[open] summary ~ * { animation: sweep .3s ease-in-out; }
         @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
 
-        /* 초보/전문가 모드 전용 디스플레이 제어 클래스 */
         body.beginner-mode .expert-only { display: none !important; }
         body:not(.beginner-mode) .beginner-only { display: none !important; }
-        body.beginner-mode .beginner-only { display: flex; } /* 빅 카드를 위해 flex 지정 */
+        body.beginner-mode .beginner-only { display: flex; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
@@ -266,7 +262,6 @@
 
                 <div id="pf-modal-compare-chart" class="pf-modal-chart-container bg-themeBg/50 rounded-xl border border-themeBorder mb-4"></div>
                 
-                <!-- 구간 수익률 검증 (Live 백테스트 데이터) -->
                 <div id="pf-historical-section" class="expert-only mb-4 bg-[var(--bg-color)] rounded-xl border border-themeBorder p-3 md:p-4">
                     <p class="text-[0.7rem] font-black text-themeText uppercase mb-2 flex items-center gap-2">
                         <svg class="icon-sm text-accent" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
@@ -287,7 +282,6 @@
                     <div id="pf-pie-chart" class="pie-container"></div>
                 </div>
 
-                <!-- 라이브 전략 계산 엔진 영역 (전문가용 모드) -->
                 <div id="pf-modal-live-area" class="expert-only w-full bg-[var(--bg-color)] rounded-xl border border-accent/40 mb-4 hidden relative overflow-hidden">
                     <div class="p-3 border-b border-themeBorder flex flex-col md:flex-row md:justify-between md:items-center bg-black/20 gap-3">
                         <div class="flex items-center gap-2">
@@ -440,7 +434,6 @@
                 <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
 
-            <!-- 하단 인텔리전스 레이아웃 (반응형 3분할) -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
                 <div class="expert-only glass rounded-2xl p-3 md:p-5 lg:col-span-1 flex flex-col shadow-xl border-t-4 border-t-accent">
                     <div class="flex justify-between items-center mb-3 border-b border-themeBorder pb-2">
@@ -470,7 +463,6 @@
                     <p class="text-[0.55rem] text-themeMuted text-center mt-1">박스를 터치하면 AI가 작성한 상세 계산식을 볼 수 있어요!</p>
                 </div>
 
-                <!-- 초보자 전용 큼직한 요약 카드 -->
                 <div class="beginner-only glass rounded-2xl p-6 lg:col-span-1 shadow-xl border-t-4 border-t-accent flex flex-col justify-center items-center h-full text-center">
                     <p class="text-xs font-black text-themeMuted mb-2">지금 사도 될까요?</p>
                     <div id="beginner-summary-text" class="text-3xl font-black text-themeText mb-4 break-keep">AI 분석 중...</div>
@@ -488,7 +480,6 @@
                         </div>
                     </div>
                     
-                    <!-- 2xl:grid-cols-7 와 넘침 방지를 적용한 stat-box 그리드 -->
                     <div id="stock-expert-indicators" class="expert-only grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
                         <div class="stat-box" onclick="openStatInfo('vix', 'stock')">
                             <div class="weight-badge">9.0</div>
@@ -527,7 +518,6 @@
                         </div>
                     </div>
 
-                    <!-- 초보/전문가 공통: AI 해석 요약 및 증명 아코디언 -->
                     <div id="reasoning-container" class="space-y-2 overflow-y-auto pr-2 custom-scroll max-h-[300px] md:max-h-[350px]">
                         <p class="text-xs text-themeMuted text-center py-6">분석 대기 중...</p>
                     </div>
@@ -622,7 +612,6 @@
                     <p class="text-[0.55rem] text-themeMuted text-center mt-1">박스를 터치하면 AI가 작성한 상세 계산식을 볼 수 있어요!</p>
                 </div>
 
-                <!-- 초보자 전용 요약 카드 (코인) -->
                 <div class="beginner-only glass rounded-2xl p-6 lg:col-span-1 shadow-xl border-t-4 border-t-accent flex flex-col justify-center items-center h-full text-center">
                     <p class="text-xs font-black text-themeMuted mb-2">지금 사도 될까요?</p>
                     <div id="crypto-beginner-summary-text" class="text-3xl font-black text-themeText mb-4 break-keep">AI 분석 중...</div>
@@ -775,7 +764,7 @@
             </div>
         </div>
 
-        <!-- View: BAA 심화 (레버리지) - 1번 코드의 완벽한 기능 복구 -->
+        <!-- View: BAA 심화 -->
         <div id="view-baa" class="hidden flex-col space-y-4">
             <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-orange-500 relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
@@ -825,7 +814,7 @@
                 
                 <div id="baa-live-loading" class="hidden flex-col items-center justify-center py-6">
                     <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
-                    <p class="text-[0.7rem] font-bold text-accent uppercase tracking-widest text-center">실시간 야후 파이낸스 주가 데이터를 바탕으로<br>카나리아 생존 여부를 판단 중입니다...</p>
+                    <p class="text-[0.7rem] font-bold text-accent uppercase tracking-widest text-center">야후 파이낸스 주가 데이터를 바탕으로<br>카나리아 생존 여부를 판단 중입니다...</p>
                 </div>
 
                 <div id="baa-live-result" class="hidden">
@@ -895,13 +884,12 @@
         </div>
     </div>
 
-    <!-- 스크립트 영역 (1번 코드와 2번 코드의 통합) -->
     <script>
         // ==========================================
-        // 🚀 1. 전역 변수 및 상수 (1번 + 2번 혼합)
+        // 🚀 1. 전역 변수 및 상수
         // ==========================================
         let errorLogs = [];
-        let currentExchangeRate = 1350; // 실시간 환율을 담을 변수 추가
+        let currentExchangeRate = 1350; 
         
         let currentCurrency = safeStorageGet('dashboardCurrency', 'USD');
         let currentInterval = '1d', currentRange = '1y';
@@ -921,7 +909,6 @@
         let isBeginnerMode = false;
         let baaProofs = {};
 
-        // 용어 및 설명 딕셔너리 (초보/전문가 모드용)
         const TERMS = {
             vix: { expert: 'VIX 지수', beginner: '시장 불안감 (VIX)' },
             fng: { expert: '공포/탐욕', beginner: '대중의 심리' },
@@ -944,7 +931,6 @@
             vol: { expert: '최근 30일 기준 자산의 연환산 변동성입니다.\n\n• 단기 가중치: 9.0 / 10', beginner: '코인 시장이 위아래로 얼마나 미친 듯이 요동치는지 보여줘요.' }
         };
 
-        // 🧠 금융공학 기간별 가중치 매트릭스
         const WEIGHT_MATRIX = {
             stock: { short: { VIX: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, MACD: 7, DIST: 8, BB: 6 }, mid: { VIX: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 8.5, DIST: 9, BB: 4 }, long: { VIX: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 8, DIST: 9.5, BB: 2 } },
             crypto: { short: { VOL: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, MACD: 7, DIST: 8, BB: 6 }, mid: { VOL: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 8.5, DIST: 9, BB: 4 }, long: { VOL: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 8, DIST: 9.5, BB: 2 } }
@@ -955,7 +941,6 @@
 
         let globalVix = null, globalFng = null, globalCryptoFng = null;
 
-        // 시뮬레이션용 하드코딩 데이터 (야후 파이낸스 과거 데이터 기반)
         const pfSimYears = ["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024", "2025", "2026"];
         const pfSimData = {
             'spy': [100, 88, 65, 83, 90, 94, 105, 110, 68, 84, 96, 96, 112, 145, 165, 163, 183, 218, 205, 265, 305, 395, 320, 395, 490, 560, 620],
@@ -969,14 +954,12 @@
         };
         const fxSimData = [1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
 
-        // BAA 레버리지 시뮬레이션
         const baaLevSimData = {
             'baa_qqq': pfSimData['baa'], 
             'baa_qld': [100, 135, 180, 280, 360, 460, 610, 780, 710, 1050, 1350, 1450, 1850, 2650, 3350, 3500, 4100, 5300, 4900, 7200, 9800, 12500, 9800, 13500, 18500, 23500, 28000],
             'baa_tqqq': [100, 140, 200, 350, 480, 650, 950, 1280, 1100, 1750, 2350, 2550, 3500, 5500, 7200, 7500, 9200, 12500, 11000, 18000, 26000, 35000, 22000, 32000, 48000, 62000, 75000]
         };
 
-        // 포트폴리오 상세 정보
         const pfDetails = {
             '6040': { 
                 title: '60/40 포트폴리오', type: 'static', 
@@ -1053,15 +1036,21 @@
 
         function extractCleanData(data) {
             if(!data || !data.indicators || !data.indicators.quote || !data.indicators.quote[0]) return { dates:[], kData:[], closes:[] };
-            const q = data.indicators.quote[0], ts = data.timestamp || [];
+            const q = data.indicators.quote[0];
+            // 수정종가(Adj Close)를 사용하여 배당락/분할을 보정 (없으면 일반 종가 사용)
+            const adj = data.indicators.adjclose ? data.indicators.adjclose[0].adjclose : q.close;
+            const ts = data.timestamp || [];
+            
             let dates = [], kData = [], closes = [];
             let lastValidClose = 0;
+            
             for(let i=0; i<ts.length; i++) {
-                let c = q.close[i];
+                let c = (adj[i] !== null && adj[i] !== undefined) ? adj[i] : q.close[i];
                 if (c !== null && c !== undefined) { lastValidClose = c; } else { c = lastValidClose; }
+                
                 if (c !== 0) {
                     dates.push(new Date(ts[i] * 1000).toISOString().split('T')[0]); 
-                    kData.push([q.open[i]||c, c, q.low[i]||c, q.high[i]||c]); 
+                    kData.push([q.open[i]||c, q.close[i]||c, q.low[i]||c, q.high[i]||c]); 
                     closes.push(c);
                 }
             }
@@ -1143,14 +1132,15 @@
         // 🌐 3. 데이터 로딩 (야후 파이낸스 프록시)
         // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
-            // 야후 파이낸스 직접 호출 우회 프록시 (AllOrigins)
-            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${intv}&range=${range}`;
+            // 캐시 방지 처리 추가
+            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${intv}&range=${range}&_t=${Date.now()}`;
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
 
             try {
                 const response = await fetch(proxyUrl);
                 if (!response.ok) throw new Error(`API Error: ${response.status}`);
                 const data = await response.json();
+                if (!data || !data.chart || !data.chart.result) throw new Error("Invalid format");
                 return data.chart.result[0];
             } catch (error) {
                 console.warn(`[API FAIL] Falling back to Mock Data for ${ticker}. Error: ${error.message}`);
@@ -1158,7 +1148,6 @@
             }
         }
 
-        // 실패 시 방어용 모의 데이터
         function generateMockData(ticker, interval, range) {
             let points = 250;
             if (range === '1mo') points = 22; else if (range === '2y') points = 504; else if (range === '5y') points = 1260;
@@ -1186,7 +1175,6 @@
 
         async function fetchExchangeRate() {
             try {
-                // KRW=X (원달러 환율) API 연동
                 const data = await fetchStockData('KRW=X', '1d', '5d'); 
                 const { closes } = extractCleanData(data);
                 if (closes && closes.length > 0) {
@@ -1215,7 +1203,7 @@
 
         async function fetchMacroData() {
             try {
-                await fetchExchangeRate(); // 환율 갱신 추가
+                await fetchExchangeRate(); 
 
                 const vixData = await fetchStockData('^VIX', '1d', '3mo');
                 const vixCloses = extractCleanData(vixData).closes;
@@ -1374,7 +1362,7 @@
             if(searchInput) searchInput.value = ticker;
 
             try {
-                await fetchCryptoMacroData(); // API 연동으로 가져오기
+                await fetchCryptoMacroData();
                 renderIndicatorUI('crypto-val-fng', globalCryptoFng, 'FNG', globalCryptoFng, 'crypto');
 
                 const reqInterval = interval === '1y' ? '1mo' : interval;
@@ -1406,11 +1394,11 @@
             if(closes.length === 0) return;
 
             document.getElementById('display-ticker').innerText = ticker;
-            const price = closes[closes.length - 1];
+            // 일반 가격 노출 시엔 종가를 씀
+            const price = data.indicators.quote[0].close[closes.length-1] || closes[closes.length - 1]; 
             
-            // 환율 적용 로직
             let finalPrice = price;
-            if(currentCurrency === 'KRW') finalPrice = price * currentExchangeRate; // 실시간 환율 적용
+            if(currentCurrency === 'KRW') finalPrice = price * currentExchangeRate;
             
             document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
             
@@ -1507,13 +1495,13 @@
             if(closes.length === 0) return;
 
             document.getElementById('crypto-display-ticker').innerText = ticker.replace('-USD', '');
-            const price = closes[closes.length - 1];
+            const price = data.indicators.quote[0].close[closes.length-1] || closes[closes.length - 1]; 
             let finalPrice = price;
-            if(currentCurrency === 'KRW') finalPrice = price * currentExchangeRate; // 실시간 환율 적용
+            if(currentCurrency === 'KRW') finalPrice = price * currentExchangeRate;
             document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
             
             const vol = calcVolatility(closes);
-            renderIndicatorUI('crypto-val-vol', vol.toFixed(1) + '%', 'VOL', vol, 'crypto'); // 대문자 VOL 유지 확인됨
+            renderIndicatorUI('crypto-val-vol', vol.toFixed(1) + '%', 'VOL', vol, 'crypto');
 
             const rsiArr = Indicator.rsi(closes, 14); const rsi = rsiArr[rsiArr.length - 1] || 50;
             const ma120Arr = Indicator.sma(closes, 120); const ma120 = ma120Arr[ma120Arr.length - 1];
@@ -1590,7 +1578,6 @@
 
         async function calculateTriplePerspectiveDecision(ticker, marketType = 'stock') {
             try {
-                // 단기(일봉), 중기(주봉), 장기(월봉) 데이터 병렬 호출 (프록시 사용)
                 const [dData, wData, mData] = await Promise.all([
                     fetchStockData(ticker, '1d', '2y', marketType === 'crypto'),
                     fetchStockData(ticker, '1wk', '5y', marketType === 'crypto'),
@@ -1695,7 +1682,6 @@
 
                 updateUI(marketType);
 
-                // Update individual UI Boxes (Main Report - Short term)
                 const dailyClean = extractCleanData(dData);
                 const mainSma120 = Indicator.sma(dailyClean.closes, 120);
                 const lastCl = dailyClean.closes.length > 0 ? dailyClean.closes[dailyClean.closes.length-1] : 0;
@@ -1880,26 +1866,24 @@
                 else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
                 else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
 
+                document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (병렬 처리)...`;
+                
+                // 병렬 데이터 페칭으로 속도 개선
+                const promises = tickers.map(t => fetchStockData(t, '1mo', '2y'));
+                const results = await Promise.all(promises);
+                
                 const dataMap = {};
-                let unifiedMonths = new Set();
+                let minLength = 9999;
                 
                 for(let i=0; i<tickers.length; i++) {
                     const t = tickers[i];
-                    document.getElementById('pf-live-loading-text').innerText = `API 수집 중 (${i+1}/${tickers.length}) - ${t}`;
-                    if(i > 0) await new Promise(r => setTimeout(r, 500)); // Rate limit 방어
-                    
-                    const d = await fetchStockData(t, '1mo', '2y');
-                    let { dates, closes } = extractCleanData(d);
-                    
-                    dataMap[t] = {};
-                    for(let j=0; j<dates.length; j++) {
-                        const dStr = dates[j].substring(0, 7);
-                        dataMap[t][dStr] = closes[j];
-                        unifiedMonths.add(dStr);
-                    }
+                    let { dates, closes } = extractCleanData(results[i]);
+                    dataMap[t] = { dates, closes };
+                    if(closes.length < minLength) minLength = closes.length;
                 }
 
-                const sortedMonths = Array.from(unifiedMonths).sort();
+                if(minLength < 13) throw new Error("과거 데이터가 충분하지 않습니다 (12개월 미만)");
+
                 let html = '<thead><tr><th class="text-left">투자 월</th>';
                 if(pfKey === 'dual') html += `<th>SPY 12M수익</th><th>VEA 12M수익</th><th>BIL 12M수익</th>`;
                 else if(pfKey === 'vaa') html += `<th>SPY 점수</th><th>VEA 점수</th><th>VWO 점수</th><th>AGG 점수</th>`;
@@ -1910,13 +1894,12 @@
                 const getSignal = (idx) => {
                     if(idx - 12 < 0) return null;
                     let result = { assets: [], text: '', proofs: [], color: '' };
-                    const currYM = sortedMonths[idx];
                     
                     const calcScore = (t) => {
-                        const m1YM = sortedMonths[idx-1], m3YM = sortedMonths[idx-3], m6YM = sortedMonths[idx-6], m12YM = sortedMonths[idx-12];
-                        const P0 = dataMap[t][currYM], P1 = m1YM ? dataMap[t][m1YM] : null, P3 = m3YM ? dataMap[t][m3YM] : null, P6 = m6YM ? dataMap[t][m6YM] : null, P12 = m12YM ? dataMap[t][m12YM] : null;
+                        const arr = dataMap[t].closes;
+                        const P0 = arr[idx], P1 = arr[idx-1], P3 = arr[idx-3], P6 = arr[idx-6], P12 = arr[idx-12];
 
-                        if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `<span class="text-rose-400">[${t}] 과거 데이터 부족</span>` };
+                        if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
 
                         const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
                         const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
@@ -1935,8 +1918,8 @@
                     };
 
                     const calcRet = (t) => {
-                        const m12YM = sortedMonths[idx-12];
-                        const P0 = dataMap[t][currYM], P12 = m12YM ? dataMap[t][m12YM] : null;
+                        const arr = dataMap[t].closes;
+                        const P0 = arr[idx], P12 = arr[idx-12];
                         if(!P0 || !P12) return { ret: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
                         const ret = (P0/P12 - 1) * 100;
                         const proof = `<div class="mb-1"><span class="text-accent font-bold">[${t}]</span> 현재 ${getCurrSymbol()}${formatPriceStr(P0)} / 과거 ${getCurrSymbol()}${formatPriceStr(P12)} => <span class="text-white">수익률 ${ret.toFixed(2)}%</span></div>`;
@@ -1999,15 +1982,16 @@
                     return result;
                 };
 
-                const len = sortedMonths.length;
                 let actualCagrs = [];
-                for(let i = len - 1; i >= len - 12; i--) {
+                // 최근 12개월(루프 역순)
+                for(let i = minLength - 1; i >= minLength - 12; i--) {
                     if(i - 12 < 0) break;
                     
                     const sig = getSignal(i);
                     if(!sig) continue;
 
-                    const [yy, mm] = sortedMonths[i].split('-');
+                    // 기준 날짜는 SPY를 사용
+                    const [yy, mm] = dataMap['SPY'].dates[i].split('-');
                     const ymLabel = `${yy.substring(2)}년 ${parseInt(mm)}월`;
                     let row = `<tr><td class="text-left font-bold text-accent whitespace-nowrap">${ymLabel}</td>`;
                     
@@ -2034,21 +2018,21 @@
                     let actualRetHtml = '<td class="text-gray-400">--</td>';
                     let benchRetHtml = '<td class="text-gray-400 bg-black/10">-- / --</td>';
                     
-                    if (i < len - 1) { 
+                    if (i < minLength - 1) { 
                         let monRet = 0, hasData = true;
                         for(let asset of sig.assets) {
-                            const p0 = dataMap[asset.t][sortedMonths[i]];
-                            const p1 = dataMap[asset.t][sortedMonths[i+1]]; 
+                            const p0 = dataMap[asset.t].closes[i];
+                            const p1 = dataMap[asset.t].closes[i+1]; 
                             if(p0 && p1) { monRet += asset.w * (p1 / p0 - 1); } else { hasData = false; }
                         }
                         if(hasData) {
                             const retPct = monRet * 100;
                             actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
-                            actualCagrs.push(retPct); // For summary
+                            actualCagrs.push(retPct);
                         }
 
-                        const spy0 = dataMap['SPY']?.[sortedMonths[i]], spy1 = dataMap['SPY']?.[sortedMonths[i+1]];
-                        const qqq0 = dataMap['QQQ']?.[sortedMonths[i]], qqq1 = dataMap['QQQ']?.[sortedMonths[i+1]];
+                        const spy0 = dataMap['SPY']?.closes[i], spy1 = dataMap['SPY']?.closes[i+1];
+                        const qqq0 = dataMap['QQQ']?.closes[i], qqq1 = dataMap['QQQ']?.closes[i+1];
                         let spyStr = '--', qqqStr = '--';
                         if(spy0 && spy1) { const pct = (spy1/spy0 - 1)*100; spyStr = `<span class="${pct>0?'text-up':'text-down'}">${pct>0?'+':''}${pct.toFixed(2)}%</span>`; }
                         if(qqq0 && qqq1) { const pct = (qqq1/qqq0 - 1)*100; qqqStr = `<span class="${pct>0?'text-up':'text-down'}">${pct>0?'+':''}${pct.toFixed(2)}%</span>`; }
@@ -2069,7 +2053,6 @@
                 html += `</tbody>`;
                 tbody.innerHTML = html;
 
-                // 실시간 성과 요약 (12개월 누적)
                 if (summaryBox && actualCagrs.length > 0) {
                     let accRet = 1;
                     actualCagrs.forEach(r => accRet *= (1 + r/100));
@@ -2126,30 +2109,36 @@
             idle.style.display = 'none'; resultBox.style.display = 'none'; loading.style.display = 'flex';
 
             const canaries = ['SPY', 'VEA', 'VWO', 'BND'];
-            let minScore = 9999, failureCount = 0, dataMap = {}, unifiedMonths = new Set();
+            let minScore = 9999, failureCount = 0;
 
             try {
-                for (let ticker of canaries) {
-                    const d = await fetchStockData(ticker, '1mo', '2y');
-                    const { dates, closes } = extractCleanData(d);
-                    dataMap[ticker] = {};
-                    for(let j=0; j<dates.length; j++) {
-                        const dStr = dates[j].substring(0, 7); // YYYY-MM
-                        dataMap[ticker][dStr] = closes[j];
-                        unifiedMonths.add(dStr);
-                    }
-                }
+                // 병렬 처리로 속도 대폭 개선
+                const promises = canaries.map(t => fetchStockData(t, '1mo', '2y'));
+                const results = await Promise.all(promises);
 
-                const sortedMonths = Array.from(unifiedMonths).sort();
-                const idx = sortedMonths.length - 1; 
-                if(idx < 12) throw new Error("과거 12개월 데이터 부족");
-
-                const currYM = sortedMonths[idx], m1YM = sortedMonths[idx-1], m3YM = sortedMonths[idx-3], m6YM = sortedMonths[idx-6], m12YM = sortedMonths[idx-12];
                 baaProofs = {};
 
-                for (let ticker of canaries) {
-                    const P0 = dataMap[ticker][currYM], P1 = dataMap[ticker][m1YM], P3 = dataMap[ticker][m3YM], P6 = dataMap[ticker][m6YM], P12 = dataMap[ticker][m12YM];
-                    if(!P0 || !P1 || !P3 || !P6 || !P12) throw new Error(`[${ticker}] 데이터 누락`);
+                for (let i = 0; i < canaries.length; i++) {
+                    const ticker = canaries[i];
+                    const { dates, closes } = extractCleanData(results[i]);
+
+                    // 문자열 매칭 대신 정확한 수학적 인덱싱 사용 (데이터 누락 에러 원천 차단)
+                    const len = closes.length;
+                    if(len < 13) throw new Error(`[${ticker}] 데이터 부족 (최소 13개월 필요, 현재 ${len}개월)`);
+
+                    const P0 = closes[len - 1];
+                    const P1 = closes[len - 2];
+                    const P3 = closes[len - 4];
+                    const P6 = closes[len - 7];
+                    const P12 = closes[len - 13];
+
+                    const currYM = dates[len - 1].substring(0, 7);
+                    const m1YM = dates[len - 2].substring(0, 7);
+                    const m3YM = dates[len - 4].substring(0, 7);
+                    const m6YM = dates[len - 7].substring(0, 7);
+                    const m12YM = dates[len - 13].substring(0, 7);
+
+                    if(!P0 || !P1 || !P3 || !P6 || !P12) throw new Error(`[${ticker}] 가격 데이터 파싱 실패`);
                     
                     const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
                     const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
@@ -2160,7 +2149,7 @@
                     baaProofs[ticker] = `
                         <div class="space-y-3 text-sm text-themeText">
                             <div class="bg-black/20 p-3 rounded-xl border border-themeBorder flex justify-between items-center">
-                                <span class="font-bold text-themeMuted text-xs uppercase">기준월 (${currYM}) 종가</span><span class="font-mono font-black text-accent text-lg">$${P0.toFixed(2)}</span>
+                                <span class="font-bold text-themeMuted text-xs uppercase">기준월 (${currYM}) 수정종가</span><span class="font-mono font-black text-accent text-lg">$${P0.toFixed(2)}</span>
                             </div>
                             <div class="bg-black/20 p-4 rounded-xl border border-themeBorder">
                                 <p class="text-accent text-xs font-black uppercase tracking-widest border-b border-themeBorder/50 pb-2 mb-3">기간별 모멘텀 기여도 산출</p>
@@ -2208,7 +2197,7 @@
             } catch (error) {
                 logError("BAA Live Check Error", error);
                 loading.style.display = 'none'; idle.style.display = 'block';
-                idle.innerHTML = '<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다. 무료 프록시 서버 지연일 수 있으니 다시 시도해주세요.</p>';
+                idle.innerHTML = `<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다. 프록시 서버 지연일 수 있으니 다시 시도해주세요.<br><span class="text-xs text-gray-500">${error.message}</span></p>`;
             }
         }
 
@@ -2502,4 +2491,3 @@ document.addEventListener("DOMContentLoaded", () => {
     </script>
 </body>
 </html>
-```
