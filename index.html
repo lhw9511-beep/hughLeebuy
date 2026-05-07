@@ -991,7 +991,7 @@
             },
             'daa': { 
                 title: 'DAA 전략', type: 'dynamic', 
-                desc: '카나리아 자산을 도입하여 글로벌 경제 위기 조짐이 보일 때만 비중을 조절하여 도망갑니다.',
+                desc: '카나리아 자산을 도입하여 글로벌 경제 위기 조짐이 보일 때만 비중 조절을 하여 도망갑니다.',
                 rules: ['<div class="flex-1"><span class="rule-highlight">규칙:</span> VWO, BND(카나리아) 중 1개라도 무너지면 안전자산 비중을 높입니다.</div>'] 
             },
             'baa': { 
@@ -1034,7 +1034,6 @@
             }
         }
 
-        // 핵심 수정: adjclose와 close를 섞어 쓰지 않고, HTS와 동일하게 일반 캔들 값으로 고정
         function extractCleanData(data) {
             if(!data || !data.indicators || !data.indicators.quote || !data.indicators.quote[0]) return { dates:[], kData:[], closes:[] };
             
@@ -1044,7 +1043,6 @@
             let dates = [], kData = [], closes = [];
             let lastValidClose = 0;
             
-            // 야후 파이낸스 실시간 장중 가격 데이터
             const meta = data.meta || {};
             const livePrice = meta.regularMarketPrice;
             
@@ -1054,7 +1052,6 @@
                 let l = q.low[i];
                 let c = q.close[i];
 
-                // 데이터가 null인 경우 이전 종가로 복구
                 if (c === null || c === undefined) c = lastValidClose;
                 else lastValidClose = c;
 
@@ -1062,7 +1059,6 @@
                 if (h === null || h === undefined) h = c;
                 if (l === null || l === undefined) l = c;
 
-                // 마지막 캔들일 경우, 아직 종가가 안 들어왔거나 지연되었으면 실시간 가격으로 덮어씀
                 if (i === ts.length - 1 && livePrice) {
                     c = livePrice;
                     if (h < c) h = c;
@@ -1070,12 +1066,11 @@
                 }
 
                 if (c !== 0 && c !== null) {
-                    // YYYY-MM-DD 포맷 변환
                     let d = new Date(ts[i] * 1000);
                     let dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 
                     dates.push(dateStr); 
-                    kData.push([o, c, l, h]); // ECharts 캔들 포맷: [open, close, low, high]
+                    kData.push([o, c, l, h]); 
                     closes.push(c);
                 }
             }
@@ -1154,55 +1149,63 @@
         };
 
         // ==========================================
-        // 🌐 3. 데이터 로딩 (다중 프록시 및 캐시 무력화)
+        // 🌐 3. 데이터 로딩 (다중 프록시 및 JSON 래핑으로 차단 원천 봉쇄)
         // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
-            // 야후 파이낸스 자체 캐시 무력화를 위한 랜덤 문자열 추가
-            const nocache = Date.now() + Math.random().toString(36).substring(7);
-            
-            // events=div,splits 를 추가하여 분할/배당 보정이 완료된 깔끔한 차트 데이터를 받음
-            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${intv}&range=${range}&events=div%2Csplits&includePrePost=false&_t=${nocache}`;
-            
-            // 캐싱이 심한 allorigins 대신 비교적 빠른 프록시들을 앞단에 배치
+            const yUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${intv}&range=${range}&events=div%2Csplits&includePrePost=false`;
+            const yUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${intv}&range=${range}&events=div%2Csplits&includePrePost=false`;
+
             const proxies = [
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-                `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`,
-                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(targetUrl)}`
+                // 1. 가장 강력한 우회: 응답을 JSON 문자열로 한 번 감싸서 보내므로 브라우저단 에러(Load Failed) 완전 무력화
+                { url: `https://api.allorigins.win/get?url=${encodeURIComponent(yUrl1)}`, type: 'jsonp' },
+                { url: `https://api.allorigins.win/get?url=${encodeURIComponent(yUrl2)}`, type: 'jsonp' },
+                // 2. Raw 프록시 예비용
+                { url: `https://corsproxy.io/?url=${encodeURIComponent(yUrl1)}`, type: 'raw' },
+                { url: `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(yUrl1)}`, type: 'raw' }
             ];
 
             let lastError = null;
 
-            for (const proxyUrl of proxies) {
+            for (const proxy of proxies) {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 6000); // 타임아웃 6초
+                    const timeoutId = setTimeout(() => controller.abort(), 8000); // 아이폰 등 모바일 지연 대비 8초 부여
 
-                    // fetch 시에도 강력한 브라우저 캐시 무력화 헤더 사용
-                    const response = await fetch(proxyUrl, { 
+                    const res = await fetch(proxy.url, { 
                         cache: 'no-store',
-                        headers: {
-                            'Pragma': 'no-cache',
-                            'Cache-Control': 'no-cache'
-                        },
+                        headers: { 'Accept': 'application/json' },
                         signal: controller.signal 
                     });
                     
                     clearTimeout(timeoutId);
 
-                    if (!response.ok) throw new Error(`Proxy Error: ${response.status}`);
-                    
-                    const data = await response.json();
-                    if (!data || !data.chart || !data.chart.result) throw new Error("Invalid format");
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                    let data;
+                    if (proxy.type === 'jsonp') {
+                        const wrapper = await res.json();
+                        if (!wrapper.contents) throw new Error("프록시 응답 본문이 비어있습니다.");
+                        try {
+                            data = JSON.parse(wrapper.contents);
+                        } catch(e) {
+                            throw new Error("야후 파이낸스 측에서 접근을 거부했습니다. (Parsing Error)");
+                        }
+                    } else {
+                        data = await res.json();
+                    }
+
+                    if (!data || !data.chart || !data.chart.result) throw new Error("야후 데이터 형식이 올바르지 않습니다.");
                     
                     return data.chart.result[0];
-                } catch (error) {
-                    lastError = error;
-                    console.warn(`[API FAIL] Proxy failed: ${proxyUrl}. Trying next...`);
+
+                } catch (err) {
+                    lastError = err;
+                    console.warn(`[Proxy Fail] ${proxy.url} -> ${err.message}`);
                     continue; 
                 }
             }
 
-            throw new Error(`데이터 통신 실패: ${lastError.message}`);
+            throw new Error(`${lastError.message}`);
         }
 
         async function fetchExchangeRate() {
@@ -1377,7 +1380,7 @@
                     if(myChart) myChart.clear();
                     const dt = document.getElementById('display-ticker'); if (dt) dt.innerText = "ERROR";
                     const lp = document.getElementById('live-price'); if (lp) lp.innerText = "---";
-                    const rc = document.getElementById('reasoning-container'); if (rc) rc.innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.</p>';
+                    const rc = document.getElementById('reasoning-container'); if (rc) rc.innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터 통신이 차단되었습니다.<br><br>브라우저 설정이나 광고차단기(AdBlock)가<br>우회 서버 접근을 막고 있습니다.</p>';
                 }
             } finally { 
                 if(loadingOverlay) loadingOverlay.style.display = 'none'; 
@@ -1427,7 +1430,6 @@
 
             document.getElementById('display-ticker').innerText = ticker;
             
-            // extractCleanData에서 이미 최신 캔들 업데이트가 완료되었으므로, 배열의 마지막 값을 가져오면 됨
             let price = closes[closes.length - 1]; 
             
             let finalPrice = price;
@@ -2521,3 +2523,4 @@ document.addEventListener("DOMContentLoaded", () => {
     </script>
 </body>
 </html>
+```
