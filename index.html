@@ -973,7 +973,7 @@
         }
 
         function calcMDDArray(arr) {
-            let mdd = [], peak = arr[0];
+            let mdd =[], peak = arr[0];
             for(let i=0; i<arr.length; i++) {
                 if(arr[i] > peak) peak = arr[i];
                 let dd = (arr[i] - peak) / peak * 100;
@@ -1043,23 +1043,27 @@
         };
 
         // ==========================================
-        // 🌐 URL Encoding 및 프록시 강화 (오류 원천 차단)
+        // 🌐 무적 프록시 구조 설계 (DOMException 에러 원천 차단)
         // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
             let t = ticker.toUpperCase().trim();
             if (isCrypto && !t.includes('-')) t += '-USD';
 
             const nc = Date.now();
-            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_=${nc}`;
-            const targetUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_=${nc}`;
+            
+            // 야후 기본 URL (query1과 query2 혼용)
+            const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&nc=${nc}`;
+            
+            // CORS 우회 서버들에 보낼 때 타겟 URL 인코딩 여부를 철저하게 구분
+            const encUrl = encodeURIComponent(rawUrl);
 
-            // 에러를 원천 차단하기 위해 순수하게 작동이 확인된 프록시 조합으로 재설정
-            // encodeURIComponent 여부가 서버마다 다르므로 각각 맞춤형으로 설정
+            // 안정성 높은 무료 프록시 4종.
+            // 헤더 조작, 쿠키 조작을 피하기 위해 GET 파라미터로만 승부.
             const proxies =[
-                { url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, type: 'jsonp' },
-                { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl2)}`, type: 'raw' },
-                { url: `https://api.codetabs.com/v1/proxy/?quest=${targetUrl}`, type: 'raw' },
-                { url: `https://corsproxy.io/?url=${encodeURIComponent(targetUrl2)}`, type: 'raw' }
+                { url: `https://api.allorigins.win/raw?url=${encUrl}`, type: 'raw' },
+                { url: `https://api.codetabs.com/v1/proxy/?quest=${encUrl}`, type: 'raw' },
+                { url: `https://corsproxy.io/?${encUrl}`, type: 'raw' },
+                { url: `https://api.allorigins.win/get?url=${encUrl}`, type: 'jsonp' }
             ];
 
             let errors =[];
@@ -1067,40 +1071,47 @@
             for (const proxy of proxies) {
                 try {
                     const controller = new AbortController();
-                    // 타임아웃을 4.5초로 세팅하여 죽은 서버에서 빠르게 탈출
+                    // 타임아웃 4.5초 설정
                     const timeoutId = setTimeout(() => controller.abort(), 4500); 
 
+                    // headers: { Accept... } 를 완전히 제거하여 브라우저의 OPTIONS preflight(사전 요청) 회피! 
+                    // => "The string did not match the expected pattern" 에러의 주원인 제거
                     const res = await fetch(proxy.url, { 
                         cache: 'no-store',
-                        headers: { 'Accept': 'application/json' },
                         signal: controller.signal 
                     });
+                    
                     clearTimeout(timeoutId);
 
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                     const text = await res.text();
-                    if (!text || text.trim() === '') throw new Error("Empty body");
+                    if (!text || text.trim() === '') throw new Error("Empty response");
 
+                    // JSON 파싱 검증 (에러 HTML 페이지가 들어올 경우 방어)
                     let data;
                     try { 
                         data = JSON.parse(text); 
                     } catch(e) { 
-                        // HTML 등 비정상 데이터가 떨어지면 여기서 방어
-                        throw new Error("JSON Parse failed"); 
+                        throw new Error("Invalid JSON Parse (Probably blocked)"); 
                     }
 
+                    // allorigins jsonp 방식인 경우 이중 파싱
                     if (proxy.type === 'jsonp') {
                         if (!data.contents) throw new Error("Empty contents");
                         try { 
                             data = JSON.parse(data.contents); 
                         } catch(e) { 
-                            throw new Error("HTML returned instead of JSON"); 
+                            throw new Error("Invalid Inner JSON Parse"); 
                         }
                     }
 
-                    if (data.chart && data.chart.error) throw new Error(`Yahoo Error: ${data.chart.error.code}`);
-                    if (!data.chart || !data.chart.result || !data.chart.result[0]) throw new Error("Invalid Yahoo format");
+                    if (data.chart && data.chart.error) {
+                        throw new Error(`Yahoo API Error: ${data.chart.error.code}`);
+                    }
+                    if (!data.chart || !data.chart.result || !data.chart.result[0]) {
+                        throw new Error("Missing chart.result");
+                    }
                     
                     return data.chart.result[0];
 
@@ -1109,10 +1120,9 @@
                     if (err.name === 'AbortError' || msg.toLowerCase().includes('aborted') || msg.toLowerCase().includes('timeout')) {
                         msg = "Timeout (4.5s)";
                     }
-                    
                     let pName = "proxy";
                     try { pName = new URL(proxy.url).hostname; } catch(e) {}
-                    errors.push(`[${pName}] ${msg}`);
+                    errors.push(`[${pName}] -> ${msg}`);
                 }
             }
             
@@ -1275,7 +1285,7 @@
                     if(myChart) myChart.clear();
                     const dt = document.getElementById('display-ticker'); if (dt) dt.innerText = "ERROR";
                     const lp = document.getElementById('live-price'); if (lp) lp.innerText = "---";
-                    const rc = document.getElementById('reasoning-container'); if (rc) rc.innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터 통신이 차단되었습니다.</p>';
+                    const rc = document.getElementById('reasoning-container'); if (rc) rc.innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br><br>새로고침을 하거나 잠시 후 다시 시도해주세요.</p>';
                 }
             } finally { 
                 if(loadingOverlay) loadingOverlay.style.display = 'none'; 
@@ -1400,7 +1410,7 @@
                 grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
                 xAxis:[ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
                 yAxis:[ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex:[0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex: [0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
+                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex:[0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
                 series: series
             }, true);
             requestAnimationFrame(() => myChart.resize());
@@ -1480,7 +1490,7 @@
                 grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
                 xAxis:[ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
                 yAxis:[ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex:[0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex: [0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
+                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex:[0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
                 series: series
             }, true);
             requestAnimationFrame(() => cryptoChart.resize());
@@ -1488,7 +1498,6 @@
 
         async function calculateTriplePerspectiveDecision(ticker, marketType = 'stock') {
             try {
-                // 병렬 요청이 403을 유발할 수 있어 순차 요청으로 변경 (안정성 강화)
                 const dData = await fetchStockData(ticker, '1d', '2y', marketType === 'crypto');
                 await delay(200);
                 const wData = await fetchStockData(ticker, '1wk', '5y', marketType === 'crypto');
@@ -1731,7 +1740,7 @@
             tbody.innerHTML = '';
 
             try {
-                let tickers = []; let colCount = 7;
+                let tickers =[]; let colCount = 7;
                 if(pfKey === 'dual') { tickers =['SPY', 'VEA', 'BIL', 'QQQ']; colCount = 7; } 
                 else if(pfKey === 'vaa') { tickers =['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY', 'QQQ']; colCount = 8; } 
                 else if(pfKey === 'daa') { tickers =['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
@@ -1743,7 +1752,7 @@
                 for (let t of tickers) {
                     document.getElementById('pf-live-loading-text').innerText = `[${t}] 과거 데이터 로딩 중...`;
                     results.push(await fetchStockData(t, '1mo', '2y'));
-                    await delay(500); // 403 차단 방지 지연
+                    await delay(300); // 403 차단 방지 지연
                 }
                 
                 const dataMap = {}; let minLength = 9999;
@@ -1936,19 +1945,18 @@
             
             idle.style.display = 'none'; resultBox.style.display = 'none'; loading.style.display = 'flex';
 
-            const canaries = ['SPY', 'VEA', 'VWO', 'BND'];
+            const canaries =['SPY', 'VEA', 'VWO', 'BND'];
             let minScore = 9999, failureCount = 0;
 
             try {
                 baaProofs = {};
                 const results =[];
 
-                // 403 차단 방지를 위해 순차적(Sequential) 데이터 수집 및 딜레이 부여
                 for (let ticker of canaries) {
                     loadingText.innerHTML = `야후 파이낸스 주가 데이터를 바탕으로<br>카나리아 생존 여부를 판단 중입니다...<br><span class="text-white mt-2 block text-xs">[${ticker}] 수집 중 (403 우회)</span>`;
                     const data = await fetchStockData(ticker, '1mo', '2y');
                     results.push(data);
-                    await delay(600); 
+                    await delay(300); 
                 }
 
                 for (let i = 0; i < canaries.length; i++) {
@@ -2214,3 +2222,4 @@
     </script>
 </body>
 </html>
+```
