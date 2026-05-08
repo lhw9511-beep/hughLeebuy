@@ -105,7 +105,6 @@
 </head>
 <body class="min-h-screen flex flex-col p-2 md:p-4 lg:p-6">
 
-    <!-- 모달 영역 시작 -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b border-themeBorder pb-4">
@@ -291,9 +290,6 @@
             </div>
         </div>
     </div>
-    <!-- 모달 영역 끝 -->
-
-    <!-- 메인 레이아웃 시작 -->
     <div class="max-w-[1400px] mx-auto w-full flex-grow flex flex-col space-y-3 md:space-y-4 relative">
         <header class="glass rounded-2xl shadow-sm overflow-hidden">
             <div class="flex justify-between items-center p-3 md:p-4">
@@ -342,7 +338,6 @@
                 </label>
             </div>
 
-            <!-- 모바일용 탭 -->
             <div class="md:hidden flex border-t border-themeBorder bg-black/10 overflow-x-auto custom-scroll">
                 <button type="button" onclick="switchMainTab('dashboard')" id="mob-tab-btn-dashboard" class="main-tab-btn flex-1 min-w-[80px] text-center text-sm py-2 active">주식</button>
                 <button type="button" onclick="switchMainTab('crypto')" id="mob-tab-btn-crypto" class="main-tab-btn flex-1 min-w-[80px] text-center text-sm py-2">코인</button>
@@ -351,11 +346,10 @@
             </div>
         </header>
 
-        <!-- View: Dashboard (주식 분석) -->
         <div id="view-dashboard" class="flex flex-col space-y-3 md:space-y-4">
             <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
                 <form id="search-form" class="flex w-full sm:flex-grow">
-                    <input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="SPY" placeholder="주식 심볼 (예: QQQ, AAPL)">
+                    <input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" placeholder="주식 심볼 (예: QQQ, AAPL)">
                     <button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석하기</button>
                 </form>
                 <div id="status-text" class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2">
@@ -476,7 +470,6 @@
             </div>
         </div>
 
-        <!-- View: Crypto (코인 분석) -->
         <div id="view-crypto" class="hidden flex-col space-y-3 md:space-y-4">
             <div class="flex gap-2 mb-1 overflow-x-auto custom-scroll pb-1">
                 <button type="button" onclick="loadCryptoData('BTC-USD')" class="chip-btn bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border-orange-500/30">비트코인 (BTC)</button>
@@ -487,7 +480,7 @@
             
             <div class="flex flex-col sm:flex-row gap-2 md:gap-3 items-center w-full">
                 <form id="crypto-search-form" class="flex w-full sm:flex-grow">
-                    <input type="text" id="crypto-ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" value="BTC-USD" placeholder="코인 심볼 (예: ETH-USD)">
+                    <input type="text" id="crypto-ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" placeholder="코인 심볼 (예: ETH-USD)">
                     <button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석하기</button>
                 </form>
                 <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2">
@@ -611,7 +604,6 @@
             </div>
         </div>
 
-        <!-- View: Portfolio (백테스트) -->
         <div id="view-portfolio" class="hidden flex-col space-y-4">
             
             <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-emerald-500">
@@ -701,7 +693,6 @@
             </div>
         </div>
 
-        <!-- View: BAA 심화 -->
         <div id="view-baa" class="hidden flex-col space-y-4">
             <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-orange-500 relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
@@ -816,8 +807,15 @@
             </div>
         </div>
 
-        <div class="text-center mt-2 pb-6">
-            <p class="text-[0.6rem] text-themeMuted">Data Source: Yahoo Finance API | Risk-Adjusted Model (MAR) | Built with AI</p>
+        <div class="text-center mt-2 pb-8 pt-4 border-t border-themeBorder/30">
+            <p class="text-[0.65rem] text-themeMuted mb-2">
+                <strong class="text-themeText">데이터 출처 (Data Sources):</strong><br>
+                • 주가 및 암호화폐 시세: Yahoo Finance API<br>
+                • 공포 및 탐욕 지수: Alternative.me API<br>
+                • 우회 프록시 서버: AllOrigins API, CodeTabs API<br>
+                • 백테스트 벤치마크: S&P 500 (SPY), Nasdaq 100 (QQQ) 기반 자체 시뮬레이션
+            </p>
+            <p class="text-[0.6rem] text-themeMuted">Risk-Adjusted Model (MAR) | Built with AI Precision</p>
         </div>
     </div>
 
@@ -1044,30 +1042,32 @@
 
         // ==========================================
         // 🌐 무적 3중 안전망 데이터 패치 시스템 (백엔드 + 프록시 폴백)
+        // [수정됨] Cache-busting 타임스탬프 적용 및 HTML 파싱 에러 방지
         // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
             let t = ticker.toUpperCase().trim();
             if (isCrypto && !t.includes('-')) t += '-USD';
 
-            // 1순위: Render에 배포된 자체 백엔드 서버
-            const backendUrl = `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}`;
+            const timestamp = Date.now(); // 캐시 방지용 타임스탬프
             
-            // 2순위, 3순위: 백엔드 서버가 차단(500 에러)당할 경우를 대비한 외부 무료 프록시 서버
-            const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
+            // 1순위: Render에 배포된 자체 백엔드 서버
+            const backendUrl = `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`;
+            
+            // 2순위, 3순위: 백엔드 서버가 차단당할 경우를 대비한 외부 무료 프록시 서버 (HTML 차단을 피하기 위해 query2 사용)
+            const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_t=${timestamp}`;
+            const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_t=${timestamp}`;
             
             const servers =[
                 { url: backendUrl, name: '자체 백엔드 API' },
-                { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`, name: 'AllOrigins 프록시' },
+                { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`, name: 'AllOrigins 프록시' },
                 { url: `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl)}`, name: 'CodeTabs 프록시' }
             ];
 
             let lastError = "";
 
-            // 서버들을 순서대로 시도하며 하나라도 성공하면 즉시 반환 (Fallback Pattern)
             for (const server of servers) {
                 try {
                     const controller = new AbortController();
-                    // 백엔드가 막혀 무한 로딩에 빠지는 것을 방지하기 위해 8초 컷
                     const timeoutId = setTimeout(() => controller.abort(), 8000); 
 
                     const res = await fetch(server.url, { cache: 'no-store', signal: controller.signal });
@@ -1077,12 +1077,19 @@
 
                     const text = await res.text();
                     if (!text || text.trim() === '') throw new Error("빈 응답 (Empty response)");
+                    
+                    // [수정됨] 야후 보안 페이지(CAPTCHA 등 HTML) 차단 시 JSON 파싱 에러가 발생하지 않도록 사전 차단
+                    if (text.trim().startsWith('<')) {
+                        throw new Error("야후 보안 웹페이지 차단 (HTML 응답)");
+                    }
 
                     let data;
-                    try { data = JSON.parse(text); } 
-                    catch(e) { throw new Error("JSON 파싱 에러 (야후 보안 웹페이지로 막힘)"); }
+                    try { 
+                        data = JSON.parse(text); 
+                    } catch(e) { 
+                        throw new Error("JSON 파싱 에러 (데이터 형식 오류)"); 
+                    }
 
-                    // 자체 백엔드에서 에러를 JSON으로 감싸서 보낸 경우 예외 처리
                     if (data.error && typeof data.error === 'string') throw new Error(`서버 에러: ${data.error}`);
                     if (data.chart && data.chart.error) throw new Error(`야후 API 에러: ${data.chart.error.code}`);
                     if (!data.chart || !data.chart.result || !data.chart.result[0]) throw new Error("차트 데이터 없음");
@@ -1098,7 +1105,6 @@
                 }
             }
 
-            // 모든 서버가 실패했을 경우만 에러 방출
             throw new Error(`모든 데이터 서버 연결 실패 (마지막 에러: ${lastError})`);
         }
 
@@ -1114,7 +1120,7 @@
 
         async function fetchCryptoMacroData() {
             try {
-                const response = await fetch('https://api.alternative.me/fng/');
+                const response = await fetch(`https://api.alternative.me/fng/?_t=${Date.now()}`);
                 if (!response.ok) throw new Error(`Crypto FNG API Error: ${response.status}`);
                 const data = await response.json();
                 if (data && data.data && data.data[0]) globalCryptoFng = parseInt(data.data[0].value);
@@ -2151,6 +2157,7 @@
             });
         }
 
+        // [수정됨] 페이지 로드 시 기존 검색어를 불러와서 적용하는 로직 추가
         document.addEventListener("DOMContentLoaded", () => {
             window.scrollTo(0, 0);
             if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -2159,10 +2166,28 @@
                 myChart = echarts.init(document.getElementById('chart-main'));
                 
                 const form = document.getElementById('search-form');
-                if(form) { form.onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.trim().toUpperCase(); if(t) loadData(t); }; }
+                if(form) { 
+                    form.onsubmit = (e) => { 
+                        e.preventDefault(); 
+                        const t = document.getElementById('ticker-input').value.trim().toUpperCase(); 
+                        if(t) {
+                            safeStorageSet('lastTicker', t); // 검색어 저장
+                            loadData(t); 
+                        }
+                    }; 
+                }
 
                 const cryptoForm = document.getElementById('crypto-search-form');
-                if(cryptoForm) { cryptoForm.onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase(); if(t) loadCryptoData(t); }; }
+                if(cryptoForm) { 
+                    cryptoForm.onsubmit = (e) => { 
+                        e.preventDefault(); 
+                        const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase(); 
+                        if(t) {
+                            safeStorageSet('lastCryptoTicker', t); // 코인 검색어 저장
+                            loadCryptoData(t); 
+                        }
+                    }; 
+                }
 
                 const btn = document.getElementById('currency-toggle');
                 if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
@@ -2179,7 +2204,17 @@
 
                 updateMAButtons(); updateCryptoMAButtons(); updatePfCardMetrics();
 
-                setTimeout(() => { if(myChart) { myChart.resize(); loadData('SPY'); } }, 150);
+                // [수정됨] 새로고침 시 무조건 SPY가 아닌 마지막 검색 종목을 불러오도록 반영
+                const savedTicker = safeStorageGet('lastTicker', 'SPY');
+                const savedCryptoTicker = safeStorageGet('lastCryptoTicker', 'BTC-USD');
+                
+                document.getElementById('ticker-input').value = savedTicker;
+                document.getElementById('crypto-ticker-input').value = savedCryptoTicker;
+                
+                globalTicker = savedTicker;
+                globalCryptoTicker = savedCryptoTicker;
+
+                setTimeout(() => { if(myChart) { myChart.resize(); loadData(savedTicker); } }, 150);
                 
                 window.addEventListener('resize', () => { 
                     requestAnimationFrame(() => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize(); baaChart?.resize(); });
