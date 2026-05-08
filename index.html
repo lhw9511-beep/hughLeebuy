@@ -817,7 +817,7 @@
         </div>
 
         <div class="text-center mt-2 pb-6">
-            <p class="text-[0.6rem] text-themeMuted">Data Source: Yahoo Finance API | Risk-Adjusted Model (MAR) | Free of Server Dependency</p>
+            <p class="text-[0.6rem] text-themeMuted">Data Source: Yahoo Finance API | Risk-Adjusted Model (MAR) | Built with AI</p>
         </div>
     </div>
 
@@ -1043,91 +1043,63 @@
         };
 
         // ==========================================
-        // 🌐 무적 프록시 구조 설계 (병렬 레이스 방식으로 성공률 및 속도 극대화)
+        // 🌐 무적 3중 안전망 데이터 패치 시스템 (백엔드 + 프록시 폴백)
         // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
             let t = ticker.toUpperCase().trim();
             if (isCrypto && !t.includes('-')) t += '-USD';
 
-            // 야후 기본 URL (query1과 query2 혼용, CDN 캐싱 유도를 위해 파라미터 최소화)
-            const rawUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
-            const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
-
-            // 안정성 높은 무료 프록시 다중 구성
-            const proxies =[
-                { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl1)}`, type: 'raw' },
-                { url: `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl2)}`, type: 'raw' },
-                { url: `https://corsproxy.io/?${encodeURIComponent(rawUrl1)}`, type: 'raw' },
-                { url: `https://api.allorigins.win/get?url=${encodeURIComponent(rawUrl2)}`, type: 'jsonp' }
+            // 1순위: Render에 배포된 자체 백엔드 서버
+            const backendUrl = `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}`;
+            
+            // 2순위, 3순위: 백엔드 서버가 차단(500 에러)당할 경우를 대비한 외부 무료 프록시 서버
+            const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
+            
+            const servers =[
+                { url: backendUrl, name: '자체 백엔드 API' },
+                { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`, name: 'AllOrigins 프록시' },
+                { url: `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl)}`, name: 'CodeTabs 프록시' }
             ];
 
-            const fetchProxy = async (proxy) => {
-                const controller = new AbortController();
-                // 프록시 타임아웃 7초 설정 (기존 4.5초에서 증가시켜 안정성 확보)
-                const timeoutId = setTimeout(() => controller.abort(), 7000); 
+            let lastError = "";
 
+            // 서버들을 순서대로 시도하며 하나라도 성공하면 즉시 반환 (Fallback Pattern)
+            for (const server of servers) {
                 try {
-                    const res = await fetch(proxy.url, { cache: 'no-store', signal: controller.signal });
+                    const controller = new AbortController();
+                    // 백엔드가 막혀 무한 로딩에 빠지는 것을 방지하기 위해 8초 컷
+                    const timeoutId = setTimeout(() => controller.abort(), 8000); 
+
+                    const res = await fetch(server.url, { cache: 'no-store', signal: controller.signal });
                     clearTimeout(timeoutId);
 
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                     const text = await res.text();
-                    if (!text || text.trim() === '') throw new Error("Empty response");
+                    if (!text || text.trim() === '') throw new Error("빈 응답 (Empty response)");
 
-                    // JSON 파싱 검증 (야후에서 차단 HTML 페이지가 들어올 경우 방어)
                     let data;
                     try { data = JSON.parse(text); } 
-                    catch(e) { throw new Error("Invalid JSON Parse (Probably blocked HTML)"); }
+                    catch(e) { throw new Error("JSON 파싱 에러 (야후 보안 웹페이지로 막힘)"); }
 
-                    // allorigins jsonp 방식인 경우 이중 파싱
-                    if (proxy.type === 'jsonp') {
-                        if (!data.contents) throw new Error("Empty contents");
-                        try { data = JSON.parse(data.contents); } 
-                        catch(e) { throw new Error("Invalid Inner JSON Parse"); }
-                    }
-
-                    if (data.chart && data.chart.error) {
-                        throw new Error(`Yahoo API Error: ${data.chart.error.code}`);
-                    }
-                    if (!data.chart || !data.chart.result || !data.chart.result[0]) {
-                        throw new Error("Missing chart.result");
-                    }
+                    // 자체 백엔드에서 에러를 JSON으로 감싸서 보낸 경우 예외 처리
+                    if (data.error && typeof data.error === 'string') throw new Error(`서버 에러: ${data.error}`);
+                    if (data.chart && data.chart.error) throw new Error(`야후 API 에러: ${data.chart.error.code}`);
+                    if (!data.chart || !data.chart.result || !data.chart.result[0]) throw new Error("차트 데이터 없음");
                     
                     return data.chart.result[0];
+
                 } catch (err) {
-                    clearTimeout(timeoutId);
-                    let msg = err.message || String(err);
-                    if (err.name === 'AbortError' || msg.toLowerCase().includes('aborted') || msg.toLowerCase().includes('timeout')) {
-                        msg = "Timeout (7s)";
+                    lastError = err.message || String(err);
+                    if (err.name === 'AbortError' || lastError.toLowerCase().includes('timeout')) {
+                        lastError = "응답 시간 초과 (Timeout 8s)";
                     }
-                    throw new Error(msg);
+                    console.warn(`[서버 우회 중] ${server.name} 실패 -> 다음 서버로 재시도... (${lastError})`);
                 }
-            };
+            }
 
-            // 🚀 병렬 레이스 (4개의 서버에 동시 요청 후 가장 빠른 정상 데이터만 즉시 취함)
-            return new Promise((resolve, reject) => {
-                let errors =[];
-                let resolved = false;
-
-                proxies.forEach(p => {
-                    fetchProxy(p).then(data => {
-                        if (!resolved) {
-                            resolved = true;
-                            resolve(data);
-                        }
-                    }).catch(err => {
-                        let pName = "proxy";
-                        try { pName = new URL(p.url).hostname; } catch(e) {}
-                        errors.push(`[${pName}] -> ${err.message}`);
-                        
-                        // 4개의 프록시가 전부 실패했을 경우에만 최종 에러 발생
-                        if (errors.length === proxies.length) {
-                            reject(new Error("우회 서버 모두 실패:\n" + errors.join('\n')));
-                        }
-                    });
-                });
-            });
+            // 모든 서버가 실패했을 경우만 에러 방출
+            throw new Error(`모든 데이터 서버 연결 실패 (마지막 에러: ${lastError})`);
         }
 
         async function fetchExchangeRate() {
@@ -1280,7 +1252,7 @@
                 calculateTriplePerspectiveDecision(ticker, 'stock').catch(e => logError("Triple Calc Error", e, "loadData"));
 
             } catch (e) { 
-                if (e.message !== 'Timeout (7s)' && e.name !== 'AbortError') {
+                if (!e.message.includes('Timeout') && e.name !== 'AbortError') {
                     logError(`loadData failed for ${ticker}`, e, "loadData");
                     updateStatus("API ERROR", "bg-rose-500"); 
                     if(myChart) myChart.clear();
@@ -1315,7 +1287,7 @@
                 calculateTriplePerspectiveDecision(ticker, 'crypto').catch(e => logError("Crypto Triple Calc", e, "loadCryptoData"));
 
             } catch (e) { 
-                if (e.message !== 'Timeout (7s)' && e.name !== 'AbortError') {
+                if (!e.message.includes('Timeout') && e.name !== 'AbortError') {
                     logError(`loadCryptoData failed for ${ticker}`, e, "loadCryptoData");
                     updateCryptoStatus("API ERROR", "bg-rose-500"); 
                     if(cryptoChart) cryptoChart.clear();
@@ -1411,7 +1383,7 @@
                 grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
                 xAxis:[ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
                 yAxis:[ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex:[0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
+                dataZoom:[{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex:[0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
                 series: series
             }, true);
             requestAnimationFrame(() => myChart.resize());
@@ -1491,7 +1463,7 @@
                 grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
                 xAxis:[ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
                 yAxis:[ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom:[{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex:[0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
+                dataZoom:[{ type: 'inside', xAxisIndex:[0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex:[0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
                 series: series
             }, true);
             requestAnimationFrame(() => cryptoChart.resize());
@@ -1745,7 +1717,7 @@
                 else if(pfKey === 'daa') { tickers =['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
                 else if(pfKey === 'baa') { tickers =['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
 
-                document.getElementById('pf-live-loading-text').innerText = `API 병렬 수집 중 (빠르게 데이터를 가져옵니다)...`;
+                document.getElementById('pf-live-loading-text').innerText = `데이터 수집 중 (다중 서버 우회)...`;
                 
                 const results =[];
                 for (let t of tickers) {
@@ -1950,7 +1922,7 @@
                 const results =[];
 
                 for (let ticker of canaries) {
-                    loadingText.innerHTML = `야후 파이낸스 주가 데이터를 바탕으로<br>카나리아 생존 여부를 판단 중입니다...<br><span class="text-white mt-2 block text-xs">[${ticker}] 수집 중...</span>`;
+                    loadingText.innerHTML = `데이터 수집 중 (다중 서버 우회)...<br><span class="text-white mt-2 block text-xs">[${ticker}] 불러오는 중</span>`;
                     const data = await fetchStockData(ticker, '1mo', '2y');
                     results.push(data);
                 }
@@ -2090,8 +2062,7 @@
         function switchMainTab(tab) {
             document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
-            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
-            ['dashboard','crypto','portfolio','baa'].forEach(v => { const el = document.getElementById(`view-${v}`); if(el) el.style.display = v === tab ? 'flex' : 'none'; });
+            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');['dashboard','crypto','portfolio','baa'].forEach(v => { const el = document.getElementById(`view-${v}`); if(el) el.style.display = v === tab ? 'flex' : 'none'; });
             setTimeout(() => {
                 if(tab === 'dashboard' && myChart) myChart.resize();
                 else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData(globalCryptoTicker); } cryptoChart.resize(); }
