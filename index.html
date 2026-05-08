@@ -187,7 +187,7 @@
                 </div>
                 <button type="button" onclick="closeDetailModal()" class="text-themeMuted hover:text-accent p-2"><svg class="icon-md" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
-            <div id="modal-body" class="space-y-4 text-sm text-themeText py-2"></div>
+            <div id="modal-body" class="space-y-4 text-sm text-themeText py-2 w-full"></div>
             <div class="mt-6 flex justify-end">
                 <button type="button" onclick="closeDetailModal()" class="bg-themeBorder text-themeText px-6 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 transition border border-white/5">닫기</button>
             </div>
@@ -737,7 +737,7 @@
             <div class="glass p-4 md:p-6 rounded-2xl shadow-xl border-t-4 border-t-accent">
                 <div class="flex justify-between items-center mb-4 border-b border-themeBorder pb-2">
                     <h3 class="text-base font-black text-themeText">📡 이번 달 BAA 투자 시그널 (Live)</h3>
-                    <button type="button" onclick="runBaaLiveCheck()" class="bg-accent/20 text-accent px-3 py-1.5 rounded-lg text-xs font-black hover:bg-accent hover:text-white transition border border-accent/40">최신 데이터 계산</button>
+                    <button type="button" onclick="runBaaLiveCheck()" class="bg-accent/20 text-accent px-3 py-1.5 rounded-lg text-xs font-black hover:bg-accent hover:text-white transition border border-accent/40">최신 데이터 다시 계산</button>
                 </div>
                 
                 <div id="baa-live-loading" class="hidden flex-col items-center justify-center py-6">
@@ -767,21 +767,21 @@
                     <p class="text-[0.6rem] text-themeMuted text-center mb-4 uppercase tracking-widest">박스를 클릭하면 상세 계산 증명(Proof)을 볼 수 있습니다.</p>
                     
                     <div id="baa-decision-box" class="p-5 rounded-xl border border-themeBorder text-center bg-[var(--modal-bg)] shadow-inner relative overflow-hidden">
-    <div id="baa-decision-glow" class="absolute inset-0 opacity-10 pointer-events-none"></div>
-    
-    <p class="text-[0.7rem] font-bold text-themeMuted uppercase tracking-widest mb-1">AI 판독 결과 및 전략 포지션</p>
-    <h2 id="baa-decision-title" class="text-2xl md:text-3xl font-black mb-2">---</h2>
-    <p id="baa-decision-desc" class="text-[0.8rem] text-themeText font-bold mb-4">---</p>
-    
-    <div id="baa-rebalance-wrap" class="inline-flex flex-col md:flex-row items-center gap-2 bg-black/30 px-4 py-2 rounded-xl border border-themeBorder/50">
-        <span class="text-[0.65rem] font-black text-accent uppercase tracking-tighter">다음 리밸런싱 예정일 (한국시간)</span>
-        <span id="baa-rebalance-info" class="text-sm font-mono font-black text-themeText">---</span>
-        <span class="text-[0.6rem] bg-themeBorder/50 text-themeMuted px-2 py-0.5 rounded">유지 기간</span>
-    </div>
-</div>
+                        <div id="baa-decision-glow" class="absolute inset-0 opacity-10 pointer-events-none"></div>
+                        
+                        <p class="text-[0.7rem] font-bold text-themeMuted uppercase tracking-widest mb-1">AI 판독 결과 및 전략 포지션</p>
+                        <h2 id="baa-decision-title" class="text-2xl md:text-3xl font-black mb-2">---</h2>
+                        <p id="baa-decision-desc" class="text-[0.8rem] text-themeText font-bold mb-4">---</p>
+                        
+                        <div id="baa-rebalance-wrap" class="inline-flex flex-col md:flex-row items-center gap-2 bg-black/30 px-4 py-2 rounded-xl border border-themeBorder/50">
+                            <span class="text-[0.65rem] font-black text-accent uppercase tracking-tighter">다음 리밸런싱 예정일 (KST)</span>
+                            <span id="baa-rebalance-info" class="text-sm font-mono font-black text-themeText">---</span>
+                            <span class="text-[0.6rem] bg-themeBorder/50 text-themeMuted px-2 py-0.5 rounded">유지 기간</span>
+                        </div>
+                    </div>
                 </div>
                 <div id="baa-live-idle" class="py-6 text-center">
-                    <p class="text-sm text-themeMuted">우측 상단의 버튼을 눌러 현재 시점의 BAA 시그널을 확인하세요.</p>
+                    <p class="text-sm text-themeMuted">탭 이동 시 자동으로 시그널을 확인합니다.</p>
                 </div>
             </div>
 
@@ -1048,20 +1048,13 @@
             }
         };
 
-        // ==========================================
-        // 🌐 무적 3중 안전망 데이터 패치 시스템 (백엔드 + 프록시 폴백)
-        // [수정됨] Cache-busting 타임스탬프 적용 및 HTML 파싱 에러 방지
-        // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
             let t = ticker.toUpperCase().trim();
             if (isCrypto && !t.includes('-')) t += '-USD';
 
-            const timestamp = Date.now(); // 캐시 방지용 타임스탬프
+            const timestamp = Date.now();
             
-            // 1순위: Render에 배포된 자체 백엔드 서버
             const backendUrl = `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`;
-            
-            // 2순위, 3순위: 백엔드 서버가 차단당할 경우를 대비한 외부 무료 프록시 서버 (HTML 차단을 피하기 위해 query2 사용)
             const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_t=${timestamp}`;
             const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_t=${timestamp}`;
             
@@ -1086,7 +1079,6 @@
                     const text = await res.text();
                     if (!text || text.trim() === '') throw new Error("빈 응답 (Empty response)");
                     
-                    // [수정됨] 야후 보안 페이지(CAPTCHA 등 HTML) 차단 시 JSON 파싱 에러가 발생하지 않도록 사전 차단
                     if (text.trim().startsWith('<')) {
                         throw new Error("야후 보안 웹페이지 차단 (HTML 응답)");
                     }
@@ -1508,21 +1500,28 @@
                     const weights = WEIGHT_MATRIX[marketType][timeHorizon];
                     const maxScore = Object.values(weights).reduce((a, b) => a + b, 0); 
                     
+                    const macroVal = marketType === 'stock' ? (globalVix || 20) : calcVolatility(closes);
+                    const fngVal = marketType === 'stock' ? (globalFng || 50) : (globalCryptoFng || 50);
+
                     const sigs = {
                         dist: getIndicatorStatus('DIST', dist, marketType, timeHorizon),
                         rsi: getIndicatorStatus('RSI', rsi, marketType, timeHorizon),
                         macd: getIndicatorStatus('MACD', macd, marketType, timeHorizon),
                         stoch: getIndicatorStatus('STOCH', stoch, marketType, timeHorizon),
                         bb: getIndicatorStatus('BB', bbStr, marketType, timeHorizon),
-                        macro: marketType === 'stock' ? getIndicatorStatus('VIX', globalVix || 20, marketType, timeHorizon) : getIndicatorStatus('VOL', calcVolatility(closes), marketType, timeHorizon),
-                        fng: getIndicatorStatus('FNG', marketType === 'stock' ? (globalFng||50) : (globalCryptoFng||50), marketType, timeHorizon)
+                        macro: getIndicatorStatus(marketType === 'stock' ? 'VIX' : 'VOL', macroVal, marketType, timeHorizon),
+                        fng: getIndicatorStatus('FNG', fngVal, marketType, timeHorizon)
                     };
+
+                    sigs.dist.raw = dist; sigs.rsi.raw = rsi; sigs.macd.raw = macd; sigs.stoch.raw = stoch; sigs.bb.raw = bbStr;
+                    sigs.macro.raw = macroVal; sigs.fng.raw = fngVal;
 
                     let buyScore = 0, sellScore = 0, breakdown =[];
                     const addScore = (name, s) => {
-                        if (s.sig === 'BUY') { buyScore += s.weight; breakdown.push({name, sig: 'BUY', val: `+${s.weight.toFixed(1)}`}); }
-                        else if (s.sig === 'SELL') { sellScore += s.weight; breakdown.push({name, sig: 'SELL', val: `-${s.weight.toFixed(1)}`}); }
-                        else { breakdown.push({name, sig: 'NEUTRAL', val: `0.0`}); }
+                        let valStr = "0.0";
+                        if (s.sig === 'BUY') { buyScore += s.weight; valStr = `+${s.weight.toFixed(1)}`; }
+                        else if (s.sig === 'SELL') { sellScore += s.weight; valStr = `-${s.weight.toFixed(1)}`; }
+                        breakdown.push({name, sig: s.sig, val: valStr, weight: s.weight, raw: s.raw, text: s.text});
                     };
 
                     addScore(marketType === 'stock' ? 'VIX' : 'VOL', sigs.macro);
@@ -1593,6 +1592,88 @@
                     renderIndicatorUI('crypto-val-bb-main', bbStrMain, 'BB', bbStrMain, 'crypto');
                 }
             } catch (e) { logError("Calculate Signals Error", e, "calculateTriplePerspectiveDecision"); }
+        }
+
+        function buildDetailHtml(d) {
+            let html = `
+                <div class="p-4 bg-black/20 rounded-xl border border-themeBorder text-center mb-4 shadow-inner relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 pointer-events-none bg-gradient-to-r ${d.diff>0?'from-emerald-500':'from-rose-500'} to-transparent"></div>
+                    <span class="text-3xl font-black status-${String(d.status).replace(/ /g,'-')} tracking-tighter block mb-2 relative z-10">${d.status}</span>
+                    <div class="flex justify-center gap-4 mt-1 text-sm font-black relative z-10">
+                        <span class="text-up bg-up/10 px-3 py-1 rounded border border-up/20">매수 스코어: ${d.buyScore?.toFixed(1)}</span>
+                        <span class="text-down bg-down/10 px-3 py-1 rounded border border-down/20">매도 스코어: ${d.sellScore?.toFixed(1)}</span>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto custom-scroll border border-themeBorder rounded-xl bg-black/10">
+                    <table class="w-full text-sm min-w-[400px]">
+                        <thead class="bg-black/30">
+                            <tr class="text-[0.6rem] text-themeMuted uppercase tracking-widest border-b border-themeBorder">
+                                <th class="py-2.5 px-3 text-left">기술 지표명</th>
+                                <th class="py-2.5 px-2 text-right">현재 수치(Raw)</th>
+                                <th class="py-2.5 px-2 text-center">AI 판독 상태</th>
+                                <th class="py-2.5 px-2 text-center">부여 가중치</th>
+                                <th class="py-2.5 px-3 text-right">최종 점수</th>
+                            </tr>
+                        </thead>
+                        <tbody class="px-2">
+            `;
+
+            d.breakdown.forEach(b => {
+                let rawStr = b.raw;
+                if(typeof rawStr === 'number') {
+                    if(b.name === 'DIST' || b.name === 'VOL') rawStr = (rawStr > 0 ? '+' : '') + rawStr.toFixed(2) + '%';
+                    else rawStr = rawStr.toFixed(2);
+                }
+                
+                let scoreColor = b.sig === 'BUY' ? 'text-up' : (b.sig === 'SELL' ? 'text-down' : 'text-themeMuted');
+                let valColor = b.sig === 'BUY' ? 'text-up' : (b.sig === 'SELL' ? 'text-down' : 'text-gray-400');
+
+                html += `
+                    <tr class="border-b border-themeBorder/30 hover:bg-white/5 transition">
+                        <td class="py-2.5 px-3 text-left text-xs font-bold text-themeText whitespace-nowrap">${b.name}</td>
+                        <td class="py-2.5 px-2 text-right text-xs font-mono text-gray-300">${rawStr}</td>
+                        <td class="py-2.5 px-2 text-center text-[0.65rem] font-bold ${valColor}">${b.text}</td>
+                        <td class="py-2.5 px-2 text-center text-[0.65rem] text-themeMuted">±${b.weight.toFixed(1)}</td>
+                        <td class="py-2.5 px-3 text-right text-sm font-black font-mono ${scoreColor}">${b.val}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="bg-blue-500/5 p-3 rounded-xl border border-blue-500/20 mt-4">
+                    <p class="text-[0.65rem] text-blue-400 font-black mb-1.5 flex items-center gap-1.5 uppercase tracking-widest">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        AI 종합 스코어링 안내
+                    </p>
+                    <p class="text-[0.65rem] text-themeMuted leading-relaxed break-keep">
+                        • <strong>합산 매수 스코어</strong>에서 <strong>합산 매도 스코어</strong>를 뺀 격차를 기준으로 포지션을 결정합니다.<br>
+                        • 격차가 +15점 이상이면 <strong>강력 매수</strong>, +5점 이상이면 <strong>분할 매수</strong>로 판독합니다.<br>
+                        • 각 지표별 가중치는 단기, 중기, 장기 흐름에 따라 알고리즘이 자동으로 다르게 배분합니다.
+                    </p>
+                </div>
+            `;
+            return html;
+        }
+
+        function showDetail(p) {
+            const d = analysisDetails[p]; if(!d || !d.status) return;
+            document.getElementById('modal-title').innerText = p === 'short' ? '주식 단기 흐름 분석 상세' : (p === 'mid' ? '주식 중기 흐름 분석 상세' : '주식 장기 흐름 분석 상세');
+            document.getElementById('modal-period').innerText = d.summary || '---';
+            document.getElementById('modal-body').innerHTML = buildDetailHtml(d);
+            document.getElementById('detail-modal').style.display = 'flex';
+        }
+
+        function showCryptoDetail(p) {
+            const d = cryptoAnalysisDetails[p]; if(!d || !d.status) return;
+            document.getElementById('modal-title').innerText = p === 'short' ? '코인 단기 흐름 분석 상세' : (p === 'mid' ? '코인 중기 흐름 분석 상세' : '코인 장기 흐름 분석 상세');
+            document.getElementById('modal-period').innerText = d.summary || '---';
+            document.getElementById('modal-body').innerHTML = buildDetailHtml(d);
+            document.getElementById('detail-modal').style.display = 'flex';
         }
 
         const getAdjustedSimData = (key, isBaaLev = false) => {
@@ -1935,14 +2016,12 @@
                 baaProofs = {};
                 const results =[];
 
-                // 1. 데이터 수집
                 for (let ticker of canaries) {
                     loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">[${ticker}] 정확한 일봉 데이터 스캔 및 월말 종가 추출 중</span>`;
                     const rawData = await fetchStockData(ticker, '1d', '2y');
                     results.push(rawData);
                 }
 
-                // 2. 종목별 점수 계산 및 증명창 HTML 생성
                 for (let i = 0; i < canaries.length; i++) {
                     const ticker = canaries[i];
                     const rawData = results[i];
@@ -1961,7 +2040,6 @@
                         if (c === null || c === undefined) c = lastValidClose; else lastValidClose = c;
 
                         if (c !== 0 && c !== null) {
-                            // UTC 기준으로 파싱하여 시차 문제 완벽 해결
                             let d = new Date(ts[j] * 1000);
                             let y = d.getUTCFullYear();
                             let m = String(d.getUTCMonth() + 1).padStart(2, '0');
@@ -2077,7 +2155,6 @@
                     }
                 }
 
-                // 3. 차기 리밸런싱 날짜 (KST) 계산
                 function getNextRebalanceKST() {
                     let now = new Date(); 
                     let year = now.getFullYear();
@@ -2098,7 +2175,6 @@
                     return `${rebalanceDate.getFullYear()}년 ${rebalanceDate.getMonth() + 1}월 ${rebalanceDate.getDate()}일 오전 ${hour}`;
                 }
 
-                // 4. 최종 결과창 UI 업데이트
                 const titleEl = document.getElementById('baa-decision-title');
                 const descEl = document.getElementById('baa-decision-desc');
                 const boxEl = document.getElementById('baa-decision-box');
@@ -2126,6 +2202,7 @@
                 idle.innerHTML = `<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다.<br><span class="text-xs text-gray-500 font-normal mt-1 block">${error.message}</span></p>`;
             }
         }
+
         function showBaaProof(ticker) {
             if(!baaProofs[ticker]) return;
             document.getElementById('modal-title').innerText = `${ticker} 모멘텀 계산 증명`;
@@ -2223,7 +2300,6 @@
                     if(!baaChart) initBaaChart();
                     baaChart?.resize();
                     
-                    // 🚨 [추가된 핵심 로직] BAA 탭 진입 시 자동으로 데이터 계산 실행
                     const idleBox = document.getElementById('baa-live-idle');
                     if (idleBox && idleBox.style.display !== 'none') {
                         runBaaLiveCheck();
@@ -2250,69 +2326,6 @@
             loadCryptoData(globalCryptoTicker, i, r);
         }
 
-        function showDetail(p) {
-            const d = analysisDetails[p]; if(!d || !d.status) return;
-            document.getElementById('modal-title').innerText = p === 'short' ? '단기 흐름' : (p === 'mid' ? '중기 흐름' : '장기 흐름');
-            document.getElementById('modal-period').innerText = d.summary || '---';
-            let html = `<div class="p-4 bg-black/20 rounded-xl border border-themeBorder text-center mb-4">
-                <span class="text-2xl font-black status-${String(d.status).replace(/ /g,'-')}">${d.status}</span>
-                <div class="flex justify-center gap-4 mt-2 text-xs font-black"><span class="text-up">매수: ${d.buyScore?.toFixed(1)}</span><span class="text-down">매도: ${d.sellScore?.toFixed(1)}</span></div></div>`;
-            if(d.breakdown) { html += d.breakdown.map(b => `<div class="flex justify-between text-xs border-b border-themeBorder/30 py-1.5"><span class="text-themeText font-bold">${b.name}</span><span class="${b.sig==='BUY'?'text-up':b.sig==='SELL'?'text-down':'text-themeMuted'} font-bold">${b.val}</span></div>`).join(''); }
-            document.getElementById('modal-body').innerHTML = html; document.getElementById('detail-modal').style.display = 'flex';
-        }
-
-        function showCryptoDetail(p) {
-            const d = cryptoAnalysisDetails[p]; if(!d || !d.status) return;
-            document.getElementById('modal-title').innerText = `코인 ${p === 'short' ? '단기' : p === 'mid' ? '중기' : '장기'} 흐름`;
-            document.getElementById('modal-period').innerText = d.summary || '---';
-            let html = `<div class="p-4 bg-black/20 rounded-xl border border-themeBorder text-center mb-4">
-                <span class="text-2xl font-black status-${String(d.status).replace(/ /g,'-')}">${d.status}</span>
-                <div class="flex justify-center gap-4 mt-2 text-xs font-black"><span class="text-up">매수: ${d.buyScore?.toFixed(1)}</span><span class="text-down">매도: ${d.sellScore?.toFixed(1)}</span></div></div>`;
-            if(d.breakdown) { html += d.breakdown.map(b => `<div class="flex justify-between text-xs border-b border-themeBorder/30 py-1.5"><span class="text-themeText font-bold">${b.name}</span><span class="${b.sig==='BUY'?'text-up':b.sig==='SELL'?'text-down':'text-themeMuted'} font-bold">${b.val}</span></div>`).join(''); }
-            document.getElementById('modal-body').innerHTML = html; document.getElementById('detail-modal').style.display = 'flex';
-        }
-
-        function showPfDetail(key) {
-            currentPfKey = key; const detail = pfDetails[key]; if(!detail) return;
-            document.getElementById('pf-modal-title').innerText = detail.title;
-            document.getElementById('pf-modal-desc').innerHTML = detail.desc || '';
-            const dataArr = getAdjustedSimData(key);
-            const years = parseInt(pfSimYears[pfSimYears.length-1]) - parseInt(pfSimYears[0]);
-            const cagr = (((dataArr[dataArr.length-1]/dataArr[0])**(1/years))-1)*100;
-            const mdds = calcMDDArray(dataArr); const minMdd = Math.min(...mdds);
-            const mar = Math.abs(minMdd) > 0 ? cagr/Math.abs(minMdd) : 0;
-            document.getElementById('pf-modal-cagr').innerText = `${cagr.toFixed(1)}%`;
-            document.getElementById('pf-modal-mdd').innerText = `${minMdd.toFixed(1)}%`;
-            document.getElementById('pf-modal-mar').innerText = mar.toFixed(2);
-            const rulesEl = document.getElementById('pf-modal-rules');
-            if(rulesEl && detail.rules) rulesEl.innerHTML = detail.rules.map(r=>`<li>${r}</li>`).join('');
-            const tbody = document.getElementById('pf-historical-tbody');
-            if(tbody) tbody.innerHTML = pfSimYears.map((y,i) => {
-                const ret = i===0 ? 0 : (dataArr[i]-dataArr[i-1])/dataArr[i-1]*100;
-                return `<tr><td>${y}</td><td>${dataArr[i].toFixed(1)}</td><td class="${ret>0?'text-up':ret<0?'text-down':''}">${ret>0?'+':''}${ret.toFixed(2)}%</td></tr>`;
-            }).join('');
-            const liveArea = document.getElementById('pf-modal-live-area');
-            if(detail.type === 'dynamic') { if(liveArea) { liveArea.style.display = 'block'; runLiveCalc(key); } } 
-            else { if(liveArea) liveArea.style.display = 'none'; }
-            document.getElementById('pf-detail-modal').style.display = 'flex';
-            requestAnimationFrame(() => {
-                if(!pfModalChart) pfModalChart = echarts.init(document.getElementById('pf-modal-compare-chart'));
-                pfModalChart.clear();
-                const sc = getComputedStyle(document.documentElement);
-                const tc = sc.getPropertyValue('--text-muted').trim()||'#9CA3AF';
-                const bc = sc.getPropertyValue('--border-color').trim()||'rgba(255,255,255,0.1)';
-                pfModalChart.setOption({ backgroundColor:'transparent', tooltip:{trigger:'axis',backgroundColor:'rgba(0,0,0,0.8)',textStyle:{color:'#fff',fontSize:11}},
-                    legend:{data:[detail.title,'MDD'],textStyle:{color:tc,fontSize:10},top:5},
-                    grid:{left:'3%',right:'3%',top:'15%',bottom:'5%',containLabel:true},
-                    xAxis:{type:'category',data:pfSimYears,axisLabel:{color:tc}},
-                    yAxis:[{type:'value',splitLine:{lineStyle:{color:bc,type:'dashed'}},axisLabel:{color:tc}},{type:'value',min:-60,max:0,position:'right',splitLine:{show:false},axisLabel:{formatter:'{value}%',color:tc,fontSize:9}}],
-                    series:[{name:'MDD',type:'bar',data:mdds,yAxisIndex:1,itemStyle:{color:'rgba(239,83,80,0.25)'},barWidth:'60%'},{name:detail.title,type:'line',data:dataArr,smooth:true,lineStyle:{color:'#3B82F6',width:3},showSymbol:false}]
-                }, true);
-                pfModalChart.resize();
-            });
-        }
-
-        // [수정됨] 페이지 로드 시 기존 검색어를 불러와서 적용하는 로직 추가
         document.addEventListener("DOMContentLoaded", () => {
             window.scrollTo(0, 0);
             if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -2326,7 +2339,7 @@
                         e.preventDefault(); 
                         const t = document.getElementById('ticker-input').value.trim().toUpperCase(); 
                         if(t) {
-                            safeStorageSet('lastTicker', t); // 검색어 저장
+                            safeStorageSet('lastTicker', t); 
                             loadData(t); 
                         }
                     }; 
@@ -2338,7 +2351,7 @@
                         e.preventDefault(); 
                         const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase(); 
                         if(t) {
-                            safeStorageSet('lastCryptoTicker', t); // 코인 검색어 저장
+                            safeStorageSet('lastCryptoTicker', t); 
                             loadCryptoData(t); 
                         }
                     }; 
@@ -2359,7 +2372,6 @@
 
                 updateMAButtons(); updateCryptoMAButtons(); updatePfCardMetrics();
 
-                // [수정됨] 새로고침 시 무조건 SPY가 아닌 마지막 검색 종목을 불러오도록 반영
                 const savedTicker = safeStorageGet('lastTicker', 'SPY');
                 const savedCryptoTicker = safeStorageGet('lastCryptoTicker', 'BTC-USD');
                 
