@@ -18,16 +18,19 @@ const commonHeaders = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
     'Accept-Language': 'en-US,en;q=0.5',
     'Connection': 'keep-alive',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Upgrade-Insecure-Requests': '1'
 };
 
-// [수정됨] 야후 인증 토큰(Crumb) 발급 함수
 async function getYahooCrumb() {
     if (globalCookie && globalCrumb) return { cookie: globalCookie, crumb: globalCrumb };
     try {
-        // 기존 fc.yahoo.com은 자주 차단되므로 finance.yahoo.com 메인 페이지로 변경
         const cookieRes = await axios.get('https://finance.yahoo.com/', {
             headers: commonHeaders,
-            timeout: 5000
+            timeout: 8000
         });
         
         const setCookie = cookieRes.headers['set-cookie'];
@@ -37,7 +40,7 @@ async function getYahooCrumb() {
         
         const crumbRes = await axios.get('https://query1.finance.yahoo.com/v1/test/getcrumb', {
             headers: { ...commonHeaders, 'Cookie': globalCookie },
-            timeout: 5000
+            timeout: 8000
         });
         globalCrumb = crumbRes.data;
         return { cookie: globalCookie, crumb: globalCrumb };
@@ -47,7 +50,6 @@ async function getYahooCrumb() {
     }
 }
 
-// 인증 토큰을 동봉하여 안전하게 통신
 async function fetchYahoo(url, params) {
     let { cookie, crumb } = await getYahooCrumb();
     if (crumb) params.crumb = crumb;
@@ -58,7 +60,6 @@ async function fetchYahoo(url, params) {
     try {
         return await axios.get(url, { params, headers, timeout: 10000 });
     } catch (error) {
-        // 서버가 차단당했거나 토큰이 만료되었을 경우(401, 403, 429) 캐시 초기화
         if (error.response && [401, 403, 429].includes(error.response.status)) {
             globalCookie = ''; 
             globalCrumb = '';
@@ -67,12 +68,12 @@ async function fetchYahoo(url, params) {
     }
 }
 
-// 1. 주가 데이터 API
+// 1. 주가 데이터 API (query2 사용)
 app.get('/api/stock/:ticker', async (req, res) => {
     const { ticker } = req.params;
     let { interval = '1d', range = '1y' } = req.query;
     try {
-        const response = await fetchYahoo(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}`, { interval, range });
+        const response = await fetchYahoo(`https://query2.finance.yahoo.com/v8/finance/chart/${ticker}`, { interval, range, includePrePost: false });
         res.json(response.data);
     } catch (error) {
         console.error(`[API Error] ${ticker}:`, error.message);
@@ -93,11 +94,9 @@ app.get('/api/fundamentals/:ticker', async (req, res) => {
     }
 });
 
-// 라우팅 (SPA 처리)
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 app.get('*', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 
 app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
-    console.log(`📂 Serving files from: ${__dirname}`);
 });
