@@ -2207,12 +2207,28 @@
         function switchMainTab(tab) {
             document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
-            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');['dashboard','crypto','portfolio','baa'].forEach(v => { const el = document.getElementById(`view-${v}`); if(el) el.style.display = v === tab ? 'flex' : 'none'; });
+            document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
+            ['dashboard','crypto','portfolio','baa'].forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.style.display = v === tab ? 'flex' : 'none';
+            });
             setTimeout(() => {
                 if(tab === 'dashboard' && myChart) myChart.resize();
-                else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData(globalCryptoTicker); } cryptoChart.resize(); }
+                else if(tab === 'crypto') {
+                    if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData(globalCryptoTicker); }
+                    cryptoChart.resize();
+                }
                 else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart?.resize(); }
-                else if(tab === 'baa') { if(!baaChart) initBaaChart(); baaChart?.resize(); }
+                else if(tab === 'baa') {
+                    if(!baaChart) initBaaChart();
+                    baaChart?.resize();
+                    
+                    // 🚨 [추가된 핵심 로직] BAA 탭 진입 시 자동으로 데이터 계산 실행
+                    const idleBox = document.getElementById('baa-live-idle');
+                    if (idleBox && idleBox.style.display !== 'none') {
+                        runBaaLiveCheck();
+                    }
+                }
             }, 50);
         }
 
