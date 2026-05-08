@@ -1,4 +1,3 @@
-```javascript
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
@@ -16,27 +15,26 @@ let globalCrumb = '';
 
 const commonHeaders = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Accept': 'application/json, text/plain, */*',
-    'Origin': 'https://finance.yahoo.com',
-    'Referer': 'https://finance.yahoo.com/'
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Connection': 'keep-alive',
 };
 
-// [핵심] 야후 인증 토큰(Crumb) 발급 함수
+// [수정됨] 야후 인증 토큰(Crumb) 발급 함수
 async function getYahooCrumb() {
     if (globalCookie && globalCrumb) return { cookie: globalCookie, crumb: globalCrumb };
     try {
-        // 1. 야후 쿠키 획득
-        const cookieRes = await axios.get('https://fc.yahoo.com/', {
+        // 기존 fc.yahoo.com은 자주 차단되므로 finance.yahoo.com 메인 페이지로 변경
+        const cookieRes = await axios.get('https://finance.yahoo.com/', {
             headers: commonHeaders,
-            validateStatus: () => true, // 에러 코드 무시하고 헤더 캡처
             timeout: 5000
         });
+        
         const setCookie = cookieRes.headers['set-cookie'];
         if (setCookie) {
             globalCookie = setCookie.map(c => c.split(';')[0]).join('; ');
         }
         
-        // 2. 크럼브(Crumb) 토큰 획득
         const crumbRes = await axios.get('https://query1.finance.yahoo.com/v1/test/getcrumb', {
             headers: { ...commonHeaders, 'Cookie': globalCookie },
             timeout: 5000
@@ -60,8 +58,8 @@ async function fetchYahoo(url, params) {
     try {
         return await axios.get(url, { params, headers, timeout: 10000 });
     } catch (error) {
-        // Render 서버가 차단당했거나 토큰이 만료되었을 경우 캐시 초기화
-        if (error.response && (error.response.status === 401 || error.response.status === 403 || error.response.status === 429)) {
+        // 서버가 차단당했거나 토큰이 만료되었을 경우(401, 403, 429) 캐시 초기화
+        if (error.response && [401, 403, 429].includes(error.response.status)) {
             globalCookie = ''; 
             globalCrumb = '';
         }
