@@ -1046,76 +1046,63 @@
         // 🌐 URL Encoding 및 프록시 강화 (오류 원천 차단)
         // ==========================================
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
-            let encodedTicker = encodeURIComponent(ticker);
-            
-            // 암호화폐인 경우 -USD가 없으면 붙여주고, 이미 있으면 그대로 사용 등
-            // 야후 파이낸스는 BTC-USD 형식으로 호출해야 합니다.
-            if (isCrypto && !ticker.includes('-')) {
-                encodedTicker = encodeURIComponent(`${ticker}-USD`);
-            }
+            let t = ticker.toUpperCase().trim();
+            if (isCrypto && !t.includes('-')) t += '-USD';
 
             const nc = Date.now();
-            const yUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${encodedTicker}?interval=${intv}&range=${range}&events=div%2Csplits&includePrePost=false&nc=${nc}`;
-            const yUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodedTicker}?interval=${intv}&range=${range}&events=div%2Csplits&includePrePost=false&nc=${nc}`;
+            const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&nc=${nc}`;
+            const encUrl = encodeURIComponent(targetUrl);
 
-            // 코인(특히 BTC-USD)에서 403 에러가 빈번하므로 다양한 프록시 파이프라인 추가
+            // 프록시 배열 (최대한 안정적인 것들로 재구성)
+            // 403 및 DOMException(String did not match) 원천 차단
             const proxies = [
-                { url: `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(yUrl1)}`, type: 'raw' },
-                { url: `https://api.allorigins.win/get?url=${encodeURIComponent(yUrl1)}`, type: 'jsonp' },
-                { url: `https://corsproxy.io/?url=${encodeURIComponent(yUrl2)}`, type: 'raw' },
-                { url: `https://api.allorigins.win/get?url=${encodeURIComponent(yUrl2)}`, type: 'jsonp' }
+                { url: `https://api.allorigins.win/get?url=${encUrl}`, type: 'allorigins' },
+                { url: `https://api.codetabs.com/v1/proxy/?quest=${encUrl}`, type: 'raw' },
+                { url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`, type: 'raw' }
             ];
 
-            let errorDetails = [];
+            let errors = [];
 
             for (const proxy of proxies) {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 8000); 
+                    const timeoutId = setTimeout(() => controller.abort(), 6000); 
 
-                    const res = await fetch(proxy.url, { 
-                        cache: 'no-store',
-                        headers: { 'Accept': 'application/json' },
-                        signal: controller.signal 
-                    });
+                    const res = await fetch(proxy.url, { signal: controller.signal });
                     clearTimeout(timeoutId);
 
-                    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
+                    const text = await res.text();
                     let data;
-                    if (proxy.type === 'jsonp') {
-                        const wrapper = await res.json();
-                        if (!wrapper.contents) throw new Error("Empty contents from Proxy");
-                        try {
-                            data = JSON.parse(wrapper.contents);
-                        } catch(e) {
-                            throw new Error(`JSON 파싱 에러 (야후 차단 의심) - Raw: ${wrapper.contents.substring(0, 50)}...`);
-                        }
-                    } else {
-                        data = await res.json();
+                    try {
+                        data = JSON.parse(text);
+                    } catch(e) {
+                        throw new Error("Invalid JSON");
                     }
 
-                    // 야후 내부 에러가 200 OK와 함께 JSON으로 전달되는 경우 처리
-                    if (data && data.chart && data.chart.error) {
-                        throw new Error(`Yahoo API Error: ${data.chart.error.code} - ${data.chart.error.description}`);
+                    if (proxy.type === 'allorigins') {
+                        if (!data.contents) throw new Error("Empty contents");
+                        data = JSON.parse(data.contents);
                     }
 
-                    if (!data || !data.chart || !data.chart.result) throw new Error("Invalid Yahoo data format");
+                    if (data.chart && data.chart.error) throw new Error(`Yahoo Error: ${data.chart.error.code}`);
+                    if (!data.chart || !data.chart.result) throw new Error("Invalid Format");
                     
                     return data.chart.result[0];
 
                 } catch (err) {
                     let msg = err.message || String(err);
-                    if (err.name === 'AbortError') msg = "Request Timeout (8s)";
-                    try {
-                        errorDetails.push(`[${new URL(proxy.url).hostname}] -> ${msg}`);
-                    } catch(e) {
-                        errorDetails.push(`[Proxy] -> ${msg}`);
-                    }
-                    continue; 
+                    if (err.name === 'AbortError' || msg.includes('aborted')) msg = "Timeout";
+                    
+                    let pName = "Unknown Proxy";
+                    try { pName = new URL(proxy.url).hostname; } catch(e) {}
+                    
+                    errors.push(`[${pName}] ${msg}`);
                 }
             }
-            throw new Error(`Data fetch failed for ${ticker}.\nDetails:\n` + errorDetails.join('\n'));
+            
+            throw new Error(errors.join(' | '));
         }
 
         async function fetchExchangeRate() {
@@ -1295,7 +1282,6 @@
                 renderIndicatorUI('crypto-val-fng', globalCryptoFng, 'FNG', globalCryptoFng, 'crypto');
 
                 const reqInterval = interval === '1y' ? '1mo' : interval;
-                // isCrypto = true 전달
                 const d = await fetchStockData(ticker, reqInterval, range, true);
                 
                 globalCryptoChartData = d; globalCryptoTicker = ticker;
@@ -2214,3 +2200,4 @@
     </script>
 </body>
 </html>
+```
