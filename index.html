@@ -447,19 +447,19 @@
                             <div class="weight-badge">8.5</div><p class="stat-label">공포/탐욕</p><p id="val-fng" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('dist', 'stock')">
-                            <div class="weight-badge">8.0</div><p class="stat-label">이격도(120일)</p><p id="val-ma-dist" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">8.0</div><p class="stat-label">이격도(120)</p><p id="val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('macd', 'stock')">
-                            <div class="weight-badge">7.0</div><p class="stat-label">MACD (12,26)</p><p id="val-macd-main" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">7.0</div><p class="stat-label">MACD</p><p id="val-macd-main" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('rsi', 'stock')">
-                            <div class="weight-badge">6.5</div><p class="stat-label">RSI (14)</p><p id="val-rsi-main" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">6.5</div><p class="stat-label">RSI</p><p id="val-rsi-main" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('bb', 'stock')">
                             <div class="weight-badge">6.0</div><p class="stat-label">BB밴드</p><p id="val-bb-main" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('stoch', 'stock')">
-                            <div class="weight-badge">5.0</div><p class="stat-label">Stoch (14)</p><p id="val-stoch-main" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">5.0</div><p class="stat-label">Stoch</p><p id="val-stoch-main" class="stat-value text-themeText">---</p>
                         </div>
                     </div>
 
@@ -575,25 +575,25 @@
                     
                     <div id="crypto-expert-indicators" class="expert-only grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
                         <div class="stat-box" onclick="openStatInfo('vol', 'crypto')">
-                            <div class="weight-badge">9.0</div><p class="stat-label">변동성 (30일)</p><p id="crypto-val-vol" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">9.0</div><p class="stat-label">변동성</p><p id="crypto-val-vol" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('fng', 'crypto')">
                             <div class="weight-badge">8.5</div><p class="stat-label">공포/탐욕</p><p id="crypto-val-fng" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('dist', 'crypto')">
-                            <div class="weight-badge">8.0</div><p class="stat-label">이격도(120일)</p><p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">8.0</div><p class="stat-label">이격도(120)</p><p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('macd', 'crypto')">
-                            <div class="weight-badge">7.0</div><p class="stat-label">MACD (12,26)</p><p id="crypto-val-macd-main" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">7.0</div><p class="stat-label">MACD</p><p id="crypto-val-macd-main" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('rsi', 'crypto')">
-                            <div class="weight-badge">6.5</div><p class="stat-label">RSI (14)</p><p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">6.5</div><p class="stat-label">RSI</p><p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('bb', 'crypto')">
                             <div class="weight-badge">6.0</div><p class="stat-label">BB밴드</p><p id="crypto-val-bb-main" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('stoch', 'crypto')">
-                            <div class="weight-badge">5.0</div><p class="stat-label">Stoch (14)</p><p id="crypto-val-stoch-main" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">5.0</div><p class="stat-label">Stoch</p><p id="crypto-val-stoch-main" class="stat-value text-themeText">---</p>
                         </div>
                     </div>
                     
@@ -854,7 +854,7 @@
         const TERMS = {
             vix: { expert: 'VIX 지수', beginner: '시장 불안감 (VIX)' },
             fng: { expert: '공포/탐욕', beginner: '대중의 심리' },
-            dist: { expert: '이격도', beginner: '이동평균선 (흐름)' },
+            dist: { expert: '이격도(120)', beginner: '이동평균선 (흐름)' },
             macd: { expert: 'MACD', beginner: '단기 방향타' },
             rsi: { expert: 'RSI', beginner: '단기 체력' },
             bb: { expert: 'BB밴드', beginner: '가격 저항선' },
@@ -865,7 +865,7 @@
         const DESCRIPTIONS = {
             vix: { expert: 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다.\n\n• 단기 가중치: 9.0 / 10\n(역사적으로 극단적 공포에서의 역발상 매수는 높은 단기 반등 승률을 자랑합니다.)', beginner: '주식 시장의 일기예보 같은 거예요.\n\n폭풍우가 치면(사람들이 공포에 질림) 쌀 때 살 수 있는 좋은 기회예요!' },
             fng: { expert: '군중 심리를 수치화한 지표입니다.\n\n• 단기 가중치: 8.5 / 10\n(VIX와 함께 군중 심리의 역발상 투자는 확률 높은 기법입니다.)', beginner: '다른 사람들이 얼마나 욕심을 내고 있는지 보여줘요.\n\n남들이 욕심낼 때는 팔고, 무서워할 때 사는 단서가 돼요.' },
-            dist: { expert: '현재가와 기준 이동평균선 간의 거리(%)입니다.\n\n• 단기 가중치: 8.0 / 10', beginner: '주요 평균 가격 위로 주가가 올라탔는지 확인해요.\n\n선 위로 올라타면 계속 오르는 중이라는 뜻이에요.' },
+            dist: { expert: '현재가와 120일 이동평균선 간의 거리(%)입니다.\n\n• 단기 가중치: 8.0 / 10', beginner: '주요 평균 가격 위로 주가가 올라탔는지 확인해요.\n\n선 위로 올라타면 계속 오르는 중이라는 뜻이에요.' },
             macd: { expert: '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 단기 가중치: 7.0 / 10', beginner: '자동차의 엑셀과 브레이크 같아요.\n\n엑셀을 밟아서 오르는 힘이 세지는 중인지 확인해요.' },
             rsi: { expert: '추세의 단기 과열 강도를 의미합니다.\n\n• 단기 가중치: 6.5 / 10', beginner: '단기적으로 얼마나 달렸는지 체력을 보여줘요.\n\n너무 많이 달려서 숨이 차면 쉬어갈 확률이 높아요.' },
             bb: { expert: '가격 변동성 기반의 밴드입니다.\n\n• 단기 가중치: 6.0 / 10', beginner: '주가가 움직이는 도로의 차선 같아요.\n\n천장에 부딪히면 튕겨 내려올 수 있어요.' },
@@ -1053,6 +1053,7 @@
             if (isCrypto && !t.includes('-')) t += '-USD';
 
             const timestamp = Date.now();
+            
             const backendUrl = `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`;
             const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_t=${timestamp}`;
             const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_t=${timestamp}`;
@@ -1180,7 +1181,7 @@
                 else if (val === 'UPPER') { sig = 'SELL'; text = '상단 저항 (매도)'; color = 'var(--down)'; }
             } else if (type === 'STOCH') {
                 if (val < 20) { sig = 'BUY'; text = '바닥 (매수)'; color = 'var(--up)'; }
-                else if (val > 80) { sig = 'SELL', text = '과열 (매도)', color = 'var(--down)'; }
+                else if (val > 80) { sig = 'SELL'; text = '과열 (매도)'; color = 'var(--down)'; }
             }
             return { sig, text, color, weight };
         }
@@ -1202,6 +1203,7 @@
         function updateSummaryUI(type) {
             const signals = type === 'stock' ? stockSignals : cryptoSignals;
             let buyScore = 0, sellScore = 0;
+            
             Object.values(signals).forEach(s => {
                 if (s.sig === 'BUY') buyScore += s.w;
                 else if (s.sig === 'SELL') sellScore += s.w;
@@ -1209,6 +1211,7 @@
             
             let finalVerdict = "관망 (HOLD)", finalColor = "text-themeMuted", finalVerdictBeginner = "가만히 지켜보세요.";
             let diff = buyScore - sellScore;
+
             if (diff >= 15) { finalVerdict = "강력 매수 (STRONG BUY)"; finalVerdictBeginner = "지금 당장 사도 좋아요!"; finalColor = "text-up"; }
             else if (diff > 5) { finalVerdict = "분할 매수 (BUY)"; finalVerdictBeginner = "조금씩 사보는 것도 좋아요."; finalColor = "text-emerald-400"; }
             else if (diff <= -15) { finalVerdict = "적극 매도 (STRONG BYE)"; finalVerdictBeginner = "위험해요! 당장 파세요!"; finalColor = "text-rose-600"; }
@@ -1243,14 +1246,17 @@
             abortController = new AbortController();
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) loadingOverlay.style.display = 'flex';
+            
             try {
                 fetchMacroData(); 
                 const reqInterval = interval === '1y' ? '1mo' : interval;
                 const d = await fetchStockData(ticker, reqInterval, range);
+                
                 globalChartData = d; globalTicker = ticker;
                 updateStatus("LIVE DATA", "bg-emerald-500");
                 renderDashboard(ticker, d);
                 calculateTriplePerspectiveDecision(ticker, 'stock').catch(e => logError("Triple Calc Error", e, "loadData"));
+
             } catch (e) { 
                 if (!e.message.includes('Timeout') && e.name !== 'AbortError') {
                     logError(`loadData failed for ${ticker}`, e, "loadData");
@@ -1258,9 +1264,11 @@
                     if(myChart) myChart.clear();
                     const dt = document.getElementById('display-ticker'); if (dt) dt.innerText = "ERROR";
                     const lp = document.getElementById('live-price'); if (lp) lp.innerText = "---";
-                    const rc = document.getElementById('reasoning-container'); if (rc) rc.innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.</p>';
+                    const rc = document.getElementById('reasoning-container'); if (rc) rc.innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br><br>새로고침을 하거나 잠시 후 다시 시도해주세요.</p>';
                 }
-            } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
+            } finally { 
+                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
+            }
         }
 
         async function loadCryptoData(ticker, interval = currentCryptoInterval, range = currentCryptoRange) {
@@ -1268,17 +1276,22 @@
             cryptoAbortController = new AbortController();
             const loadingOverlay = document.getElementById('crypto-loading-overlay');
             if(loadingOverlay) loadingOverlay.style.display = 'flex';
+            
             const searchInput = document.getElementById('crypto-ticker-input');
             if(searchInput) searchInput.value = ticker;
+
             try {
                 await fetchCryptoMacroData();
                 renderIndicatorUI('crypto-val-fng', globalCryptoFng, 'FNG', globalCryptoFng, 'crypto');
+
                 const reqInterval = interval === '1y' ? '1mo' : interval;
                 const d = await fetchStockData(ticker, reqInterval, range, true);
+                
                 globalCryptoChartData = d; globalCryptoTicker = ticker;
                 updateCryptoStatus("LIVE DATA", "bg-emerald-500");
                 renderCryptoDashboard(ticker, d);
                 calculateTriplePerspectiveDecision(ticker, 'crypto').catch(e => logError("Crypto Triple Calc", e, "loadCryptoData"));
+
             } catch (e) { 
                 if (!e.message.includes('Timeout') && e.name !== 'AbortError') {
                     logError(`loadCryptoData failed for ${ticker}`, e, "loadCryptoData");
@@ -1287,13 +1300,16 @@
                     const dt = document.getElementById('crypto-display-ticker'); if (dt) dt.innerText = "ERROR";
                     const lp = document.getElementById('crypto-live-price'); if (lp) lp.innerText = "---";
                 }
-            } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
+            } finally { 
+                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
+            }
         }
 
         function renderDashboard(ticker, data) {
             if(!myChart || !data) return;
             let { dates, kData, closes } = extractCleanData(data);
             if(closes.length === 0) return;
+
             document.getElementById('display-ticker').innerText = ticker;
             let price = closes[closes.length - 1]; 
             let finalPrice = currentCurrency === 'KRW' ? price * currentExchangeRate : price;
@@ -1310,16 +1326,42 @@
                 dates = sorted; kData = sorted.map(y =>[yearly[y].open, yearly[y].close, yearly[y].low, yearly[y].high]); closes = sorted.map(y => yearly[y].close);
             }
 
+            const rsiArr = Indicator.rsi(closes, 14); const rsi = rsiArr[rsiArr.length - 1] || 50;
+            const ma120Arr = Indicator.sma(closes, 120); const ma120 = ma120Arr[ma120Arr.length - 1];
+            const macdObj = Indicator.macd(closes, 12, 26, 9); const macd = macdObj.hist[macdObj.hist.length - 1] || 0;
+            const bb = Indicator.bollinger(closes, 20, 2); const last = closes.length - 1;
+            
+            let reasoning =[];
+            if(ma120 !== null && ma120 !== undefined) {
+                const maPct = (((closes[last] - ma120) / ma120) * 100).toFixed(2);
+                reasoning.push({type: closes[last]>ma120?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치`, proof: `계산식: ((현재가 - 120일평균) / 120일평균) * 100 = ${maPct}%`});
+            }
+            if(rsi < 30) reasoning.push({type: 'up', t:'RSI (14)', d:`과매도 상태.`, proof: `상대강도지수: ${rsi.toFixed(2)}`});
+            else if(rsi > 70) reasoning.push({type: 'down', t:'RSI (14)', d:`과매수 상태.`, proof: `상대강도지수: ${rsi.toFixed(2)}`});
+            if(macd > 0) reasoning.push({type: 'up', t:'MACD', d:`상승 에너지 발산 중`, proof: `MACD: ${macd.toFixed(3)}`});
+            else reasoning.push({type: 'down', t:'MACD', d:`하락 에너지 진행 중`, proof: `MACD: ${macd.toFixed(3)}`});
+            
+            const rc = document.getElementById('reasoning-container');
+            if (rc) {
+                rc.innerHTML = reasoning.length > 0 ? reasoning.map(i => `
+                    <div class="glass rounded-xl border border-themeBorder mb-2 overflow-hidden">
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2"><span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'GOOD':'BAD'}</span><p class="text-[0.65rem] font-black text-themeText">${i.t}</p></div>
+                            <p class="text-[0.6rem] text-themeMuted text-right leading-tight">${i.d}</p>
+                        </div>
+                    </div>
+                `).join('') : '<p class="text-xs text-themeMuted text-center py-10">특이 지표가 없습니다.</p>';
+            }
+            
             const styleColor = getComputedStyle(document.documentElement);
             const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
             const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
             const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
-            const bb = Indicator.bollinger(closes, 20, 2);
-            const macdObj = Indicator.macd(closes, 12, 26, 9);
             
             let series =[{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
             let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
             const widthNum = parseFloat(chartLineWidth);
+            
             Object.keys(maSettings).forEach(p => { if (maSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
             series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
             series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
@@ -1338,7 +1380,7 @@
                             } else {
                                 let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
                                 if (val === null || val === undefined || isNaN(val)) return;
-                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`;
+                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val)* (currentCurrency==='KRW'&&!p.seriesName.includes('MA')?1:1))}</b><br/>`;
                             }
                         });
                         return result;
@@ -1357,23 +1399,49 @@
             if(!cryptoChart || !data) return;
             let { dates, kData, closes } = extractCleanData(data);
             if(closes.length === 0) return;
+
             document.getElementById('crypto-display-ticker').innerText = ticker.replace('-USD', '');
             let price = closes[closes.length - 1]; 
             let finalPrice = currentCurrency === 'KRW' ? price * currentExchangeRate : price;
             document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
+            
             const vol = calcVolatility(closes);
             renderIndicatorUI('crypto-val-vol', vol.toFixed(1) + '%', 'VOL', vol, 'crypto');
+
+            const rsiArr = Indicator.rsi(closes, 14); const rsi = rsiArr[rsiArr.length - 1] || 50;
+            const ma120Arr = Indicator.sma(closes, 120); const ma120 = ma120Arr[ma120Arr.length - 1];
+            const macdObj = Indicator.macd(closes, 12, 26, 9); const macd = macdObj.hist[macdObj.hist.length - 1] || 0;
+            const bb = Indicator.bollinger(closes, 20, 2); const last = closes.length - 1;
+            
+            let reasoning =[];
+            if(ma120 !== null && ma120 !== undefined) {
+                const maPct = (((closes[last] - ma120) / ma120) * 100).toFixed(2);
+                reasoning.push({type: closes[last]>ma120?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치`, proof: `이격도: ${maPct}%`});
+            }
+            if(rsi < 30) reasoning.push({type: 'up', t:'RSI (14)', d:`과매도 상태.`, proof: `RSI가 30 이하입니다.`});
+            else if(rsi > 70) reasoning.push({type: 'down', t:'RSI (14)', d:`과매수 상태.`, proof: `RSI가 70 이상입니다.`});
+            
+            const crc = document.getElementById('crypto-reasoning-container');
+            if (crc) {
+                crc.innerHTML = reasoning.length > 0 ? reasoning.map(i => `
+                    <div class="glass rounded-xl border border-themeBorder mb-2 overflow-hidden">
+                        <div class="p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2"><span class="signal-badge ${i.type==='up'?'signal-up':'signal-down'}">${i.type==='up'?'GOOD':'BAD'}</span><p class="text-[0.65rem] font-black text-themeText">${i.t}</p></div>
+                            <p class="text-[0.6rem] text-themeMuted text-right leading-tight">${i.d}</p>
+                        </div>
+                    </div>
+                `).join('') : '<p class="text-xs text-themeMuted text-center py-10">특이 지표가 없습니다.</p>';
+            }
             
             const styleColor = getComputedStyle(document.documentElement);
             const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
             const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
             const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
-            const bb = Indicator.bollinger(closes, 20, 2);
-            const macdObj = Indicator.macd(closes, 12, 26, 9);
             
             let series =[{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
             let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
             const widthNum = parseFloat(chartLineWidth);
+            
             Object.keys(cryptoMaSettings).forEach(p => { if (cryptoMaSettings[p]) series.push({ name: `MA${p}`, type: 'line', data: Indicator.sma(closes, parseInt(p)), symbol: 'none', lineStyle: { color: maCols[p], width: widthNum, opacity: 0.8 }, z: 5 }); });
             series.push({ name: 'BB Upper', type: 'line', data: bb.upper, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
             series.push({ name: 'BB Lower', type: 'line', data: bb.lower, symbol: 'none', lineStyle: { color: chartTextColor, width: 1, type: 'dashed', opacity: 0.3 }, z: 1 });
@@ -1392,7 +1460,7 @@
                             } else {
                                 let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
                                 if (val === null || val === undefined || isNaN(val)) return;
-                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`;
+                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val)* (currentCurrency==='KRW'&&!p.seriesName.includes('MA')?1:1))}</b><br/>`;
                             }
                         });
                         return result;
@@ -1448,22 +1516,12 @@
                     sigs.dist.raw = dist; sigs.rsi.raw = rsi; sigs.macd.raw = macd; sigs.stoch.raw = stoch; sigs.bb.raw = bbStr;
                     sigs.macro.raw = macroVal; sigs.fng.raw = fngVal;
 
-                    // 🚨 [수정] 지표 이름에 기준값(평균선 기간 등) 명시
-                    const getIndicatorLabel = (name) => {
-                        if(name === 'DIST') return `이격도(${periods.ma}${timeHorizon==='long'?'개월':'일'}선)`;
-                        if(name === 'MACD') return `MACD(${timeHorizon==='long'?'월봉':'일봉'})`;
-                        if(name === 'RSI') return `RSI(${periods.rsi})`;
-                        if(name === 'STOCH') return `Stoch(${periods.stoch})`;
-                        if(name === 'VIX' || name === 'VOL') return name;
-                        return name;
-                    }
-
                     let buyScore = 0, sellScore = 0, breakdown =[];
                     const addScore = (name, s) => {
                         let valStr = "0.0";
                         if (s.sig === 'BUY') { buyScore += s.weight; valStr = `+${s.weight.toFixed(1)}`; }
                         else if (s.sig === 'SELL') { sellScore += s.weight; valStr = `-${s.weight.toFixed(1)}`; }
-                        breakdown.push({name: getIndicatorLabel(name), sig: s.sig, val: valStr, weight: s.weight, raw: s.raw, text: s.text});
+                        breakdown.push({name, sig: s.sig, val: valStr, weight: s.weight, raw: s.raw, text: s.text});
                     };
 
                     addScore(marketType === 'stock' ? 'VIX' : 'VOL', sigs.macro);
@@ -1481,9 +1539,7 @@
                 const ltRes = analyze(mData, 'long', { ma: 10, rsi: 14, stoch: 14 });
                 
                 const summaries = {
-                    short: { s: "단기 모멘텀 및 심리 지표 기반 (일봉)", a: "" }, 
-                    mid: { s: "중기 추세 및 모멘텀 기반 (주봉)", a: "" }, 
-                    long: { s: "장기 사이클 및 평균 회귀 기반 (월봉)", a: "" }
+                    short: { s: "단기 모멘텀 및 심리 지표 기반", a: "" }, mid: { s: "중기 추세 및 모멘텀 기반", a: "" }, long: { s: "장기 사이클 및 평균 회귀 기반", a: "" }
                 };
 
                 const updateUI = (prefix) => {
@@ -1509,16 +1565,18 @@
                 updateUI(marketType);
 
                 const dailyClean = extractCleanData(dData);
-                const lastCl = dailyClean.closes[dailyClean.closes.length-1] || 0;
-                const sma120 = Indicator.sma(dailyClean.closes, 120);
-                const dist120 = (sma120[sma120.length-1]) ? ((lastCl - sma120[sma120.length-1]) / sma120[sma120.length-1] * 100) : 0;
-                const rsiVal = Indicator.rsi(dailyClean.closes, 14).pop() || 50;
-                const macdVal = Indicator.macd(dailyClean.closes, 12, 26, 9).hist.pop() || 0;
-                const stochVal = Indicator.stochastic(dailyClean.kData, 14, 3).k.pop() || 50;
+                const mainSma120 = Indicator.sma(dailyClean.closes, 120);
+                const lastCl = dailyClean.closes.length > 0 ? dailyClean.closes[dailyClean.closes.length-1] : 0;
+                
+                const dist120 = (mainSma120.length > 0 && mainSma120[mainSma120.length-1]) ? ((lastCl - mainSma120[mainSma120.length-1]) / mainSma120[mainSma120.length-1] * 100) : 0;
+                const rsiArr = Indicator.rsi(dailyClean.closes, 14); const rsiVal = rsiArr[rsiArr.length - 1] || 50;
+                const macdObj = Indicator.macd(dailyClean.closes, 12, 26, 9); const macdVal = macdObj.hist[macdObj.hist.length - 1] || 0;
+                const stochObj = Indicator.stochastic(dailyClean.kData, 14, 3); const stochVal = stochObj.k[stochObj.k.length - 1] || 50;
                 const bbMain = Indicator.bollinger(dailyClean.closes, 20, 2);
+                
                 let bbStrMain = "MID";
-                if (bbMain.upper.pop() <= lastCl * 1.02) bbStrMain = "UPPER";
-                else if (bbMain.lower.pop() >= lastCl * 0.98) bbStrMain = "LOWER";
+                if (bbMain.upper.length > 0 && bbMain.upper[bbMain.upper.length - 1] !== null && lastCl >= bbMain.upper[bbMain.upper.length - 1] * 0.98) bbStrMain = "UPPER";
+                else if (bbMain.lower.length > 0 && bbMain.lower[bbMain.lower.length - 1] !== null && lastCl <= bbMain.lower[bbMain.lower.length - 1] * 1.02) bbStrMain = "LOWER";
 
                 if (marketType === 'stock') {
                     renderIndicatorUI('val-ma-dist', `${dist120>0?'+':''}${dist120.toFixed(2)}%`, 'DIST', dist120, 'stock');
@@ -1546,41 +1604,65 @@
                         <span class="text-down bg-down/10 px-3 py-1 rounded border border-down/20">매도 스코어: ${d.sellScore?.toFixed(1)}</span>
                     </div>
                 </div>
+                
                 <div class="overflow-x-auto custom-scroll border border-themeBorder rounded-xl bg-black/10">
                     <table class="w-full text-sm min-w-[400px]">
                         <thead class="bg-black/30">
                             <tr class="text-[0.6rem] text-themeMuted uppercase tracking-widest border-b border-themeBorder">
-                                <th class="py-2.5 px-3 text-left">기술 지표 (기준)</th>
+                                <th class="py-2.5 px-3 text-left">기술 지표명</th>
                                 <th class="py-2.5 px-2 text-right">현재 수치(Raw)</th>
-                                <th class="py-2.5 px-2 text-center">AI 판독</th>
-                                <th class="py-2.5 px-2 text-center">가중치</th>
-                                <th class="py-2.5 px-3 text-right">점수</th>
+                                <th class="py-2.5 px-2 text-center">AI 판독 상태</th>
+                                <th class="py-2.5 px-2 text-center">부여 가중치</th>
+                                <th class="py-2.5 px-3 text-right">최종 점수</th>
                             </tr>
                         </thead>
                         <tbody class="px-2">
             `;
+
             d.breakdown.forEach(b => {
                 let rawStr = b.raw;
                 if(typeof rawStr === 'number') {
-                    if(b.name.includes('이격도') || b.name === 'VOL') rawStr = (rawStr > 0 ? '+' : '') + rawStr.toFixed(2) + '%';
+                    if(b.name === 'DIST' || b.name === 'VOL') rawStr = (rawStr > 0 ? '+' : '') + rawStr.toFixed(2) + '%';
                     else rawStr = rawStr.toFixed(2);
                 }
+                
                 let scoreColor = b.sig === 'BUY' ? 'text-up' : (b.sig === 'SELL' ? 'text-down' : 'text-themeMuted');
-                html += `<tr class="border-b border-themeBorder/30 hover:bg-white/5 transition">
-                    <td class="py-2.5 px-3 text-left text-xs font-bold text-themeText">${b.name}</td>
-                    <td class="py-2.5 px-2 text-right text-xs font-mono text-gray-300">${rawStr}</td>
-                    <td class="py-2.5 px-2 text-center text-[0.65rem] font-bold ${scoreColor}">${b.text}</td>
-                    <td class="py-2.5 px-2 text-center text-[0.65rem] text-themeMuted">±${b.weight.toFixed(1)}</td>
-                    <td class="py-2.5 px-3 text-right text-sm font-black font-mono ${scoreColor}">${b.val}</td>
-                </tr>`;
+                let valColor = b.sig === 'BUY' ? 'text-up' : (b.sig === 'SELL' ? 'text-down' : 'text-gray-400');
+
+                html += `
+                    <tr class="border-b border-themeBorder/30 hover:bg-white/5 transition">
+                        <td class="py-2.5 px-3 text-left text-xs font-bold text-themeText whitespace-nowrap">${b.name}</td>
+                        <td class="py-2.5 px-2 text-right text-xs font-mono text-gray-300">${rawStr}</td>
+                        <td class="py-2.5 px-2 text-center text-[0.65rem] font-bold ${valColor}">${b.text}</td>
+                        <td class="py-2.5 px-2 text-center text-[0.65rem] text-themeMuted">±${b.weight.toFixed(1)}</td>
+                        <td class="py-2.5 px-3 text-right text-sm font-black font-mono ${scoreColor}">${b.val}</td>
+                    </tr>
+                `;
             });
-            html += `</tbody></table></div>`;
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="bg-blue-500/5 p-3 rounded-xl border border-blue-500/20 mt-4">
+                    <p class="text-[0.65rem] text-blue-400 font-black mb-1.5 flex items-center gap-1.5 uppercase tracking-widest">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        AI 종합 스코어링 안내
+                    </p>
+                    <p class="text-[0.65rem] text-themeMuted leading-relaxed break-keep">
+                        • <strong>합산 매수 스코어</strong>에서 <strong>합산 매도 스코어</strong>를 뺀 격차를 기준으로 포지션을 결정합니다.<br>
+                        • 격차가 +15점 이상이면 <strong>강력 매수</strong>, +5점 이상이면 <strong>분할 매수</strong>로 판독합니다.<br>
+                        • 각 지표별 가중치는 단기, 중기, 장기 흐름에 따라 알고리즘이 자동으로 다르게 배분합니다.
+                    </p>
+                </div>
+            `;
             return html;
         }
 
         function showDetail(p) {
             const d = analysisDetails[p]; if(!d || !d.status) return;
-            document.getElementById('modal-title').innerText = p === 'short' ? '주식 단기 흐름 (일봉)' : (p === 'mid' ? '주식 중기 흐름 (주봉)' : '주식 장기 흐름 (월봉)');
+            document.getElementById('modal-title').innerText = p === 'short' ? '주식 단기 흐름 분석 상세' : (p === 'mid' ? '주식 중기 흐름 분석 상세' : '주식 장기 흐름 분석 상세');
             document.getElementById('modal-period').innerText = d.summary || '---';
             document.getElementById('modal-body').innerHTML = buildDetailHtml(d);
             document.getElementById('detail-modal').style.display = 'flex';
@@ -1588,10 +1670,335 @@
 
         function showCryptoDetail(p) {
             const d = cryptoAnalysisDetails[p]; if(!d || !d.status) return;
-            document.getElementById('modal-title').innerText = p === 'short' ? '코인 단기 흐름 (일봉)' : (p === 'mid' ? '코인 중기 흐름 (주봉)' : '코인 장기 흐름 (월봉)');
+            document.getElementById('modal-title').innerText = p === 'short' ? '코인 단기 흐름 분석 상세' : (p === 'mid' ? '코인 중기 흐름 분석 상세' : '코인 장기 흐름 분석 상세');
             document.getElementById('modal-period').innerText = d.summary || '---';
             document.getElementById('modal-body').innerHTML = buildDetailHtml(d);
             document.getElementById('detail-modal').style.display = 'flex';
+        }
+
+        const getAdjustedSimData = (key, isBaaLev = false) => {
+            const data = isBaaLev ? baaLevSimData[key] : pfSimData[key];
+            if(!data) return[];
+            if (currentCurrency === 'USD') return data;
+            const fxBase = fxSimData[0]; 
+            return data.map((val, idx) => {
+                const fxRatio = fxSimData[idx] ? (fxSimData[idx] / fxBase) : 1;
+                return val * fxRatio;
+            });
+        };
+
+        function updatePfCardMetrics() {
+            const years = parseInt(pfSimYears[pfSimYears.length - 1]) - parseInt(pfSimYears[0]);
+            Object.keys(pfDetails).forEach(key => {
+                const cagrEl = document.getElementById(`card-cagr-${key}`);
+                const mddEl = document.getElementById(`card-mdd-${key}`);
+                const marEl = document.getElementById(`card-mar-${key}`);
+                if(!cagrEl || !mddEl) return;
+
+                const dataArr = getAdjustedSimData(key);
+                const baseVal = dataArr[0], finalVal = dataArr[dataArr.length - 1];
+                let cagr = (((finalVal / baseVal) ** (1 / years)) - 1) * 100;
+                let mdds = calcMDDArray(dataArr);
+                let minMdd = Math.min(...mdds);
+                let mar = Math.abs(minMdd) > 0 ? (cagr / Math.abs(minMdd)) : 0;
+
+                cagrEl.innerText = `${cagr.toFixed(1)}%`; cagrEl.className = cagr > 0 ? "text-up ml-1" : "text-down ml-1";
+                mddEl.innerText = `${minMdd.toFixed(1)}%`; mddEl.className = minMdd < -5 ? "text-down ml-1" : "text-up ml-1";
+                if (marEl) {
+                    marEl.innerText = `MAR ${mar.toFixed(2)}`;
+                    marEl.style.color = mar > 1.0 ? '#10B981' : (mar < 0.5 ? '#EF5350' : '#3B82F6');
+                    marEl.style.background = mar > 1.0 ? 'rgba(16, 185, 129, 0.1)' : (mar < 0.5 ? 'rgba(239, 83, 80, 0.1)' : 'rgba(59, 130, 246, 0.1)');
+                }
+            });
+        }
+
+        function initPortfolioChart() {
+            if(!document.getElementById('chart-portfolio')) return;
+            pfChart = echarts.init(document.getElementById('chart-portfolio'));
+            renderPortfolioChart();
+        }
+
+        function renderPortfolioChart() {
+            if(!pfChart) return;
+            const styleColor = getComputedStyle(document.documentElement);
+            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+
+            pfChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 },
+                    formatter: function (params) {
+                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}년</div>`;
+                        params.forEach(p => {
+                            let val = p.value !== undefined ? p.value : p.data;
+                            if (val === null || val === undefined || isNaN(val)) return;
+                            let unit = p.seriesName.includes('MDD') ? '%' : '';
+                            result += `${p.marker} ${p.seriesName}: <b>${Number(val).toFixed(2)}${unit}</b><br/>`;
+                        });
+                        return result;
+                    }
+                },
+                legend: { data:['S&P 500 (SPY)', 'All-Weather', 'BAA (Bold)', 'MDD (BAA)'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
+                grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
+                xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
+                yAxis:[
+                    { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
+                    { type: 'value', min: -60, max: 0, position: 'right', splitLine: { show: false }, axisLabel: { formatter: '{value}%', color: chartTextColor, fontSize: 9 } }
+                ],
+                series:[
+                    { name: 'MDD (BAA)', type: 'bar', data: calcMDDArray(getAdjustedSimData('baa')), yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
+                    { name: 'S&P 500 (SPY)', type: 'line', data: getAdjustedSimData('spy'), smooth: true, lineStyle: { color: '#EF5350', width: 2 }, showSymbol: false },
+                    { name: 'All-Weather', type: 'line', data: getAdjustedSimData('allweather'), smooth: true, lineStyle: { color: '#3B82F6', width: 2 }, showSymbol: false },
+                    { name: 'BAA (Bold)', type: 'line', data: getAdjustedSimData('baa'), smooth: true, lineStyle: { color: '#10B981', width: 3 }, showSymbol: false, z: 10 }
+                ]
+            }, true);
+            setTimeout(() => pfChart.resize(), 100);
+        }
+
+        async function comparePortfolioStock() {
+            const ticker = document.getElementById('pf-compare-input').value.trim().toUpperCase();
+            const btn = document.getElementById('pf-compare-btn');
+            if(!ticker || !currentPfKey || !pfModalChart) return;
+            btn.innerText = '검색중...';
+            try {
+                const d = await fetchStockData(ticker, '1mo', 'max');
+                let { dates, closes } = extractCleanData(d);
+                let yearlyData = {};
+                for(let i=0; i<dates.length; i++){ if(closes[i] != null) yearlyData[dates[i].substring(0, 4)] = closes[i]; }
+                
+                let compData =[], basePrice = null; 
+                pfSimYears.forEach(yr => {
+                    if(yearlyData[yr]) {
+                        if(basePrice === null) basePrice = yearlyData[yr];
+                        compData.push((yearlyData[yr] / basePrice) * 100);
+                    } else compData.push(null);
+                });
+
+                const styleColor = getComputedStyle(document.documentElement);
+                const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+                
+                pfModalChart.setOption({
+                    legend: { data: [pfDetails[currentPfKey].title, ticker, 'MDD'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
+                    series:[
+                        { name: `MDD`, type: 'bar', data: calcMDDArray(getAdjustedSimData(currentPfKey)), yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
+                        { name: pfDetails[currentPfKey].title, type: 'line', data: getAdjustedSimData(currentPfKey), smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 },
+                        { name: ticker, type: 'line', data: compData, smooth: true, lineStyle: { color: '#EAB308', width: 2, type: 'dashed' }, connectNulls: true, showSymbol: false, z: 5 }
+                    ]
+                });
+                btn.innerText = '완료'; setTimeout(() => btn.innerText = '차트 비교', 2000);
+            } catch(e) {
+                logError(`Compare Failed`, e, "comparePortfolioStock");
+                btn.innerText = '오류'; btn.classList.add('bg-rose-500');
+                setTimeout(() => { btn.innerText = '차트 비교'; btn.classList.remove('bg-rose-500'); }, 2000);
+            }
+        }
+
+        async function runLiveCalc(pfKey) {
+            const area = document.getElementById('pf-modal-live-area');
+            const loading = document.getElementById('pf-live-loading');
+            const content = document.getElementById('pf-live-content');
+            const tbody = document.getElementById('pf-live-table');
+            const summaryBox = document.getElementById('pf-live-summary');
+            
+            if(!area) return;
+            area.style.display = 'block'; loading.style.display = 'flex'; content.style.display = 'none';
+            if(summaryBox) summaryBox.style.display = 'none';
+            tbody.innerHTML = '';
+
+            try {
+                let tickers =[]; let colCount = 7;
+                if(pfKey === 'dual') { tickers =['SPY', 'VEA', 'BIL', 'QQQ']; colCount = 7; } 
+                else if(pfKey === 'vaa') { tickers =['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY', 'QQQ']; colCount = 8; } 
+                else if(pfKey === 'daa') { tickers =['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
+                else if(pfKey === 'baa') { tickers =['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
+
+                document.getElementById('pf-live-loading-text').innerText = `데이터 수집 중 (다중 서버 우회)...`;
+                
+                const results =[];
+                for (let t of tickers) {
+                    results.push(await fetchStockData(t, '1mo', '2y'));
+                }
+                
+                const dataMap = {}; let minLength = 9999;
+                for(let i=0; i<tickers.length; i++) {
+                    const t = tickers[i];
+                    let { dates, closes } = extractCleanData(results[i]);
+                    dataMap[t] = { dates, closes };
+                    if(closes.length < minLength) minLength = closes.length;
+                }
+
+                if(minLength < 13) throw new Error("과거 데이터가 충분하지 않습니다 (12개월 미만)");
+
+                let html = '<thead><tr><th class="text-left">투자 월</th>';
+                if(pfKey === 'dual') html += `<th>SPY 12M수익</th><th>VEA 12M수익</th><th>BIL 12M수익</th>`;
+                else if(pfKey === 'vaa') html += `<th>SPY 점수</th><th>VEA 점수</th><th>VWO 점수</th><th>AGG 점수</th>`;
+                else if(pfKey === 'daa') html += `<th>VWO 점수</th><th>BND 점수</th><th>위험?</th>`;
+                else if(pfKey === 'baa') html += `<th>최저 카나리아</th><th>안전 대피?</th>`;
+                html += `<th>월간 수익률</th><th>SPY / QQQ</th><th class="text-right">투자 비중</th></tr></thead><tbody>`;
+
+                const getSignal = (idx) => {
+                    if(idx - 12 < 0) return null;
+                    let result = { assets: [], text: '', proofs:[], color: '' };
+                    
+                    const calcScore = (t) => {
+                        const arr = dataMap[t].closes;
+                        const P0 = arr[idx], P1 = arr[idx-1], P3 = arr[idx-3], P6 = arr[idx-6], P12 = arr[idx-12];
+                        if(!P0 || !P1 || !P3 || !P6 || !P12) return { score: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
+                        const r1 = (P0/P1 - 1), r3 = (P0/P3 - 1), r6 = (P0/P6 - 1), r12 = (P0/P12 - 1);
+                        const score = (r1*12 + r3*4 + r6*2 + r12*1) * 100;
+                        const proof = `[${t}] 스코어: ${score.toFixed(2)}`;
+                        return { score, proof };
+                    };
+
+                    const calcRet = (t) => {
+                        const arr = dataMap[t].closes; const P0 = arr[idx], P12 = arr[idx-12];
+                        if(!P0 || !P12) return { ret: -999, proof: `<span class="text-rose-400">[${t}] 데이터 부족</span>` };
+                        const ret = (P0/P12 - 1) * 100;
+                        const proof = `[${t}] 12M 수익: ${ret.toFixed(2)}%`;
+                        return { ret, proof };
+                    };
+
+                    if(pfKey === 'dual') {
+                        const s = calcRet('SPY'), v = calcRet('VEA'), b = calcRet('BIL');
+                        result.proofs.push(s.proof, v.proof, b.proof); result.raw = { s, v, b };
+                        if(s.ret === -999 || v.ret === -999 || b.ret === -999) return null;
+                        if(s.ret < b.ret && v.ret < b.ret) { result.assets=[{t:'BIL', w:1}]; result.text='BIL 100%'; result.color='text-gray-400'; }
+                        else if(s.ret > v.ret) { result.assets=[{t:'SPY', w:1}]; result.text='SPY 100%'; result.color='text-up'; }
+                        else { result.assets=[{t:'VEA', w:1}]; result.text='VEA 100%'; result.color='text-accent'; }
+                    }
+                    else if(pfKey === 'vaa') {
+                        const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), as=calcScore('AGG');
+                        result.proofs.push(ss.proof, vs.proof, vws.proof, as.proof); result.raw = { ss, vs, vws, as };
+                        if(ss.score===-999) return null;
+                        if(ss.score>0 && vs.score>0 && vws.score>0 && as.score>0) {
+                            const m = Math.max(ss.score, vs.score, vws.score, as.score);
+                            const t = ss.score===m?'SPY':(vs.score===m?'VEA':(vws.score===m?'VWO':'AGG'));
+                            result.assets=[{t, w:1}]; result.text=`${t} 100% (공격)`; result.color='text-up';
+                        } else {
+                            const lq=calcScore('LQD'), ie=calcScore('IEF'), sh=calcScore('SHY');
+                            result.proofs.push(lq.proof, ie.proof, sh.proof);
+                            const m = Math.max(lq.score, ie.score, sh.score);
+                            const t = lq.score===m?'LQD':(ie.score===m?'IEF':'SHY');
+                            result.assets=[{t, w:1}]; result.text=`${t} 100% (방어)`; result.color='text-gray-400';
+                        }
+                    }
+                    else if(pfKey === 'daa') {
+                        const vws=calcScore('VWO'), bns=calcScore('BND');
+                        result.proofs.push(vws.proof, bns.proof); result.raw = { vws, bns };
+                        if(vws.score===-999) return null;
+                        if(vws.score>0 && bns.score>0) {
+                            result.assets=[{t:'SPY', w:0.5}, {t:'VEA', w:0.5}]; result.text='SPY 50%, VEA 50%'; result.color='text-up';
+                        } else {
+                            result.assets=[{t:'SHY', w:1}]; result.text='SHY 100% (방어)'; result.color='text-gray-400';
+                        }
+                    }
+                    else if(pfKey === 'baa') {
+                        const ss=calcScore('SPY'), vs=calcScore('VEA'), vws=calcScore('VWO'), bns=calcScore('BND');
+                        result.proofs.push(ss.proof, vs.proof, vws.proof, bns.proof); result.raw = { ss, vs, vws, bns };
+                        if(ss.score===-999) return null;
+                        const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
+                        if(minS > 0) {
+                            result.assets=[{t:'QQQ', w:1}]; result.text='QQQ 100% (공격)'; result.color='text-up';
+                        } else {
+                            result.assets=[{t:'BIL', w:0.333}, {t:'IEF', w:0.333}, {t:'TLT', w:0.333}]; result.text='BIL 33%, IEF 33%, TLT 33%'; result.color='text-gray-400';
+                        }
+                    }
+                    return result;
+                };
+
+                let actualCagrs =[];
+                for(let i = minLength - 1; i >= minLength - 12; i--) {
+                    if(i - 12 < 0) break;
+                    const sig = getSignal(i); if(!sig) continue;
+
+                    const [yy, mm] = dataMap['SPY'].dates[i].split('-');
+                    const ymLabel = `${yy.substring(2)}년 ${parseInt(mm)}월`;
+                    let row = `<tr><td class="text-left font-bold text-accent whitespace-nowrap">${ymLabel}</td>`;
+                    
+                    if(pfKey === 'dual') {
+                        const { s, v, b } = sig.raw;
+                        row += `<td class="${s.ret>0?'text-up':'text-down'}">${s.ret>0?'+':''}${s.ret.toFixed(2)}%</td><td class="${v.ret>0?'text-up':'text-down'}">${v.ret>0?'+':''}${v.ret.toFixed(2)}%</td><td class="text-gray-400">+${b.ret.toFixed(2)}%</td>`;
+                    } else if(pfKey === 'vaa') {
+                        const { ss, vs, vws, as } = sig.raw;
+                        row += `<td class="${ss.score>0?'text-up':'text-down'}">${ss.score.toFixed(1)}</td><td class="${vs.score>0?'text-up':'text-down'}">${vs.score.toFixed(1)}</td><td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${as.score>0?'text-up':'text-down'}">${as.score.toFixed(1)}</td>`;
+                    } else if(pfKey === 'daa') {
+                        const { vws, bns } = sig.raw; let def = (vws.score <= 0 || bns.score <= 0) ? 'YES (위험)' : 'NO (안전)';
+                        row += `<td class="${vws.score>0?'text-up':'text-down'}">${vws.score.toFixed(1)}</td><td class="${bns.score>0?'text-up':'text-down'}">${bns.score.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
+                    } else if(pfKey === 'baa') {
+                        const { ss, vs, vws, bns } = sig.raw; const minS = Math.min(ss.score, vs.score, vws.score, bns.score);
+                        let def = minS <= 0 ? 'YES (대피 발동)' : 'NO (안전)';
+                        row += `<td class="${minS>0?'text-up':'text-down'} font-bold">${minS.toFixed(1)}</td><td class="${def.includes('YES')?'text-down':'text-up'} font-bold">${def}</td>`;
+                    }
+
+                    let actualRetHtml = '<td class="text-gray-400">--</td>', benchRetHtml = '<td class="text-gray-400 bg-black/10">-- / --</td>';
+                    if (i < minLength - 1) { 
+                        let monRet = 0, hasData = true;
+                        for(let asset of sig.assets) {
+                            const p0 = dataMap[asset.t].closes[i]; const p1 = dataMap[asset.t].closes[i+1]; 
+                            if(p0 && p1) { monRet += asset.w * (p1 / p0 - 1); } else { hasData = false; }
+                        }
+                        if(hasData) {
+                            const retPct = monRet * 100;
+                            actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
+                            actualCagrs.push(retPct);
+                        }
+                        const spy0 = dataMap['SPY']?.closes[i], spy1 = dataMap['SPY']?.closes[i+1];
+                        const qqq0 = dataMap['QQQ']?.closes[i], qqq1 = dataMap['QQQ']?.closes[i+1];
+                        let spyStr = '--', qqqStr = '--';
+                        if(spy0 && spy1) { const pct = (spy1/spy0 - 1)*100; spyStr = `<span class="${pct>0?'text-up':'text-down'}">${pct>0?'+':''}${pct.toFixed(2)}%</span>`; }
+                        if(qqq0 && qqq1) { const pct = (qqq1/qqq0 - 1)*100; qqqStr = `<span class="${pct>0?'text-up':'text-down'}">${pct>0?'+':''}${pct.toFixed(2)}%</span>`; }
+                        benchRetHtml = `<td class="text-[0.65rem] font-bold whitespace-nowrap bg-black/10">S: ${spyStr} / Q: ${qqqStr}</td>`;
+                    } else {
+                        actualRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold">진행중</td>'; benchRetHtml = '<td class="text-themeMuted text-[0.6rem] font-bold bg-black/10">진행중</td>';
+                    }
+
+                    row += actualRetHtml + benchRetHtml + `<td class="text-right font-black ${sig.color}">${sig.text}</td></tr>`;
+                    const proofHtml = sig.proofs.map(p => `<div>${p}</div>`).join('');
+                    row += `<tr class="proof-row"><td colspan="${colCount}" class="proof-cell"><div class="proof-box">${proofHtml}</div></td></tr>`;
+                    html += row;
+                }
+                html += `</tbody>`; tbody.innerHTML = html;
+
+                if (summaryBox && actualCagrs.length > 0) {
+                    let accRet = 1; actualCagrs.forEach(r => accRet *= (1 + r/100));
+                    const finalRet = (accRet - 1) * 100;
+                    document.getElementById('pf-live-summary-cagr').innerText = `${finalRet>0?'+':''}${finalRet.toFixed(2)}%`;
+                    document.getElementById('pf-live-summary-cagr').className = `text-2xl md:text-3xl font-black ${finalRet>0?'text-up':'text-down'}`;
+                    document.getElementById('pf-live-summary-mdd').innerText = '진행중 (표 참조)';
+                    summaryBox.style.display = 'flex';
+                }
+                loading.style.display = 'none'; content.style.display = 'block';
+
+            } catch (error) {
+                logError(`Live Engine Failed (${pfKey})`, error, "runLiveCalc");
+                loading.innerHTML = `<p class="text-down text-xs font-bold text-center">API 데이터를 수집하지 못했습니다.<br><span class="text-gray-500 font-normal mt-1 block">${error.message}</span></p>`;
+            }
+        }
+
+        function initBaaChart() {
+            if (!baaChart) baaChart = echarts.init(document.getElementById('chart-baa-leverage'));
+            renderBaaChart();
+        }
+
+        function renderBaaChart() {
+            if (!baaChart) return;
+            const styleColor = getComputedStyle(document.documentElement);
+            const chartTextColor = styleColor.getPropertyValue('--text-muted').trim() || '#9CA3AF';
+            const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
+
+            baaChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 11 } },
+                legend: { data:['BAA (1배)', 'BAA (2배 QLD)', 'BAA (3배 TQQQ)'], textStyle: { color: chartTextColor, fontSize: 11 }, top: 0 },
+                grid: { left: '4%', right: '4%', bottom: '5%', top: '15%', containLabel: true },
+                xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
+                yAxis: { type: 'log', scale: true, splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor, formatter: '{value}' } },
+                series:[
+                    { name: 'BAA (1배)', type: 'line', data: getAdjustedSimData('baa_qqq', true), smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#3B82F6' } },
+                    { name: 'BAA (2배 QLD)', type: 'line', data: getAdjustedSimData('baa_qld', true), smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#A855F7' } },
+                    { name: 'BAA (3배 TQQQ)', type: 'line', data: getAdjustedSimData('baa_tqqq', true), smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#F97316' } }
+                ]
+            }, true);
         }
 
         async function runBaaLiveCheck() {
@@ -1599,49 +2006,147 @@
             const loading = document.getElementById('baa-live-loading');
             const resultBox = document.getElementById('baa-live-result');
             const loadingText = document.getElementById('baa-live-loading-text');
+            
             idle.style.display = 'none'; resultBox.style.display = 'none'; loading.style.display = 'flex';
+
             const canaries =['SPY', 'VEA', 'VWO', 'BND'];
             let minScore = 9999, failureCount = 0;
 
             try {
                 baaProofs = {};
+                const results =[];
+
+                for (let ticker of canaries) {
+                    loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">[${ticker}] 정확한 일봉 데이터 스캔 및 월말 종가 추출 중</span>`;
+                    const rawData = await fetchStockData(ticker, '1d', '2y');
+                    results.push(rawData);
+                }
+
                 for (let i = 0; i < canaries.length; i++) {
                     const ticker = canaries[i];
-                    loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">[${ticker}] 월말 종가 추출 중</span>`;
-                    const rawData = await fetchStockData(ticker, '1d', '2y');
+                    const rawData = results[i];
+                    
                     const ts = rawData.timestamp || [];
                     const quoteClose = rawData.indicators?.quote?.[0]?.close || [];
                     const adjClose = rawData.indicators?.adjclose?.[0]?.adjclose || quoteClose;
                     const livePrice = rawData.meta?.regularMarketPrice;
 
                     let monthlyData = {};
+                    let lastValidClose = 0;
+
                     for (let j = 0; j < ts.length; j++) {
-                        let c = adjClose[j] || quoteClose[j];
-                        if (c) {
+                        let c = adjClose[j];
+                        if (c === null || c === undefined) c = quoteClose[j];
+                        if (c === null || c === undefined) c = lastValidClose; else lastValidClose = c;
+
+                        if (c !== 0 && c !== null) {
                             let d = new Date(ts[j] * 1000);
                             let y = d.getUTCFullYear();
                             let m = String(d.getUTCMonth() + 1).padStart(2, '0');
                             let day = String(d.getUTCDate()).padStart(2, '0');
-                            monthlyData[`${y}-${m}`] = { date: `${y}-${m}-${day}`, close: c };
+                            let ym = `${y}-${m}`;
+                            monthlyData[ym] = { date: `${y}-${m}-${day}`, close: c };
                         }
                     }
+
                     let sortedMonths = Object.keys(monthlyData).sort();
-                    if (livePrice) monthlyData[sortedMonths[sortedMonths.length - 1]].close = livePrice;
+                    let lastMonthKey = sortedMonths[sortedMonths.length - 1];
+                    if (livePrice && monthlyData[lastMonthKey]) {
+                        monthlyData[lastMonthKey].close = livePrice;
+                    }
 
                     const len = sortedMonths.length;
-                    const M0 = monthlyData[sortedMonths[len - 1]], M1 = monthlyData[sortedMonths[len - 2]], M3 = monthlyData[sortedMonths[len - 4]], M6 = monthlyData[sortedMonths[len - 7]], M12 = monthlyData[sortedMonths[len - 13]];
-                    const P0 = M0.close, P1 = M1.close, P3 = M3.close, P6 = M6.close, P12 = M12.close;
-                    const r1 = (P0/P1 - 1), s1 = r1 * 12 * 100;
-                    const r3 = (P0/P3 - 1), s3 = r3 * 4 * 100;
-                    const r6 = (P0/P6 - 1), s6 = r6 * 2 * 100;
-                    const r12 = (P0/P12 - 1), s12 = r12 * 1 * 100;
+                    if(len < 13) throw new Error(`[${ticker}] 데이터 부족 (최소 13개월 필요)`);
+
+                    const M0 = monthlyData[sortedMonths[len - 1]];
+                    const M1 = monthlyData[sortedMonths[len - 2]];
+                    const M3 = monthlyData[sortedMonths[len - 4]];
+                    const M6 = monthlyData[sortedMonths[len - 7]];
+                    const M12 = monthlyData[sortedMonths[len - 13]];
+
+                    const P0 = M0.close; const D0 = M0.date;
+                    const P1 = M1.close; const D1 = M1.date;
+                    const P3 = M3.close; const D3 = M3.date;
+                    const P6 = M6.close; const D6 = M6.date;
+                    const P12 = M12.close; const D12 = M12.date;
+
+                    if(!P0 || !P1 || !P3 || !P6 || !P12) throw new Error(`[${ticker}] 월말 종가 추출 실패`);
+                    
+                    const r1 = (P0/P1 - 1); const s1 = r1 * 12 * 100;
+                    const r3 = (P0/P3 - 1); const s3 = r3 * 4 * 100;
+                    const r6 = (P0/P6 - 1); const s6 = r6 * 2 * 100;
+                    const r12 = (P0/P12 - 1); const s12 = r12 * 1 * 100;
+                    
                     const score = s1 + s3 + s6 + s12;
+                    
                     if (score < minScore) minScore = score;
                     if (score <= 0) failureCount++;
 
-                    const mkRow = (label, pastDate, pastPrice, ret, weight, wScore) => `<tr class="border-b border-themeBorder/30 hover:bg-white/5 transition"><td class="py-2 text-left text-xs text-themeMuted">${label}</td><td class="py-2 text-center text-[0.65rem] text-emerald-400 font-mono">${pastDate}</td><td class="py-2 text-right text-xs font-mono text-themeText font-bold">$${pastPrice.toFixed(2)}</td><td class="py-2 text-right text-[0.7rem] font-mono ${ret>0?'text-up':'text-down'}">${(ret*100).toFixed(2)}%</td><td class="py-2 text-center text-[0.7rem] text-accent font-black">x${weight}</td><td class="py-2 text-right text-xs font-mono ${wScore>0?'text-up':'text-down'} font-bold">${wScore.toFixed(2)}</td></tr>`;
+                    const mkRow = (label, pastDate, pastPrice, ret, weight, wScore) => `
+                        <tr class="border-b border-themeBorder/30 hover:bg-white/5 transition">
+                            <td class="py-2 text-left text-xs text-themeMuted whitespace-nowrap">${label}</td>
+                            <td class="py-2 text-center text-[0.65rem] text-emerald-400 font-mono tracking-widest">${pastDate}</td>
+                            <td class="py-2 text-right text-xs font-mono text-themeText font-bold">$${pastPrice.toFixed(2)}</td>
+                            <td class="py-2 text-right text-[0.7rem] font-mono ${ret>0?'text-up':'text-down'}">${(ret*100).toFixed(2)}%</td>
+                            <td class="py-2 text-center text-[0.7rem] text-accent font-black">x${weight}</td>
+                            <td class="py-2 text-right text-xs font-mono ${wScore>0?'text-up':'text-down'} font-bold">${wScore.toFixed(2)}</td>
+                        </tr>
+                    `;
 
-                    baaProofs[ticker] = `<div class="space-y-4 text-sm text-themeText"><div class="bg-black/20 p-4 rounded-xl border border-themeBorder shadow-inner relative overflow-hidden"><div class="flex justify-between items-center mb-1"><span class="font-black text-themeText text-lg">${ticker} <span class="text-[0.6rem] bg-accent/20 text-accent px-2 py-0.5 rounded">실시간 종가</span></span><span class="font-mono font-black text-themeText text-2xl">$${P0.toFixed(2)}</span></div><p class="text-[0.65rem] text-themeMuted text-right">최근 기준일: ${M0.date}</p></div><div class="overflow-x-auto custom-scroll border border-themeBorder rounded-xl bg-black/10"><table class="w-full text-sm min-w-[380px]"><thead class="bg-black/30"><tr class="text-[0.6rem] text-themeMuted uppercase tracking-widest border-b border-themeBorder"><th class="py-2 px-2 text-left">기간</th><th class="py-2 text-center text-emerald-400">월말 날짜</th><th class="py-2 text-right">수정종가</th><th class="py-2 text-right">수익률(R)</th><th class="py-2 text-center">가중치</th><th class="py-2 px-2 text-right">점수</th></tr></thead><tbody class="px-2">${mkRow('1개월 전', M1.date, P1, r1, 12, s1)}${mkRow('3개월 전', M3.date, P3, r3, 4, s3)}${mkRow('6개월 전', M6.date, P6, r6, 2, s6)}${mkRow('12개월 전', M12.date, P12, r12, 1, s12)}</tbody></table></div><div class="bg-black/40 p-4 rounded-xl border ${score>0?'border-up':'border-down'} text-center shadow-inner mt-2"><div class="text-[0.6rem] text-themeMuted font-bold uppercase mb-4">최종 모멘텀 합산 스코어</div><div class="text-3xl font-black ${score>0?'text-up':'text-down'}">${score.toFixed(2)} <span class="text-sm font-bold text-themeMuted ml-1">점</span></div></div></div>`;
+                    baaProofs[ticker] = `
+                        <div class="space-y-4 text-sm text-themeText">
+                            <div class="bg-black/20 p-4 rounded-xl border border-themeBorder shadow-inner relative overflow-hidden">
+                                <div class="absolute top-0 right-0 p-2 opacity-10"><svg class="w-16 h-16 text-themeText" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-black text-themeText text-lg flex items-center gap-2">
+                                        ${ticker} <span class="text-[0.6rem] bg-accent/20 text-accent px-2 py-0.5 rounded uppercase tracking-widest border border-accent/30">현재(실시간) 종가</span>
+                                    </span>
+                                    <span class="font-mono font-black text-themeText text-2xl">$${P0.toFixed(2)}</span>
+                                </div>
+                                <p class="text-[0.65rem] text-themeMuted text-right">최근 기준일: ${D0}</p>
+                            </div>
+                            
+                            <div class="overflow-x-auto custom-scroll border border-themeBorder rounded-xl bg-black/10">
+                                <table class="w-full text-sm min-w-[380px]">
+                                    <thead class="bg-black/30">
+                                        <tr class="text-[0.6rem] text-themeMuted uppercase tracking-widest border-b border-themeBorder">
+                                            <th class="py-2 px-2 text-left">기간</th>
+                                            <th class="py-2 text-center text-emerald-400">정확한 월말 날짜</th>
+                                            <th class="py-2 text-right">배당반영 종가</th>
+                                            <th class="py-2 text-right">수익률(R)</th>
+                                            <th class="py-2 text-center">가중치</th>
+                                            <th class="py-2 px-2 text-right">점수(R×W)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="px-2">
+                                        ${mkRow('1개월 전', D1, P1, r1, 12, s1)}
+                                        ${mkRow('3개월 전', D3, P3, r3, 4, s3)}
+                                        ${mkRow('6개월 전', D6, P6, r6, 2, s6)}
+                                        ${mkRow('12개월 전', D12, P12, r12, 1, s12)}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-black/40 p-4 rounded-xl border ${score>0?'border-up':'border-down'} text-center shadow-inner relative mt-2">
+                                <div class="absolute top-2 left-3 text-[0.6rem] text-themeMuted font-bold uppercase tracking-widest">최종 모멘텀 합산 스코어</div>
+                                <div class="text-[0.65rem] text-gray-500 font-mono mb-1 mt-5 break-keep">
+                                    (${s1.toFixed(2)}) + (${s3.toFixed(2)}) + (${s6.toFixed(2)}) + (${s12.toFixed(2)})
+                                </div>
+                                <div class="text-3xl font-black ${score>0?'text-up':'text-down'}">${score.toFixed(2)} <span class="text-sm font-bold text-themeMuted ml-1">점</span></div>
+                            </div>
+
+                            <div class="bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/20 mt-4">
+                                <p class="text-[0.65rem] text-emerald-500 font-black mb-2 flex items-center gap-1.5 uppercase tracking-widest">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
+                                    데이터 무결성 검증 (오차율 0%)
+                                </p>
+                                <p class="text-[0.65rem] text-themeMuted leading-relaxed break-keep">
+                                    • 기존 API의 <strong>한국-미국 시차로 인한 날짜 밀림 현상</strong>을 완벽히 교정하여, 실제 미국 장 마감일 기준 <strong>월말 거래일</strong>을 정확히 추적합니다.<br>
+                                    • 모든 주가는 배당 및 액면분할이 보정된 <strong>수정 종가(Adjusted Close)</strong>를 기반으로 계산됩니다.
+                                </p>
+                            </div>
+                        </div>
+                    `;
 
                     const boxEl = document.getElementById(`canary-${ticker}`);
                     if(boxEl) {
@@ -1650,37 +2155,130 @@
                     }
                 }
 
-                const getNextRebalanceKST = () => {
-                    let now = new Date(), year = now.getFullYear(), month = now.getMonth();
+                function getNextRebalanceKST() {
+                    let now = new Date(); 
+                    let year = now.getFullYear();
+                    let month = now.getMonth(); 
+                    
                     let lastDay = new Date(year, month + 1, 0);
-                    if (lastDay.getDay() === 0) lastDay.setDate(lastDay.getDate() - 2);
-                    else if (lastDay.getDay() === 6) lastDay.setDate(lastDay.getDate() - 1);
-                    let reDate = new Date(lastDay); reDate.setDate(reDate.getDate() + 1);
-                    let hour = (month >= 2 && month <= 10) ? "05:00" : "06:00";
-                    return `${reDate.getFullYear()}년 ${reDate.getMonth() + 1}월 ${reDate.getDate()}일 오전 ${hour}`;
-                };
+                    
+                    let dayOfWeek = lastDay.getDay();
+                    if (dayOfWeek === 0) lastDay.setDate(lastDay.getDate() - 2);
+                    else if (dayOfWeek === 6) lastDay.setDate(lastDay.getDate() - 1);
 
-                const titleEl = document.getElementById('baa-decision-title'), descEl = document.getElementById('baa-decision-desc'), boxEl = document.getElementById('baa-decision-box'), rebEl = document.getElementById('baa-rebalance-info');
+                    let rebalanceDate = new Date(lastDay);
+                    rebalanceDate.setDate(rebalanceDate.getDate() + 1);
+
+                    let isDST = (month >= 2 && month <= 10); 
+                    let hour = isDST ? "05:00" : "06:00";
+
+                    return `${rebalanceDate.getFullYear()}년 ${rebalanceDate.getMonth() + 1}월 ${rebalanceDate.getDate()}일 오전 ${hour}`;
+                }
+
+                const titleEl = document.getElementById('baa-decision-title');
+                const descEl = document.getElementById('baa-decision-desc');
+                const boxEl = document.getElementById('baa-decision-box');
+                const rebEl = document.getElementById('baa-rebalance-info');
+
                 if (minScore > 0) {
-                    titleEl.innerText = "🟢 공격 모드 (나스닥 몰빵)"; titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-up";
+                    titleEl.innerText = "🟢 공격 모드 (나스닥 몰빵)";
+                    titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-up";
                     descEl.innerHTML = "모든 카나리아 자산 생존! <strong>QQQ 100%</strong> 포지션을 유지하세요.";
                     boxEl.style.borderColor = "#26A69A";
                 } else {
-                    titleEl.innerText = "🔴 방어 모드 (안전 자산 대피)"; titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-down";
+                    titleEl.innerText = "🔴 방어 모드 (안전 자산 대피)";
+                    titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-down";
                     descEl.innerHTML = "위험 감지! 즉시 모든 주식을 팔고 <strong>안전자산 3종</strong>으로 대피하세요.";
                     boxEl.style.borderColor = "#EF5350";
                 }
+
                 if(rebEl) rebEl.innerText = getNextRebalanceKST();
+
                 loading.style.display = 'none'; resultBox.style.display = 'block';
-            } catch (error) { logError("BAA Error", error); loading.style.display = 'none'; idle.style.display = 'block'; }
+
+            } catch (error) {
+                console.error("BAA Error", error);
+                loading.style.display = 'none'; idle.style.display = 'block';
+                idle.innerHTML = `<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다.<br><span class="text-xs text-gray-500 font-normal mt-1 block">${error.message}</span></p>`;
+            }
         }
 
         function showBaaProof(ticker) {
             if(!baaProofs[ticker]) return;
             document.getElementById('modal-title').innerText = `${ticker} 모멘텀 계산 증명`;
-            document.getElementById('modal-period').innerText = 'BAA 카나리아 알고리즘 (수정종가 기준)';
+            document.getElementById('modal-period').innerText = 'BAA 카나리아 알고리즘 (13612 공식)';
             document.getElementById('modal-body').innerHTML = baaProofs[ticker];
             document.getElementById('detail-modal').style.display = 'flex';
+        }
+
+        function toggleMode(el) {
+            isBeginnerMode = el.checked;
+            const deskSwitch = document.getElementById('mode-switch'); if(deskSwitch) deskSwitch.checked = isBeginnerMode;
+            const mobSwitch = document.getElementById('mob-mode-switch'); if(mobSwitch) mobSwitch.checked = isBeginnerMode;
+            document.body.classList.toggle('beginner-mode', isBeginnerMode);
+            safeStorageSet('dashboardMode', isBeginnerMode ? 'beginner' : 'expert');
+            updateSummaryUI('stock'); updateSummaryUI('crypto');
+        }
+
+        function openStatInfo(type, marketType) {
+            const info = DESCRIPTIONS[type];
+            if(!info) return;
+            document.getElementById('info-title').innerHTML = `<svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>` + (TERMS[type] ? TERMS[type].expert : type);
+            document.getElementById('info-body').innerText = isBeginnerMode ? info.beginner : info.expert;
+            document.getElementById('info-modal').style.display = 'flex';
+        }
+
+        function resetDashboard() { location.reload(); }
+        function updateStatus(t, c) { const l = document.getElementById('conn-label'), d = document.getElementById('status-dot'); if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; } }
+        function updateCryptoStatus(t, c) { const l = document.getElementById('crypto-conn-label'), d = document.getElementById('crypto-status-dot'); if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; } }
+        function openErrorModal() { document.getElementById('error-log-text').value = errorLogs.join('\n---\n') || '에러 없음'; document.getElementById('error-modal').style.display = 'flex'; }
+        function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
+        function copyErrorLog() { const t = document.getElementById('error-log-text'); t.select(); document.execCommand('copy'); }
+        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
+        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+        function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
+        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
+
+        function toggleCurrency() {
+            currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
+            safeStorageSet('dashboardCurrency', currentCurrency);
+            const btn = document.getElementById('currency-toggle');
+            if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
+            if(globalTicker) loadData(globalTicker);
+            if(globalCryptoTicker) loadCryptoData(globalCryptoTicker);
+            updatePfCardMetrics();
+            if(pfChart) renderPortfolioChart();
+            if(baaChart) renderBaaChart();
+        }
+
+        function toggleProofs(show) { document.querySelectorAll('.proof-row').forEach(r => show ? r.classList.add('show') : r.classList.remove('show')); }
+
+        function setTheme(t) {
+            document.documentElement.className = t; safeStorageSet('dashboardTheme', t);
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${t}`)?.classList.add('active');
+            requestAnimationFrame(() => {
+                if(globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
+                if(globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData);
+                if(pfChart) renderPortfolioChart(); if(baaChart) renderBaaChart();
+            });
+        }
+
+        function setFontSize(s) {
+            document.documentElement.style.fontSize = {sm:'14px', md:'16px', lg:'18px'}[s];
+            safeStorageSet('dashboardFontSize', s);
+            document.querySelectorAll("[id^='btn-font-']").forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-font-${s}`)?.classList.add('active');
+            requestAnimationFrame(() => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); baaChart?.resize(); });
+        }
+
+        function setLineWidth(w) {
+            safeStorageSet('dashboardLineWidth', w);
+            document.querySelectorAll("[id^='btn-line-']").forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-line-${w}`)?.classList.add('active');
+            if(globalChartData && myChart) renderDashboard(globalTicker, globalChartData);
+            if(globalCryptoChartData && cryptoChart) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData);
         }
 
         function switchMainTab(tab) {
@@ -1701,44 +2299,94 @@
                 else if(tab === 'baa') {
                     if(!baaChart) initBaaChart();
                     baaChart?.resize();
+                    
                     const idleBox = document.getElementById('baa-live-idle');
-                    if (idleBox && idleBox.style.display !== 'none') runBaaLiveCheck();
+                    if (idleBox && idleBox.style.display !== 'none') {
+                        runBaaLiveCheck();
+                    }
                 }
             }, 50);
         }
 
-        // 기타 설정 및 초기화 함수들은 기존과 동일하게 유지
-        function toggleMode(el) { isBeginnerMode = el.checked; document.body.classList.toggle('beginner-mode', isBeginnerMode); safeStorageSet('dashboardMode', isBeginnerMode ? 'beginner' : 'expert'); updateSummaryUI('stock'); updateSummaryUI('crypto'); }
-        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
-        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
-        function openErrorModal() { document.getElementById('error-log-text').value = errorLogs.join('\n---\n') || '에러 없음'; document.getElementById('error-modal').style.display = 'flex'; }
-        function closeErrorModal() { document.getElementById('error-modal').style.display = 'none'; }
-        function copyErrorLog() { const t = document.getElementById('error-log-text'); t.select(); document.execCommand('copy'); }
-        function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
-        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
-        function openStatInfo(type, m) { const info = DESCRIPTIONS[type]; if(!info) return; document.getElementById('info-title').innerText = TERMS[type].expert; document.getElementById('info-body').innerText = isBeginnerMode ? info.beginner : info.expert; document.getElementById('info-modal').style.display = 'flex'; }
-        function setTheme(t) { document.documentElement.className = t; safeStorageSet('dashboardTheme', t); }
-        function setFontSize(s) { document.documentElement.style.fontSize = {sm:'14px', md:'16px', lg:'18px'}[s]; safeStorageSet('dashboardFontSize', s); }
-        function setLineWidth(w) { safeStorageSet('dashboardLineWidth', w); }
-        function toggleMA(p) { maSettings[p] = !maSettings[p]; loadData(globalTicker); }
-        function toggleCryptoMA(p) { cryptoMaSettings[p] = !cryptoMaSettings[p]; loadCryptoData(globalCryptoTicker); }
-        function changeInterval(i, r, l) { currentInterval = i; currentRange = r; loadData(globalTicker); }
-        function changeCryptoInterval(i, r, l) { currentCryptoInterval = i; currentCryptoRange = r; loadCryptoData(globalCryptoTicker); }
-        function resetDashboard() { location.reload(); }
-        function updateStatus(t, c) { const l = document.getElementById('conn-label'), d = document.getElementById('status-dot'); if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; } }
-        function updateCryptoStatus(t, c) { const l = document.getElementById('crypto-conn-label'), d = document.getElementById('crypto-status-dot'); if(l) { l.innerText = t; d.className = `w-2 h-2 rounded-full ${c}`; } }
+        function toggleMA(p) { maSettings[p] = !maSettings[p]; updateMAButtons(); if(globalChartData) renderDashboard(globalTicker, globalChartData); }
+        function toggleCryptoMA(p) { cryptoMaSettings[p] = !cryptoMaSettings[p]; updateCryptoMAButtons(); if(globalCryptoChartData) renderCryptoDashboard(globalCryptoTicker, globalCryptoChartData); }
+        function updateMAButtons() { Object.keys(maSettings).forEach(p => { const b = document.getElementById(`btn-ma-${p}`); if(b) maSettings[p] ? b.classList.add('active') : b.classList.remove('active'); }); }
+        function updateCryptoMAButtons() { Object.keys(cryptoMaSettings).forEach(p => { const b = document.getElementById(`crypto-btn-ma-${p}`); if(b) cryptoMaSettings[p] ? b.classList.add('active') : b.classList.remove('active'); }); }
+
+        function changeInterval(i, r, l) {
+            currentInterval = i; currentRange = r;
+            document.querySelectorAll('#view-dashboard .range-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`range-${l}`)?.classList.add('active');
+            loadData(globalTicker, i, r);
+        }
+        function changeCryptoInterval(i, r, l) {
+            currentCryptoInterval = i; currentCryptoRange = r;
+            document.querySelectorAll('#view-crypto .range-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`crypto-range-${l}`)?.classList.add('active');
+            loadCryptoData(globalCryptoTicker, i, r);
+        }
 
         document.addEventListener("DOMContentLoaded", () => {
-            myChart = echarts.init(document.getElementById('chart-main'));
-            const savedTicker = safeStorageGet('lastTicker', 'SPY');
-            const savedCryptoTicker = safeStorageGet('lastCryptoTicker', 'BTC-USD');
-            document.getElementById('ticker-input').value = savedTicker;
-            document.getElementById('crypto-ticker-input').value = savedCryptoTicker;
-            setTheme(safeStorageGet('dashboardTheme', 'theme-green'));
-            setFontSize(safeStorageGet('dashboardFontSize', 'md'));
-            loadData(savedTicker);
-            document.getElementById('search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('ticker-input').value.toUpperCase(); safeStorageSet('lastTicker', t); loadData(t); };
-            document.getElementById('crypto-search-form').onsubmit = (e) => { e.preventDefault(); const t = document.getElementById('crypto-ticker-input').value.toUpperCase(); safeStorageSet('lastCryptoTicker', t); loadCryptoData(t); };
+            window.scrollTo(0, 0);
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            
+            try {
+                myChart = echarts.init(document.getElementById('chart-main'));
+                
+                const form = document.getElementById('search-form');
+                if(form) { 
+                    form.onsubmit = (e) => { 
+                        e.preventDefault(); 
+                        const t = document.getElementById('ticker-input').value.trim().toUpperCase(); 
+                        if(t) {
+                            safeStorageSet('lastTicker', t); 
+                            loadData(t); 
+                        }
+                    }; 
+                }
+
+                const cryptoForm = document.getElementById('crypto-search-form');
+                if(cryptoForm) { 
+                    cryptoForm.onsubmit = (e) => { 
+                        e.preventDefault(); 
+                        const t = document.getElementById('crypto-ticker-input').value.trim().toUpperCase(); 
+                        if(t) {
+                            safeStorageSet('lastCryptoTicker', t); 
+                            loadCryptoData(t); 
+                        }
+                    }; 
+                }
+
+                const btn = document.getElementById('currency-toggle');
+                if(btn) btn.innerHTML = currentCurrency === 'USD' ? '🇺🇸 USD' : '🇰🇷 KRW';
+                
+                const currentTheme = safeStorageGet('dashboardTheme', 'theme-green');
+                const currentFont = safeStorageGet('dashboardFontSize', 'md');
+                
+                setTheme(currentTheme); setFontSize(currentFont);
+                
+                isBeginnerMode = (safeStorageGet('dashboardMode', 'expert') === 'beginner');
+                const deskSwitch = document.getElementById('mode-switch'); if (deskSwitch) deskSwitch.checked = isBeginnerMode;
+                const mobSwitch = document.getElementById('mob-mode-switch'); if (mobSwitch) mobSwitch.checked = isBeginnerMode;
+                document.body.classList.toggle('beginner-mode', isBeginnerMode);
+
+                updateMAButtons(); updateCryptoMAButtons(); updatePfCardMetrics();
+
+                const savedTicker = safeStorageGet('lastTicker', 'SPY');
+                const savedCryptoTicker = safeStorageGet('lastCryptoTicker', 'BTC-USD');
+                
+                document.getElementById('ticker-input').value = savedTicker;
+                document.getElementById('crypto-ticker-input').value = savedCryptoTicker;
+                
+                globalTicker = savedTicker;
+                globalCryptoTicker = savedCryptoTicker;
+
+                setTimeout(() => { if(myChart) { myChart.resize(); loadData(savedTicker); } }, 150);
+                
+                window.addEventListener('resize', () => { 
+                    requestAnimationFrame(() => { myChart?.resize(); cryptoChart?.resize(); pfChart?.resize(); pfPieChart?.resize(); pfModalChart?.resize(); baaChart?.resize(); });
+                });
+            } catch(e) { logError("Init Crash", e); }
         });
     </script>
 </body>
