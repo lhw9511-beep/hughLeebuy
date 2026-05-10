@@ -9,10 +9,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.static(path.join(__dirname)));
 
-// ✅ 1. 인메모리 캐시 및 중복 요청 방지(Deduplication) 설정
 const cache = new Map();
 const pendingRequests = new Map();
-const CACHE_TTL = 5 * 60 * 1000; // 5분 유지 (트래픽 대폭 감소)
+const CACHE_TTL = 10 * 60 * 1000; // 10분으로 증가 (서버 부하 및 IP 밴 원천 차단)
 
 function getPeriod1FromRange(range) {
     const now = new Date();
@@ -30,37 +29,70 @@ function getPeriod1FromRange(range) {
     return now;
 }
 
+// 🚀 야후 API 직접 호출 헬퍼 (403 에러 발생 시 우회용)
+async function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
+    const subdomain = useQuery1 ? 'query1' : 'query2';
+    const url = `https://${subdomain}.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${interval}&range=${range}`;
+    
+    // 사람인 것처럼 브라우저 정보를 무작위로 위장
+    const uas = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0'
+    ];
+    
+    const res = await fetch(url, {
+        headers: {
+            'User-Agent': uas[Math.floor(Math.random() * uas.length)],
+            'Accept': '*/*',
+            'Origin': 'https://finance.yahoo.com',
+            'Referer': `https://finance.yahoo.com/quote/${ticker}`
+        }
+    });
+    
+    if (!res.ok) throw new Error(`Direct fetch HTTP ${res.status}`);
+    return await res.json();
+}
+
 app.get('/api/stock/:ticker', async (req, res) => {
     const { ticker } = req.params;
     const { interval = '1d', range = '1y' } = req.query;
-    
     const cacheKey = `${ticker}-${interval}-${range}`;
 
-    // ✅ 2. 유효한 캐시가 있다면 즉시 반환 (API 호출 안 함)
+    // 1. 캐시 확인
     if (cache.has(cacheKey)) {
         const cached = cache.get(cacheKey);
-        if (Date.now() - cached.timestamp < CACHE_TTL) {
-            return res.json(cached.data);
-        }
+        if (Date.now() - cached.timestamp < CACHE_TTL) return res.json(cached.data);
     }
 
-    // ✅ 3. 이미 동일한 요청이 진행 중이면, 해당 Promise를 기다렸다가 결과만 공유받음 (동시 호출 방지)
+    // 2. 동시 요청 병합 처리
     if (pendingRequests.has(cacheKey)) {
-        try {
-            const responseData = await pendingRequests.get(cacheKey);
-            return res.json(responseData);
-        } catch (error) {
-            return res.status(500).json({ error: "Chart data load failed", details: error.message });
-        }
+        try { return res.json(await pendingRequests.get(cacheKey)); } 
+        catch (error) { return res.status(500).json({ error: "Failed", details: error.message }); }
     }
 
-    // ✅ 4. 실제 API 호출을 Promise로 감싸서 pendingRequests에 등록
     const fetchPromise = (async () => {
-        const period1 = getPeriod1FromRange(range);
-        const result = await yahooFinance.chart(ticker, { period1: period1, interval: interval });
-        
-        const timestamp = [];
-        const open = []; const high = []; const low = []; const close = []; const volume = [];
+        let result = null;
+
+        // 🛡️ 3중 폴백(Fallback) 안전장치 탑재
+        try {
+            // 1단계: 기본 라이브러리 시도
+            const period1 = getPeriod1FromRange(range);
+            result = await yahooFinance.chart(ticker, { period1: period1, interval: interval });
+        } catch (err1) {
+            try {
+                // 2단계: 에러 시 query1 메인 서버 직접 우회 시도
+                const raw = await fetchDirectYahoo(ticker, interval, range, true);
+                result = raw.chart.result[0];
+            } catch (err2) {
+                // 3단계: query1마저 막히면 query2 예비 서버 직접 우회 시도
+                const raw = await fetchDirectYahoo(ticker, interval, range, false);
+                result = raw.chart.result[0];
+            }
+        }
+
+        let timestamp = [], open = [], high = [], low = [], close = [], volume = [];
 
         if (result && result.quotes && result.quotes.length > 0) {
             result.quotes.forEach(q => {
@@ -71,17 +103,16 @@ app.get('/api/stock/:ticker', async (req, res) => {
                 close.push(q.close !== undefined ? q.close : null);
                 volume.push(q.volume !== undefined ? q.volume : null);
             });
-        }
+        } 
+        else if (result && result.timestamp && result.indicators && result.indicators.quote) {
+            timestamp = result.timestamp;
+            const q = result.indicators.quote[0];
+            open = q.open; high = q.high; low = q.low; close = q.close; volume = q.volume;
+        } 
+        else { throw new Error("Data empty or blocked"); }
 
         return {
-            chart: {
-                result: [{
-                    meta: result.meta || {},
-                    timestamp: timestamp,
-                    indicators: { quote: [{ open, high, low, close, volume }] }
-                }],
-                error: null
-            }
+            chart: { result: [{ meta: result.meta || {}, timestamp: timestamp, indicators: { quote: [{ open, high, low, close, volume }] } }], error: null }
         };
     })();
 
@@ -89,17 +120,16 @@ app.get('/api/stock/:ticker', async (req, res) => {
 
     try {
         const responseData = await fetchPromise;
-        // 성공 시 캐시에 저장하고 대기열에서 삭제
         cache.set(cacheKey, { timestamp: Date.now(), data: responseData });
         pendingRequests.delete(cacheKey);
         res.json(responseData);
     } catch (error) {
-        console.error(`[API Error] ${ticker}:`, error.message);
         pendingRequests.delete(cacheKey);
         
-        // ✅ 5. 에러 발생 시 서비스 다운을 막기 위해 만료된 캐시라도 있다면 반환 (Fallback)
+        // 🚨 최후의 보루: 3중 우회마저 모두 실패해 에러가 나더라도, 
+        // 화면이 죽지 않도록 만료된 과거 캐시라도 무조건 꺼내서 반환
         if (cache.has(cacheKey)) {
-            console.log(`[Cache Fallback] ${ticker} 임시 데이터 반환`);
+            console.warn(`[Cache Fallback] ${ticker} 에러 방어를 위해 임시 데이터 반환`);
             return res.json(cache.get(cacheKey).data);
         }
         res.status(500).json({ error: "Chart data load failed", details: error.message });
