@@ -443,7 +443,7 @@
                             <div class="weight-badge">8.5</div><p class="stat-label">공포/탐욕</p><p id="val-fng" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('dist', 'stock')">
-                            <div class="weight-badge">8.0</div><p class="stat-label">이격도(추세)</p><p id="val-ma-dist" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">8.0</div><p class="stat-label">추세선 돌파</p><p id="val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('macd', 'stock')">
                             <div class="weight-badge">7.0</div><p class="stat-label">MACD</p><p id="val-macd-main" class="stat-value text-themeText">---</p>
@@ -582,7 +582,7 @@
                             <div class="weight-badge">8.5</div><p class="stat-label">공포/탐욕</p><p id="crypto-val-fng" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('dist', 'crypto')">
-                            <div class="weight-badge">8.0</div><p class="stat-label">이격도(추세)</p><p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">8.0</div><p class="stat-label">추세선 돌파</p><p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('macd', 'crypto')">
                             <div class="weight-badge">7.0</div><p class="stat-label">MACD</p><p id="crypto-val-macd-main" class="stat-value text-themeText">---</p>
@@ -859,7 +859,7 @@
         const TERMS = {
             vix: { expert: 'VIX 지수', beginner: '시장 불안감 (VIX)' },
             fng: { expert: '공포/탐욕', beginner: '대중의 심리' },
-            dist: { expert: '이격도(추세)', beginner: '이동평균선 (흐름)' },
+            dist: { expert: '추세선 돌파', beginner: '이동평균선 (흐름)' },
             macd: { expert: 'MACD', beginner: '단기 방향타' },
             rsi: { expert: 'RSI', beginner: '단기 체력' },
             bb: { expert: 'BB밴드', beginner: '가격 저항선' },
@@ -870,7 +870,7 @@
         const DESCRIPTIONS = {
             vix: { expert: 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다.\n\n• 가중치 (단기 9.0 | 중기 5.0 | 장기 2.0)', beginner: '주식 시장의 일기예보 같은 거예요.\n폭풍우가 치면(사람들이 공포에 질림) 쌀 때 살 수 있는 기회예요!' },
             fng: { expert: '군중 심리를 수치화한 지표입니다.\n\n• 가중치 (단기 8.5 | 중기 5.0 | 장기 3.0)', beginner: '다른 사람들이 얼마나 욕심을 내고 있는지 보여줘요.\n남들이 욕심낼 때는 팔고, 무서워할 때 사는 단서가 돼요.' },
-            dist: { expert: '현재가와 주요 추세선(단기 120일, 중기 50주, 장기 20월) 간의 거리(%)입니다.\n\n• 가중치 (단기 8.0 | 중기 9.0 | 장기 9.5)', beginner: '주요 평균 가격 위로 주가가 올라탔는지 확인해요.\n선 위로 올라타면 계속 오르는 중이라는 뜻이에요.' },
+            dist: { expert: '현재가와 주요 추세선(단기 20일, 중기 50주, 장기 120월) 간의 거리(%)입니다.\n\n• 가중치 (단기 8.0 | 중기 9.0 | 장기 9.5)', beginner: '주요 평균 가격 위로 주가가 올라탔는지 확인해요.\n선 위로 올라타면 계속 오르는 중이라는 뜻이에요.' },
             macd: { expert: '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 가중치 (단기 7.0 | 중기 8.5 | 장기 8.0)', beginner: '자동차의 엑셀과 브레이크 같아요.\n엑셀을 밟아서 오르는 힘이 세지는 중인지 확인해요.' },
             rsi: { expert: '추세의 과열 강도를 의미합니다.\n\n• 가중치 (단기 6.5 | 중기 5.0 | 장기 4.0)', beginner: '얼마나 달렸는지 체력을 보여줘요.\n너무 많이 달려서 숨이 차면 쉬어갈 확률이 높아요.' },
             bb: { expert: '가격 변동성 기반의 밴드(표준편차)입니다.\n\n• 가중치 (단기 6.0 | 중기 4.0 | 장기 2.0)', beginner: '주가가 움직이는 도로의 차선 같아요.\n천장에 부딪히면 튕겨 내려올 수 있어요.' },
@@ -1141,11 +1141,11 @@
             } else if (type === 'VOL') {
                 if (val < 40) { sig = 'BUY'; text = '안정 (매수)'; color = 'var(--up)'; } else if (val > 80) { sig = 'SELL'; text = '위험 (매도)'; color = 'var(--down)'; }
             } else if (type === 'DIST') {
-                if (val > 0) { sig = 'BUY'; text = '상승 (매수)'; color = 'var(--up)'; } else if (val < 0) { sig = 'SELL'; text = '하락 (매도)'; color = 'var(--down)'; }
+                if (val > 0) { sig = 'BUY'; text = '상향돌파 (매수)'; color = 'var(--up)'; } else if (val < 0) { sig = 'SELL'; text = '하향돌파 (매도)'; color = 'var(--down)'; }
             } else if (type === 'RSI') {
                 if (val < 40) { sig = 'BUY'; text = '과매도 (매수)'; color = 'var(--up)'; } else if (val > 60) { sig = 'SELL'; text = '과매수 (매도)'; color = 'var(--down)'; }
             } else if (type === 'MACD') {
-                if (val > 0) { sig = 'BUY'; text = '상승 (매수)'; color = 'var(--up)'; } else if (val < 0) { sig = 'SELL'; text = '하락 (매도)'; color = 'var(--down)'; }
+                if (val > 0) { sig = 'BUY'; text = '상향돌파 (매수)'; color = 'var(--up)'; } else if (val < 0) { sig = 'SELL'; text = '하향돌파 (매도)'; color = 'var(--down)'; }
             } else if (type === 'BB') {
                 if (val === 'LOWER') { sig = 'BUY'; text = '하단 지지 (매수)'; color = 'var(--up)'; } else if (val === 'UPPER') { sig = 'SELL'; text = '상단 저항 (매도)'; color = 'var(--down)'; }
             } else if (type === 'STOCH') {
@@ -1192,7 +1192,7 @@
                         const badge = boxEl.querySelector('.weight-badge');
                         if (badge) badge.innerText = data.weight.toFixed(1);
                         const labelEl = boxEl.querySelector('.stat-label');
-                        if (labelEl && name === 'DIST') { labelEl.innerText = horizon === 'short' ? '이격도(120)' : (horizon === 'mid' ? '이격도(50)' : '이격도(20)'); }
+                        if (labelEl && name === 'DIST') { labelEl.innerText = horizon === 'short' ? '20선 돌파' : (horizon === 'mid' ? '50선 돌파' : '120선 돌파'); }
                     }
                 }
             };
@@ -1520,9 +1520,9 @@
                     return { status: st, buyScore, sellScore, diff, pct, maxScore, breakdown };
                 };
 
-                const stRes = analyze(dData, 'short', { ma: 120, rsi: 14, stoch: 14 });
+                const stRes = analyze(dData, 'short', { ma: 20, rsi: 14, stoch: 14 });
                 const mtRes = analyze(wData, 'mid', { ma: 50, rsi: 14, stoch: 14 });
-                const ltRes = analyze(mData, 'long', { ma: 20, rsi: 14, stoch: 14 });
+                const ltRes = analyze(mData, 'long', { ma: 120, rsi: 14, stoch: 14 });
                 
                 const summaries = { short: { s: "단기 모멘텀 및 심리 지표 기반", a: "" }, mid: { s: "중기 추세 및 모멘텀 기반", a: "" }, long: { s: "장기 사이클 및 평균 회귀 기반", a: "" } };
 
@@ -2397,4 +2397,3 @@
     </script>
 </body>
 </html>
-```
