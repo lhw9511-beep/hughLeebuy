@@ -1077,18 +1077,7 @@
             if (intv === '1wk') binanceIntv = '1w';
             else if (intv === '1mo' || intv === '1y') binanceIntv = '1M';
 
-            let limit = 365;
-            if (range === '1mo') limit = 30;
-            else if (range === '3mo') limit = 90;
-            else if (range === '6mo') limit = 180;
-            else if (range === '1y') limit = 365;
-            else if (range === '2y') limit = 730;
-            else if (range === '5y') limit = 1825;
-            else if (range === 'max') limit = 3000;
-
-            if (binanceIntv === '1w') limit = Math.ceil(limit / 7);
-            if (binanceIntv === '1M') limit = Math.ceil(limit / 30);
-            if (limit > 1000) limit = 1000;
+            let limit = 1000; // 바이낸스 API 최대치 (1d=약3년, 1w=약19년, 1M=약83년)
 
             const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${binanceIntv}&limit=${limit}`;
 
@@ -1535,12 +1524,14 @@
 
                 const analyze = (data, timeHorizon, periods) => {
                     let { kData, closes } = extractCleanData(data);
-                    if(closes.length < periods.ma) return { status:"WAIT", buyScore:0, sellScore:0, diff:0, pct: 50, maxScore: 50, breakdown:[] };
+                    // 데이터가 부족해도 가능한 지표까지만 계산하도록 제한 완화 (Binance 120개월 등 장기 데이터 부족 해결)
+                    if(closes.length < 10) return { status:"WAIT", buyScore:0, sellScore:0, diff:0, pct: 50, maxScore: 50, breakdown:[] };
                     
                     const last = closes.length - 1;
                     const rsiArr = Indicator.rsi(closes, periods.rsi); const rsi = rsiArr[last] || 50;
                     const macdArr = Indicator.macd(closes, 12, 26, 9).hist; const macd = macdArr[last] || 0;
-                    const smaArr = Indicator.sma(closes, periods.ma); const sma = smaArr[last] || closes[last];
+                    const actualMa = Math.min(periods.ma, closes.length);
+                    const smaArr = Indicator.sma(closes, actualMa); const sma = smaArr[last] || closes[last];
                     const stochArr = Indicator.stochastic(kData, periods.stoch, 3).k; const stoch = stochArr[last] || 50;
                     const bb = Indicator.bollinger(closes, 20, 2);
                     const dist = ((closes[last] - sma) / sma) * 100;
