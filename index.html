@@ -829,7 +829,7 @@
     </div>
 
 <script>
-        let errorLogs = [];
+        let errorLogs =[];
         let currentExchangeRate = 1350; 
         
         let currentCurrency = safeStorageGet('dashboardCurrency', 'USD');
@@ -868,7 +868,7 @@
         };
 
         const DESCRIPTIONS = {
-            vix: { expert: 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다.\n\n• 가중치 (단기 9.0 | 중기 5.0 | 장기 2.0)', beginner: '주식 시장의 일기예보 같은 거예요.\n폭풍우가 치면(사람들이 공포에 질림) 쌀 때 살 수 있는 좋은 기회예요!' },
+            vix: { expert: 'S&P 500 옵션에 기반한 30일 변동성 기대치입니다.\n\n• 가중치 (단기 9.0 | 중기 5.0 | 장기 2.0)', beginner: '주식 시장의 일기예보 같은 거예요.\n폭풍우가 치면(사람들이 공포에 질림) 쌀 때 살 수 있는 기회예요!' },
             fng: { expert: '군중 심리를 수치화한 지표입니다.\n\n• 가중치 (단기 8.5 | 중기 5.0 | 장기 3.0)', beginner: '다른 사람들이 얼마나 욕심을 내고 있는지 보여줘요.\n남들이 욕심낼 때는 팔고, 무서워할 때 사는 단서가 돼요.' },
             dist: { expert: '현재가와 주요 추세선(단기 120일, 중기 50주, 장기 20월) 간의 거리(%)입니다.\n\n• 가중치 (단기 8.0 | 중기 9.0 | 장기 9.5)', beginner: '주요 평균 가격 위로 주가가 올라탔는지 확인해요.\n선 위로 올라타면 계속 오르는 중이라는 뜻이에요.' },
             macd: { expert: '이평선의 수렴/발산 역동성을 나타냅니다.\n\n• 가중치 (단기 7.0 | 중기 8.5 | 장기 8.0)', beginner: '자동차의 엑셀과 브레이크 같아요.\n엑셀을 밟아서 오르는 힘이 세지는 중인지 확인해요.' },
@@ -885,7 +885,7 @@
 
         let globalVix = null, globalFng = null, globalCryptoFng = null;
 
-        const pfSimYears = ["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024", "2025", "2026"];
+        const pfSimYears =["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024", "2025", "2026"];
         const pfSimData = {
             'spy':[100, 88, 65, 83, 90, 94, 105, 110, 68, 84, 96, 96, 112, 145, 165, 163, 183, 218, 205, 265, 305, 395, 320, 395, 490, 560, 620],
             '6040':[100, 95, 87, 103, 110, 115, 125, 135, 105, 122, 135, 142, 158, 178, 195, 195, 210, 240, 230, 280, 320, 360, 300, 345, 410, 450, 485],
@@ -896,7 +896,7 @@
             'vaa':[100, 118, 140, 175, 205, 235, 280, 320, 305, 385, 460, 485, 560, 695, 790, 820, 910, 1080, 1040, 1320, 1580, 1850, 1550, 1950, 2450, 2850, 3250],
             'baa':[100, 125, 155, 210, 250, 295, 365, 430, 405, 535, 645, 685, 810, 1050, 1250, 1300, 1450, 1750, 1680, 2200, 2750, 3250, 2850, 3650, 4850, 5850, 6850]
         };
-        const fxSimData = [1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
+        const fxSimData =[1130, 1290, 1250, 1190, 1145, 1020, 930, 929, 1259, 1164, 1134, 1151, 1070, 1055, 1099, 1172, 1207, 1070, 1115, 1156, 1086, 1188, 1264, 1300, 1350, 1400, 1430];
 
         const baaLevSimData = {
             'baa_qqq': pfSimData['baa'], 
@@ -905,13 +905,13 @@
         };
 
         const pfDetails = {
-            '6040': { title: '60/40 포트폴리오', type: 'static', rules: [], allocation: [{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] },
-            'permanent': { title: '영구 포트폴리오', type: 'static', rules: [], allocation: [{value: 25, name: '주식'}, {value: 25, name: '장기채'}, {value: 25, name: '금'}, {value: 25, name: '현금'}] },
-            'allweather': { title: '올웨더 전략', type: 'static', rules: [], allocation: [{value: 30, name: '주식'}, {value: 40, name: '장기채'}, {value: 15, name: '중기채'}, {value: 7.5, name: '금'}, {value: 7.5, name: '원자재'}] },
-            'dual': { title: '오리지널 듀얼 모멘텀', type: 'dynamic', rules: [] },
-            'vaa': { title: 'VAA (Vigilant Asset Allocation)', type: 'dynamic', rules: [] },
-            'daa': { title: 'DAA (Defensive Asset Allocation)', type: 'dynamic', rules: [] },
-            'baa': { title: 'BAA (Bold Asset Allocation)', type: 'dynamic', rules: [] }
+            '6040': { title: '60/40 포트폴리오', type: 'static', rules:[], allocation:[{value: 60, name: '주식(SPY)'}, {value: 40, name: '채권(IEF)'}] },
+            'permanent': { title: '영구 포트폴리오', type: 'static', rules: [], allocation:[{value: 25, name: '주식'}, {value: 25, name: '장기채'}, {value: 25, name: '금'}, {value: 25, name: '현금'}] },
+            'allweather': { title: '올웨더 전략', type: 'static', rules: [], allocation:[{value: 30, name: '주식'}, {value: 40, name: '장기채'}, {value: 15, name: '중기채'}, {value: 7.5, name: '금'}, {value: 7.5, name: '원자재'}] },
+            'dual': { title: '오리지널 듀얼 모멘텀', type: 'dynamic', rules:[] },
+            'vaa': { title: 'VAA (Vigilant Asset Allocation)', type: 'dynamic', rules:[] },
+            'daa': { title: 'DAA (Defensive Asset Allocation)', type: 'dynamic', rules:[] },
+            'baa': { title: 'BAA (Bold Asset Allocation)', type: 'dynamic', rules:[] }
         };
 
         function safeStorageGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
@@ -946,21 +946,29 @@
 
         function extractCleanData(data) {
             if(!data || !data.indicators || !data.indicators.quote || !data.indicators.quote[0]) return { dates:[], kData:[], closes:[] };
-            const q = data.indicators.quote[0]; const ts = data.timestamp || [];
-            let dates = [], kData = [], closes = []; let lastValidClose = 0;
-            const livePrice = data.meta?.regularMarketPrice;
+            const q = data.indicators.quote[0]; 
+            // ✨ 배당반영 수정종가(adjclose) 추출
+            const a = data.indicators.adjclose?.[0]?.adjclose || q.close; 
+            const ts = data.timestamp || [];
+            let dates = [], kData = [], closes =[]; let lastValidClose = 0;
             
             for(let i = 0; i < ts.length; i++) {
-                let o = q.open[i]; let h = q.high[i]; let l = q.low[i]; let c = q.close[i];
+                let o = q.open[i]; let h = q.high[i]; let l = q.low[i]; 
+                let rawC = q.close[i];
+                let c = a[i];
+
                 if (c === null || c === undefined) c = lastValidClose; else lastValidClose = c;
-                if (o === null || o === undefined) o = c;
-                if (h === null || h === undefined) h = c;
-                if (l === null || l === undefined) l = c;
-                if (i === ts.length - 1 && livePrice) { c = livePrice; if (h < c) h = c; if (l > c) l = c; }
+                if (rawC === null || rawC === undefined) rawC = c;
+                if (o === null || o === undefined) o = rawC;
+                if (h === null || h === undefined) h = rawC;
+                if (l === null || l === undefined) l = rawC;
+
                 if (c !== 0 && c !== null) {
                     let d = new Date(ts[i] * 1000);
                     let dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-                    dates.push(dateStr); kData.push([o, c, l, h]); closes.push(c);
+                    dates.push(dateStr); 
+                    kData.push([o, rawC, l, h]); 
+                    closes.push(c);              
                 }
             }
             return { dates, kData, closes };
@@ -977,7 +985,7 @@
 
         function calcVolatility(closes) {
             if(closes.length < 30) return 0;
-            const recent = closes.slice(-30); let returns = [];
+            const recent = closes.slice(-30); let returns =[];
             for(let i=1; i<recent.length; i++) returns.push((recent[i] - recent[i-1]) / recent[i-1]);
             const mean = returns.reduce((a,b)=>a+b, 0) / returns.length;
             const variance = returns.reduce((a,b)=>a + Math.pow(b-mean, 2), 0) / returns.length;
@@ -1002,9 +1010,8 @@
             const rawUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
             const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
 
-            // 접속을 시도할 서버 목록 (다양한 프록시 풀 가동)
-            const urlsToTry = [
-                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`, // 1. 최우선: 내 백엔드 서버
+            const urlsToTry =[
+                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`, // 1. 내 백엔드 서버
                 `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl1)}`,                   // 2. AllOrigins 우회
                 `https://corsproxy.io/?${encodeURIComponent(rawUrl2)}`,                                // 3. CorsProxy 우회
                 `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`              // 4. CodeTabs 우회
@@ -1012,12 +1019,11 @@
 
             let lastErrorMsg = "";
 
-            // ♻️ 무조건 성공시키기 위해 실패 시 총 2바퀴(최대 8번) 끈질기게 재시도
             for (let attempt = 0; attempt < 2; attempt++) {
                 for (const url of urlsToTry) {
                     try {
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 12000); // 타임아웃 12초
+                        const timeoutId = setTimeout(() => controller.abort(), 12000); 
                         
                         const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
                         clearTimeout(timeoutId);
@@ -1026,36 +1032,34 @@
                         
                         const text = await res.text();
                         
-                        // HTML이나 일반 텍스트 에러 페이지가 반환된 경우 (Edge 에러 방어)
                         if (!text || text.trim() === '' || text.trim().startsWith('<') || text.trim().toLowerCase().startsWith('edge')) {
                             throw new Error("비정상적인 응답 (프록시 에러 또는 HTML 반환)");
                         }
 
                         let data;
                         try {
-                            data = JSON.parse(text); // 여기서 발생하던 Edge 에러를 캐치!
+                            data = JSON.parse(text); 
                         } catch (parseErr) {
-                            throw new Error(`JSON 파싱 실패 (응답 텍스트: ${text.substring(0, 15)}...)`);
+                            throw new Error(`JSON 파싱 실패`);
                         }
 
-                        if (data.error) throw new Error(`서버 내부 오류: ${data.error}`);
+                        if (data.error) throw new Error(`서버 오류: ${data.error}`);
 
                         if (data.chart && data.chart.result && data.chart.result[0]) {
                             return data.chart.result[0]; 
                         } else {
-                            throw new Error("데이터 구조가 올바르지 않음 (chart.result 없음)");
+                            throw new Error("데이터 구조가 올바르지 않음");
                         }
                     } catch (err) {
                         lastErrorMsg = err.message;
-                        console.warn(`[접속 실패 - 다음 경로 우회] ${url} : ${err.message}`);
-                        continue; // 에러가 나도 죽지 않고 다음 프록시로 부드럽게 넘어감
+                        console.warn(`[접속 실패 우회] ${url} : ${err.message}`);
+                        continue; 
                     }
                 }
-                // 한 바퀴를 다 돌아도 실패했다면 1.5초간 숨을 고르고 2회차 재시도
                 await new Promise(r => setTimeout(r, 1500));
             }
 
-            throw new Error(`현재 데이터 서버 접속이 지연되고 있습니다. 잠시 후 다시 시도해주세요. (최종 에러: ${lastErrorMsg})`);
+            throw new Error(`서버 접속 지연. 잠시 후 시도해주세요. (${lastErrorMsg})`);
         }
     
         let lastMacroFetch = 0;
@@ -1115,6 +1119,14 @@
                     renderIndicatorUI('crypto-val-fng', globalCryptoFng, 'FNG', globalCryptoFng, 'crypto');
                 }
             } catch (error) { globalCryptoFng = 50; }
+        }
+
+        async function fetchExchangeRate() {
+            try {
+                const data = await fetchStockData('KRW=X', '1d', '5d');
+                const closes = extractCleanData(data).closes;
+                if(closes.length > 0) currentExchangeRate = closes[closes.length - 1];
+            } catch (e) { console.warn("Exchange Rate fetch failed", e); }
         }
 
         function getIndicatorStatus(type, val, marketType = 'stock', timeHorizon = 'short') {
@@ -1228,7 +1240,7 @@
 
         function switchHorizon(marketType, horizon) {
             if(marketType === 'stock') currentStockHorizon = horizon; else currentCryptoHorizon = horizon;
-            const horizons = ['short', 'mid', 'long'];
+            const horizons =['short', 'mid', 'long'];
             horizons.forEach(h => {
                 const btn = document.getElementById(`${marketType}-btn-${h}`);
                 if(btn) { btn.className = h === horizon ? `px-2 py-0.5 text-[0.6rem] font-bold rounded bg-emerald-500 text-white transition` : `px-2 py-0.5 text-[0.6rem] font-bold rounded text-themeMuted hover:text-white transition`; }
@@ -1320,7 +1332,7 @@
             const macdObj = Indicator.macd(closes, 12, 26, 9); const macd = macdObj.hist[macdObj.hist.length - 1] || 0;
             const bb = Indicator.bollinger(closes, 20, 2); const last = closes.length - 1;
             
-            let reasoning = [];
+            let reasoning =[];
             if(ma120 !== null && ma120 !== undefined) {
                 const maPct = (((closes[last] - ma120) / ma120) * 100).toFixed(2);
                 reasoning.push({type: closes[last]>ma120?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치`});
@@ -1340,7 +1352,7 @@
             const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
             const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
             
-            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
+            let series =[{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
             let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
             const widthNum = parseFloat(chartLineWidth);
             
@@ -1368,10 +1380,10 @@
                         return result;
                     }
                 },
-                grid: [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
-                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
-                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex: [0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
+                grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
+                xAxis:[ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
+                yAxis:[ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
+                dataZoom:[{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex: [0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
                 series: series
             }, true);
             requestAnimationFrame(() => myChart.resize());
@@ -1392,7 +1404,7 @@
             const macdObj = Indicator.macd(closes, 12, 26, 9); const macd = macdObj.hist[macdObj.hist.length - 1] || 0;
             const bb = Indicator.bollinger(closes, 20, 2); const last = closes.length - 1;
             
-            let reasoning = [];
+            let reasoning =[];
             if(ma120 !== null && ma120 !== undefined) {
                 const maPct = (((closes[last] - ma120) / ma120) * 100).toFixed(2);
                 reasoning.push({type: closes[last]>ma120?'up':'down', t:'120일선 추세', d:`장기 추세선 대비 ${maPct}% 위치`});
@@ -1410,7 +1422,7 @@
             const chartSplitColor = styleColor.getPropertyValue('--border-color').trim() || 'rgba(255,255,255,0.1)';
             const maCols = { 10: '#FF3D71', 20: '#F97316', 50: '#A855F7', 60: '#3B82F6', 120: '#10B981', 200: '#EAB308' };
             
-            let series = [{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
+            let series =[{ name: 'Price', type: 'candlestick', data: kData, itemStyle: { color: '#26A69A', color0: '#EF5350', borderColor: '#26A69A', borderColor0: '#EF5350' }, z: 10 }];
             let chartLineWidth = safeStorageGet('dashboardLineWidth', '2');
             const widthNum = parseFloat(chartLineWidth);
             
@@ -1438,10 +1450,10 @@
                         return result;
                     }
                 },
-                grid: [ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
-                xAxis: [ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
-                yAxis: [ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
-                dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex: [0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
+                grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
+                xAxis:[ { type: 'category', data: dates, axisLabel: { show: false } }, { type: 'category', gridIndex: 1, data: dates, axisLabel: { color: chartTextColor, fontSize: 10 } } ],
+                yAxis:[ { scale: true, splitLine: { lineStyle: { color: chartSplitColor } }, axisLabel: { color: chartTextColor } }, { gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } } ],
+                dataZoom:[{ type: 'inside', xAxisIndex: [0, 1], start: 70, end: 100 }, { show: true, type: 'slider', xAxisIndex: [0, 1], bottom: '0%', height: 20, textStyle: {color: chartTextColor} }],
                 series: series
             }, true);
             requestAnimationFrame(() => cryptoChart.resize());
@@ -1457,7 +1469,7 @@
 
                 const analyze = (data, timeHorizon, periods) => {
                     let { kData, closes } = extractCleanData(data);
-                    if(closes.length < periods.ma) return { status:"WAIT", buyScore:0, sellScore:0, diff:0, pct: 50, maxScore: 50, breakdown: [] };
+                    if(closes.length < periods.ma) return { status:"WAIT", buyScore:0, sellScore:0, diff:0, pct: 50, maxScore: 50, breakdown:[] };
                     
                     const last = closes.length - 1;
                     const rsiArr = Indicator.rsi(closes, periods.rsi); const rsi = rsiArr[last] || 50;
@@ -1490,7 +1502,7 @@
                     sigs.dist.raw = dist; sigs.rsi.raw = rsi; sigs.macd.raw = macd; sigs.stoch.raw = stoch; sigs.bb.raw = bbStr;
                     sigs.macro.raw = macroVal; sigs.fng.raw = fngVal;
 
-                    let buyScore = 0, sellScore = 0, breakdown = [];
+                    let buyScore = 0, sellScore = 0, breakdown =[];
                     const addScore = (name, s) => {
                         let valStr = "0.0";
                         if (s.sig === 'BUY') { buyScore += s.weight; valStr = `+${s.weight.toFixed(1)}`; }
@@ -1610,7 +1622,7 @@
 
         const getAdjustedSimData = (key, isBaaLev = false) => {
             const data = isBaaLev ? baaLevSimData[key] : pfSimData[key];
-            if(!data) return [];
+            if(!data) return[];
             if (currentCurrency === 'USD') return data;
             const fxBase = fxSimData[0]; 
             return data.map((val, idx) => { const fxRatio = fxSimData[idx] ? (fxSimData[idx] / fxBase) : 1; return val * fxRatio; });
@@ -1694,9 +1706,9 @@
                     pfPieChart.setOption({
                         backgroundColor: 'transparent',
                         tooltip: { trigger: 'item', backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 12 }, formatter: '{b}: <b>{c}%</b>' },
-                        color: ['#EF5350', '#3B82F6', '#EAB308', '#9CA3AF', '#A855F7'],
-                        series: [{
-                            type: 'pie', radius: ['40%', '75%'], avoidLabelOverlap: true, center: ['50%', '55%'],
+                        color:['#EF5350', '#3B82F6', '#EAB308', '#9CA3AF', '#A855F7'],
+                        series:[{
+                            type: 'pie', radius: ['40%', '75%'], avoidLabelOverlap: true, center:['50%', '55%'],
                             itemStyle: { borderRadius: 4, borderColor: 'var(--bg-color)', borderWidth: 2 },
                             label: { show: true, color: textColor, fontSize: 10, formatter: '{b}\n{c}%' },
                             data: data.allocation
@@ -1716,14 +1728,14 @@
                 pfModalChart.setOption({
                     backgroundColor: 'transparent',
                     tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.8)', borderColor: chartSplitColor, textStyle: { color: '#fff', fontSize: 11 } },
-                    legend: { data: [data.title, 'MDD'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
+                    legend: { data:[data.title, 'MDD'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 5 },
                     grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
                     xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
-                    yAxis: [
+                    yAxis:[
                         { type: 'value', splitLine: { lineStyle: { color: chartSplitColor, type: 'dashed' } }, axisLabel: { color: chartTextColor } },
                         { type: 'value', min: -60, max: 0, position: 'right', splitLine: { show: false }, axisLabel: { formatter: '{value}%', color: chartTextColor, fontSize: 9 } }
                     ],
-                    series: [
+                    series:[
                         { name: `MDD`, type: 'bar', data: mdds, yAxisIndex: 1, itemStyle: { color: 'rgba(239, 83, 80, 0.25)' }, barWidth: '60%' },
                         { name: data.title, type: 'line', data: dataArr, smooth: true, lineStyle: { color: '#3B82F6', width: 3 }, showSymbol: false, z: 10 }
                     ]
@@ -1786,7 +1798,7 @@
                 let yearlyData = {};
                 for(let i=0; i<dates.length; i++){ if(closes[i] != null) yearlyData[dates[i].substring(0, 4)] = closes[i]; }
                 
-                let compData = [], basePrice = null; 
+                let compData =[], basePrice = null; 
                 pfSimYears.forEach((yr, idx) => {
                     if(yearlyData[yr]) {
                         let adjustedPrice = yearlyData[yr];
@@ -1827,15 +1839,15 @@
             if(summaryBox) summaryBox.style.display = 'none'; tbody.innerHTML = '';
 
             try {
-                let tickers = []; let colCount = 7;
+                let tickers =[]; let colCount = 7;
                 if(pfKey === 'dual') { tickers = ['SPY', 'VEA', 'BIL', 'QQQ']; colCount = 7; } 
-                else if(pfKey === 'vaa') { tickers = ['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY', 'QQQ']; colCount = 8; } 
-                else if(pfKey === 'daa') { tickers = ['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
-                else if(pfKey === 'baa') { tickers = ['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
+                else if(pfKey === 'vaa') { tickers =['SPY', 'VEA', 'VWO', 'AGG', 'LQD', 'IEF', 'SHY', 'QQQ']; colCount = 8; } 
+                else if(pfKey === 'daa') { tickers =['VWO', 'BND', 'SPY', 'VEA', 'SHY', 'QQQ']; colCount = 7; } 
+                else if(pfKey === 'baa') { tickers =['SPY', 'VEA', 'VWO', 'BND', 'QQQ', 'BIL', 'IEF', 'TLT']; colCount = 6; } 
 
                 document.getElementById('pf-live-loading-text').innerText = `데이터 수집 중 (다중 서버 우회)...`;
                 
-                const results = [];
+                const results =[];
                 for (let t of tickers) {
                     results.push(await fetchStockData(t, '1mo', '2y'));
                     await delay(300);
@@ -1928,7 +1940,7 @@
                     return result;
                 };
 
-                let actualCagrs = [];
+                let actualCagrs =[];
                 for(let i = minLength - 1; i >= minLength - 12; i--) {
                     if(i - 12 < 0) break;
                     const sig = getSignal(i); if(!sig) continue;
@@ -1962,7 +1974,7 @@
                         if(hasData) {
                             const retPct = monRet * 100;
                             actualRetHtml = `<td class="${retPct > 0 ? 'text-up' : (retPct < 0 ? 'text-down' : 'text-themeText')} font-bold">${retPct > 0 ? '+' : ''}${retPct.toFixed(2)}%</td>`;
-                            actualCagrs.push(retPct); // 순서대로 들어감 (최근 -> 과거)
+                            actualCagrs.push(retPct); 
                         }
                         const spy0 = dataMap['SPY']?.closes[i], spy1 = dataMap['SPY']?.closes[i+1];
                         const qqq0 = dataMap['QQQ']?.closes[i], qqq1 = dataMap['QQQ']?.closes[i+1];
@@ -1985,8 +1997,7 @@
                     let accRet = 1;
                     let equityCurve = [100];
                     
-                    // 최근 -> 과거 순이므로, MDD 계산을 위해 과거 -> 최근 순으로 뒤집어서 누적
-                    let reversedCagrs = [...actualCagrs].reverse();
+                    let reversedCagrs =[...actualCagrs].reverse();
                     reversedCagrs.forEach(r => {
                         accRet *= (1 + r/100);
                         equityCurve.push(100 * accRet);
@@ -2046,28 +2057,27 @@
             
             idle.style.display = 'none'; resultBox.style.display = 'none'; loading.style.display = 'flex';
 
-            const canaries = ['SPY', 'VEA', 'VWO', 'BND'];
+            const canaries =['SPY', 'VEA', 'VWO', 'BND'];
             let minScore = 9999, failureCount = 0;
 
             try {
                 baaProofs = {};
-                const results = [];
+                const results =[];
 
                 for (let ticker of canaries) {
                     loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">[${ticker}] 정확한 일봉 데이터 스캔 및 월말 종가 추출 중</span>`;
                     const rawData = await fetchStockData(ticker, '1d', '2y');
                     results.push(rawData);
-                    await delay(300); // 딜레이 추가로 에러 방지
+                    await delay(300); 
                 }
 
                 for (let i = 0; i < canaries.length; i++) {
                     const ticker = canaries[i];
                     const rawData = results[i];
                     
-                    const ts = rawData.timestamp || [];
-                    const quoteClose = rawData.indicators?.quote?.[0]?.close || [];
+                    const ts = rawData.timestamp ||[];
+                    const quoteClose = rawData.indicators?.quote?.[0]?.close ||[];
                     const adjClose = rawData.indicators?.adjclose?.[0]?.adjclose || quoteClose;
-                    const livePrice = rawData.meta?.regularMarketPrice;
 
                     let monthlyData = {};
                     let lastValidClose = 0;
@@ -2083,16 +2093,12 @@
                             let m = String(d.getUTCMonth() + 1).padStart(2, '0');
                             let day = String(d.getUTCDate()).padStart(2, '0');
                             let ym = `${y}-${m}`;
-                            monthlyData[ym] = { date: `${y}-${m}-${day}`, close: c };
+                            monthlyData[ym] = { date: `${y}-${m}-${day}`, close: c }; 
                         }
                     }
 
                     let sortedMonths = Object.keys(monthlyData).sort();
-                    let lastMonthKey = sortedMonths[sortedMonths.length - 1];
-                    if (livePrice && monthlyData[lastMonthKey]) {
-                        monthlyData[lastMonthKey].close = livePrice;
-                    }
-
+                    
                     const len = sortedMonths.length;
                     if(len < 13) throw new Error(`[${ticker}] 데이터 부족 (최소 13개월 필요)`);
 
@@ -2137,7 +2143,7 @@
                                 <div class="absolute top-0 right-0 p-2 opacity-10"><svg class="w-16 h-16 text-themeText" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="font-black text-themeText text-lg flex items-center gap-2">
-                                        ${ticker} <span class="text-[0.6rem] bg-accent/20 text-accent px-2 py-0.5 rounded uppercase tracking-widest border border-accent/30">현재(실시간) 종가</span>
+                                        ${ticker} <span class="text-[0.6rem] bg-accent/20 text-accent px-2 py-0.5 rounded uppercase tracking-widest border border-accent/30">배당반영 종가</span>
                                     </span>
                                     <span class="font-mono font-black text-themeText text-2xl">$${P0.toFixed(2)}</span>
                                 </div>
@@ -2369,7 +2375,6 @@
                 
                 updateMAButtons(); updateCryptoMAButtons();
                 
-                // === FIX: 페이지 로드 시 포트폴리오 카드 MDD / 수익률 즉시 갱신 ===
                 updatePfCardMetrics(); 
                 
                 const savedTicker = safeStorageGet('lastTicker', 'SPY');
@@ -2378,7 +2383,6 @@
                 document.getElementById('ticker-input').value = savedTicker;
                 document.getElementById('crypto-ticker-input').value = savedCrypto;
                 
-                // === FIX: API 연속 호출로 인한 에러 방지 (순차적 딜레이 로딩) ===
                 setTimeout(() => loadData(savedTicker), 100);
                 setTimeout(() => loadCryptoData(savedCrypto), 1500);
                 
@@ -2393,3 +2397,4 @@
     </script>
 </body>
 </html>
+```
