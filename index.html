@@ -1062,6 +1062,56 @@
             throw new Error(`서버 접속 지연. 잠시 후 시도해주세요. (${lastErrorMsg})`);
         }
     
+        
+        // 🚀 코인 전용 초고속 바이낸스 API 호출 함수
+        async function fetchBinanceData(ticker, intv = '1d', range = '1y') {
+            let symbol = ticker.replace('-USD', 'USDT').toUpperCase();
+            let binanceIntv = '1d';
+            if (intv === '1wk') binanceIntv = '1w';
+            else if (intv === '1mo' || intv === '1y') binanceIntv = '1M';
+
+            let limit = 365;
+            if (range === '1mo') limit = 30;
+            else if (range === '3mo') limit = 90;
+            else if (range === '6mo') limit = 180;
+            else if (range === '1y') limit = 365;
+            else if (range === '2y') limit = 730;
+            else if (range === '5y') limit = 1825;
+            else if (range === 'max') limit = 3000;
+
+            if (binanceIntv === '1w') limit = Math.ceil(limit / 7);
+            if (binanceIntv === '1M') limit = Math.ceil(limit / 30);
+            if (limit > 1000) limit = 1000;
+
+            const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${binanceIntv}&limit=${limit}`;
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Binance API HTTP Error: ${res.status}`);
+                const data = await res.json();
+
+                let timestamp = [], open = [], high = [], low = [], close = [];
+                data.forEach(candle => {
+                    timestamp.push(Math.floor(candle[0] / 1000));
+                    open.push(parseFloat(candle[1]));
+                    high.push(parseFloat(candle[2]));
+                    low.push(parseFloat(candle[3]));
+                    close.push(parseFloat(candle[4]));
+                });
+
+                return {
+                    timestamp: timestamp,
+                    indicators: {
+                        quote: [{ open, high, low, close }],
+                        adjclose: [{ adjclose: close }]
+                    }
+                };
+            } catch (error) {
+                console.error("Binance Fetch Error:", error);
+                throw error;
+            }
+        }
+
         let lastMacroFetch = 0;
         let isFetchingMacro = false;
 
@@ -1288,7 +1338,7 @@
             try {
                 await fetchCryptoMacroData();
                 const reqInterval = interval === '1y' ? '1mo' : interval;
-                const d = await fetchStockData(ticker, reqInterval, range, true);
+                const d = await fetchBinanceData(ticker, reqInterval, range);
                 
                 globalCryptoChartData = d; globalCryptoTicker = ticker;
                 updateCryptoStatus("LIVE DATA", "bg-emerald-500");
@@ -1461,11 +1511,20 @@
 
         async function calculateTriplePerspectiveDecision(ticker, marketType = 'stock') {
             try {
-                const dData = await fetchStockData(ticker, '1d', '2y', marketType === 'crypto');
-                await delay(300);
-                const wData = await fetchStockData(ticker, '1wk', '5y', marketType === 'crypto');
-                await delay(300);
-                const mData = await fetchStockData(ticker, '1mo', '10y', marketType === 'crypto');
+                let dData, wData, mData;
+                if (marketType === 'crypto') {
+                    [dData, wData, mData] = await Promise.all([
+                        fetchBinanceData(ticker, '1d', '2y'),
+                        fetchBinanceData(ticker, '1wk', '5y'),
+                        fetchBinanceData(ticker, '1mo', '10y')
+                    ]);
+                } else {
+                    dData = await fetchStockData(ticker, '1d', '2y');
+                    await delay(300);
+                    wData = await fetchStockData(ticker, '1wk', '5y');
+                    await delay(300);
+                    mData = await fetchStockData(ticker, '1mo', '10y');
+                }
 
                 const analyze = (data, timeHorizon, periods) => {
                     let { kData, closes } = extractCleanData(data);
