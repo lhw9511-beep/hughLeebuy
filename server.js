@@ -14,6 +14,16 @@ const cache = new Map();
 const pendingRequests = new Map();
 const CACHE_TTL = 10 * 60 * 1000; // 10분 캐시 유지
 
+// [수정 1] 메모리 누수 방지: 1분마다 백그라운드에서 만료된 캐시 데이터 청소
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of cache.entries()) {
+        if (now - value.timestamp >= CACHE_TTL) {
+            cache.delete(key);
+        }
+    }
+}, 60 * 1000);
+
 function getPeriod1FromRange(range) {
     const now = new Date();
     switch(range) {
@@ -47,10 +57,12 @@ function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
                 'User-Agent': uas[Math.floor(Math.random() * uas.length)],
                 'Accept': 'application/json',
                 'Connection': 'keep-alive'
-            }
+            },
+            // [수정 2] 무한 대기 방지용 10초 타임아웃 설정
+            timeout: 10000
         };
 
-        https.get(url, options, (res) => {
+        const req = https.get(url, options, (res) => {
             let data = '';
             res.on('data', (chunk) => { data += chunk; });
             res.on('end', () => {
@@ -64,7 +76,15 @@ function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
                     reject(new Error('JSON Parse Error during Direct Fetch'));
                 }
             });
-        }).on('error', (err) => {
+        });
+
+        // [수정 2] 타임아웃 발생 시 요청 파기 및 에러 반환
+        req.on('timeout', () => {
+            req.destroy();
+            reject(new Error('Direct fetch timeout'));
+        });
+
+        req.on('error', (err) => {
             reject(err);
         });
     });
