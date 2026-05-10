@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const https = require('https'); // Node.js 내장 모듈 (버전 호환성 100%)
+const https = require('https');
 const yahooFinance = require('yahoo-finance2').default;
 
 const app = express();
@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname)));
 
 const cache = new Map();
 const pendingRequests = new Map();
-const CACHE_TTL = 10 * 60 * 1000; // 10분 캐시 (IP 밴 방어)
+const CACHE_TTL = 10 * 60 * 1000; // 10분 캐시 유지
 
 function getPeriod1FromRange(range) {
     const now = new Date();
@@ -30,13 +30,13 @@ function getPeriod1FromRange(range) {
     return now;
 }
 
-// 🚀 야후 API 직접 호출 헬퍼 (https 내장 모듈 사용으로 에러 완전 차단)
+// 🚀 야후 API 직접 호출 헬퍼 (https 내장 모듈 사용으로 에러 차단)
 function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
     return new Promise((resolve, reject) => {
         const subdomain = useQuery1 ? 'query1' : 'query2';
         const url = `https://${subdomain}.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${interval}&range=${range}`;
 
-        const uas = [
+        const uas =[
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15',
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0'
@@ -45,7 +45,7 @@ function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
         const options = {
             headers: {
                 'User-Agent': uas[Math.floor(Math.random() * uas.length)],
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept': 'application/json',
                 'Connection': 'keep-alive'
             }
         };
@@ -90,24 +90,22 @@ app.get('/api/stock/:ticker', async (req, res) => {
     const fetchPromise = (async () => {
         let result = null;
 
-        // 🛡️ 3중 폴백(Fallback) 안전장치 탑재
+        // 3중 우회 안전장치
         try {
-            // 1단계: 기본 라이브러리 시도
             const period1 = getPeriod1FromRange(range);
             result = await yahooFinance.chart(ticker, { period1: period1, interval: interval });
         } catch (err1) {
             try {
-                // 2단계: 에러 시 query1 메인 서버 직접 우회 시도
                 const raw = await fetchDirectYahoo(ticker, interval, range, true);
                 result = raw.chart.result[0];
             } catch (err2) {
-                // 3단계: query1마저 막히면 query2 예비 서버 직접 우회 시도
                 const raw = await fetchDirectYahoo(ticker, interval, range, false);
                 result = raw.chart.result[0];
             }
         }
 
-        let timestamp = [], open = [], high = [], low = [], close = [], volume = [];
+        // ✨ 수정종가(adjclose) 배열 처리 추가
+        let timestamp = [], open =[], high = [], low = [], close = [], volume = [], adjclose =[];
 
         if (result && result.quotes && result.quotes.length > 0) {
             result.quotes.forEach(q => {
@@ -117,17 +115,34 @@ app.get('/api/stock/:ticker', async (req, res) => {
                 low.push(q.low !== undefined ? q.low : null);
                 close.push(q.close !== undefined ? q.close : null);
                 volume.push(q.volume !== undefined ? q.volume : null);
+                adjclose.push(q.adjclose !== undefined ? q.adjclose : (q.close !== undefined ? q.close : null));
             });
         } 
         else if (result && result.timestamp && result.indicators && result.indicators.quote) {
             timestamp = result.timestamp;
             const q = result.indicators.quote[0];
             open = q.open; high = q.high; low = q.low; close = q.close; volume = q.volume;
+            if (result.indicators.adjclose && result.indicators.adjclose[0]) {
+                adjclose = result.indicators.adjclose[0].adjclose;
+            } else {
+                adjclose = close; // fallback
+            }
         } 
         else { throw new Error("Data empty or blocked"); }
 
+        // adjclose를 포함하여 반환
         return {
-            chart: { result: [{ meta: result.meta || {}, timestamp: timestamp, indicators: { quote: [{ open, high, low, close, volume }] } }], error: null }
+            chart: { 
+                result:[{ 
+                    meta: result.meta || {}, 
+                    timestamp: timestamp, 
+                    indicators: { 
+                        quote: [{ open, high, low, close, volume }],
+                        adjclose: [{ adjclose }] 
+                    } 
+                }] 
+            }, 
+            error: null 
         };
     })();
 
@@ -140,9 +155,6 @@ app.get('/api/stock/:ticker', async (req, res) => {
         res.json(responseData);
     } catch (error) {
         pendingRequests.delete(cacheKey);
-        
-        // 🚨 최후의 보루: 3중 우회마저 모두 실패해 에러가 나더라도, 
-        // 화면이 죽지 않도록 만료된 과거 캐시라도 무조건 꺼내서 반환
         if (cache.has(cacheKey)) {
             console.warn(`[Cache Fallback] ${ticker} 에러 방어를 위해 임시 데이터 반환`);
             return res.json(cache.get(cacheKey).data);
@@ -155,7 +167,7 @@ app.get('/api/fundamentals/:ticker', async (req, res) => {
     const { ticker } = req.params;
     try {
         const summary = await yahooFinance.quoteSummary(ticker, {
-            modules: ['defaultKeyStatistics', 'summaryDetail', 'assetProfile', 'fundProfile', 'topHoldings']
+            modules:['defaultKeyStatistics', 'summaryDetail', 'assetProfile', 'fundProfile', 'topHoldings']
         });
         res.json({ quoteSummary: { result: [summary], error: null } });
     } catch (error) {
