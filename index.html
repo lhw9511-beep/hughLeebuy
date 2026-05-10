@@ -993,63 +993,61 @@
             stochastic: function(k, p, s) { let r=Array(k.length).fill(null); for(let i=p-1;i<k.length;i++){ const sl=k.slice(i-p+1,i+1); const h=Math.max(...sl.map(d=>d[3])), l=Math.min(...sl.map(d=>d[2])); r[i]=(h!==l)?((k[i][1]-l)/(h-l))*100:50; } return { k: r, d: this.sma(r, s) }; }
         };
 
-        // 🚀 순차적 릴레이 방식 (서버 콜드스타트 및 야후 IP 차단 방지)
+        // 🚀 순차적 릴레이 방식 및 무한 재시도 (완벽한 에러 방어)
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
             let t = ticker.toUpperCase().trim();
             if (isCrypto && !t.includes('-')) t += '-USD';
 
             const timestamp = Date.now();
-            const rawUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
+            const rawUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
+            const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
 
-            // 접속을 시도할 서버 목록 (가장 안정적인 내 서버를 1순위로 배치)
+            // 접속을 시도할 서버 목록 (다양한 프록시 풀 가동)
             const urlsToTry = [
-                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`, // 1순위: 내 서버 (Render)
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`,                   // 2순위: AllOrigins 우회
-                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl)}`,             // 3순위: CodeTabs 우회
-                `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`                                 // 4순위: CorsProxy 우회
+                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`, // 1. 최우선: 3중 우회 탑재된 내 서버
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl1)}`,                   // 2. AllOrigins 우회 (query1)
+                `https://corsproxy.io/?${encodeURIComponent(rawUrl2)}`,                                 // 3. CorsProxy 우회 (query2)
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`,                   // 4. AllOrigins 우회 (query2)
+                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`               // 5. CodeTabs 우회
             ];
 
             let lastErrorMsg = "";
 
-            // ⚠️ 핵심: 동시에 공격하지 않고, 순서대로 하나씩 조심스럽게 접속을 시도합니다.
-            for (const url of urlsToTry) {
-                try {
-                    const controller = new AbortController();
-                    // ⏱️ 타임아웃을 15초로 늘렸습니다. (Render 서버가 깨어날 충분한 시간 확보)
-                    const timeoutId = setTimeout(() => controller.abort(), 15000); 
-                    
-                    const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
-                    clearTimeout(timeoutId);
+            // ♻️ 무조건 성공시키기 위해 실패 시 총 2바퀴(최대 10번) 끈질기게 재시도
+            for (let attempt = 0; attempt < 2; attempt++) {
+                for (const url of urlsToTry) {
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 12000); // 타임아웃 12초
+                        
+                        const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+                        clearTimeout(timeoutId);
 
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    
-                    const text = await res.text();
-                    
-                    // 야후 보안 정책에 의해 차단된 응답(HTML) 필터링
-                    if (!text || text.trim() === '' || text.trim().startsWith('<')) {
-                        throw new Error("야후 API 보안에 의해 차단됨");
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        
+                        const text = await res.text();
+                        if (!text || text.trim() === '' || text.trim().startsWith('<')) {
+                            throw new Error("야후 보안 정책에 의해 차단됨");
+                        }
+
+                        const data = JSON.parse(text);
+                        if (data.error) throw new Error(`서버 내부 오류: ${data.error}`);
+
+                        if (data.chart && data.chart.result && data.chart.result[0]) {
+                            return data.chart.result[0]; 
+                        } else {
+                            throw new Error("데이터 구조가 올바르지 않음");
+                        }
+                    } catch (err) {
+                        lastErrorMsg = err.message;
+                        console.warn(`[접속 실패 - 다음 경로 우회] ${url} : ${err.message}`);
+                        continue; 
                     }
-
-                    const data = JSON.parse(text);
-                    
-                    // 자체 백엔드(server.js)의 에러 메시지 처리
-                    if (data.error) throw new Error(`서버 내부 오류: ${data.error}`);
-
-                    // 데이터가 완벽하면 즉시 반환하고 함수 종료
-                    if (data.chart && data.chart.result && data.chart.result[0]) {
-                        return data.chart.result[0]; 
-                    } else {
-                        throw new Error("데이터 구조가 올바르지 않음");
-                    }
-                } catch (err) {
-                    // 실패할 경우 에러를 기록하고 다음 2순위, 3순위 주소로 넘어갑니다.
-                    lastErrorMsg = err.message;
-                    console.warn(`[접속 실패] ${url} : ${err.message}`);
-                    continue; 
                 }
+                // 한 바퀴를 다 돌아도 실패했다면 1.5초간 숨을 고르고 2회차 재시도
+                await new Promise(r => setTimeout(r, 1500));
             }
 
-            // 4개의 서버가 모두 응답하지 않을 때의 최후 에러
             throw new Error(`현재 데이터 서버 접속이 지연되고 있습니다. 잠시 후 새로고침(F5) 해주세요. (최종 에러: ${lastErrorMsg})`);
         }
     
