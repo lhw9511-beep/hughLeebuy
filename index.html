@@ -993,49 +993,65 @@
             stochastic: function(k, p, s) { let r=Array(k.length).fill(null); for(let i=p-1;i<k.length;i++){ const sl=k.slice(i-p+1,i+1); const h=Math.max(...sl.map(d=>d[3])), l=Math.min(...sl.map(d=>d[2])); r[i]=(h!==l)?((k[i][1]-l)/(h-l))*100:50; } return { k: r, d: this.sma(r, s) }; }
         };
 
-        // 💡 수정된 fetchStockData 부분입니다
+        // 🚀 속도와 안정성을 모두 잡은 궁극의 fetchStockData (스피드 레이싱 방식)
         async function fetchStockData(ticker, intv = '1d', range = '1y', isCrypto = false) {
             let t = ticker.toUpperCase().trim();
             if (isCrypto && !t.includes('-')) t += '-USD';
 
             const timestamp = Date.now();
-            const backendUrl = `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`;
-            const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_t=${timestamp}`;
-            const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false&_t=${timestamp}`;
             
-            // 자체 백엔드 API를 1순위로 호출하도록 수정되었습니다.
-            const servers = [
-                { url: backendUrl, name: '자체 백엔드 API' },
-                { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`, name: 'AllOrigins 프록시' },
-                { url: `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl)}`, name: 'CodeTabs 프록시' }
+            // 1. 내 서버 (Render)
+            const backendUrl = `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`;
+            // 2. 야후 파이낸스 직접 주소 (프록시가 우회할 목적지)
+            const rawUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
+            const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
+
+            // 여러 우회 경로를 동시에 쏘기 위한 출전 명단
+            const urlsToRace = [
+                backendUrl, // 1번 레인: 자체 백엔드 API
+                `https://corsproxy.io/?${encodeURIComponent(rawUrl1)}`, // 2번 레인: 신규 강력 프록시
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`, // 3번 레인: 기존 프록시 A
+                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`  // 4번 레인: 기존 프록시 B
             ];
 
-            let lastError = "";
+            // 4개의 서버가 동시에 데이터를 향해 출발합니다!
+            const fetchPromises = urlsToRace.map(url => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const controller = new AbortController();
+                        // ⏱️ 핵심: 기존 20초 대기를 4초로 확 줄였습니다. 막히면 지체 없이 포기!
+                        const timeoutId = setTimeout(() => controller.abort(), 4000); 
+                        
+                        const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+                        clearTimeout(timeoutId);
 
-            for (const server of servers) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 20000); 
-                    const res = await fetch(server.url, { cache: 'no-store', signal: controller.signal });
-                    clearTimeout(timeoutId);
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        const text = await res.text();
+                        
+                        // 차단 페이지나 빈 응답이 오면 즉시 실패 처리
+                        if (!text || text.trim() === '' || text.trim().startsWith('<')) throw new Error("차단됨");
 
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const text = await res.text();
-                    if (!text || text.trim() === '') throw new Error("빈 응답");
-                    if (text.trim().startsWith('<')) throw new Error("보안 차단 페이지");
+                        let data = JSON.parse(text);
+                        // 데이터가 완벽하게 들어있다면 즉시 반환 (1등 도착)
+                        if (data.chart && data.chart.result && data.chart.result[0]) {
+                            resolve(data.chart.result[0]); 
+                        } else {
+                            throw new Error("데이터 없음");
+                        }
+                    } catch (err) {
+                        // 실패하면 조용히 뒤로 빠져서 다른 서버의 성공을 기다립니다.
+                        reject(err); 
+                    }
+                });
+            });
 
-                    let data = JSON.parse(text);
-                    if (data.error && typeof data.error === 'string') throw new Error(data.error);
-                    if (data.chart && data.chart.error) throw new Error(data.chart.error.code);
-                    if (!data.chart || !data.chart.result || !data.chart.result[0]) throw new Error("차트 데이터 없음");
-                    return data.chart.result[0];
-
-                } catch (err) {
-                    lastError = err.message || String(err);
-                    if (err.name === 'AbortError' || lastError.toLowerCase().includes('timeout')) { lastError = "Timeout"; }
-                }
+            try {
+                // Promise.any: 4명 중 1등으로 성공한 녀석의 데이터만 낼름 받아옵니다.
+                return await Promise.any(fetchPromises);
+            } catch (error) {
+                // 4곳 모두 야후에게 차단당했을 때만 에러를 띄웁니다.
+                throw new Error("모든 우회 경로가 차단되었습니다. 잠시 후 다시 시도해주세요.");
             }
-            throw new Error(`서버 연결 실패: ${lastError}`);
         }
 
         let lastMacroFetch = 0;
