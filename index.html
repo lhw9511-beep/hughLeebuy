@@ -1004,16 +1004,15 @@
 
             // 접속을 시도할 서버 목록 (다양한 프록시 풀 가동)
             const urlsToTry = [
-                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`, // 1. 최우선: 3중 우회 탑재된 내 서버
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl1)}`,                   // 2. AllOrigins 우회 (query1)
-                `https://corsproxy.io/?${encodeURIComponent(rawUrl2)}`,                                 // 3. CorsProxy 우회 (query2)
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`,                   // 4. AllOrigins 우회 (query2)
-                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`               // 5. CodeTabs 우회
+                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`, // 1. 최우선: 내 백엔드 서버
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl1)}`,                   // 2. AllOrigins 우회
+                `https://corsproxy.io/?${encodeURIComponent(rawUrl2)}`,                                // 3. CorsProxy 우회
+                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`              // 4. CodeTabs 우회
             ];
 
             let lastErrorMsg = "";
 
-            // ♻️ 무조건 성공시키기 위해 실패 시 총 2바퀴(최대 10번) 끈질기게 재시도
+            // ♻️ 무조건 성공시키기 위해 실패 시 총 2바퀴(최대 8번) 끈질기게 재시도
             for (let attempt = 0; attempt < 2; attempt++) {
                 for (const url of urlsToTry) {
                     try {
@@ -1026,29 +1025,37 @@
                         if (!res.ok) throw new Error(`HTTP ${res.status}`);
                         
                         const text = await res.text();
-                        if (!text || text.trim() === '' || text.trim().startsWith('<')) {
-                            throw new Error("야후 보안 정책에 의해 차단됨");
+                        
+                        // HTML이나 일반 텍스트 에러 페이지가 반환된 경우 (Edge 에러 방어)
+                        if (!text || text.trim() === '' || text.trim().startsWith('<') || text.trim().toLowerCase().startsWith('edge')) {
+                            throw new Error("비정상적인 응답 (프록시 에러 또는 HTML 반환)");
                         }
 
-                        const data = JSON.parse(text);
+                        let data;
+                        try {
+                            data = JSON.parse(text); // 여기서 발생하던 Edge 에러를 캐치!
+                        } catch (parseErr) {
+                            throw new Error(`JSON 파싱 실패 (응답 텍스트: ${text.substring(0, 15)}...)`);
+                        }
+
                         if (data.error) throw new Error(`서버 내부 오류: ${data.error}`);
 
                         if (data.chart && data.chart.result && data.chart.result[0]) {
                             return data.chart.result[0]; 
                         } else {
-                            throw new Error("데이터 구조가 올바르지 않음");
+                            throw new Error("데이터 구조가 올바르지 않음 (chart.result 없음)");
                         }
                     } catch (err) {
                         lastErrorMsg = err.message;
                         console.warn(`[접속 실패 - 다음 경로 우회] ${url} : ${err.message}`);
-                        continue; 
+                        continue; // 에러가 나도 죽지 않고 다음 프록시로 부드럽게 넘어감
                     }
                 }
                 // 한 바퀴를 다 돌아도 실패했다면 1.5초간 숨을 고르고 2회차 재시도
                 await new Promise(r => setTimeout(r, 1500));
             }
 
-            throw new Error(`현재 데이터 서버 접속이 지연되고 있습니다. 잠시 후 새로고침(F5) 해주세요. (최종 에러: ${lastErrorMsg})`);
+            throw new Error(`현재 데이터 서버 접속이 지연되고 있습니다. 잠시 후 다시 시도해주세요. (최종 에러: ${lastErrorMsg})`);
         }
     
         let lastMacroFetch = 0;
