@@ -1,10 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const https = require('https'); // Node.js 내장 모듈 (버전 호환성 100%)
 const yahooFinance = require('yahoo-finance2').default;
-
-// 야후 파이낸스 라이브러리 경고 숨김 (안정성 강화)
-yahooFinance.suppressNotices(['yahooSurvey']);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +12,7 @@ app.use(express.static(path.join(__dirname)));
 
 const cache = new Map();
 const pendingRequests = new Map();
-const CACHE_TTL = 10 * 60 * 1000; // 10분 캐시 유지 (IP 밴 방어)
+const CACHE_TTL = 10 * 60 * 1000; // 10분 캐시 (IP 밴 방어)
 
 function getPeriod1FromRange(range) {
     const now = new Date();
@@ -32,33 +30,44 @@ function getPeriod1FromRange(range) {
     return now;
 }
 
-// 🚀 야후 API 직접 호출 헬퍼 (403 에러 발생 시 우회용)
-async function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
-    const subdomain = useQuery1 ? 'query1' : 'query2';
-    const url = `https://${subdomain}.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${interval}&range=${range}`;
-    
-    // 로봇이 아닌 실제 사람인 것처럼 브라우저 정보 위장 강화
-    const uas = [
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15',
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0'
-    ];
-    
-    const res = await fetch(url, {
-        headers: {
-            'User-Agent': uas[Math.floor(Math.random() * uas.length)],
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none'
-        }
+// 🚀 야후 API 직접 호출 헬퍼 (https 내장 모듈 사용으로 에러 완전 차단)
+function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
+    return new Promise((resolve, reject) => {
+        const subdomain = useQuery1 ? 'query1' : 'query2';
+        const url = `https://${subdomain}.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${interval}&range=${range}`;
+
+        const uas = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0'
+        ];
+
+        const options = {
+            headers: {
+                'User-Agent': uas[Math.floor(Math.random() * uas.length)],
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Connection': 'keep-alive'
+            }
+        };
+
+        https.get(url, options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', () => {
+                try {
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        resolve(JSON.parse(data));
+                    } else {
+                        reject(new Error(`Direct fetch HTTP ${res.statusCode}`));
+                    }
+                } catch (e) {
+                    reject(new Error('JSON Parse Error during Direct Fetch'));
+                }
+            });
+        }).on('error', (err) => {
+            reject(err);
+        });
     });
-    
-    if (!res.ok) throw new Error(`Direct fetch HTTP ${res.status}`);
-    return await res.json();
 }
 
 app.get('/api/stock/:ticker', async (req, res) => {
