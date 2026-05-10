@@ -830,6 +830,7 @@
 
 <script>
         let errorLogs =[];
+        let frontendDataCache = new Map();
         let currentExchangeRate = 1350; 
         
         let currentCurrency = safeStorageGet('dashboardCurrency', 'USD');
@@ -1006,15 +1007,20 @@
             let t = ticker.toUpperCase().trim();
             if (isCrypto && !t.includes('-')) t += '-USD';
 
+            const cacheKey = `${t}-${intv}-${range}`;
+            if (frontendDataCache.has(cacheKey)) {
+                return frontendDataCache.get(cacheKey);
+            }
+
             const timestamp = Date.now();
             const rawUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
             const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
 
             const urlsToTry =[
-                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`, // 1. 내 백엔드 서버
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl1)}`,                   // 2. AllOrigins 우회
-                `https://corsproxy.io/?${encodeURIComponent(rawUrl2)}`,                                // 3. CorsProxy 우회
-                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`              // 4. CodeTabs 우회
+                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`,   // 1. 내 백엔드 서버
+                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp+1}`, // 2. 내 백엔드 1회 재시도 (안정성 확보)
+                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`,              // 3. CodeTabs 우회
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`                     // 4. AllOrigins 우회
             ];
 
             let lastErrorMsg = "";
@@ -1046,6 +1052,7 @@
                         if (data.error) throw new Error(`서버 오류: ${data.error}`);
 
                         if (data.chart && data.chart.result && data.chart.result[0]) {
+                            frontendDataCache.set(cacheKey, data.chart.result[0]);
                             return data.chart.result[0]; 
                         } else {
                             throw new Error("데이터 구조가 올바르지 않음");
@@ -1130,9 +1137,9 @@
             isFetchingMacro = true;
             try {
                 const vixData = await fetchStockData('^VIX', '1d', '3mo');
-                await delay(200); 
+                await delay(400); 
                 const spyData = await fetchStockData('SPY', '1d', '3mo');
-                await delay(200);
+                await delay(400);
                 await fetchExchangeRate();
                 
                 const vixCloses = extractCleanData(vixData).closes;
@@ -1520,9 +1527,9 @@
                     ]);
                 } else {
                     dData = await fetchStockData(ticker, '1d', '2y');
-                    await delay(300);
+                    await delay(800);
                     wData = await fetchStockData(ticker, '1wk', '5y');
-                    await delay(300);
+                    await delay(800);
                     mData = await fetchStockData(ticker, '1mo', '10y');
                 }
 
@@ -1909,7 +1916,7 @@
                 const results =[];
                 for (let t of tickers) {
                     results.push(await fetchStockData(t, '1mo', '2y'));
-                    await delay(300);
+                    await delay(800);
                 }
                 
                 const dataMap = {}; let minLength = 9999;
@@ -2127,7 +2134,7 @@
                     loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">[${ticker}] 정확한 일봉 데이터 스캔 및 월말 종가 추출 중</span>`;
                     const rawData = await fetchStockData(ticker, '1d', '2y');
                     results.push(rawData);
-                    await delay(300); 
+                    await delay(800); 
                 }
 
                 for (let i = 0; i < canaries.length; i++) {
