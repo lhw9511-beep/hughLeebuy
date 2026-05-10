@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.static(path.join(__dirname)));
 
-// 요청 기간(range)을 yahoo-finance2가 인식할 수 있는 Date 객체로 변환
 function getPeriod1FromRange(range) {
     const now = new Date();
     switch(range) {
@@ -26,7 +25,6 @@ function getPeriod1FromRange(range) {
     return now;
 }
 
-// 1. 주가 및 코인 데이터 API
 app.get('/api/stock/:ticker', async (req, res) => {
     const { ticker } = req.params;
     const { interval = '1d', range = '1y' } = req.query;
@@ -65,7 +63,6 @@ app.get('/api/stock/:ticker', async (req, res) => {
     }
 });
 
-// 2. 펀더멘털 데이터 API
 app.get('/api/fundamentals/:ticker', async (req, res) => {
     const { ticker } = req.params;
     try {
