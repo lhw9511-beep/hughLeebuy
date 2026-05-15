@@ -358,13 +358,6 @@
                     <div>
                         <h2 id="display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
                         <div id="live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
-                        <div id="period-changes" class="flex flex-wrap gap-x-3 gap-y-1 mt-1.5">
-                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1D"><span class="text-themeMuted">전일</span> <span class="font-black">---</span></span>
-                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1W"><span class="text-themeMuted">전주</span> <span class="font-black">---</span></span>
-                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1M"><span class="text-themeMuted">전월</span> <span class="font-black">---</span></span>
-                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1Y"><span class="text-themeMuted">전년</span> <span class="font-black">---</span></span>
-                        </div>
-                    </div>
                     <div class="flex flex-col w-full lg:w-auto gap-2">
                         <div class="expert-only flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
                             <span class="text-[0.55rem] font-black text-themeMuted shrink-0 bg-black/20 px-2 py-1 rounded">기간</span>
@@ -501,13 +494,6 @@
                     <div>
                         <h2 id="crypto-display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
                         <div id="crypto-live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
-                        <div id="crypto-period-changes" class="flex flex-wrap gap-x-3 gap-y-1 mt-1.5">
-                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1D"><span class="text-themeMuted">전일</span> <span class="font-black">---</span></span>
-                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1W"><span class="text-themeMuted">전주</span> <span class="font-black">---</span></span>
-                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1M"><span class="text-themeMuted">전월</span> <span class="font-black">---</span></span>
-                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1Y"><span class="text-themeMuted">전년</span> <span class="font-black">---</span></span>
-                        </div>
-                    </div>
                     
                     <div class="flex flex-col w-full lg:w-auto gap-2">
                         <div class="expert-only flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
@@ -1332,7 +1318,6 @@
                     if(myChart) myChart.clear();
                     const dt = document.getElementById('display-ticker'); if (dt) dt.innerText = "ERROR";
                     const lp = document.getElementById('live-price'); if (lp) lp.innerText = "---";
-                    const pc = document.getElementById('period-changes'); if (pc) pc.querySelectorAll('span:last-child').forEach(s => { s.innerText = '---'; s.className = 'font-black text-themeMuted'; });
                     const rc = document.getElementById('reasoning-container'); if (rc) rc.innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br><br>새로고침을 하거나 잠시 후 다시 시도해주세요.</p>';
                 }
             } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
@@ -1365,7 +1350,6 @@
                     if(cryptoChart) cryptoChart.clear();
                     const dt = document.getElementById('crypto-display-ticker'); if (dt) dt.innerText = "ERROR";
                     const lp = document.getElementById('crypto-live-price'); if (lp) lp.innerText = "---";
-                    const cpc = document.getElementById('crypto-period-changes'); if (cpc) cpc.querySelectorAll('span:last-child').forEach(s => { s.innerText = '---'; s.className = 'font-black text-themeMuted'; });
                 }
             } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
         }
@@ -1379,39 +1363,6 @@
             let price = closes[closes.length - 1]; 
             let finalPrice = currentCurrency === 'KRW' ? price * currentExchangeRate : price;
             document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
-
-            // ── 기간별 등락률 계산 (전일/전주/전월/전년) ──
-            (function renderPeriodChanges() {
-                const now = closes[closes.length - 1];
-                // closes는 일봉 기준. dates 배열과 같은 인덱스
-                function findClosestIdx(daysAgo) {
-                    // 영업일 기준 근사: 1D=1, 1W=5, 1M=21, 1Y=252
-                    const targetIdx = closes.length - 1 - daysAgo;
-                    return Math.max(0, targetIdx);
-                }
-                const periods = [
-                    { id: '1D', label: '전일',  days: 1   },
-                    { id: '1W', label: '전주',  days: 5   },
-                    { id: '1M', label: '전월',  days: 21  },
-                    { id: '1Y', label: '전년',  days: 252 },
-                ];
-                const container = document.getElementById('period-changes');
-                if (!container) return;
-                container.querySelectorAll('.period-chg-item').forEach(el => {
-                    const pid = el.dataset.period;
-                    const p = periods.find(x => x.id === pid);
-                    if (!p) return;
-                    const idx = findClosestIdx(p.days);
-                    if (idx >= closes.length - 1) { el.querySelector('span:last-child').innerText = 'N/A'; return; }
-                    const base = closes[idx];
-                    if (!base || base === 0) { el.querySelector('span:last-child').innerText = 'N/A'; return; }
-                    const pct = ((now - base) / base * 100);
-                    const sign = pct >= 0 ? '+' : '';
-                    const valueEl = el.querySelector('span:last-child');
-                    valueEl.innerText = `${sign}${pct.toFixed(2)}%`;
-                    valueEl.className = `font-black ${pct >= 0 ? 'text-up' : 'text-down'}`;
-                });
-            })();
             
             if (currentInterval === '1y') {
                 let yearly = {};
@@ -1507,33 +1458,6 @@
             let price = closes[closes.length - 1]; 
             let finalPrice = currentCurrency === 'KRW' ? price * currentExchangeRate : price;
             document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
-
-            // ── 코인 기간별 등락률 계산 ──
-            (function renderCryptoPeriodChanges() {
-                const now = closes[closes.length - 1];
-                const periods = [
-                    { id: '1D', label: '전일',  days: 1   },
-                    { id: '1W', label: '전주',  days: 7   },
-                    { id: '1M', label: '전월',  days: 30  },
-                    { id: '1Y', label: '전년',  days: 365 },
-                ];
-                const container = document.getElementById('crypto-period-changes');
-                if (!container) return;
-                container.querySelectorAll('.period-chg-item').forEach(el => {
-                    const pid = el.dataset.period;
-                    const p = periods.find(x => x.id === pid);
-                    if (!p) return;
-                    const idx = Math.max(0, closes.length - 1 - p.days);
-                    if (idx >= closes.length - 1) { el.querySelector('span:last-child').innerText = 'N/A'; return; }
-                    const base = closes[idx];
-                    if (!base || base === 0) { el.querySelector('span:last-child').innerText = 'N/A'; return; }
-                    const pct = ((now - base) / base * 100);
-                    const sign = pct >= 0 ? '+' : '';
-                    const valueEl = el.querySelector('span:last-child');
-                    valueEl.innerText = `${sign}${pct.toFixed(2)}%`;
-                    valueEl.className = `font-black ${pct >= 0 ? 'text-up' : 'text-down'}`;
-                });
-            })();
             
             const rsiArr = Indicator.rsi(closes, 14); const rsi = rsiArr[rsiArr.length - 1] || 50;
             const ma120Arr = Indicator.sma(closes, 120); const ma120 = ma120Arr[ma120Arr.length - 1];
@@ -1683,10 +1607,9 @@
 
                 const updateUI = (prefix) => {
                     const targetDetails = prefix === 'stock' ? analysisDetails : cryptoAnalysisDetails;
-                    const _dCloses = extractCleanData(dData).closes;
-                    targetDetails.short = {...stRes, summary: summaries.short.s, closes: _dCloses};
-                    targetDetails.mid = {...mtRes, summary: summaries.mid.s, closes: _dCloses};
-                    targetDetails.long = {...ltRes, summary: summaries.long.s, closes: _dCloses};
+                    targetDetails.short = {...stRes, summary: summaries.short.s};
+                    targetDetails.mid = {...mtRes, summary: summaries.mid.s};
+                    targetDetails.long = {...ltRes, summary: summaries.long.s};
 
                     const upBox = (id, res, barId) => { 
                         const el = document.getElementById(id); const bar = document.getElementById(barId);
@@ -1716,32 +1639,7 @@
         }
 
         function buildDetailHtml(d) {
-            // ── 기간별 등락률 계산 ──
-            let periodHtml = '';
-            if (d.closes && d.closes.length > 1) {
-                const cl = d.closes;
-                const now = cl[cl.length - 1];
-                const periods = [
-                    { label: '전일', days: 1  },
-                    { label: '전주', days: 5  },
-                    { label: '전월', days: 21 },
-                    { label: '전년', days: 252},
-                ];
-                const chips = periods.map(p => {
-                    const idx = Math.max(0, cl.length - 1 - p.days);
-                    if (idx >= cl.length - 1) return `<div class="text-center"><p class="text-[0.55rem] text-themeMuted mb-0.5">${p.label}</p><p class="text-xs font-black font-mono text-themeMuted">N/A</p></div>`;
-                    const base = cl[idx];
-                    if (!base) return '';
-                    const pct = (now - base) / base * 100;
-                    const sign = pct >= 0 ? '+' : '';
-                    const color = pct >= 0 ? 'text-up' : 'text-down';
-                    const bg    = pct >= 0 ? 'bg-up/10 border-up/20' : 'bg-down/10 border-down/20';
-                    return `<div class="flex-1 text-center p-2 rounded-lg border ${bg}"><p class="text-[0.55rem] text-themeMuted mb-0.5">${p.label}</p><p class="text-xs font-black font-mono ${color}">${sign}${pct.toFixed(2)}%</p></div>`;
-                }).join('');
-                periodHtml = `<div class="flex gap-2 mb-4">${chips}</div>`;
-            }
-
-            let html = periodHtml + `
+            let html = `
                 <div class="p-4 bg-black/20 rounded-xl border border-themeBorder text-center mb-4 shadow-inner relative overflow-hidden">
                     <div class="absolute inset-0 opacity-10 pointer-events-none bg-gradient-to-r ${d.diff>0?'from-emerald-500':'from-rose-500'} to-transparent"></div>
                     <span class="text-3xl font-black status-${String(d.status).replace(/ /g,'-')} tracking-tighter block mb-2 relative z-10">${d.status}</span>
@@ -2560,7 +2458,64 @@
             });
             setTimeout(() => {
                 if(tab === 'dashboard' && myChart) myChart.resize();
-                else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData(globalCryptoTicker); } cryptoChart.resize(); }
+                else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main'));
+                    cryptoChart.on('click', function(params) {
+                        if (!params || params.seriesType !== 'candlestick') return;
+                        const idx = params.dataIndex;
+                        if (!globalCryptoChartData) return;
+                        const { dates, kData, closes } = extractCleanData(globalCryptoChartData);
+                        if (!dates[idx]) return;
+                        const rate = currentCurrency === 'KRW' ? currentExchangeRate : 1;
+                        const sym  = getCurrSymbol();
+                        const fmt  = v => sym + formatPriceStr(v * rate);
+                        const [o, c, l, h] = kData[idx];
+                        const chg = ((c - o) / o * 100);
+                        const chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+                        const chgColor = chg >= 0 ? '#26A69A' : '#EF5350';
+                        const periods = [
+                            { label: '전일', days: 1   },
+                            { label: '전주', days: 7   },
+                            { label: '전월', days: 30  },
+                            { label: '전년', days: 365 },
+                        ];
+                        const periodRows = periods.map(p => {
+                            const baseIdx = idx - p.days;
+                            if (baseIdx < 0) return `<tr><td style="padding:4px 8px;color:#9CA3AF">${p.label}</td><td style="padding:4px 8px;color:#9CA3AF;text-align:right">N/A</td></tr>`;
+                            const base = closes[baseIdx];
+                            if (!base) return '';
+                            const pct = (c - base) / base * 100;
+                            const s = pct >= 0 ? '+' : '';
+                            const col = pct >= 0 ? '#26A69A' : '#EF5350';
+                            return `<tr><td style="padding:4px 8px;color:#9CA3AF">${p.label}</td><td style="padding:4px 8px;font-weight:900;color:${col};text-align:right">${s}${pct.toFixed(2)}%</td></tr>`;
+                        }).join('');
+                        document.getElementById('modal-title').innerText = dates[idx];
+                        document.getElementById('modal-period').innerText = globalCryptoTicker + ' · 캔들 상세';
+                        document.getElementById('modal-body').innerHTML = `
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+                                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
+                                    <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">시가</p>
+                                    <p style="font-weight:900;font-family:monospace">${fmt(o)}</p>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
+                                    <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">종가</p>
+                                    <p style="font-weight:900;font-family:monospace;color:${chgColor}">${fmt(c)} <span style="font-size:0.75rem">${chgStr}</span></p>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
+                                    <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">고가</p>
+                                    <p style="font-weight:900;font-family:monospace;color:#26A69A">${fmt(h)}</p>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
+                                    <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">저가</p>
+                                    <p style="font-weight:900;font-family:monospace;color:#EF5350">${fmt(l)}</p>
+                                </div>
+                            </div>
+                            <div style="background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid rgba(255,255,255,0.08);overflow:hidden">
+                                <p style="font-size:0.6rem;color:#9CA3AF;font-weight:900;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);letter-spacing:0.1em">기간 대비 등락률</p>
+                                <table style="width:100%">${periodRows}</table>
+                            </div>`;
+                        document.getElementById('detail-modal').style.display = 'flex';
+                    });
+                    loadCryptoData(globalCryptoTicker); } cryptoChart.resize(); }
                 else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart?.resize(); }
                 else if(tab === 'baa') {
                     if(!baaChart) initBaaChart(); baaChart?.resize();
@@ -2593,6 +2548,70 @@
             
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
+
+                // ── 캔들 클릭 → 해당 날짜 OHLC + 기간별 등락률 팝업 ──
+                myChart.on('click', function(params) {
+                    if (!params || params.seriesType !== 'candlestick') return;
+                    const idx = params.dataIndex;
+                    if (!globalChartData) return;
+                    const { dates, kData, closes } = extractCleanData(globalChartData);
+                    if (!dates[idx]) return;
+                    const rate = currentCurrency === 'KRW' ? currentExchangeRate : 1;
+                    const sym  = getCurrSymbol();
+                    const fmt  = v => sym + formatPriceStr(v * rate);
+                    const [o, c, l, h] = kData[idx];
+                    const chg = ((c - o) / o * 100);
+                    const chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+                    const chgColor = chg >= 0 ? '#26A69A' : '#EF5350';
+
+                    // 기간별 등락률
+                    const periods = [
+                        { label: '전일', days: 1   },
+                        { label: '전주', days: 5   },
+                        { label: '전월', days: 21  },
+                        { label: '전년', days: 252 },
+                    ];
+                    const periodRows = periods.map(p => {
+                        const baseIdx = idx - p.days;
+                        if (baseIdx < 0) return `<tr><td style="padding:4px 8px;color:#9CA3AF">${p.label}</td><td style="padding:4px 8px;color:#9CA3AF;text-align:right">N/A</td></tr>`;
+                        const base = closes[baseIdx];
+                        if (!base) return '';
+                        const pct = (c - base) / base * 100;
+                        const s = pct >= 0 ? '+' : '';
+                        const col = pct >= 0 ? '#26A69A' : '#EF5350';
+                        return `<tr><td style="padding:4px 8px;color:#9CA3AF">${p.label}</td><td style="padding:4px 8px;font-weight:900;color:${col};text-align:right">${s}${pct.toFixed(2)}%</td></tr>`;
+                    }).join('');
+
+                    document.getElementById('modal-title').innerText = dates[idx];
+                    document.getElementById('modal-period').innerText = globalTicker + ' · 캔들 상세';
+                    document.getElementById('modal-body').innerHTML = `
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+                            <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
+                                <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">시가</p>
+                                <p style="font-weight:900;font-family:monospace">${fmt(o)}</p>
+                            </div>
+                            <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
+                                <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">종가</p>
+                                <p style="font-weight:900;font-family:monospace;color:${chgColor}">${fmt(c)} <span style="font-size:0.75rem">${chgStr}</span></p>
+                            </div>
+                            <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
+                                <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">고가</p>
+                                <p style="font-weight:900;font-family:monospace;color:#26A69A">${fmt(h)}</p>
+                            </div>
+                            <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
+                                <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">저가</p>
+                                <p style="font-weight:900;font-family:monospace;color:#EF5350">${fmt(l)}</p>
+                            </div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid rgba(255,255,255,0.08);overflow:hidden">
+                            <p style="font-size:0.6rem;color:#9CA3AF;font-weight:900;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);letter-spacing:0.1em">기간 대비 등락률</p>
+                            <table style="width:100%">${periodRows}</table>
+                        </div>`;
+                    document.getElementById('detail-modal').style.display = 'flex';
+                });
+
+                // 코인 차트 클릭 이벤트는 cryptoChart 초기화 후 등록
+
                 
                 const form = document.getElementById('search-form');
                 if(form) { 
