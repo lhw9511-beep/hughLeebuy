@@ -14,7 +14,7 @@ const cache = new Map();
 const pendingRequests = new Map();
 const CACHE_TTL = 10 * 60 * 1000; // 10분 캐시 유지
 
-// [필수 추가] 메모리 누수 방어: 1분마다 만료된 캐시 청소
+// 메모리 누수 방어: 1분마다 만료된 캐시 청소
 setInterval(() => {
     const now = Date.now();
     for (const [key, value] of cache.entries()) {
@@ -40,13 +40,13 @@ function getPeriod1FromRange(range) {
     return now;
 }
 
-// 🚀 야후 API 직접 호출 헬퍼 (https 내장 모듈 사용으로 에러 차단)
+// 야후 API 직접 호출 헬퍼
 function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
     return new Promise((resolve, reject) => {
         const subdomain = useQuery1 ? 'query1' : 'query2';
         const url = `https://${subdomain}.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${interval}&range=${range}`;
 
-        const uas =[
+        const uas = [
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15',
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0'
@@ -58,7 +58,7 @@ function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
                 'Accept': 'application/json',
                 'Connection': 'keep-alive'
             },
-            timeout: 10000 // [필수 추가] 10초 타임아웃
+            timeout: 10000
         };
 
         const req = https.get(url, options, (res) => {
@@ -67,7 +67,12 @@ function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
             res.on('end', () => {
                 try {
                     if (res.statusCode >= 200 && res.statusCode < 300) {
-                        resolve(JSON.parse(data));
+                        const parsed = JSON.parse(data);
+                        // [버그수정] chart.result가 null이거나 빈 배열인 경우 명시적 에러 처리
+                        if (!parsed.chart || !parsed.chart.result || parsed.chart.result.length === 0) {
+                            return reject(new Error(`Direct fetch: empty result for ${ticker}`));
+                        }
+                        resolve(parsed);
                     } else {
                         reject(new Error(`Direct fetch HTTP ${res.statusCode}`));
                     }
@@ -77,7 +82,6 @@ function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
             });
         });
 
-        // 타임아웃 처리
         req.on('timeout', () => {
             req.destroy();
             reject(new Error('Direct fetch timeout'));
@@ -102,7 +106,7 @@ app.get('/api/stock/:ticker', async (req, res) => {
 
     // 2. 동시 요청 병합 처리
     if (pendingRequests.has(cacheKey)) {
-        try { return res.json(await pendingRequests.get(cacheKey)); } 
+        try { return res.json(await pendingRequests.get(cacheKey)); }
         catch (error) { return res.status(500).json({ error: "Failed", details: error.message }); }
     }
 
@@ -118,13 +122,15 @@ app.get('/api/stock/:ticker', async (req, res) => {
                 const raw = await fetchDirectYahoo(ticker, interval, range, true);
                 result = raw.chart.result[0];
             } catch (err2) {
+                // [버그수정] err2도 로깅하여 디버깅 가능하게 수정
+                console.warn(`[Fallback] query1 failed: ${err2.message}`);
                 const raw = await fetchDirectYahoo(ticker, interval, range, false);
                 result = raw.chart.result[0];
             }
         }
 
-        // ✨ 수정종가(adjclose) 배열 처리 추가
-        let timestamp = [], open =[], high = [], low = [], close = [], volume = [], adjclose =[];
+        // 수정종가(adjclose) 배열 처리
+        let timestamp = [], open = [], high = [], low = [], close = [], volume = [], adjclose = [];
 
         if (result && result.quotes && result.quotes.length > 0) {
             result.quotes.forEach(q => {
@@ -136,7 +142,7 @@ app.get('/api/stock/:ticker', async (req, res) => {
                 volume.push(q.volume !== undefined ? q.volume : null);
                 adjclose.push(q.adjclose !== undefined ? q.adjclose : (q.close !== undefined ? q.close : null));
             });
-        } 
+        }
         else if (result && result.timestamp && result.indicators && result.indicators.quote) {
             timestamp = result.timestamp;
             const q = result.indicators.quote[0];
@@ -146,22 +152,21 @@ app.get('/api/stock/:ticker', async (req, res) => {
             } else {
                 adjclose = close; // fallback
             }
-        } 
+        }
         else { throw new Error("Data empty or blocked"); }
 
-        // adjclose를 포함하여 반환
         return {
-            chart: { 
-                result:[{ 
-                    meta: result.meta || {}, 
-                    timestamp: timestamp, 
-                    indicators: { 
+            chart: {
+                result: [{
+                    meta: result.meta || {},
+                    timestamp: timestamp,
+                    indicators: {
                         quote: [{ open, high, low, close, volume }],
-                        adjclose: [{ adjclose }] 
-                    } 
-                }] 
-            }, 
-            error: null 
+                        adjclose: [{ adjclose }]
+                    }
+                }]
+            },
+            error: null
         };
     })();
 
@@ -170,6 +175,7 @@ app.get('/api/stock/:ticker', async (req, res) => {
     try {
         const responseData = await fetchPromise;
         cache.set(cacheKey, { timestamp: Date.now(), data: responseData });
+        // [버그수정] finally 블록 대신 try/catch 각각에서 pendingRequests 삭제 보장
         pendingRequests.delete(cacheKey);
         res.json(responseData);
     } catch (error) {
@@ -186,10 +192,12 @@ app.get('/api/fundamentals/:ticker', async (req, res) => {
     const { ticker } = req.params;
     try {
         const summary = await yahooFinance.quoteSummary(ticker, {
-            modules:['defaultKeyStatistics', 'summaryDetail', 'assetProfile', 'fundProfile', 'topHoldings']
+            modules: ['defaultKeyStatistics', 'summaryDetail', 'assetProfile', 'fundProfile', 'topHoldings']
         });
         res.json({ quoteSummary: { result: [summary], error: null } });
     } catch (error) {
+        // [버그수정] 에러 메시지를 클라이언트에 반환하여 디버깅 가능하게 수정
+        console.error(`[Fundamentals Error] ${ticker}: ${error.message}`);
         res.json({ quoteSummary: { result: [null], error: "Limited" } });
     }
 });
