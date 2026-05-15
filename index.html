@@ -1473,7 +1473,21 @@
                                 });
                             }
                         }
-                        return ''; // tooltip 말풍선 숨김
+                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
+                        params.forEach(p => {
+                            if (p.seriesType === 'candlestick') {
+                                let open  = formatPriceStr(p.data[1]*(currentCurrency==='KRW'?currentExchangeRate:1));
+                                let close = formatPriceStr(p.data[2]*(currentCurrency==='KRW'?currentExchangeRate:1));
+                                let high  = formatPriceStr(p.data[4]*(currentCurrency==='KRW'?currentExchangeRate:1));
+                                let low   = formatPriceStr(p.data[3]*(currentCurrency==='KRW'?currentExchangeRate:1));
+                                result += `${p.marker} 시: ${getCurrSymbol()}${open} / 종: ${getCurrSymbol()}${close}<br/>${p.marker} 고: ${getCurrSymbol()}${high} / 저: ${getCurrSymbol()}${low}<br/>`;
+                            } else {
+                                let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data;
+                                if (val === null || val === undefined || isNaN(val)) return;
+                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`;
+                            }
+                        });
+                        return result;
                     }
                 },
                 grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
@@ -1575,7 +1589,21 @@
                                 });
                             }
                         }
-                        return '';
+                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
+                        params.forEach(p => {
+                            if (p.seriesType === 'candlestick') {
+                                let open  = formatPriceStr(p.data[1]*(currentCurrency==='KRW'?currentExchangeRate:1));
+                                let close = formatPriceStr(p.data[2]*(currentCurrency==='KRW'?currentExchangeRate:1));
+                                let high  = formatPriceStr(p.data[4]*(currentCurrency==='KRW'?currentExchangeRate:1));
+                                let low   = formatPriceStr(p.data[3]*(currentCurrency==='KRW'?currentExchangeRate:1));
+                                result += `${p.marker} 시: ${getCurrSymbol()}${open} / 종: ${getCurrSymbol()}${close}<br/>${p.marker} 고: ${getCurrSymbol()}${high} / 저: ${getCurrSymbol()}${low}<br/>`;
+                            } else {
+                                let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data;
+                                if (val === null || val === undefined || isNaN(val)) return;
+                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val))}</b><br/>`;
+                            }
+                        });
+                        return result;
                     }
                 },
                 grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
