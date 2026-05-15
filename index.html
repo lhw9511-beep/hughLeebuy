@@ -1026,11 +1026,11 @@
 
             let lastErrorMsg = "";
 
-            for (let attempt = 0; attempt < 2; attempt++) {
+            for (let attempt = 0; attempt < 1; attempt++) {
                 for (const url of urlsToTry) {
                     try {
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 12000); 
+                        const timeoutId = setTimeout(() => controller.abort(), 8000); 
                         
                         const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
                         clearTimeout(timeoutId);
@@ -1064,7 +1064,6 @@
                         continue; 
                     }
                 }
-                await new Promise(r => setTimeout(r, 1500));
             }
 
             throw new Error(`서버 접속 지연. 잠시 후 시도해주세요. (${lastErrorMsg})`);
@@ -1126,11 +1125,11 @@
             }
             isFetchingMacro = true;
             try {
-                const vixData = await fetchStockData('^VIX', '1d', '3mo');
-                await delay(400); 
-                const spyData = await fetchStockData('SPY', '1d', '3mo');
-                await delay(400);
-                await fetchExchangeRate();
+                const [vixData, spyData] = await Promise.all([
+                    fetchStockData('^VIX', '1d', '3mo'),
+                    fetchStockData('SPY', '1d', '3mo'),
+                    fetchExchangeRate()
+                ]);
                 
                 const vixCloses = extractCleanData(vixData).closes;
                 globalVix = vixCloses[vixCloses.length - 1];
@@ -1549,11 +1548,11 @@
                         fetchBinanceData(ticker, '1mo', '10y')
                     ]);
                 } else {
-                    dData = await fetchStockData(ticker, '1d', '2y');
-                    await delay(800);
-                    wData = await fetchStockData(ticker, '1wk', '5y');
-                    await delay(800);
-                    mData = await fetchStockData(ticker, '1mo', '10y');
+                    [dData, wData, mData] = await Promise.all([
+                        fetchStockData(ticker, '1d', '2y'),
+                        fetchStockData(ticker, '1wk', '5y'),
+                        fetchStockData(ticker, '1mo', '10y')
+                    ]);
                 }
 
                 const analyze = (data, timeHorizon, periods, dailyData) => {
@@ -1946,11 +1945,7 @@
 
                 document.getElementById('pf-live-loading-text').innerText = `데이터 수집 중 (다중 서버 우회)...`;
                 
-                const results =[];
-                for (let t of tickers) {
-                    results.push(await fetchStockData(t, '1mo', '2y'));
-                    await delay(800);
-                }
+                const results = await Promise.all(tickers.map(t => fetchStockData(t, '1mo', '2y')));
                 
                 const dataMap = {}; let minLength = 9999;
                 for(let i=0; i<tickers.length; i++) {
@@ -2163,12 +2158,9 @@
                 baaProofs = {};
                 const results =[];
 
-                for (let ticker of canaries) {
-                    loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">[${ticker}] 정확한 일봉 데이터 스캔 및 월말 종가 추출 중</span>`;
-                    const rawData = await fetchStockData(ticker, '1d', '2y');
-                    results.push(rawData);
-                    await delay(800); 
-                }
+                loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">전체 종목 병렬 로딩 중</span>`;
+                const baaFetched = await Promise.all(canaries.map(t => fetchStockData(t, '1d', '2y')));
+                baaFetched.forEach(d => results.push(d));
 
                 for (let i = 0; i < canaries.length; i++) {
                     const ticker = canaries[i];
@@ -2340,7 +2332,6 @@
                                 const ds = ((dP0/dP1-1)*12 + (dP0/dP3-1)*4 + (dP0/dP6-1)*2 + (dP0/dP12-1)*1) * 100;
                                 defScores.push({ t: dt, score: ds });
                             } catch(e) { defScores.push({ t: dt, score: -9999 }); }
-                            await delay(400);
                         }
 
                         // BAA 규칙: 점수 내림차순 정렬 → 상위 3개 → 각 33.3% 균등 배분
