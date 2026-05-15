@@ -1683,9 +1683,10 @@
 
                 const updateUI = (prefix) => {
                     const targetDetails = prefix === 'stock' ? analysisDetails : cryptoAnalysisDetails;
-                    targetDetails.short = {...stRes, summary: summaries.short.s};
-                    targetDetails.mid = {...mtRes, summary: summaries.mid.s};
-                    targetDetails.long = {...ltRes, summary: summaries.long.s};
+                    const _dCloses = extractCleanData(dData).closes;
+                    targetDetails.short = {...stRes, summary: summaries.short.s, closes: _dCloses};
+                    targetDetails.mid = {...mtRes, summary: summaries.mid.s, closes: _dCloses};
+                    targetDetails.long = {...ltRes, summary: summaries.long.s, closes: _dCloses};
 
                     const upBox = (id, res, barId) => { 
                         const el = document.getElementById(id); const bar = document.getElementById(barId);
@@ -1715,7 +1716,32 @@
         }
 
         function buildDetailHtml(d) {
-            let html = `
+            // ── 기간별 등락률 계산 ──
+            let periodHtml = '';
+            if (d.closes && d.closes.length > 1) {
+                const cl = d.closes;
+                const now = cl[cl.length - 1];
+                const periods = [
+                    { label: '전일', days: 1  },
+                    { label: '전주', days: 5  },
+                    { label: '전월', days: 21 },
+                    { label: '전년', days: 252},
+                ];
+                const chips = periods.map(p => {
+                    const idx = Math.max(0, cl.length - 1 - p.days);
+                    if (idx >= cl.length - 1) return `<div class="text-center"><p class="text-[0.55rem] text-themeMuted mb-0.5">${p.label}</p><p class="text-xs font-black font-mono text-themeMuted">N/A</p></div>`;
+                    const base = cl[idx];
+                    if (!base) return '';
+                    const pct = (now - base) / base * 100;
+                    const sign = pct >= 0 ? '+' : '';
+                    const color = pct >= 0 ? 'text-up' : 'text-down';
+                    const bg    = pct >= 0 ? 'bg-up/10 border-up/20' : 'bg-down/10 border-down/20';
+                    return `<div class="flex-1 text-center p-2 rounded-lg border ${bg}"><p class="text-[0.55rem] text-themeMuted mb-0.5">${p.label}</p><p class="text-xs font-black font-mono ${color}">${sign}${pct.toFixed(2)}%</p></div>`;
+                }).join('');
+                periodHtml = `<div class="flex gap-2 mb-4">${chips}</div>`;
+            }
+
+            let html = periodHtml + `
                 <div class="p-4 bg-black/20 rounded-xl border border-themeBorder text-center mb-4 shadow-inner relative overflow-hidden">
                     <div class="absolute inset-0 opacity-10 pointer-events-none bg-gradient-to-r ${d.diff>0?'from-emerald-500':'from-rose-500'} to-transparent"></div>
                     <span class="text-3xl font-black status-${String(d.status).replace(/ /g,'-')} tracking-tighter block mb-2 relative z-10">${d.status}</span>
