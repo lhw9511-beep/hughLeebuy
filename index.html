@@ -358,6 +358,12 @@
                     <div>
                         <h2 id="display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
                         <div id="live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
+                        <div id="period-changes" class="flex flex-wrap gap-x-3 gap-y-1 mt-1.5">
+                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1D"><span class="text-themeMuted">전일</span> <span class="font-black">---</span></span>
+                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1W"><span class="text-themeMuted">전주</span> <span class="font-black">---</span></span>
+                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1M"><span class="text-themeMuted">전월</span> <span class="font-black">---</span></span>
+                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1Y"><span class="text-themeMuted">전년</span> <span class="font-black">---</span></span>
+                        </div>
                     </div>
                     <div class="flex flex-col w-full lg:w-auto gap-2">
                         <div class="expert-only flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
@@ -495,6 +501,12 @@
                     <div>
                         <h2 id="crypto-display-ticker" class="text-3xl md:text-5xl font-black text-themeText uppercase tracking-tighter leading-none mb-1">---</h2>
                         <div id="crypto-live-price" class="text-xl md:text-3xl font-mono font-black text-themeText">---</div>
+                        <div id="crypto-period-changes" class="flex flex-wrap gap-x-3 gap-y-1 mt-1.5">
+                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1D"><span class="text-themeMuted">전일</span> <span class="font-black">---</span></span>
+                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1W"><span class="text-themeMuted">전주</span> <span class="font-black">---</span></span>
+                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1M"><span class="text-themeMuted">전월</span> <span class="font-black">---</span></span>
+                            <span class="period-chg-item text-[0.65rem] font-mono" data-period="1Y"><span class="text-themeMuted">전년</span> <span class="font-black">---</span></span>
+                        </div>
                     </div>
                     
                     <div class="flex flex-col w-full lg:w-auto gap-2">
@@ -1320,6 +1332,7 @@
                     if(myChart) myChart.clear();
                     const dt = document.getElementById('display-ticker'); if (dt) dt.innerText = "ERROR";
                     const lp = document.getElementById('live-price'); if (lp) lp.innerText = "---";
+                    const pc = document.getElementById('period-changes'); if (pc) pc.querySelectorAll('span:last-child').forEach(s => { s.innerText = '---'; s.className = 'font-black text-themeMuted'; });
                     const rc = document.getElementById('reasoning-container'); if (rc) rc.innerHTML = '<p class="text-xs text-rose-500 font-bold text-center py-10">데이터를 불러오지 못했습니다.<br><br>새로고침을 하거나 잠시 후 다시 시도해주세요.</p>';
                 }
             } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
@@ -1352,6 +1365,7 @@
                     if(cryptoChart) cryptoChart.clear();
                     const dt = document.getElementById('crypto-display-ticker'); if (dt) dt.innerText = "ERROR";
                     const lp = document.getElementById('crypto-live-price'); if (lp) lp.innerText = "---";
+                    const cpc = document.getElementById('crypto-period-changes'); if (cpc) cpc.querySelectorAll('span:last-child').forEach(s => { s.innerText = '---'; s.className = 'font-black text-themeMuted'; });
                 }
             } finally { if(loadingOverlay) loadingOverlay.style.display = 'none'; }
         }
@@ -1365,6 +1379,39 @@
             let price = closes[closes.length - 1]; 
             let finalPrice = currentCurrency === 'KRW' ? price * currentExchangeRate : price;
             document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
+
+            // ── 기간별 등락률 계산 (전일/전주/전월/전년) ──
+            (function renderPeriodChanges() {
+                const now = closes[closes.length - 1];
+                // closes는 일봉 기준. dates 배열과 같은 인덱스
+                function findClosestIdx(daysAgo) {
+                    // 영업일 기준 근사: 1D=1, 1W=5, 1M=21, 1Y=252
+                    const targetIdx = closes.length - 1 - daysAgo;
+                    return Math.max(0, targetIdx);
+                }
+                const periods = [
+                    { id: '1D', label: '전일',  days: 1   },
+                    { id: '1W', label: '전주',  days: 5   },
+                    { id: '1M', label: '전월',  days: 21  },
+                    { id: '1Y', label: '전년',  days: 252 },
+                ];
+                const container = document.getElementById('period-changes');
+                if (!container) return;
+                container.querySelectorAll('.period-chg-item').forEach(el => {
+                    const pid = el.dataset.period;
+                    const p = periods.find(x => x.id === pid);
+                    if (!p) return;
+                    const idx = findClosestIdx(p.days);
+                    if (idx >= closes.length - 1) { el.querySelector('span:last-child').innerText = 'N/A'; return; }
+                    const base = closes[idx];
+                    if (!base || base === 0) { el.querySelector('span:last-child').innerText = 'N/A'; return; }
+                    const pct = ((now - base) / base * 100);
+                    const sign = pct >= 0 ? '+' : '';
+                    const valueEl = el.querySelector('span:last-child');
+                    valueEl.innerText = `${sign}${pct.toFixed(2)}%`;
+                    valueEl.className = `font-black ${pct >= 0 ? 'text-up' : 'text-down'}`;
+                });
+            })();
             
             if (currentInterval === '1y') {
                 let yearly = {};
@@ -1460,6 +1507,33 @@
             let price = closes[closes.length - 1]; 
             let finalPrice = currentCurrency === 'KRW' ? price * currentExchangeRate : price;
             document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
+
+            // ── 코인 기간별 등락률 계산 ──
+            (function renderCryptoPeriodChanges() {
+                const now = closes[closes.length - 1];
+                const periods = [
+                    { id: '1D', label: '전일',  days: 1   },
+                    { id: '1W', label: '전주',  days: 7   },
+                    { id: '1M', label: '전월',  days: 30  },
+                    { id: '1Y', label: '전년',  days: 365 },
+                ];
+                const container = document.getElementById('crypto-period-changes');
+                if (!container) return;
+                container.querySelectorAll('.period-chg-item').forEach(el => {
+                    const pid = el.dataset.period;
+                    const p = periods.find(x => x.id === pid);
+                    if (!p) return;
+                    const idx = Math.max(0, closes.length - 1 - p.days);
+                    if (idx >= closes.length - 1) { el.querySelector('span:last-child').innerText = 'N/A'; return; }
+                    const base = closes[idx];
+                    if (!base || base === 0) { el.querySelector('span:last-child').innerText = 'N/A'; return; }
+                    const pct = ((now - base) / base * 100);
+                    const sign = pct >= 0 ? '+' : '';
+                    const valueEl = el.querySelector('span:last-child');
+                    valueEl.innerText = `${sign}${pct.toFixed(2)}%`;
+                    valueEl.className = `font-black ${pct >= 0 ? 'text-up' : 'text-down'}`;
+                });
+            })();
             
             const rsiArr = Indicator.rsi(closes, 14); const rsi = rsiArr[rsiArr.length - 1] || 50;
             const ma120Arr = Indicator.sma(closes, 120); const ma120 = ma120Arr[ma120Arr.length - 1];
