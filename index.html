@@ -1027,19 +1027,20 @@
             const rawUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t)}?interval=${intv}&range=${range}&includePrePost=false`;
 
             const urlsToTry =[
-                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`,   // 1. 내 백엔드 서버
-                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`,              // 2. CodeTabs 우회
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`,                    // 3. AllOrigins 우회
-                `https://corsproxy.io/?url=${encodeURIComponent(rawUrl1)}`                              // 4. CorsProxy 추가
+                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`,        // 1. 내 백엔드
+                `https://corsproxy.io/?url=${encodeURIComponent(rawUrl1)}`,                                   // 2. CorsProxy (빠름)
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl1)}`,                          // 3. AllOrigins
+                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`,                   // 4. CodeTabs
+                `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(rawUrl2)}`                       // 5. ThingProxy
             ];
 
             let lastErrorMsg = "";
 
-            for (let attempt = 0; attempt < 2; attempt++) {
+            for (let attempt = 0; attempt < 3; attempt++) {
                 for (const url of urlsToTry) {
                     try {
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 10000); 
+                        const timeoutId = setTimeout(() => controller.abort(), 12000); 
                         
                         const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
                         clearTimeout(timeoutId);
@@ -1075,7 +1076,9 @@
                 }
             }
 
-            throw new Error(`서버 접속 지연. 잠시 후 시도해주세요. (${lastErrorMsg})`);
+            // 모든 프록시 실패 → 사용자 친화적 에러
+            console.error(`[fetchStockData] ${t} 모든 프록시 실패:`, lastErrorMsg);
+            throw new Error(`${t} 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.`);
         }
     
         
@@ -1335,6 +1338,11 @@
             } catch (e) { 
                 if (!e.message.includes('Timeout') && e.name !== 'AbortError') {
                     logError(`loadData failed for ${ticker}`, e, "loadData");
+                    // 로딩 오버레이 숨기고 재시도 버튼 표시
+                    const lo = document.getElementById('loading-overlay');
+                    if(lo) lo.style.display = 'none';
+                    updateStatus("API 오류 - 재시도 중...", "bg-rose-500");
+                    setTimeout(() => loadData(ticker, interval, range), 3000);
                     updateStatus("API ERROR", "bg-rose-500"); 
                     if(myChart) myChart.clear();
                     const dt = document.getElementById('display-ticker'); if (dt) dt.innerText = "ERROR";
@@ -1371,6 +1379,10 @@
             } catch (e) { 
                 if (!e.message.includes('Timeout') && e.name !== 'AbortError') {
                     logError(`loadCryptoData failed for ${ticker}`, e, "loadCryptoData");
+                    const co = document.getElementById('crypto-loading-overlay');
+                    if(co) co.style.display = 'none';
+                    updateCryptoStatus("API 오류 - 재시도 중...", "bg-rose-500");
+                    setTimeout(() => loadCryptoData(ticker, interval, range), 3000);
                     updateCryptoStatus("API ERROR", "bg-rose-500"); 
                     if(cryptoChart) cryptoChart.clear();
                     const dt = document.getElementById('crypto-display-ticker'); if (dt) dt.innerText = "ERROR";
