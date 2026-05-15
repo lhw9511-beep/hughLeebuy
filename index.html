@@ -1418,9 +1418,18 @@
                         let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
                         params.forEach(p => {
                             if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]* (currentCurrency==='KRW'?currentExchangeRate:1));
-                                let close = formatPriceStr(p.data[2]* (currentCurrency==='KRW'?currentExchangeRate:1));
-                                result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
+                                const rate = currentCurrency==='KRW'?currentExchangeRate:1;
+                                const o = p.data[1], c = p.data[2], l = p.data[3], h = p.data[4];
+                                const idx = p.dataIndex;
+                                const prev = idx > 0 ? closes[idx-1] : null;
+                                let chgHtml = '';
+                                if (prev && prev !== 0) {
+                                    const pct = (c - prev) / prev * 100;
+                                    const lbl = currentInterval==='1wk'?'전주':currentInterval==='1mo'?'전월':currentInterval==='1y'?'전년':'전일';
+                                    const col = pct>=0?'#26A69A':'#EF5350';
+                                    chgHtml = '<span style="color:'+col+';font-weight:900">'+lbl+' 대비 '+(pct>=0?'+':'')+pct.toFixed(2)+'%</span><br/>';
+                                }
+                                result += p.marker+' 시: '+getCurrSymbol()+formatPriceStr(o*rate)+' / 고: '+getCurrSymbol()+formatPriceStr(h*rate)+'<br/>'+p.marker+' 저: '+getCurrSymbol()+formatPriceStr(l*rate)+' / 종: '+getCurrSymbol()+formatPriceStr(c*rate)+'<br/>'+chgHtml;
                             } else {
                                 let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
                                 if (val === null || val === undefined || isNaN(val)) return;
@@ -1500,9 +1509,18 @@
                         let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
                         params.forEach(p => {
                             if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]* (currentCurrency==='KRW'?currentExchangeRate:1));
-                                let close = formatPriceStr(p.data[2]* (currentCurrency==='KRW'?currentExchangeRate:1));
-                                result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
+                                const rate = currentCurrency==='KRW'?currentExchangeRate:1;
+                                const o = p.data[1], c = p.data[2], l = p.data[3], h = p.data[4];
+                                const idx = p.dataIndex;
+                                const prev = idx > 0 ? closes[idx-1] : null;
+                                let chgHtml = '';
+                                if (prev && prev !== 0) {
+                                    const pct = (c - prev) / prev * 100;
+                                    const lbl = currentCryptoInterval==='1wk'?'전주':currentCryptoInterval==='1mo'?'전월':currentCryptoInterval==='1y'?'전년':'전일';
+                                    const col = pct>=0?'#26A69A':'#EF5350';
+                                    chgHtml = '<span style="color:'+col+';font-weight:900">'+lbl+' 대비 '+(pct>=0?'+':'')+pct.toFixed(2)+'%</span><br/>';
+                                }
+                                result += p.marker+' 시: '+getCurrSymbol()+formatPriceStr(o*rate)+' / 고: '+getCurrSymbol()+formatPriceStr(h*rate)+'<br/>'+p.marker+' 저: '+getCurrSymbol()+formatPriceStr(l*rate)+' / 종: '+getCurrSymbol()+formatPriceStr(c*rate)+'<br/>'+chgHtml;
                             } else {
                                 let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
                                 if (val === null || val === undefined || isNaN(val)) return;
