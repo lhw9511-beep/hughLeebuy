@@ -795,7 +795,7 @@
                 </div>
             </div>
 
-            <div class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-purple-500">
+            <div id="lev-backtest-box" class="glass p-3 md:p-5 rounded-2xl shadow-xl border-t-4 border-t-purple-500">
                 <div class="flex items-center justify-between mb-3 border-b border-themeBorder pb-2">
                     <h2 class="text-base md:text-lg font-black text-themeText">레버리지 적용 백테스트 (2000~2026)</h2>
                 </div>
@@ -2564,6 +2564,9 @@
                 const el = document.getElementById(`view-${v}`);
                 if(el) el.style.display = v === tab ? 'flex' : 'none';
             });
+            // 레버리지 백테스트는 BAA 탭에서만 표시
+            const _lev = document.getElementById('lev-backtest-box');
+            if (_lev) _lev.style.display = (tab === 'baa') ? '' : 'none';
             setTimeout(() => {
                 if(tab === 'dashboard' && myChart) myChart.resize();
                 else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData(globalCryptoTicker); } cryptoChart.resize(); }
@@ -2650,6 +2653,8 @@
 
             } catch (e) { logError("Init Error", e, "DOMContentLoaded"); }
         });
-    </script>
+            // 초기 로드: 레버리지 섹션 숨김
+        (function(){ const _l=document.getElementById('lev-backtest-box'); if(_l) _l.style.display='none'; })();
+        </script>
 </body>
 </html>
