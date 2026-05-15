@@ -2192,12 +2192,12 @@
                 baaProofs = {};
                 const results =[];
 
-                loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">전체 종목 병렬 로딩 중</span>`;
+                loadingText.innerHTML = `카나리아 4종 데이터 로딩 중...`;
                 setProgress('baa-progress-bar','baa-progress-text', 5);
                 let baaDone = 0;
                 const baaFetched = await Promise.all(canaries.map(t => fetchStockData(t, '1d', '2y').catch(() => fetchStockData(t, '1d', '2y')).then(r => { baaDone++; setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*70)+5); return r; })));
                 baaFetched.forEach(d => results.push(d));
-                setProgress('baa-progress-bar','baa-progress-text', 85);
+                setProgress('baa-progress-bar','baa-progress-text', 85); loadingText.innerHTML = `점수 계산 중...`;
 
                 for (let i = 0; i < canaries.length; i++) {
                     const ticker = canaries[i];
@@ -2344,11 +2344,19 @@
                         <span class="inline-block mt-2 text-[0.7rem] text-accent animate-pulse">⏳ 방어 자산 7종 모멘텀 계산 중...</span>`;
 
                     try {
-                        const defScores = [];
+                        loadingText.innerHTML = `방어자산 7종 병렬 로딩 중...`;
+                        // ── 7종 병렬 로딩으로 속도 개선 ──
+                        const defRawAll = await Promise.all(
+                            defenseUniverse.map(dt =>
+                                fetchStockData(dt, '1d', '2y').catch(() => null)
+                            )
+                        );
+                        setProgress('baa-progress-bar','baa-progress-text', 95);
 
-                        for (const dt of defenseUniverse) {
+                        const defScores = defenseUniverse.map((dt, idx) => {
                             try {
-                                const rawD = await fetchStockData(dt, '1d', '2y');
+                                const rawD = defRawAll[idx];
+                                if (!rawD) return { t: dt, score: -9999, proof: null };
                                 const dts = rawD.timestamp || [];
                                 const dAdj = rawD.indicators?.adjclose?.[0]?.adjclose || rawD.indicators?.quote?.[0]?.close || [];
                                 let dMonthly = {}, lastV = 0;
@@ -2362,65 +2370,105 @@
                                 }
                                 const dm = Object.keys(dMonthly).sort();
                                 const dLen = dm.length;
-                                if (dLen < 13) { defScores.push({ t: dt, score: -9999 }); continue; }
+                                if (dLen < 13) return { t: dt, score: -9999, proof: null };
                                 const dP0=dMonthly[dm[dLen-1]], dP1=dMonthly[dm[dLen-2]],
                                       dP3=dMonthly[dm[dLen-4]], dP6=dMonthly[dm[dLen-7]],
                                       dP12=dMonthly[dm[dLen-13]];
-                                const ds = ((dP0/dP1-1)*12 + (dP0/dP3-1)*4 + (dP0/dP6-1)*2 + (dP0/dP12-1)*1) * 100;
-                                defScores.push({ t: dt, score: ds });
-                            } catch(e) { defScores.push({ t: dt, score: -9999 }); }
-                        }
+                                const r1=(dP0/dP1-1), r3=(dP0/dP3-1), r6=(dP0/dP6-1), r12=(dP0/dP12-1);
+                                const s1=r1*12*100, s3=r3*4*100, s6=r6*2*100, s12=r12*1*100;
+                                const ds = s1+s3+s6+s12;
+                                const proof = `<div class="space-y-3 text-sm">
+                                    <div class="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-themeBorder">
+                                        <span class="font-black text-lg">${dt}</span>
+                                        <span class="font-mono font-black text-xl">$${dP0.toFixed(2)}</span>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                    <table class="w-full text-xs min-w-[320px]">
+                                        <thead class="bg-black/30"><tr class="text-[0.6rem] text-themeMuted uppercase tracking-widest border-b border-themeBorder">
+                                            <th class="py-1.5 px-2 text-left">기간</th><th class="py-1.5 text-right">배당반영가</th>
+                                            <th class="py-1.5 text-right">수익률</th><th class="py-1.5 text-center">가중치</th><th class="py-1.5 px-2 text-right">점수</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            <tr class="border-b border-themeBorder/20"><td class="py-1.5 px-2 text-themeMuted">1개월 전</td><td class="py-1.5 text-right font-mono">$${dP1.toFixed(2)}</td><td class="py-1.5 text-right ${r1>0?'text-up':'text-down'}">${(r1*100).toFixed(2)}%</td><td class="py-1.5 text-center text-accent">×12</td><td class="py-1.5 px-2 text-right ${s1>0?'text-up':'text-down'} font-bold">${s1.toFixed(2)}</td></tr>
+                                            <tr class="border-b border-themeBorder/20"><td class="py-1.5 px-2 text-themeMuted">3개월 전</td><td class="py-1.5 text-right font-mono">$${dP3.toFixed(2)}</td><td class="py-1.5 text-right ${r3>0?'text-up':'text-down'}">${(r3*100).toFixed(2)}%</td><td class="py-1.5 text-center text-accent">×4</td><td class="py-1.5 px-2 text-right ${s3>0?'text-up':'text-down'} font-bold">${s3.toFixed(2)}</td></tr>
+                                            <tr class="border-b border-themeBorder/20"><td class="py-1.5 px-2 text-themeMuted">6개월 전</td><td class="py-1.5 text-right font-mono">$${dP6.toFixed(2)}</td><td class="py-1.5 text-right ${r6>0?'text-up':'text-down'}">${(r6*100).toFixed(2)}%</td><td class="py-1.5 text-center text-accent">×2</td><td class="py-1.5 px-2 text-right ${s6>0?'text-up':'text-down'} font-bold">${s6.toFixed(2)}</td></tr>
+                                            <tr><td class="py-1.5 px-2 text-themeMuted">12개월 전</td><td class="py-1.5 text-right font-mono">$${dP12.toFixed(2)}</td><td class="py-1.5 text-right ${r12>0?'text-up':'text-down'}">${(r12*100).toFixed(2)}%</td><td class="py-1.5 text-center text-accent">×1</td><td class="py-1.5 px-2 text-right ${s12>0?'text-up':'text-down'} font-bold">${s12.toFixed(2)}</td></tr>
+                                        </tbody>
+                                    </table></div>
+                                    <div class="bg-black/40 p-3 rounded-xl text-center border ${ds>0?'border-up':'border-down'}">
+                                        <div class="text-[0.55rem] text-themeMuted mb-1">(${s1.toFixed(2)}) + (${s3.toFixed(2)}) + (${s6.toFixed(2)}) + (${s12.toFixed(2)})</div>
+                                        <div class="text-2xl font-black ${ds>0?'text-up':'text-down'}">${ds.toFixed(2)} <span class="text-sm font-bold text-themeMuted">pt</span></div>
+                                    </div>
+                                </div>`;
+                                return { t: dt, score: ds, proof };
+                            } catch(e) { return { t: dt, score: -9999, proof: null }; }
+                        });
 
-                        // BAA 규칙: 점수 내림차순 정렬 → 상위 3개 → 각 33.3% 균등 배분
+                        // BAA 규칙: 점수 내림차순 정렬 → 상위 3개 투자 / 나머지 4개 표시
                         defScores.sort((a, b) => b.score - a.score);
                         const top3 = defScores.slice(0, 3);
+                        const rest4 = defScores.slice(3);
 
-                        const rows = top3.map((x, i) => {
-                            const rank = ['🥇','🥈','🥉'][i];
+                        // baaProofs에 방어자산 proof 저장
+                        defScores.forEach(x => { if(x.proof) baaProofs['DEF_' + x.t] = x.proof; });
+
+                        const makeDefRow = (x, i, isTop) => {
+                            const rank = isTop ? ['🥇','🥈','🥉'][i] : '';
                             const scoreText = x.score > -9999 ? x.score.toFixed(1) + 'pt' : 'N/A';
-                            return `
-                            <div class="flex items-center justify-between py-1.5 border-b border-themeBorder/20 last:border-0">
+                            const alloc = isTop ? '<span class="font-black text-down text-sm">33.3%</span>' : '<span class="text-themeMuted text-xs">미선택</span>';
+                            const proofKey = 'DEF_' + x.t;
+                            return `<div class="flex items-center justify-between py-2 border-b border-themeBorder/20 last:border-0 cursor-pointer hover:bg-white/5 rounded-lg px-1 transition" onclick="showBaaProof('${proofKey}')">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-base">${rank}</span>
+                                    ${rank ? `<span class="text-base">${rank}</span>` : '<span class="w-5 text-center text-themeMuted text-xs">${i+4}</span>'}
                                     <span class="font-black text-themeText text-sm w-10">${x.t}</span>
-                                    <span class="text-[0.6rem] text-themeMuted">(${scoreText})</span>
+                                    <span class="text-[0.6rem] ${x.score>0?'text-up':'text-down'} font-bold">${scoreText}</span>
+                                    <span class="text-[0.55rem] text-themeMuted/60 ml-1">▶ 계산과정</span>
                                 </div>
-                                <span class="font-black text-down text-sm">33.3%</span>
+                                ${alloc}
                             </div>`;
-                        }).join('');
+                        };
+
+                        const topRows = top3.map((x,i) => makeDefRow(x,i,true)).join('');
+                        const restRows = rest4.map((x,i) => makeDefRow(x,i,false)).join('');
 
                         descEl.innerHTML = `
                             <span class="block mb-3">위험 감지! 즉시 모든 주식을 팔고 아래 <strong>안전자산 TOP 3</strong>에 각 33.3%씩 분산하세요.</span>
                             <div class="bg-black/30 rounded-xl border border-down/30 p-3 mt-2 text-left">
                                 <div class="text-[0.6rem] text-themeMuted font-black uppercase tracking-widest mb-2">
-                                    📊 방어 유니버스 상위 3개 · 균등 33.3% 배분
+                                    📊 방어 유니버스 상위 3개 · 균등 33.3% 배분 <span class="text-accent ml-1">(클릭 → 계산과정)</span>
                                 </div>
-                                ${rows}
+                                ${topRows}
+                                <div class="mt-3 pt-2 border-t border-themeBorder/30">
+                                    <div class="text-[0.6rem] text-themeMuted font-black uppercase tracking-widest mb-1">📋 나머지 방어자산 점수</div>
+                                    ${restRows}
+                                </div>
                                 <div class="text-[0.55rem] text-themeMuted mt-2 pt-2 border-t border-themeBorder/30">
                                     * 모멘텀 공식: (1M×12)+(3M×4)+(6M×2)+(12M×1) · BAA 원칙 기준
                                 </div>
                             </div>`;
 
                     } catch(defErr) {
+                        console.warn('방어자산 계산 실패', defErr);
                         // fallback: API 실패 시 BIL/IEF/TLT 33.3% 균등
                         descEl.innerHTML = `위험 감지! 즉시 모든 주식을 팔고 <strong>안전자산 3종 (SGOV / IEF / TLT)</strong>에 각 33.3%씩 대피하세요.<br>
                             <span class="text-[0.6rem] text-themeMuted">(방어자산 모멘텀 계산 실패 - 기본 균등 배분 적용)</span>`;
                     }
                 }
                 if(rebEl) rebEl.innerText = getNextRebalanceKST();
-                loading.style.display = 'none'; resultBox.style.display = 'block';
+                setProgress('baa-progress-bar','baa-progress-text', 100); loading.style.display = 'none'; resultBox.style.display = 'block';
 
             } catch (error) {
                 console.error("BAA Error", error);
-                loading.style.display = 'none'; idle.style.display = 'block';
+                setProgress('baa-progress-bar','baa-progress-text', 0); loading.style.display = 'none'; idle.style.display = 'block';
                 idle.innerHTML = `<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다.<br><span class="text-xs text-gray-500 font-normal mt-1 block">${error.message}</span></p>`;
             }
         }
 
         function showBaaProof(ticker) {
             if(!baaProofs[ticker]) return;
-            document.getElementById('modal-title').innerText = `${ticker} 모멘텀 계산 증명`;
-            document.getElementById('modal-period').innerText = 'BAA 카나리아 알고리즘 (13612 공식)';
+            const label = ticker.startsWith('DEF_') ? ticker.replace('DEF_','') + ' 방어자산 모멘텀 계산' : ticker + ' 모멘텀 계산 증명';
+            document.getElementById('modal-title').innerText = label;
+            document.getElementById('modal-period').innerText = 'BAA 알고리즘 (13612 공식)';
             document.getElementById('modal-body').innerHTML = baaProofs[ticker];
             document.getElementById('detail-modal').style.display = 'flex';
         }
