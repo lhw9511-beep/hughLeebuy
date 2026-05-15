@@ -266,6 +266,8 @@
                     <div id="pf-live-loading" class="flex flex-col items-center justify-center p-6">
                         <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-accent mb-2"></div>
                         <p id="pf-live-loading-text" class="text-[0.6rem] font-bold text-themeMuted uppercase tracking-widest text-center">API 데이터 계산 중...</p>
+                        <div class="w-36 h-1 bg-white/10 rounded-full mt-2 overflow-hidden"><div id="pf-progress-bar" class="h-full bg-accent rounded-full transition-all duration-300" style="width:0%"></div></div>
+                        <p id="pf-progress-text" class="text-[0.55rem] text-accent/70 mt-1">0%</p>
                     </div>
                     <div id="pf-live-content" class="hidden overflow-x-auto custom-scroll p-1">
                         <table class="calc-table" id="pf-live-table"></table>
@@ -353,6 +355,8 @@
                 <div id="loading-overlay">
                     <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
                     <p id="loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">데이터를 불러오는 중입니다...</p>
+                    <div class="w-40 h-1 bg-white/10 rounded-full mt-3 overflow-hidden"><div id="loading-progress-bar" class="h-full bg-accent rounded-full transition-all duration-300" style="width:0%"></div></div>
+                    <p id="loading-progress-text" class="text-[0.6rem] text-accent/70 mt-1">0%</p>
                 </div>
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-3 md:pb-4 gap-3">
                     <div>
@@ -489,6 +493,8 @@
                 <div id="crypto-loading-overlay">
                     <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
                     <p id="crypto-loading-text" class="text-[0.65rem] font-bold text-accent uppercase tracking-widest text-center">코인 데이터를 불러오는 중...</p>
+                    <div class="w-40 h-1 bg-white/10 rounded-full mt-3 overflow-hidden"><div id="crypto-progress-bar" class="h-full bg-accent rounded-full transition-all duration-300" style="width:0%"></div></div>
+                    <p id="crypto-progress-text" class="text-[0.6rem] text-accent/70 mt-1">0%</p>
                 </div>
                 
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-4 border-b border-themeBorder pb-3 md:pb-4 gap-3">
@@ -742,7 +748,10 @@
                 </div>
                 
                 <div id="baa-live-loading" class="hidden flex-col items-center justify-center py-6">
-                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"></div>
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent mb-3"
+                    <div class="w-40 h-1 bg-white/10 rounded-full mt-3 overflow-hidden"><div id="baa-progress-bar" class="h-full bg-accent rounded-full transition-all duration-300" style="width:0%"></div></div>
+                    <p id="baa-progress-text" class="text-[0.6rem] text-accent/70 mt-1">0%</p>
+                </div>
                     <p class="text-[0.7rem] font-bold text-accent uppercase tracking-widest text-center" id="baa-live-loading-text">야후 파이낸스 주가 데이터를 바탕으로<br>카나리아 생존 여부를 판단 중입니다...</p>
                 </div>
 
@@ -1019,18 +1028,18 @@
 
             const urlsToTry =[
                 `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp}`,   // 1. 내 백엔드 서버
-                `/api/stock/${encodeURIComponent(t)}?interval=${intv}&range=${range}&_t=${timestamp+1}`, // 2. 내 백엔드 1회 재시도 (안정성 확보)
-                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`,              // 3. CodeTabs 우회
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`                     // 4. AllOrigins 우회
+                `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl1)}`,              // 2. CodeTabs 우회
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl2)}`,                    // 3. AllOrigins 우회
+                `https://corsproxy.io/?url=${encodeURIComponent(rawUrl1)}`                              // 4. CorsProxy 추가
             ];
 
             let lastErrorMsg = "";
 
-            for (let attempt = 0; attempt < 1; attempt++) {
+            for (let attempt = 0; attempt < 2; attempt++) {
                 for (const url of urlsToTry) {
                     try {
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 8000); 
+                        const timeoutId = setTimeout(() => controller.abort(), 10000); 
                         
                         const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
                         clearTimeout(timeoutId);
@@ -1296,13 +1305,22 @@
             renderIndicatorPanel(marketType, horizon);
         }
 
+        function setProgress(barId, textId, pct) {
+            const bar = document.getElementById(barId);
+            const txt = document.getElementById(textId);
+            if(bar) bar.style.width = pct + '%';
+            if(txt) txt.textContent = Math.round(pct) + '%';
+        }
+
         async function loadData(ticker, interval = currentInterval, range = currentRange) {
             if (abortController) abortController.abort();
             abortController = new AbortController();
             const loadingOverlay = document.getElementById('loading-overlay');
             if(loadingOverlay) loadingOverlay.style.display = 'flex';
+            setProgress('loading-progress-bar','loading-progress-text', 0);
             
             try {
+                setProgress('loading-progress-bar','loading-progress-text', 15);
                 await fetchMacroData();
                 // '1y' interval은 Yahoo API가 지원 안 해서 '1mo'로 요청하되,
                 // currentInterval은 '1y' 유지 → renderDashboard의 연봉 집계 로직이 정상 작동
@@ -1331,21 +1349,25 @@
             cryptoAbortController = new AbortController();
             const loadingOverlay = document.getElementById('crypto-loading-overlay');
             if(loadingOverlay) loadingOverlay.style.display = 'flex';
+            setProgress('crypto-progress-bar','crypto-progress-text', 0);
             
             const searchInput = document.getElementById('crypto-ticker-input');
             if(searchInput) searchInput.value = ticker;
 
             try {
+                setProgress('crypto-progress-bar','crypto-progress-text', 20);
                 await fetchCryptoMacroData();
+                setProgress('crypto-progress-bar','crypto-progress-text', 45);
                 // '1y' interval → Binance는 '1M'으로 요청하되 currentCryptoInterval은 유지
                 const reqInterval = interval === '1y' ? '1mo' : interval;
                 const d = await fetchBinanceData(ticker, reqInterval, range, interval);
-                
+                setProgress('crypto-progress-bar','crypto-progress-text', 75);
                 globalCryptoChartData = d; globalCryptoTicker = ticker;
                 updateCryptoStatus("LIVE DATA", "bg-emerald-500");
                 renderCryptoDashboard(ticker, d);
-                
+                setProgress('crypto-progress-bar','crypto-progress-text', 92);
                 await calculateTriplePerspectiveDecision(ticker, 'crypto');
+                setProgress('crypto-progress-bar','crypto-progress-text', 100);
             } catch (e) { 
                 if (!e.message.includes('Timeout') && e.name !== 'AbortError') {
                     logError(`loadCryptoData failed for ${ticker}`, e, "loadCryptoData");
@@ -1951,7 +1973,13 @@
 
                 document.getElementById('pf-live-loading-text').innerText = `데이터 수집 중 (다중 서버 우회)...`;
                 
-                const results = await Promise.all(tickers.map(t => fetchStockData(t, '1mo', '2y').catch(() => fetchStockData(t, '1mo', '2y'))));
+                // 포트폴리오 진행바
+                const pfBar = document.getElementById('pf-live-loading');
+                if(pfBar) { const pb = pfBar.querySelector('[id]'); }
+                let pfDone = 0;
+                function pfProg(n,total){ setProgress('pf-progress-bar','pf-progress-text', Math.round(n/total*90)); }
+                const results = await Promise.all(tickers.map((t,i) => fetchStockData(t, '1mo', '2y').catch(() => fetchStockData(t, '1mo', '2y')).then(r => { pfDone++; pfProg(pfDone, tickers.length); return r; })));
+                setProgress('pf-progress-bar','pf-progress-text', 100);
                 
                 const dataMap = {}; let minLength = 9999;
                 for(let i=0; i<tickers.length; i++) {
@@ -2165,8 +2193,11 @@
                 const results =[];
 
                 loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">전체 종목 병렬 로딩 중</span>`;
-                const baaFetched = await Promise.all(canaries.map(t => fetchStockData(t, '1d', '2y').catch(() => fetchStockData(t, '1d', '2y'))));
+                setProgress('baa-progress-bar','baa-progress-text', 5);
+                let baaDone = 0;
+                const baaFetched = await Promise.all(canaries.map(t => fetchStockData(t, '1d', '2y').catch(() => fetchStockData(t, '1d', '2y')).then(r => { baaDone++; setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*70)+5); return r; })));
                 baaFetched.forEach(d => results.push(d));
+                setProgress('baa-progress-bar','baa-progress-text', 85);
 
                 for (let i = 0; i < canaries.length; i++) {
                     const ticker = canaries[i];
