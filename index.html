@@ -2291,10 +2291,8 @@
                     titleEl.innerText = "🔴 방어 모드 (안전 자산 대피)"; titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-down";
                     boxEl.style.borderColor = "#EF5350";
 
-                    // ── 상대 모멘텀 기반 방어 자산 비중 자동 계산 ──────────────
-                    // BAA 원본 방어 유니버스: TIP, DBC, BIL, IEF, TLT, LQD, BND 중 상위 3개
+                    // ── BAA 원칙: 방어 유니버스 7종 중 모멘텀 상위 3개 → 각 33.3% 균등 투자 ──
                     const defenseUniverse = ['TIP', 'DBC', 'BIL', 'IEF', 'TLT', 'LQD', 'BND'];
-
                     descEl.innerHTML = `위험 감지! 즉시 모든 주식을 팔고 안전자산으로 대피하세요.<br>
                         <span class="inline-block mt-2 text-[0.7rem] text-accent animate-pulse">⏳ 방어 자산 7종 모멘텀 계산 중...</span>`;
 
@@ -2306,9 +2304,7 @@
                                 const rawD = await fetchStockData(dt, '1d', '2y');
                                 const dts = rawD.timestamp || [];
                                 const dAdj = rawD.indicators?.adjclose?.[0]?.adjclose || rawD.indicators?.quote?.[0]?.close || [];
-
-                                let dMonthly = {};
-                                let lastV = 0;
+                                let dMonthly = {}, lastV = 0;
                                 for (let j = 0; j < dts.length; j++) {
                                     let c = dAdj[j]; if (!c) c = lastV; else lastV = c;
                                     if (c) {
@@ -2320,69 +2316,51 @@
                                 const dm = Object.keys(dMonthly).sort();
                                 const dLen = dm.length;
                                 if (dLen < 13) { defScores.push({ t: dt, score: -9999 }); continue; }
-
                                 const dP0=dMonthly[dm[dLen-1]], dP1=dMonthly[dm[dLen-2]],
                                       dP3=dMonthly[dm[dLen-4]], dP6=dMonthly[dm[dLen-7]],
                                       dP12=dMonthly[dm[dLen-13]];
-
                                 const ds = ((dP0/dP1-1)*12 + (dP0/dP3-1)*4 + (dP0/dP6-1)*2 + (dP0/dP12-1)*1) * 100;
                                 defScores.push({ t: dt, score: ds });
-                            } catch(e) {
-                                defScores.push({ t: dt, score: -9999 });
-                            }
+                            } catch(e) { defScores.push({ t: dt, score: -9999 }); }
                             await delay(400);
                         }
 
-                        // 상위 3개 선택 후 점수 → 비중 환산
+                        // BAA 규칙: 점수 내림차순 정렬 → 상위 3개 → 각 33.3% 균등 배분
                         defScores.sort((a, b) => b.score - a.score);
                         const top3 = defScores.slice(0, 3);
 
-                        // 음수 점수는 0으로 처리 후 정규화
-                        const positives = top3.map(x => Math.max(0, x.score));
-                        const total = positives.reduce((s, v) => s + v, 0);
-
-                        let weights;
-                        if (total <= 0) {
-                            weights = [34, 33, 33]; // 전부 0 이하면 균등 분배
-                        } else {
-                            weights = positives.map(v => Math.round((v / total) * 100));
-                            // 반올림 오차 보정
-                            const diff = 100 - weights.reduce((s, v) => s + v, 0);
-                            weights[0] += diff;
-                        }
-
-                        const allocationRows = top3.map((x, i) => `
-                            <div class="flex items-center justify-between gap-3 py-1">
+                        const rows = top3.map((x, i) => {
+                            const rank = ['🥇','🥈','🥉'][i];
+                            const scoreText = x.score > -9999 ? x.score.toFixed(1) + 'pt' : 'N/A';
+                            return `
+                            <div class="flex items-center justify-between py-1.5 border-b border-themeBorder/20 last:border-0">
                                 <div class="flex items-center gap-2">
+                                    <span class="text-base">${rank}</span>
                                     <span class="font-black text-themeText text-sm w-10">${x.t}</span>
-                                    <div class="h-2 rounded-full bg-down/80" style="width:${weights[i] * 1.8}px; min-width:8px;"></div>
+                                    <span class="text-[0.6rem] text-themeMuted">(${scoreText})</span>
                                 </div>
-                                <div class="text-right">
-                                    <span class="font-black text-themeText text-sm">${weights[i]}%</span>
-                                    <span class="text-[0.6rem] text-themeMuted ml-1">(${x.score > -9999 ? x.score.toFixed(1) + 'pt' : 'N/A'})</span>
-                                </div>
-                            </div>
-                        `).join('');
+                                <span class="font-black text-down text-sm">33.3%</span>
+                            </div>`;
+                        }).join('');
 
                         descEl.innerHTML = `
-                            <span class="block mb-3">위험 감지! 즉시 모든 주식을 팔고 아래 <strong>안전자산 TOP 3</strong>에 분산하세요.</span>
+                            <span class="block mb-3">위험 감지! 즉시 모든 주식을 팔고 아래 <strong>안전자산 TOP 3</strong>에 각 33.3%씩 분산하세요.</span>
                             <div class="bg-black/30 rounded-xl border border-down/30 p-3 mt-2 text-left">
-                                <div class="text-[0.6rem] text-themeMuted font-black uppercase tracking-widest mb-2 flex items-center gap-1">
-                                    📊 모멘텀 기반 권장 비중 (7종 유니버스 중 상위 3개)
+                                <div class="text-[0.6rem] text-themeMuted font-black uppercase tracking-widest mb-2">
+                                    📊 방어 유니버스 상위 3개 · 균등 33.3% 배분
                                 </div>
-                                ${allocationRows}
+                                ${rows}
                                 <div class="text-[0.55rem] text-themeMuted mt-2 pt-2 border-t border-themeBorder/30">
-                                    * 모멘텀 공식: (1M수익×12) + (3M수익×4) + (6M수익×2) + (12M수익×1) | 점수 비례 비중 자동 배분
+                                    * 모멘텀 공식: (1M×12)+(3M×4)+(6M×2)+(12M×1) · BAA 원칙 기준
                                 </div>
                             </div>`;
 
                     } catch(defErr) {
-                        // fallback: API 실패 시 균등 33.3%
+                        // fallback: API 실패 시 BIL/IEF/TLT 33.3% 균등
                         descEl.innerHTML = `위험 감지! 즉시 모든 주식을 팔고 <strong>안전자산 3종 (BIL / IEF / TLT)</strong>에 각 33.3%씩 대피하세요.<br>
-                            <span class="text-[0.6rem] text-themeMuted">(방어자산 모멘텀 계산 실패 - 균등 배분 적용)</span>`;
+                            <span class="text-[0.6rem] text-themeMuted">(방어자산 모멘텀 계산 실패 - 기본 균등 배분 적용)</span>`;
                     }
                 }
-
                 if(rebEl) rebEl.innerText = getNextRebalanceKST();
                 loading.style.display = 'none'; resultBox.style.display = 'block';
 
