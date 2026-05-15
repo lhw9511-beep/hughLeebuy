@@ -380,6 +380,19 @@
                         </div>
                     </div>
                 </div>
+                <div id="mts-ohlc-bar" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:4px 8px 6px;line-height:1.8;border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;gap:0 16px;" class="flex items-center text-themeMuted">
+                    <span id="mts-date" class="font-black text-themeText mr-2"></span>
+                    <span>시 <span id="mts-open" class="font-black text-themeText"></span></span>
+                    <span>고 <span id="mts-high" class="font-black text-up"></span></span>
+                    <span>저 <span id="mts-low" class="font-black text-down"></span></span>
+                    <span>종 <span id="mts-close" class="font-black text-themeText"></span></span>
+                    <span id="mts-chg" class="font-black ml-1"></span>
+                    <span class="mx-2 text-themeBorder">|</span>
+                    <span>전일 <span id="mts-1d" class="font-black"></span></span>
+                    <span>전주 <span id="mts-1w" class="font-black"></span></span>
+                    <span>전월 <span id="mts-1m" class="font-black"></span></span>
+                    <span>전년 <span id="mts-1y" class="font-black"></span></span>
+                </div>
                 <div id="chart-main" class="chart-container flex-grow"></div>
             </div>
 
@@ -518,6 +531,19 @@
                     </div>
                 </div>
 
+                <div id="crypto-mts-ohlc-bar" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:4px 8px 6px;line-height:1.8;border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;gap:0 16px;" class="flex items-center text-themeMuted">
+                    <span id="crypto-mts-date" class="font-black text-themeText mr-2"></span>
+                    <span>시 <span id="crypto-mts-open" class="font-black text-themeText"></span></span>
+                    <span>고 <span id="crypto-mts-high" class="font-black text-up"></span></span>
+                    <span>저 <span id="crypto-mts-low" class="font-black text-down"></span></span>
+                    <span>종 <span id="crypto-mts-close" class="font-black text-themeText"></span></span>
+                    <span id="crypto-mts-chg" class="font-black ml-1"></span>
+                    <span class="mx-2 text-themeBorder">|</span>
+                    <span>전일 <span id="crypto-mts-1d" class="font-black"></span></span>
+                    <span>전주 <span id="crypto-mts-1w" class="font-black"></span></span>
+                    <span>전월 <span id="crypto-mts-1m" class="font-black"></span></span>
+                    <span>전년 <span id="crypto-mts-1y" class="font-black"></span></span>
+                </div>
                 <div id="crypto-chart-main" class="chart-container flex-grow"></div>
             </div>
 
@@ -1413,19 +1439,41 @@
                 backgroundColor: 'transparent',
                 tooltip: { trigger: 'axis', axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 },
                     formatter: function (params) {
-                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
-                        params.forEach(p => {
-                            if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]* (currentCurrency==='KRW'?currentExchangeRate:1));
-                                let close = formatPriceStr(p.data[2]* (currentCurrency==='KRW'?currentExchangeRate:1));
-                                result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
-                            } else {
-                                let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
-                                if (val === null || val === undefined || isNaN(val)) return;
-                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val)* (currentCurrency==='KRW'&&!p.seriesName.includes('MA')?1:1))}</b><br/>`;
+                        // MTS 스타일: 차트 위 OHLC 바 업데이트
+                        const bar = document.getElementById('mts-ohlc-bar');
+                        if (bar) {
+                            const cp = params.find(p => p.seriesType === 'candlestick');
+                            if (cp) {
+                                bar.style.display = 'flex';
+                                const rate = currentCurrency === 'KRW' ? currentExchangeRate : 1;
+                                const sym = getCurrSymbol();
+                                const [o, c, l, h] = [cp.data[1], cp.data[2], cp.data[3], cp.data[4]];
+                                const chg = ((c - o) / o * 100);
+                                const chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+                                document.getElementById('mts-date').innerText = cp.axisValue;
+                                document.getElementById('mts-open').innerText  = sym + formatPriceStr(o * rate);
+                                document.getElementById('mts-high').innerText  = sym + formatPriceStr(h * rate);
+                                document.getElementById('mts-low').innerText   = sym + formatPriceStr(l * rate);
+                                document.getElementById('mts-close').innerText = sym + formatPriceStr(c * rate);
+                                const chgEl = document.getElementById('mts-chg');
+                                chgEl.innerText = chgStr;
+                                chgEl.style.color = chg >= 0 ? '#26A69A' : '#EF5350';
+                                // 기간 대비 등락률
+                                const allCloses = closes;
+                                const idx = cp.dataIndex;
+                                const pDays = [{id:'1d',days:1},{id:'1w',days:5},{id:'1m',days:21},{id:'1y',days:252}];
+                                pDays.forEach(p => {
+                                    const el = document.getElementById('mts-' + p.id);
+                                    if (!el) return;
+                                    const bi = idx - p.days;
+                                    if (bi < 0 || !allCloses[bi]) { el.innerText = 'N/A'; el.style.color = '#9CA3AF'; return; }
+                                    const pct = (c - allCloses[bi]) / allCloses[bi] * 100;
+                                    el.innerText = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+                                    el.style.color = pct >= 0 ? '#26A69A' : '#EF5350';
+                                });
                             }
-                        });
-                        return result;
+                        }
+                        return ''; // tooltip 말풍선 숨김
                     }
                 },
                 grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
@@ -1495,19 +1543,39 @@
                 backgroundColor: 'transparent',
                 tooltip: { trigger: 'axis', axisPointer: { type: 'cross', lineStyle: { color: chartTextColor, type: 'dashed' } }, backgroundColor: 'rgba(0,0,0,0.8)', textStyle: { color: '#fff', fontSize: 11 },
                     formatter: function (params) {
-                        let result = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}</div>`;
-                        params.forEach(p => {
-                            if (p.seriesType === 'candlestick') {
-                                let open = formatPriceStr(p.data[1]* (currentCurrency==='KRW'?currentExchangeRate:1));
-                                let close = formatPriceStr(p.data[2]* (currentCurrency==='KRW'?currentExchangeRate:1));
-                                result += `${p.marker} 시가: ${getCurrSymbol()}${open}<br/>${p.marker} 종가: ${getCurrSymbol()}${close}<br/>`;
-                            } else {
-                                let val = p.value !== undefined ? (p.value.value !== undefined ? p.value.value : p.value) : p.data; 
-                                if (val === null || val === undefined || isNaN(val)) return;
-                                result += `${p.marker} ${p.seriesName}: <b>${formatPriceStr(Number(val)* (currentCurrency==='KRW'&&!p.seriesName.includes('MA')?1:1))}</b><br/>`;
+                        const bar = document.getElementById('crypto-mts-ohlc-bar');
+                        if (bar) {
+                            const cp = params.find(p => p.seriesType === 'candlestick');
+                            if (cp) {
+                                bar.style.display = 'flex';
+                                const rate = currentCurrency === 'KRW' ? currentExchangeRate : 1;
+                                const sym = getCurrSymbol();
+                                const [o, c, l, h] = [cp.data[1], cp.data[2], cp.data[3], cp.data[4]];
+                                const chg = ((c - o) / o * 100);
+                                const chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+                                document.getElementById('crypto-mts-date').innerText = cp.axisValue;
+                                document.getElementById('crypto-mts-open').innerText  = sym + formatPriceStr(o * rate);
+                                document.getElementById('crypto-mts-high').innerText  = sym + formatPriceStr(h * rate);
+                                document.getElementById('crypto-mts-low').innerText   = sym + formatPriceStr(l * rate);
+                                document.getElementById('crypto-mts-close').innerText = sym + formatPriceStr(c * rate);
+                                const chgEl = document.getElementById('crypto-mts-chg');
+                                chgEl.innerText = chgStr;
+                                chgEl.style.color = chg >= 0 ? '#26A69A' : '#EF5350';
+                                const allCloses = closes;
+                                const idx = cp.dataIndex;
+                                const pDays = [{id:'1d',days:1},{id:'1w',days:7},{id:'1m',days:30},{id:'1y',days:365}];
+                                pDays.forEach(p => {
+                                    const el = document.getElementById('crypto-mts-' + p.id);
+                                    if (!el) return;
+                                    const bi = idx - p.days;
+                                    if (bi < 0 || !allCloses[bi]) { el.innerText = 'N/A'; el.style.color = '#9CA3AF'; return; }
+                                    const pct = (c - allCloses[bi]) / allCloses[bi] * 100;
+                                    el.innerText = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+                                    el.style.color = pct >= 0 ? '#26A69A' : '#EF5350';
+                                });
                             }
-                        });
-                        return result;
+                        }
+                        return '';
                     }
                 },
                 grid:[ { left: '2%', right: '2%', top: '5%', height: '55%', containLabel: true }, { left: '2%', right: '2%', top: '75%', height: '15%', containLabel: true } ],
@@ -2458,64 +2526,7 @@
             });
             setTimeout(() => {
                 if(tab === 'dashboard' && myChart) myChart.resize();
-                else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main'));
-                    cryptoChart.on('click', function(params) {
-                        if (!params || params.seriesType !== 'candlestick') return;
-                        const idx = params.dataIndex;
-                        if (!globalCryptoChartData) return;
-                        const { dates, kData, closes } = extractCleanData(globalCryptoChartData);
-                        if (!dates[idx]) return;
-                        const rate = currentCurrency === 'KRW' ? currentExchangeRate : 1;
-                        const sym  = getCurrSymbol();
-                        const fmt  = v => sym + formatPriceStr(v * rate);
-                        const [o, c, l, h] = kData[idx];
-                        const chg = ((c - o) / o * 100);
-                        const chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
-                        const chgColor = chg >= 0 ? '#26A69A' : '#EF5350';
-                        const periods = [
-                            { label: '전일', days: 1   },
-                            { label: '전주', days: 7   },
-                            { label: '전월', days: 30  },
-                            { label: '전년', days: 365 },
-                        ];
-                        const periodRows = periods.map(p => {
-                            const baseIdx = idx - p.days;
-                            if (baseIdx < 0) return `<tr><td style="padding:4px 8px;color:#9CA3AF">${p.label}</td><td style="padding:4px 8px;color:#9CA3AF;text-align:right">N/A</td></tr>`;
-                            const base = closes[baseIdx];
-                            if (!base) return '';
-                            const pct = (c - base) / base * 100;
-                            const s = pct >= 0 ? '+' : '';
-                            const col = pct >= 0 ? '#26A69A' : '#EF5350';
-                            return `<tr><td style="padding:4px 8px;color:#9CA3AF">${p.label}</td><td style="padding:4px 8px;font-weight:900;color:${col};text-align:right">${s}${pct.toFixed(2)}%</td></tr>`;
-                        }).join('');
-                        document.getElementById('modal-title').innerText = dates[idx];
-                        document.getElementById('modal-period').innerText = globalCryptoTicker + ' · 캔들 상세';
-                        document.getElementById('modal-body').innerHTML = `
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-                                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
-                                    <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">시가</p>
-                                    <p style="font-weight:900;font-family:monospace">${fmt(o)}</p>
-                                </div>
-                                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
-                                    <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">종가</p>
-                                    <p style="font-weight:900;font-family:monospace;color:${chgColor}">${fmt(c)} <span style="font-size:0.75rem">${chgStr}</span></p>
-                                </div>
-                                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
-                                    <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">고가</p>
-                                    <p style="font-weight:900;font-family:monospace;color:#26A69A">${fmt(h)}</p>
-                                </div>
-                                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
-                                    <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">저가</p>
-                                    <p style="font-weight:900;font-family:monospace;color:#EF5350">${fmt(l)}</p>
-                                </div>
-                            </div>
-                            <div style="background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid rgba(255,255,255,0.08);overflow:hidden">
-                                <p style="font-size:0.6rem;color:#9CA3AF;font-weight:900;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);letter-spacing:0.1em">기간 대비 등락률</p>
-                                <table style="width:100%">${periodRows}</table>
-                            </div>`;
-                        document.getElementById('detail-modal').style.display = 'flex';
-                    });
-                    loadCryptoData(globalCryptoTicker); } cryptoChart.resize(); }
+                else if(tab === 'crypto') { if(!cryptoChart) { cryptoChart = echarts.init(document.getElementById('crypto-chart-main')); loadCryptoData(globalCryptoTicker); } cryptoChart.resize(); }
                 else if(tab === 'portfolio') { if(!pfChart) initPortfolioChart(); pfChart?.resize(); }
                 else if(tab === 'baa') {
                     if(!baaChart) initBaaChart(); baaChart?.resize();
@@ -2548,69 +2559,6 @@
             
             try {
                 myChart = echarts.init(document.getElementById('chart-main'));
-
-                // ── 캔들 클릭 → 해당 날짜 OHLC + 기간별 등락률 팝업 ──
-                myChart.on('click', function(params) {
-                    if (!params || params.seriesType !== 'candlestick') return;
-                    const idx = params.dataIndex;
-                    if (!globalChartData) return;
-                    const { dates, kData, closes } = extractCleanData(globalChartData);
-                    if (!dates[idx]) return;
-                    const rate = currentCurrency === 'KRW' ? currentExchangeRate : 1;
-                    const sym  = getCurrSymbol();
-                    const fmt  = v => sym + formatPriceStr(v * rate);
-                    const [o, c, l, h] = kData[idx];
-                    const chg = ((c - o) / o * 100);
-                    const chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
-                    const chgColor = chg >= 0 ? '#26A69A' : '#EF5350';
-
-                    // 기간별 등락률
-                    const periods = [
-                        { label: '전일', days: 1   },
-                        { label: '전주', days: 5   },
-                        { label: '전월', days: 21  },
-                        { label: '전년', days: 252 },
-                    ];
-                    const periodRows = periods.map(p => {
-                        const baseIdx = idx - p.days;
-                        if (baseIdx < 0) return `<tr><td style="padding:4px 8px;color:#9CA3AF">${p.label}</td><td style="padding:4px 8px;color:#9CA3AF;text-align:right">N/A</td></tr>`;
-                        const base = closes[baseIdx];
-                        if (!base) return '';
-                        const pct = (c - base) / base * 100;
-                        const s = pct >= 0 ? '+' : '';
-                        const col = pct >= 0 ? '#26A69A' : '#EF5350';
-                        return `<tr><td style="padding:4px 8px;color:#9CA3AF">${p.label}</td><td style="padding:4px 8px;font-weight:900;color:${col};text-align:right">${s}${pct.toFixed(2)}%</td></tr>`;
-                    }).join('');
-
-                    document.getElementById('modal-title').innerText = dates[idx];
-                    document.getElementById('modal-period').innerText = globalTicker + ' · 캔들 상세';
-                    document.getElementById('modal-body').innerHTML = `
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-                            <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
-                                <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">시가</p>
-                                <p style="font-weight:900;font-family:monospace">${fmt(o)}</p>
-                            </div>
-                            <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
-                                <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">종가</p>
-                                <p style="font-weight:900;font-family:monospace;color:${chgColor}">${fmt(c)} <span style="font-size:0.75rem">${chgStr}</span></p>
-                            </div>
-                            <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
-                                <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">고가</p>
-                                <p style="font-weight:900;font-family:monospace;color:#26A69A">${fmt(h)}</p>
-                            </div>
-                            <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.08)">
-                                <p style="font-size:0.6rem;color:#9CA3AF;margin-bottom:4px">저가</p>
-                                <p style="font-weight:900;font-family:monospace;color:#EF5350">${fmt(l)}</p>
-                            </div>
-                        </div>
-                        <div style="background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid rgba(255,255,255,0.08);overflow:hidden">
-                            <p style="font-size:0.6rem;color:#9CA3AF;font-weight:900;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.06);letter-spacing:0.1em">기간 대비 등락률</p>
-                            <table style="width:100%">${periodRows}</table>
-                        </div>`;
-                    document.getElementById('detail-modal').style.display = 'flex';
-                });
-
-                // 코인 차트 클릭 이벤트는 cryptoChart 초기화 후 등록
 
                 
                 const form = document.getElementById('search-form');
