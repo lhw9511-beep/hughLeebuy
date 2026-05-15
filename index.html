@@ -1125,11 +1125,13 @@
             }
             isFetchingMacro = true;
             try {
-                const [vixData, spyData] = await Promise.all([
+                const macroResults = await Promise.allSettled([
                     fetchStockData('^VIX', '1d', '3mo'),
                     fetchStockData('SPY', '1d', '3mo'),
                     fetchExchangeRate()
                 ]);
+                const vixData = macroResults[0].status === 'fulfilled' ? macroResults[0].value : await fetchStockData('^VIX', '1d', '3mo');
+                const spyData = macroResults[1].status === 'fulfilled' ? macroResults[1].value : await fetchStockData('SPY', '1d', '3mo');
                 
                 const vixCloses = extractCleanData(vixData).closes;
                 globalVix = vixCloses[vixCloses.length - 1];
@@ -1548,11 +1550,15 @@
                         fetchBinanceData(ticker, '1mo', '10y')
                     ]);
                 } else {
-                    [dData, wData, mData] = await Promise.all([
+                    const tripleResults = await Promise.allSettled([
                         fetchStockData(ticker, '1d', '2y'),
                         fetchStockData(ticker, '1wk', '5y'),
                         fetchStockData(ticker, '1mo', '10y')
                     ]);
+                    const [dr, wr, mr] = tripleResults;
+                    dData = dr.status === 'fulfilled' ? dr.value : await fetchStockData(ticker, '1d', '2y');
+                    wData = wr.status === 'fulfilled' ? wr.value : await fetchStockData(ticker, '1wk', '5y');
+                    mData = mr.status === 'fulfilled' ? mr.value : await fetchStockData(ticker, '1mo', '10y');
                 }
 
                 const analyze = (data, timeHorizon, periods, dailyData) => {
@@ -1945,7 +1951,7 @@
 
                 document.getElementById('pf-live-loading-text').innerText = `데이터 수집 중 (다중 서버 우회)...`;
                 
-                const results = await Promise.all(tickers.map(t => fetchStockData(t, '1mo', '2y')));
+                const results = await Promise.all(tickers.map(t => fetchStockData(t, '1mo', '2y').catch(() => fetchStockData(t, '1mo', '2y'))));
                 
                 const dataMap = {}; let minLength = 9999;
                 for(let i=0; i<tickers.length; i++) {
@@ -2159,7 +2165,7 @@
                 const results =[];
 
                 loadingText.innerHTML = `데이터 검증 중...<br><span class="text-white mt-2 block text-xs">전체 종목 병렬 로딩 중</span>`;
-                const baaFetched = await Promise.all(canaries.map(t => fetchStockData(t, '1d', '2y')));
+                const baaFetched = await Promise.all(canaries.map(t => fetchStockData(t, '1d', '2y').catch(() => fetchStockData(t, '1d', '2y'))));
                 baaFetched.forEach(d => results.push(d));
 
                 for (let i = 0; i < canaries.length; i++) {
