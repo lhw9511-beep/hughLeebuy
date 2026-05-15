@@ -2550,7 +2550,14 @@
             document.getElementById(`mob-tab-btn-${tab}`)?.classList.add('active');
             ['dashboard','crypto','portfolio','baa'].forEach(v => {
                 const el = document.getElementById(`view-${v}`);
-                if(el) el.style.display = v === tab ? 'flex' : 'none';
+                if (!el) return;
+                if (v === tab) {
+                    el.classList.remove('hidden');
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'none';
+                    el.classList.add('hidden');
+                }
             });
             setTimeout(() => {
                 if(tab === 'dashboard' && myChart) myChart.resize();
