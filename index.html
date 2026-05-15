@@ -2425,19 +2425,28 @@
                         defScores.forEach(x => { if(x.proof) baaProofs['DEF_' + x.t] = x.proof; });
 
                         const makeDefRow = (x, i, isTop) => {
-                            const rank = isTop ? ['🥇','🥈','🥉'][i] : '';
                             const scoreText = x.score > -9999 ? x.score.toFixed(1) + 'pt' : 'N/A';
-                            const alloc = isTop ? '<span class="font-black text-down text-sm">33.3%</span>' : '<span class="text-themeMuted text-xs">미선택</span>';
+                            const scoreColor = x.score > 0 ? 'text-up' : 'text-down';
                             const proofKey = 'DEF_' + x.t;
-                            return `<div class="flex items-center justify-between py-2 border-b border-themeBorder/20 last:border-0 cursor-pointer hover:bg-white/5 rounded-lg px-1 transition" onclick="showBaaProof('${proofKey}')">
-                                <div class="flex items-center gap-2">
-                                    ${rank ? `<span class="text-base">${rank}</span>` : '<span class="w-5 text-center text-themeMuted text-xs">${i+4}</span>'}
-                                    <span class="font-black text-themeText text-sm w-10">${x.t}</span>
-                                    <span class="text-[0.6rem] ${x.score>0?'text-up':'text-down'} font-bold">${scoreText}</span>
-                                    <span class="text-[0.55rem] text-themeMuted/60 ml-1">▶ 계산과정</span>
-                                </div>
-                                ${alloc}
-                            </div>`;
+                            let leftIcon = '';
+                            if (isTop) {
+                                const emojis = ['🥇','🥈','🥉'];
+                                leftIcon = '<span style="font-size:1rem">' + emojis[i] + '</span>';
+                            } else {
+                                leftIcon = '<span style="font-size:0.65rem;font-weight:900;color:#888;min-width:20px;display:inline-block;text-align:center">' + (i + 4) + '위</span>';
+                            }
+                            const allocHtml = isTop
+                                ? '<span style="font-weight:900;color:#EF5350;font-size:0.85rem">33.3%</span>'
+                                : '<span style="color:#888;font-size:0.75rem">미선택</span>';
+                            return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer" onclick="showBaaProof(\'' + proofKey + '\')" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'\'">'
+                                + '<div style="display:flex;align-items:center;gap:6px">'
+                                + leftIcon
+                                + '<span style="font-weight:900;font-size:0.85rem;min-width:36px">' + x.t + '</span>'
+                                + '<span style="font-size:0.75rem;font-weight:700" class="' + scoreColor + '">' + scoreText + '</span>'
+                                + '<span style="font-size:0.6rem;color:#888;margin-left:2px">▶ 계산과정</span>'
+                                + '</div>'
+                                + allocHtml
+                                + '</div>';
                         };
 
                         const topRows = top3.map((x,i) => makeDefRow(x,i,true)).join('');
