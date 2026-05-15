@@ -12,6 +12,70 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+
+        // ═══════════════════════════════
+        // 즐겨찾기 기능
+        // ═══════════════════════════════
+        let favorites = [];
+        try { favorites = JSON.parse(localStorage.getItem('fav_tickers') || '[]'); } catch(e) { favorites = []; }
+
+        function saveFavorites() {
+            try { localStorage.setItem('fav_tickers', JSON.stringify(favorites)); } catch(e) {}
+        }
+
+        function renderFavChips() {
+            const wrap = document.getElementById('fav-chips');
+            if (!wrap) return;
+            if (favorites.length === 0) {
+                wrap.style.display = 'none';
+                return;
+            }
+            wrap.style.display = 'flex';
+            wrap.innerHTML = favorites.map(t =>
+                '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--modal-bg);border:1px solid var(--border-color);border-radius:999px;padding:2px 10px 2px 8px;font-size:0.78rem;font-weight:900;cursor:pointer;transition:all 0.15s"'
+                + ' onclick="loadData('' + t + '')" title="' + t + ' 분석">'
+                + '⭐ ' + t
+                + '<span onclick="event.stopPropagation();removeFavorite('' + t + '')" style="margin-left:3px;color:#888;font-size:0.9rem;font-weight:400;cursor:pointer" title="삭제">×</span>'
+                + '</span>'
+            ).join('');
+        }
+
+        function toggleFavorite() {
+            const ticker = (document.getElementById('ticker-input')?.value || globalTicker || '').toUpperCase().trim();
+            if (!ticker) return;
+            const idx = favorites.indexOf(ticker);
+            if (idx === -1) {
+                favorites.push(ticker);
+                updateFavBtn(true);
+            } else {
+                favorites.splice(idx, 1);
+                updateFavBtn(false);
+            }
+            saveFavorites();
+            renderFavChips();
+        }
+
+        function removeFavorite(ticker) {
+            favorites = favorites.filter(t => t !== ticker);
+            saveFavorites();
+            renderFavChips();
+            if ((globalTicker || '').toUpperCase() === ticker) updateFavBtn(false);
+        }
+
+        function updateFavBtn(isFav) {
+            const btn = document.getElementById('fav-toggle-btn');
+            if (!btn) return;
+            btn.textContent = isFav ? '⭐' : '☆';
+            btn.title = isFav ? '즐겨찾기 해제' : '즐겨찾기 추가';
+        }
+
+        function syncFavBtn(ticker) {
+            updateFavBtn(favorites.includes((ticker || '').toUpperCase()));
+        }
+
+        // 초기 렌더
+        renderFavChips();
+
         tailwind.config = {
             theme: { extend: { colors: { themeBg: 'var(--bg-color)', themePanel: 'var(--panel-color)', themeModal: 'var(--modal-bg)', themeText: 'var(--text-main)', themeMuted: 'var(--text-muted)', themeBorder: 'var(--border-color)', accent: '#3B82F6', up: '#26A69A', down: '#EF5350' } } }
         }
@@ -344,7 +408,9 @@
                 <form id="search-form" class="flex w-full sm:flex-grow">
                     <input type="text" id="ticker-input" class="flex-grow bg-[var(--modal-bg)] border border-[var(--border-color)] text-themeText rounded-l-xl px-4 py-2.5 md:py-3 uppercase outline-none focus:border-accent text-sm font-black shadow-inner" placeholder="주식 심볼 (예: QQQ, AAPL)">
                     <button type="submit" class="bg-accent text-white px-5 py-2.5 md:py-3 rounded-r-xl font-black text-sm hover:bg-blue-600 transition shrink-0">분석하기</button>
+                    <button type="button" id="fav-toggle-btn" onclick="toggleFavorite()" title="즐겨찾기" class="ml-1 px-3 py-2.5 md:py-3 rounded-xl border border-[var(--border-color)] bg-[var(--modal-bg)] text-xl transition hover:scale-110 shrink-0" style="line-height:1">☆</button>
                 </form>
+                <div id="fav-chips" class="flex flex-wrap gap-1.5 w-full" style="display:none!important"></div>
                 <div id="status-text" class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end px-2">
                     <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
                     <span id="conn-label" class="text-[0.65rem] font-bold text-themeMuted tracking-widest uppercase">WAITING</span>
@@ -1331,6 +1397,7 @@
                 const d = await fetchStockData(ticker, reqInterval, range, interval);
                 
                 globalChartData = d; globalTicker = ticker;
+                syncFavBtn(globalTicker);
                 updateStatus("LIVE DATA", "bg-emerald-500");
                 renderDashboard(ticker, d);
                 
