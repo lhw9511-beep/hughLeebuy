@@ -696,7 +696,8 @@
 
             <div class="expert-only glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
                 <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">과거 모의 투자 결과 그래프 (Base 100)</h3>
-                <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
+                <p class="text-[0.6rem] text-themeMuted mt-1 mb-1 text-center">※ 포트폴리오 수익 곡선은 참고용 추정치이며 실제 검증된 백테스트 결과가 아닙니다.</p>
+<div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
             </div>
         </div>
 
@@ -1261,15 +1262,15 @@
             if (isNaN(val) || val === null || val === undefined) return { sig, text, color, weight: 0 };
 
             if (type === 'VIX') {
-                if (val >= 25) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; } else if (val <= 15) { sig = 'SELL'; text = '탐욕 (매도)'; color = 'var(--down)'; }
+                if (val >= 30) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; } else if (val <= 20) { sig = 'SELL'; text = '탐욕 (매도)'; color = 'var(--down)'; }
             } else if (type === 'FNG') {
-                if (val <= 45) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; } else if (val >= 55) { sig = 'SELL'; text = '탐욕 (매도)'; color = 'var(--down)'; }
+                if (val <= 44) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; } else if (val >= 56) { sig = 'SELL'; text = '탐욕 (매도)'; color = 'var(--down)'; }
             } else if (type === 'VOL') {
                 if (val < 40) { sig = 'BUY'; text = '안정 (매수)'; color = 'var(--up)'; } else if (val > 80) { sig = 'SELL'; text = '위험 (매도)'; color = 'var(--down)'; }
             } else if (type === 'DIST') {
                 if (val > 0) { sig = 'BUY'; text = '상향돌파 (매수)'; color = 'var(--up)'; } else if (val < 0) { sig = 'SELL'; text = '하향돌파 (매도)'; color = 'var(--down)'; }
             } else if (type === 'RSI') {
-                if (val < 40) { sig = 'BUY'; text = '과매도 (매수)'; color = 'var(--up)'; } else if (val > 60) { sig = 'SELL'; text = '과매수 (매도)'; color = 'var(--down)'; }
+                if (val < 30) { sig = 'BUY'; text = '과매도 (매수)'; color = 'var(--up)'; } else if (val > 70) { sig = 'SELL'; text = '과매수 (매도)'; color = 'var(--down)'; }
             } else if (type === 'MACD') {
                 if (val > 0) { sig = 'BUY'; text = '상향돌파 (매수)'; color = 'var(--up)'; } else if (val < 0) { sig = 'SELL'; text = '하향돌파 (매도)'; color = 'var(--down)'; }
             } else if (type === 'BB') {
@@ -1684,8 +1685,8 @@
                     const dist = ((currentPriceForDist - sma) / sma) * 100;
                     
                     let bbStr = "MID";
-                    if(bb.upper[last] !== null && closes[last] >= bb.upper[last] * 0.98) bbStr = "UPPER";
-                    else if(bb.lower[last] !== null && closes[last] <= bb.lower[last] * 1.02) bbStr = "LOWER";
+                    if(bb.upper[last] !== null && closes[last] >= bb.upper[last]) bbStr = "UPPER";
+                    else if(bb.lower[last] !== null && closes[last] <= bb.lower[last]) bbStr = "LOWER";
 
                     const weights = WEIGHT_MATRIX[marketType][timeHorizon];
                     const maxScore = Object.values(weights).reduce((a, b) => a + b, 0); 
@@ -1708,10 +1709,12 @@
 
                     let buyScore = 0, sellScore = 0, breakdown =[];
                     const addScore = (name, s) => {
+                        // normalised contribution: BUY=+weight, SELL=-weight, NEUTRAL=0
+                        let contribution = 0;
                         let valStr = "0.0";
-                        if (s.sig === 'BUY') { buyScore += s.weight; valStr = `+${s.weight.toFixed(1)}`; }
-                        else if (s.sig === 'SELL') { sellScore += s.weight; valStr = `-${s.weight.toFixed(1)}`; }
-                        breakdown.push({name, sig: s.sig, val: valStr, weight: s.weight, raw: s.raw, text: s.text});
+                        if (s.sig === 'BUY') { contribution = s.weight; buyScore += s.weight; valStr = `+${s.weight.toFixed(1)}`; }
+                        else if (s.sig === 'SELL') { contribution = -s.weight; sellScore += s.weight; valStr = `-${s.weight.toFixed(1)}`; }
+                        breakdown.push({name, sig: s.sig, val: valStr, weight: s.weight, raw: s.raw, text: s.text, contribution});
                     };
 
                     addScore(marketType === 'stock' ? 'VIX' : 'VOL', sigs.macro);
@@ -1719,14 +1722,15 @@
 
                     const diff = buyScore - sellScore;
                     let st = "HOLD"; 
-                    if (diff >= 15) st = "STRONG BUY"; else if (diff > 5) st = "BUY"; else if (diff <= -15) st = "STRONG BYE"; else if (diff < -5) st = "BYE";
+                    const stBound = maxScore * 0.40; const buyBound = maxScore * 0.15;
+                    if (diff >= stBound) st = "STRONG BUY"; else if (diff > buyBound) st = "BUY"; else if (diff <= -stBound) st = "STRONG BYE"; else if (diff < -buyBound) st = "BYE";
                     const pct = Math.max(0, Math.min(100, 50 + (diff / maxScore) * 50));
                     return { status: st, buyScore, sellScore, diff, pct, maxScore, breakdown };
                 };
 
                 const stRes = analyze(dData, 'short', { ma: 20, rsi: 14, stoch: 14 }, dData);
-                const mtRes = analyze(wData, 'mid', { ma: 50, rsi: 14, stoch: 14 }, dData);
-                const ltRes = analyze(mData, 'long', { ma: 120, rsi: 14, stoch: 14 }, dData);
+                const mtRes = analyze(wData, 'mid', { ma: 50, rsi: 21, stoch: 21 }, dData);
+                const ltRes = analyze(mData, 'long', { ma: 120, rsi: 28, stoch: 28 }, dData);
                 
                 const summaries = { short: { s: "단기 모멘텀 및 심리 지표 기반", a: "" }, mid: { s: "중기 추세 및 모멘텀 기반", a: "" }, long: { s: "장기 사이클 및 평균 회귀 기반", a: "" } };
 
@@ -1975,6 +1979,7 @@
                     }
                 },
                 legend: { data:['S&P 500 (SPY)', 'All-Weather', 'BAA (Bold)', 'MDD (BAA)'], textStyle: { color: chartTextColor, fontSize: 10 }, top: 0 },
+                /* NOTE: pfSimData values are illustrative estimates, not verified backtest results */
                 grid: { left: '3%', right: '3%', top: '15%', bottom: '5%', containLabel: true },
                 xAxis: { type: 'category', data: pfSimYears, axisLabel: { color: chartTextColor } },
                 yAxis:[
