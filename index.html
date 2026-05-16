@@ -893,7 +893,7 @@
             crypto: { short: { VOL: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, MACD: 7, DIST: 8, BB: 6 }, mid: { VOL: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 8.5, DIST: 9, BB: 4 }, long: { VOL: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 8, DIST: 9.5, BB: 2 } }
         };
 
-        let globalVix = null, globalFng = null, globalCryptoFng = null;
+        let globalVix = null, globalFng = null, globalCryptoFng = null, globalStockFngSource = 'unavailable';
 
         const pfSimYears =["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024", "2025", "2026"];
         const pfSimData = {
@@ -1150,14 +1150,21 @@
 
                 const spyCloses = extractCleanData(spyData).closes;
                 const rsiArr = Indicator.rsi(spyCloses, 14);
-                const spyRsi = rsiArr[rsiArr.length - 1] || 50;
+                const spyRsi = rsiArr[rsiArr.length - 1] || 50;                renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
 
-                let vixScore = Math.max(0, Math.min(100, ((35 - globalVix) / 25) * 100));
-                let rsiScore = Math.max(0, Math.min(100, ((spyRsi - 30) / 40) * 100));
-                globalFng = Math.round((vixScore + rsiScore) / 2);
-
-                renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
-                renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
+                const cnnExactFng = await fetchCnnFearGreedExact();
+                if (cnnExactFng != null) {
+                    globalFng = cnnExactFng;
+                    globalStockFngSource = 'cnn';
+                    renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
+                } else {
+                    globalFng = 50;
+                    globalStockFngSource = 'unavailable';
+                    const fngEl = document.getElementById('val-fng');
+                    if (fngEl) {
+                        fngEl.innerHTML = '<span class="text-yellow-400 font-black">CNN 확인</span><span class="text-[0.55rem] text-themeMuted mt-1">원본 링크 ↗</span>';
+                    }
+                }
                 lastMacroFetch = Date.now();
             } catch(e) { 
                 logError("Macro Error", e, "fetchMacroData"); 
@@ -2511,8 +2518,8 @@
             // FNG 전용: 실시간 수치 + 근거 + 출처 링크
             if (type === 'fng') {
                 const isStock = (marketType !== 'crypto');
-                const curVal = isStock ? globalFng : globalCryptoFng;
-                const valLabel = curVal == null ? '로딩중...' : curVal;
+                const curVal = isStock ? (globalStockFngSource === 'cnn' ? globalFng : null) : globalCryptoFng;
+                const valLabel = curVal == null ? (isStock ? '직접 확인' : '로딩중...') : curVal;
                 let fngLevel = '';
                 if (curVal != null) {
                     if (curVal <= 24)      fngLevel = '😱 극도의 공포 (Extreme Fear)';
@@ -2535,7 +2542,7 @@
                     + '<pre style="font-size:0.78rem;white-space:pre-wrap;color:var(--text-sub);margin-bottom:14px">' + compText + '</pre>'
                     + '<div style="font-size:0.78rem;color:#aaa;margin-bottom:6px;font-weight:700">🔗 출처 (직접 확인)</div>'
                     + '<a href="' + srcUrl + '" target="_blank" rel="noopener" style="color:var(--accent);font-size:0.85rem;text-decoration:underline">' + srcName + ' ↗</a>'
-                    + '<div style="font-size:0.7rem;color:#888;margin-top:10px">※ 앱 내 수치는 API를 통해 자동 수집되며,<br>실제 지수와 최대 1-2pt 차이가 있을 수 있습니다.</div>'
+                    + '<div style="font-size:0.7rem;color:#888;margin-top:10px">' + (isStock ? '※ 주식 공포탐욕은 CNN 원본값 파싱 성공 시에만 숫자를 표시합니다.<br>실패하면 숫자 대신 직접 확인 링크만 보여줍니다.' : '※ 코인 공포탐욕은 Alternative.me 기준값입니다.') + '</div>'
                     + '</div>';
                 document.getElementById('info-body').innerHTML = bodyHtml;
                 document.getElementById('info-modal').style.display = 'flex';
