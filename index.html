@@ -798,7 +798,6 @@
                 </div>
 
                 <div id="baa-live-result" style="display:none" class="">
-                    <!-- 캐시 상태 배너 -->
                     <div id="baa-cache-banner" style="display:none" class="flex items-center justify-between gap-2 mb-3 px-3 py-2 rounded-xl bg-accent/10 border border-accent/30 text-[0.7rem]">
                         <div class="flex items-center gap-2">
                             <svg class="w-3.5 h-3.5 text-accent shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
@@ -2494,7 +2493,7 @@
                         resultBox.style.display = 'block';
                         idle.style.display = 'none'; loading.style.display = 'none';
                         const _bn = document.getElementById('baa-cache-banner');
-                        if (_bn) { _bn.style.display='flex'; _bn.querySelector('span').textContent = '💾 ' + _cr.month + ' 월말 기준 저장됨 — 다음 달이 되면 자동 재계산'; }
+                        if (_bn) { _bn.style.display='flex'; _bn.querySelector('span').textContent = '💾 ' + _cr.month + ' 월말 기준 저장됨  (매월 자동갱신)'; }
                         return;
                     }
                 } catch(e) {}
@@ -2948,7 +2947,7 @@
                 const _prevMonth = (() => { const d = new Date(_sNow.getFullYear(), _sNow.getMonth(), 0); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); })();
                 safeStorageSet(_sKey, JSON.stringify({ html: resultBox.innerHTML, month: _prevMonth, proofs: baaProofs }));
                 const _bn2 = document.getElementById('baa-cache-banner');
-                if (_bn2) { _bn2.style.display='flex'; _bn2.querySelector('span').textContent = '💾 ' + _prevMonth + ' 월말 기준 저장됨 — 다음 달이 되면 자동 재계산'; }
+                if (_bn2) { _bn2.style.display='flex'; _bn2.querySelector('span').textContent = '💾 ' + _prevMonth + ' 월말 기준 저장됨  (매월 자동갱신)'; }
                 resultBox.style.display = 'block';
 
             } catch (error) {
