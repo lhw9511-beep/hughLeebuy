@@ -2730,23 +2730,40 @@
                         <button onclick="showOffProof()" class="text-[0.7rem] text-accent underline mt-1 hover:text-white transition">📊 13종 전체 순위표 보기 →</button>`;
 
                     // ── 공격 유니버스 PROOF 저장 ──
-                    const offRankRows = offScores.map((x, i) => `
-                        <tr class="${x.t===winner.t ? 'bg-accent/10 border-accent/30' : 'border-themeBorder/30'} border-b hover:bg-white/5 transition">
-                            <td class="py-2 px-3 text-center font-black ${i===0?'text-accent text-lg':'text-themeMuted'}">${i===0?'🥇':i+1}</td>
-                            <td class="py-2 font-black text-sm ${i===0?'text-accent':''}">${x.t} <span class="text-[0.6rem] text-themeMuted font-normal">${winnerName[x.t]||''}</span></td>
-                            <td class="py-2 text-right font-mono text-[0.7rem] ${x.r1>=0?'text-up':'text-down'}">${(x.r1*100).toFixed(2)}%</td>
-                            <td class="py-2 text-right font-mono text-[0.7rem] ${x.r3>=0?'text-up':'text-down'}">${(x.r3*100).toFixed(2)}%</td>
-                            <td class="py-2 text-right font-mono text-[0.7rem] ${x.r6>=0?'text-up':'text-down'}">${(x.r6*100).toFixed(2)}%</td>
-                            <td class="py-2 text-right font-mono text-[0.7rem] ${x.r12>=0?'text-up':'text-down'}">${(x.r12*100).toFixed(2)}%</td>
-                            <td class="py-2 pr-3 text-right font-black font-mono ${x.score>=0?'text-up':'text-down'}">${x.score.toFixed(2)}</td>
-                            <td class="py-2 pr-3 font-mono text-[0.58rem] text-themeMuted leading-relaxed">
-                                <span class="${(12*(x.r1))>=0?'text-up':'text-down'}">12×${x.r1>=0?'+':''}${(x.r1*100).toFixed(2)}%</span><br>
-                                <span class="${(4*(x.r3))>=0?'text-up':'text-down'}">+4×${x.r3>=0?'+':''}${(x.r3*100).toFixed(2)}%</span><br>
-                                <span class="${(2*(x.r6))>=0?'text-up':'text-down'}">+2×${x.r6>=0?'+':''}${(x.r6*100).toFixed(2)}%</span><br>
-                                <span class="${(x.r12)>=0?'text-up':'text-down'}">+1×${x.r12>=0?'+':''}${(x.r12*100).toFixed(2)}%</span><br>
-                                <span class="text-themeText font-black">= ${x.score.toFixed(2)}</span>
-                            </td>
-                        </tr>`).join('');
+                    const buildOffRow = (x, i) => {
+                        const isWinner = x.t === winner.t;
+                        const trCls = isWinner ? 'bg-accent/10 border-accent/30' : 'border-themeBorder/30';
+                        const rankCls = i===0 ? 'text-accent text-lg' : 'text-themeMuted';
+                        const nameCls = i===0 ? 'text-accent' : '';
+                        const c1 = x.r1>=0?'text-up':'text-down';
+                        const c3 = x.r3>=0?'text-up':'text-down';
+                        const c6 = x.r6>=0?'text-up':'text-down';
+                        const c12= x.r12>=0?'text-up':'text-down';
+                        const cs = x.score>=0?'text-up':'text-down';
+                        const s1 = (x.r1*100).toFixed(2);
+                        const s3 = (x.r3*100).toFixed(2);
+                        const s6 = (x.r6*100).toFixed(2);
+                        const s12= (x.r12*100).toFixed(2);
+                        const sc = x.score.toFixed(2);
+                        const p1 = x.r1>=0?'+':''; const p3=x.r3>=0?'+':''; const p6=x.r6>=0?'+':''; const p12=x.r12>=0?'+':'';
+                        return '<tr class="' + trCls + ' border-b hover:bg-white/5 transition">'
+                            + '<td class="py-2 px-3 text-center font-black ' + rankCls + '">' + (i===0?'🥇':i+1) + '</td>'
+                            + '<td class="py-2 font-black text-sm ' + nameCls + '">' + x.t + ' <span class="text-[0.6rem] text-themeMuted font-normal">' + (winnerName[x.t]||'') + '</span></td>'
+                            + '<td class="py-2 text-right font-mono text-[0.7rem] ' + c1 + '">' + s1 + '%</td>'
+                            + '<td class="py-2 text-right font-mono text-[0.7rem] ' + c3 + '">' + s3 + '%</td>'
+                            + '<td class="py-2 text-right font-mono text-[0.7rem] ' + c6 + '">' + s6 + '%</td>'
+                            + '<td class="py-2 text-right font-mono text-[0.7rem] ' + c12 + '">' + s12 + '%</td>'
+                            + '<td class="py-2 pr-3 text-right font-black font-mono ' + cs + '">' + sc + '</td>'
+                            + '<td class="py-2 px-3 font-mono text-[0.58rem] leading-relaxed">'
+                            + '<span class="' + c1 + '">12×' + p1 + s1 + '%</span><br>'
+                            + '<span class="' + c3 + '">+4×' + p3 + s3 + '%</span><br>'
+                            + '<span class="' + c6 + '">+2×' + p6 + s6 + '%</span><br>'
+                            + '<span class="' + c12 + '">+1×' + p12 + s12 + '%</span><br>'
+                            + '<span class="text-themeText font-black">= ' + sc + '</span>'
+                            + '</td>'
+                            + '</tr>';
+                    };
+                    const offRankRows = offScores.map((x, i) => buildOffRow(x, i)).join('');
 
                     baaProofs['__OFF__'] = `
                         <div class="space-y-4 text-sm text-themeText">
