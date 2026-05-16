@@ -444,7 +444,7 @@
                             <div class="weight-badge">9.0</div><p class="stat-label">VIX 지수</p><p id="val-vix" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('fng', 'stock')">
-                            <div class="weight-badge">8.5</div><p class="stat-label">공포/탐욕</p><p id="val-fng" class="stat-value text-themeText">---</p>
+                            <div class="weight-badge">8.5</div><p class="stat-label">공포/탐욕</p><p id="val-fng" class="stat-value text-themeText">---</p><div class="mt-2 flex items-center gap-1" onclick="event.stopPropagation()"><input type="number" id="stock-fng-input" min="0" max="100" placeholder="직접입력" class="w-full bg-black/20 border border-themeBorder rounded-lg px-2 py-1 text-[0.7rem] font-bold text-themeText outline-none" onkeydown="if(event.key==='Enter') applyManualStockFng(event)"><button type="button" onclick="applyManualStockFng(event)" class="px-2 py-1 rounded-lg bg-accent text-white text-[0.65rem] font-black shrink-0">적용</button><button type="button" onclick="resetManualStockFng(event)" class="px-2 py-1 rounded-lg bg-themeBorder text-themeText text-[0.65rem] font-black shrink-0">복원</button></div>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('dist', 'stock')">
                             <div class="weight-badge">8.0</div><p class="stat-label">추세선 돌파</p><p id="val-ma-dist" class="stat-value text-themeText">---</p>
@@ -893,7 +893,7 @@
             crypto: { short: { VOL: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, MACD: 7, DIST: 8, BB: 6 }, mid: { VOL: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 8.5, DIST: 9, BB: 4 }, long: { VOL: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 8, DIST: 9.5, BB: 2 } }
         };
 
-        let globalVix = null, globalFng = null, globalCryptoFng = null, globalStockFngMeta = null;
+        let globalVix = null, globalFng = null, globalCryptoFng = null, globalStockFngMeta = null, globalStockFngDefaultMeta = null, isManualStockFng = false;
 
         const pfSimYears =["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024", "2025", "2026"];
         const pfSimData = {
@@ -1123,16 +1123,65 @@
         let lastMacroFetch = 0;
         let isFetchingMacro = false;
 
+        function getFngLabelFromScore(score) {
+            if (score == null || Number.isNaN(score)) return '';
+            if (score <= 24) return 'Extreme Fear';
+            if (score <= 44) return 'Fear';
+            if (score <= 55) return 'Neutral';
+            if (score <= 74) return 'Greed';
+            return 'Extreme Greed';
+        }
+
         async function fetchStoredStockFng() {
             const res = await fetch(`./data/cnn-fng.json?_t=${Date.now()}`);
             if (!res.ok) throw new Error('cnn-fng.json load failed');
             const data = await res.json();
             if (data && typeof data.score === 'number') {
-                globalFng = Math.round(data.score);
-                globalStockFngMeta = data;
+                globalStockFngDefaultMeta = data;
+                if (!isManualStockFng) {
+                    globalFng = Math.round(data.score);
+                    globalStockFngMeta = data;
+                }
                 return data;
             }
             throw new Error('invalid cnn-fng.json');
+        }
+
+        function applyManualStockFng(event) {
+            if (event) event.stopPropagation();
+            const input = document.getElementById('stock-fng-input');
+            if (!input) return;
+            const value = Number(input.value);
+            if (!Number.isFinite(value) || value < 0 || value > 100) {
+                alert('공포탐욕 수치는 0~100 사이로 입력하세요.');
+                input.focus();
+                return;
+            }
+            globalFng = Math.round(value);
+            isManualStockFng = true;
+            globalStockFngMeta = {
+                score: globalFng,
+                rating: getFngLabelFromScore(globalFng),
+                updated_at: new Date().toISOString(),
+                source: 'manual-ui',
+                source_url: 'https://www.cnn.com/markets/fear-and-greed',
+                note: 'Manual UI override'
+            };
+            renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
+            updateSummaryUI('stock');
+        }
+
+        function resetManualStockFng(event) {
+            if (event) event.stopPropagation();
+            isManualStockFng = false;
+            const input = document.getElementById('stock-fng-input');
+            if (input) input.value = '';
+            if (globalStockFngDefaultMeta && typeof globalStockFngDefaultMeta.score === 'number') {
+                globalFng = Math.round(globalStockFngDefaultMeta.score);
+                globalStockFngMeta = globalStockFngDefaultMeta;
+                renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
+                updateSummaryUI('stock');
+            }
         }
 
         async function fetchMacroData() {
@@ -2552,7 +2601,7 @@
                     + '<pre style="font-size:0.78rem;white-space:pre-wrap;color:var(--text-sub);margin-bottom:14px">' + compText + '</pre>'
                     + '<div style="font-size:0.78rem;color:#aaa;margin-bottom:6px;font-weight:700">🔗 출처 (직접 확인)</div>'
                     + '<a href="' + srcUrl + '" target="_blank" rel="noopener" style="color:var(--accent);font-size:0.85rem;text-decoration:underline">' + srcName + ' ↗</a>'
-                    + (isStock && globalStockFngMeta && globalStockFngMeta.updated_at ? '<div style="font-size:0.72rem;color:#999;margin-top:-4px;margin-bottom:10px">업데이트: ' + globalStockFngMeta.updated_at + '</div>' : '')+ '<div style="font-size:0.7rem;color:#888;margin-top:10px">' + (isStock ? '※ 주식 공포탐욕은 GitHub Actions가 RapidAPI에서 하루 1번만 받아 저장한 값을 표시합니다.' : '※ 코인 공포탐욕은 Alternative.me 기준값입니다.') + '</div>'
+                    + (isStock && globalStockFngMeta && globalStockFngMeta.updated_at ? '<div style="font-size:0.72rem;color:#999;margin-top:-4px;margin-bottom:10px">업데이트: ' + globalStockFngMeta.updated_at + '</div>' : '')+ '<div style="font-size:0.7rem;color:#888;margin-top:10px">' + (isStock ? '※ 주식 공포탐욕은 저장된 값 또는 카드 안에 직접 입력한 값을 표시합니다.' : '※ 코인 공포탐욕은 Alternative.me 기준값입니다.') + '</div>'
                     + '</div>';
                 document.getElementById('info-body').innerHTML = bodyHtml;
                 document.getElementById('info-modal').style.display = 'flex';
