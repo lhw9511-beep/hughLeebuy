@@ -2473,7 +2473,7 @@
             
             // 월간 캐시: 같은 달 재계산 방지
             const _cNow = new Date();
-            const _cKey = 'baaResult_' + _cNow.getFullYear() + '_' + String(_cNow.getMonth()+1).padStart(2,'0');
+            const _cKey = 'baaResult_v2_' + _cNow.getFullYear() + '_' + String(_cNow.getMonth()+1).padStart(2,'0');
             const _cHit = safeStorageGet(_cKey, null);
             if (_cHit) {
                 try {
@@ -2889,7 +2889,7 @@
                 setProgress('baa-progress-bar','baa-progress-text', 100); loading.style.display = 'none';
                 // 이번달 결과 캐시 저장
                 const _sNow = new Date();
-                const _sKey = 'baaResult_' + _sNow.getFullYear() + '_' + String(_sNow.getMonth()+1).padStart(2,'0');
+                const _sKey = 'baaResult_v2_' + _sNow.getFullYear() + '_' + String(_sNow.getMonth()+1).padStart(2,'0');
                 const _prevMonth = (() => { const d = new Date(_sNow.getFullYear(), _sNow.getMonth(), 0); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); })();
                 safeStorageSet(_sKey, JSON.stringify({ html: resultBox.innerHTML, month: _prevMonth, proofs: baaProofs }));
                 const _bn2 = document.getElementById('baa-cache-banner');
