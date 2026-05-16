@@ -974,10 +974,13 @@
         function safeStorageSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
         
         function logError(msg, err, context = "") {
-            console.error(msg, err, context);
             const time = new Date().toLocaleTimeString();
-            let errStr = err ? (err.stack ? err.stack : String(err)) : "Unknown error";
-            errorLogs.unshift(`[${time}] ${msg}\n${errStr}\n`);
+            const errMsg = err ? (err.message || String(err)) : "Unknown";
+            const errType = err ? err.constructor?.name || 'Error' : '';
+            const ctxStr = context ? ` [${context}]` : '';
+            const full = `[${time}]${ctxStr} ${msg} — ${errType}: ${errMsg}`;
+            console.error(full, err);
+            errorLogs.unshift(full + '\n');
             if(errorLogs.length > 20) errorLogs.length = 20; 
             const btn = document.getElementById('btn-show-error');
             if(btn) btn.classList.remove('hidden');
@@ -1562,6 +1565,9 @@
         }
 
         async function loadData(ticker, interval = currentInterval, range = currentRange) {
+            if (!ticker || typeof ticker !== 'string') { console.warn('[loadData] invalid ticker:', ticker); return; }
+            ticker = ticker.trim().toUpperCase();
+            console.log('[loadData] loading:', ticker);
             if (abortController) abortController.abort();
             abortController = new AbortController();
             const loadingOverlay = document.getElementById('loading-overlay');
@@ -1599,6 +1605,12 @@
         }
 
         async function loadCryptoData(ticker, interval = currentCryptoInterval, range = currentCryptoRange) {
+            if (!ticker || typeof ticker !== 'string') { console.warn('[loadCryptoData] invalid ticker:', ticker); return; }
+            ticker = ticker.trim().toUpperCase();
+            const stables = ['USDT-USD','USDC-USD','BUSD-USD','DAI-USD','TUSD-USD'];
+            if (stables.includes(ticker)) { console.warn('[loadCryptoData] skipped stablecoin:', ticker); return; }
+            safeStorageSet('lastCryptoTicker', ticker);
+            console.log('[loadCryptoData] loading:', ticker);
             if (cryptoAbortController) cryptoAbortController.abort();
             cryptoAbortController = new AbortController();
             const loadingOverlay = document.getElementById('crypto-loading-overlay');
@@ -2936,11 +2948,11 @@
                 updatePfCardMetrics(); 
                 
                 const savedTicker = safeStorageGet('lastTicker', 'SPY');
-                const savedCrypto = safeStorageGet('lastCryptoTicker', 'BTC-USD');
-                
+                const _stables = ['USDT-USD','USDC-USD','BUSD-USD','DAI-USD','TUSD-USD'];
+                let savedCrypto = safeStorageGet('lastCryptoTicker', 'BTC-USD');
+                if (_stables.includes(savedCrypto)) { savedCrypto = 'BTC-USD'; safeStorageSet('lastCryptoTicker', 'BTC-USD'); }
                 document.getElementById('ticker-input').value = savedTicker;
                 document.getElementById('crypto-ticker-input').value = savedCrypto;
-                
                 setTimeout(() => loadData(savedTicker), 100);
                 setTimeout(() => loadCryptoData(savedCrypto), 1500);
                 
