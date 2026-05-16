@@ -2677,9 +2677,13 @@
                                 const dm = Object.keys(dMonthly).sort();
                                 const dLen = dm.length;
                                 if (dLen < 13) return { t: dt, score: -9999, proof: null };
-                                const dP0=dMonthly[dm[dLen-1]], dP1=dMonthly[dm[dLen-2]],
-                                      dP3=dMonthly[dm[dLen-4]], dP6=dMonthly[dm[dLen-7]],
-                                      dP12=dMonthly[dm[dLen-13]];
+                                // 전월말 기준 고정
+                                const _dn = new Date();
+                                const _dEnd = _dn.getDate() >= new Date(_dn.getFullYear(), _dn.getMonth()+1, 0).getDate() - 1;
+                                const _dBi = _dEnd ? dLen-1 : dLen-2;
+                                const dP0=dMonthly[dm[_dBi]], dP1=dMonthly[dm[_dBi-1]],
+                                      dP3=dMonthly[dm[_dBi-3]], dP6=dMonthly[dm[_dBi-6]],
+                                      dP12=dMonthly[dm[_dBi-12]];
                                 const r1=(dP0/dP1-1), r3=(dP0/dP3-1), r6=(dP0/dP6-1), r12=(dP0/dP12-1);
                                 const s1=r1*12*100, s3=r3*4*100, s6=r6*2*100, s12=r12*1*100;
                                 const ds = s1+s3+s6+s12;
@@ -2782,8 +2786,11 @@
 
             } catch (error) {
                 console.error("BAA Error", error);
-                setProgress('baa-progress-bar','baa-progress-text', 0); loading.style.display = 'none'; idle.style.display = 'block';
+                setProgress('baa-progress-bar','baa-progress-text', 0);
                 idle.innerHTML = `<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다.<br><span class="text-xs text-gray-500 font-normal mt-1 block">${error.message}</span></p>`;
+                idle.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
             }
         }
 
