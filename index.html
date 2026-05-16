@@ -1564,7 +1564,16 @@
             if(txt) txt.textContent = Math.round(pct) + '%';
         }
 
-        async function loadData(ticker, interval = currentInterval, range = currentRange) {
+        function loadStockChip(ticker) {
+            const t = (ticker || '').trim().toUpperCase();
+            if (!t) return;
+            const input = document.getElementById('ticker-input');
+            if (input) input.value = t;
+            safeStorageSet('lastTicker', t);
+            loadData(t);
+        }
+
+                async function loadData(ticker, interval = currentInterval, range = currentRange) {
             if (!ticker || typeof ticker !== 'string') { console.warn('[loadData] invalid ticker:', ticker); return; }
             ticker = ticker.trim().toUpperCase();
             console.log('[loadData] loading:', ticker);
