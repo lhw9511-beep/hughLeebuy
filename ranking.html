@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko" class="theme-green">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BUY or BYE | 자산 랭킹</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root, .theme-default { --bg-color: #0B0E11; --panel-color: rgba(21, 25, 33, 0.8); --modal-bg: #151921; --text-main: #ffffff; --text-muted: #9CA3AF; --border-color: rgba(255, 255, 255, 0.1); }
+        .theme-light { --bg-color: #f3f4f6; --panel-color: rgba(255, 255, 255, 0.95); --modal-bg: #ffffff; --text-main: #111827; --text-muted: #4b5563; --border-color: rgba(0, 0, 0, 0.15); }
+        .theme-navy { --bg-color: #0f172a; --panel-color: rgba(30, 41, 59, 0.8); --modal-bg: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: rgba(255, 255, 255, 0.1); }
+        .theme-purple { --bg-color: #171026; --panel-color: rgba(37, 26, 58, 0.8); --modal-bg: #251a3a; --text-main: #f3e8ff; --text-muted: #a855f7; --border-color: rgba(255, 255, 255, 0.1); }
+        .theme-green { --bg-color: #022c22; --panel-color: rgba(6, 78, 59, 0.8); --modal-bg: #064e3b; --text-main: #ecfdf5; --text-muted: #34d399; --border-color: rgba(255, 255, 255, 0.1); }
+        html { font-size: 16px; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', 'Pretendard', sans-serif; overflow-x: hidden; }
+        .glass { background: var(--panel-color); backdrop-filter: blur(12px); border: 1px solid var(--border-color); }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+
+        /* 랭킹 테이블 스타일 */
+        .rank-table { width: 100%; border-collapse: collapse; }
+        .rank-table th { font-size: 0.65rem; color: var(--text-muted); font-weight: 900; text-align: left; padding: 10px 8px; border-bottom: 2px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+        .rank-table td { font-size: 0.8rem; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; white-space: nowrap; vertical-align: middle; }
+        .rank-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .rank-num { font-family: 'JetBrains Mono', monospace; font-weight: 900; font-size: 1.1rem; width: 36px; text-align: center; }
+        .rank-1 { color: #F59E0B; }
+        .rank-2 { color: #9CA3AF; }
+        .rank-3 { color: #B45309; }
+        .rank-other { color: var(--text-muted); }
+        .score-pill { display: inline-flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 900; font-size: 0.75rem; padding: 3px 10px; border-radius: 999px; min-width: 60px; }
+        .score-pill-up { background: rgba(38, 166, 154, 0.15); color: #26A69A; border: 1px solid rgba(38,166,154,0.3); }
+        .score-pill-down { background: rgba(239, 83, 80, 0.15); color: #EF5350; border: 1px solid rgba(239,83,80,0.3); }
+        .score-pill-neutral { background: rgba(156,163,175,0.1); color: #9CA3AF; border: 1px solid rgba(156,163,175,0.2); }
+        .signal-strong-buy { color: #10B981; font-weight: 900; font-size: 0.7rem; }
+        .signal-buy { color: #34D399; font-weight: 900; font-size: 0.7rem; }
+        .signal-hold { color: #9CA3AF; font-weight: 900; font-size: 0.7rem; }
+        .signal-sell { color: #F87171; font-weight: 900; font-size: 0.7rem; }
+        .signal-strong-sell { color: #EF4444; font-weight: 900; font-size: 0.7rem; text-shadow: 0 0 8px rgba(239,68,68,0.5); }
+        .bar-wrap { width: 80px; height: 6px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
+        .bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+        .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite; border-radius: 4px; }
+        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        .asset-tag { display: inline-block; font-size: 0.55rem; font-weight: 900; padding: 1px 5px; border-radius: 4px; margin-left: 4px; text-transform: uppercase; vertical-align: middle; }
+        .tag-stock { background: rgba(59,130,246,0.2); color: #60A5FA; }
+        .tag-etf { background: rgba(16,185,129,0.2); color: #34D399; }
+        .tag-bond { background: rgba(245,158,11,0.2); color: #FCD34D; }
+        .tag-gold { background: rgba(234,179,8,0.2); color: #FBBF24; }
+        .tag-crypto { background: rgba(249,115,22,0.2); color: #FB923C; }
+        .btn-back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); font-size: 0.75rem; font-weight: 900; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .btn-back:hover { border-color: #3B82F6; color: var(--text-main); background: rgba(59,130,246,0.1); }
+        .refresh-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.4); border-radius: 10px; color: #60A5FA; font-size: 0.75rem; font-weight: 900; cursor: pointer; transition: all 0.2s; }
+        .refresh-btn:hover { background: rgba(59,130,246,0.3); }
+        .refresh-btn.loading { opacity: 0.6; pointer-events: none; }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        .momentum-bar-wrap { width: 100px; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; display: inline-block; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-3 md:p-5">
+
+<div class="max-w-[1200px] mx-auto w-full flex-grow flex flex-col gap-4">
+
+    <!-- 헤더 -->
+    <div class="flex items-center justify-between flex-wrap gap-3">
+        <div class="flex items-center gap-3">
+            <a href="./index.html" class="btn-back">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                메인으로
+            </a>
+            <div>
+                <h1 class="text-lg md:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                    <span class="text-yellow-400">🏆</span> 13개 자산 AI 모멘텀 랭킹
+                </h1>
+                <p class="text-xs text-gray-400 mt-0.5">야후 파이낸스 실시간 데이터 기반 · RSI + MACD + MA 거리 통합 점수</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span id="updated-label" class="text-xs text-gray-500 font-mono">업데이트 중...</span>
+            <button class="refresh-btn" id="refresh-btn" onclick="runRanking()">
+                <svg id="refresh-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                새로고침
+            </button>
+        </div>
+    </div>
+
+    <!-- 요약 카드 3개 -->
+    <div class="grid grid-cols-3 gap-3">
+        <div class="glass rounded-xl p-3 text-center">
+            <p class="text-xs text-gray-400 font-bold uppercase">TOP 1 자산</p>
+            <p id="top1-name" class="text-base font-black text-yellow-400 mt-1">--</p>
+            <p id="top1-score" class="text-xs text-gray-400 mt-0.5 font-mono">점수: --</p>
+        </div>
+        <div class="glass rounded-xl p-3 text-center">
+            <p class="text-xs text-gray-400 font-bold uppercase">시장 전체 분위기</p>
+            <p id="market-mood" class="text-base font-black mt-1">--</p>
+            <p id="market-mood-sub" class="text-xs text-gray-400 mt-0.5">--</p>
+        </div>
+        <div class="glass rounded-xl p-3 text-center">
+            <p class="text-xs text-gray-400 font-bold uppercase">매수 신호 자산 수</p>
+            <p id="buy-count" class="text-base font-black text-emerald-400 mt-1">-- / 13</p>
+            <p id="sell-count" class="text-xs text-red-400 mt-0.5 font-mono">매도: -- 개</p>
+        </div>
+    </div>
+
+    <!-- 메인 랭킹 테이블 -->
+    <div class="glass rounded-2xl overflow-hidden shadow-xl">
+        <div class="p-3 md:p-4 border-b border-white/10 flex items-center justify-between flex-wrap gap-2">
+            <p class="text-xs font-black text-gray-400 uppercase tracking-widest">AI 모멘텀 종합 순위</p>
+            <div class="flex gap-2 text-xs text-gray-500 flex-wrap">
+                <span>✅ 점수 = RSI(30%) + MACD방향(25%) + 이평선 거리(30%) + 볼린저(15%)</span>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="rank-table" id="rank-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">순위</th>
+                        <th>자산</th>
+                        <th class="text-right">현재가</th>
+                        <th class="text-right">1개월 수익</th>
+                        <th class="text-center">모멘텀 점수</th>
+                        <th class="text-center">AI 신호</th>
+                        <th class="text-center">RSI</th>
+                        <th class="text-center">MACD</th>
+                        <th class="text-center">MA200 대비</th>
+                    </tr>
+                </thead>
+                <tbody id="rank-tbody">
+                    <!-- 로딩 스켈레톤 -->
+                    <tr><td colspan="9" class="text-center py-12 text-gray-500">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                            <p class="text-sm font-bold" id="loading-status">야후 파이낸스에서 13개 자산 데이터를 불러오는 중...</p>
+                            <div class="w-48 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div id="loading-bar" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width:0%"></div>
+                            </div>
+                            <p id="loading-pct" class="text-xs text-blue-400 font-mono">0 / 13</p>
+                        </div>
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 설명 -->
+    <div class="glass rounded-xl p-4 text-xs text-gray-500 leading-relaxed">
+        <p class="font-black text-gray-400 mb-2">📌 점수 계산 방식</p>
+        <ul class="space-y-1 list-disc list-inside">
+            <li><strong class="text-white">RSI 점수 (30%)</strong>: RSI 50 이상이면 긍정, 이하면 부정. 과매도(30이하) 최고점, 과매수(70이상) 최저점</li>
+            <li><strong class="text-white">MACD 방향 (25%)</strong>: MACD 히스토그램이 양수면 상승 에너지, 음수면 하락 에너지</li>
+            <li><strong class="text-white">MA200 대비 거리 (30%)</strong>: 현재가가 200일 이동평균 위에 있으면 긍정, 거리가 클수록 높은 점수</li>
+            <li><strong class="text-white">볼린저밴드 (15%)</strong>: 하단 근처면 매수, 상단 근처면 매도 신호</li>
+        </ul>
+        <p class="mt-2 text-gray-600">※ 이 랭킹은 기술적 지표 기반 참고 자료이며 투자 권유가 아닙니다. 실제 투자 결정은 본인 판단 하에 하세요.</p>
+    </div>
+
+    <div class="text-center text-xs text-gray-600 pb-4">
+        데이터 출처: Yahoo Finance API | 계산: 브라우저 실시간 처리
+    </div>
+</div>
+
+<script>
+    // ── 13개 자산 정의 ──────────────────────────────────────────
+    const ASSETS = [
+        { symbol: 'QQQ',   name: '나스닥 100',     tag: 'etf',    emoji: '📈' },
+        { symbol: 'SPY',   name: 'S&P 500',        tag: 'etf',    emoji: '🇺🇸' },
+        { symbol: 'NVDA',  name: '엔비디아',        tag: 'stock',  emoji: '🟢' },
+        { symbol: 'AAPL',  name: '애플',            tag: 'stock',  emoji: '🍎' },
+        { symbol: 'MSFT',  name: '마이크로소프트',  tag: 'stock',  emoji: '🪟' },
+        { symbol: 'TSLA',  name: '테슬라',          tag: 'stock',  emoji: '⚡' },
+        { symbol: 'GLD',   name: '금',             tag: 'gold',   emoji: '🥇' },
+        { symbol: 'TLT',   name: '미국 장기채',     tag: 'bond',   emoji: '📄' },
+        { symbol: 'BND',   name: '미국 종합채',     tag: 'bond',   emoji: '💼' },
+        { symbol: 'VWO',   name: '신흥국 주식',     tag: 'etf',    emoji: '🌏' },
+        { symbol: 'IEMG',  name: '신흥국 ETF',      tag: 'etf',    emoji: '🌐' },
+        { symbol: 'VEA',   name: '선진국 주식',     tag: 'etf',    emoji: '🇪🇺' },
+        { symbol: 'BTC-USD', name: '비트코인',      tag: 'crypto', emoji: '₿' },
+    ];
+
+    // ── 프록시 경유 데이터 패치 ────────────────────────────────
+    async function fetchYahoo(symbol) {
+        const enc = encodeURIComponent(symbol);
+        const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${enc}?interval=1d&range=1y&includePrePost=false`;
+        const proxies = [
+            `https://corsproxy.io/?url=${encodeURIComponent(rawUrl)}`,
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`,
+            `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(rawUrl)}`
+        ];
+        for (const url of proxies) {
+            try {
+                const ctrl = new AbortController();
+                const tid = setTimeout(() => ctrl.abort(), 12000);
+                const res = await fetch(url, { cache: 'no-store', signal: ctrl.signal });
+                clearTimeout(tid);
+                if (!res.ok) continue;
+                const text = await res.text();
+                if (!text || text.trim().startsWith('<')) continue;
+                const json = JSON.parse(text);
+                if (json?.chart?.result?.[0]) return json.chart.result[0];
+            } catch(e) { continue; }
+        }
+        return null;
+    }
+
+    // 비트코인은 바이낸스 직접 호출
+    async function fetchBinanceBTC() {
+        try {
+            const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=300');
+            if (!res.ok) return null;
+            const data = await res.json();
+            const ts = data.map(k => Math.floor(k[0]/1000));
+            const closes = data.map(k => parseFloat(k[4]));
+            const highs  = data.map(k => parseFloat(k[2]));
+            const lows   = data.map(k => parseFloat(k[3]));
+            return { timestamp: ts, indicators: { quote:[{ high: highs, low: lows, close: closes }], adjclose:[{ adjclose: closes }] } };
+        } catch(e) { return null; }
+    }
+
+    // ── 기술 지표 계산 ─────────────────────────────────────────
+    function sma(arr, p) {
+        return arr.map((_, i) => {
+            if (i < p-1) return null;
+            const sl = arr.slice(i-p+1, i+1).filter(v=>v!==null);
+            return sl.length===p ? sl.reduce((a,b)=>a+b)/p : null;
+        });
+    }
+    function ema(arr, p) {
+        const k = 2/(p+1); let r = Array(arr.length).fill(null);
+        let s = arr.findIndex(v=>v!==null); if(s===-1) return r;
+        r[s]=arr[s];
+        for(let i=s+1;i<arr.length;i++) r[i]=arr[i]*k+r[i-1]*(1-k);
+        return r;
+    }
+    function calcRSI(closes, p=14) {
+        let r=Array(closes.length).fill(null), g=0, l=0;
+        for(let i=1;i<closes.length;i++){
+            let df=closes[i]-closes[i-1], cg=df>0?df:0, cl=df<0?-df:0;
+            g=(g*(p-1)+cg)/p; l=(l*(p-1)+cl)/p;
+            if(i>=p) r[i]=100-(100/(1+g/(l||0.0001)));
+        }
+        return r;
+    }
+    function calcMACD(closes) {
+        const e12=ema(closes,12), e26=ema(closes,26);
+        const line=e12.map((v,i)=>v===null||e26[i]===null?null:v-e26[i]);
+        const sig=ema(line,9);
+        return line.map((v,i)=>v===null||sig[i]===null?null:v-sig[i]);
+    }
+    function calcBB(closes, p=20, m=2) {
+        const sm=sma(closes,p);
+        return closes.map((_, i) => {
+            if(sm[i]===null) return null;
+            const sl=closes.slice(i-p+1,i+1);
+            const std=Math.sqrt(sl.map(v=>(v-sm[i])**2).reduce((a,b)=>a+b)/p);
+            return { upper: sm[i]+m*std, lower: sm[i]-m*std, mid: sm[i] };
+        });
+    }
+
+    // ── 종합 점수 계산 (0 ~ 100) ────────────────────────────────
+    function calcScore(closes) {
+        const n = closes.length;
+        if (n < 30) return null;
+        const last = closes[n-1];
+
+        // RSI
+        const rsiArr = calcRSI(closes, 14);
+        const rsi = rsiArr[n-1];
+        let rsiScore = 50;
+        if (rsi !== null) {
+            if (rsi <= 30) rsiScore = 90;
+            else if (rsi <= 45) rsiScore = 70;
+            else if (rsi <= 55) rsiScore = 50;
+            else if (rsi <= 70) rsiScore = 35;
+            else rsiScore = 10;
+        }
+
+        // MACD
+        const macdHist = calcMACD(closes);
+        const macdVal = macdHist[n-1];
+        let macdScore = 50;
+        if (macdVal !== null) macdScore = macdVal > 0 ? Math.min(85, 55 + Math.abs(macdVal/last)*500) : Math.max(15, 45 - Math.abs(macdVal/last)*500);
+
+        // MA200 대비 거리
+        const ma200 = sma(closes, Math.min(200, n));
+        const ma200Last = ma200[n-1];
+        let maScore = 50;
+        if (ma200Last !== null) {
+            const pct = (last - ma200Last) / ma200Last * 100;
+            if (pct > 20) maScore = 90;
+            else if (pct > 10) maScore = 75;
+            else if (pct > 0) maScore = 60;
+            else if (pct > -10) maScore = 40;
+            else if (pct > -20) maScore = 25;
+            else maScore = 10;
+        }
+
+        // 볼린저
+        const bbArr = calcBB(closes);
+        const bb = bbArr[n-1];
+        let bbScore = 50;
+        if (bb !== null && bb.upper !== bb.lower) {
+            const pos = (last - bb.lower) / (bb.upper - bb.lower); // 0=하단, 1=상단
+            if (pos <= 0.1) bbScore = 90;
+            else if (pos <= 0.3) bbScore = 70;
+            else if (pos <= 0.7) bbScore = 50;
+            else if (pos <= 0.9) bbScore = 30;
+            else bbScore = 10;
+        }
+
+        const total = rsiScore*0.30 + macdScore*0.25 + maScore*0.30 + bbScore*0.15;
+
+        // 1개월 수익률
+        const prev = closes[Math.max(0, n-22)];
+        const ret1m = prev ? (last/prev-1)*100 : null;
+
+        // MA200 거리 %
+        const ma200Pct = ma200Last ? (last - ma200Last)/ma200Last*100 : null;
+
+        return {
+            score: Math.round(total),
+            rsi: rsi !== null ? rsi.toFixed(1) : '--',
+            macd: macdVal !== null ? (macdVal >= 0 ? '▲ 상승' : '▼ 하락') : '--',
+            macdRaw: macdVal,
+            ret1m: ret1m,
+            ma200Pct: ma200Pct,
+            lastPrice: last
+        };
+    }
+
+    // ── 점수 → 신호 변환 ──────────────────────────────────────
+    function scoreToSignal(score) {
+        if (score >= 72) return { text: '⚡ STRONG BUY', cls: 'signal-strong-buy' };
+        if (score >= 58) return { text: '✅ BUY',        cls: 'signal-buy' };
+        if (score >= 43) return { text: '⏸ HOLD',       cls: 'signal-hold' };
+        if (score >= 28) return { text: '⚠️ SELL',      cls: 'signal-sell' };
+        return                  { text: '🚨 STRONG SELL', cls: 'signal-strong-sell' };
+    }
+
+    // ── 랭킹 실행 ──────────────────────────────────────────────
+    let isRunning = false;
+    async function runRanking() {
+        if (isRunning) return;
+        isRunning = true;
+
+        const btn = document.getElementById('refresh-btn');
+        const icon = document.getElementById('refresh-icon');
+        if (btn) btn.classList.add('loading');
+        if (icon) icon.classList.add('spin');
+
+        const tbody = document.getElementById('rank-tbody');
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-12 text-gray-500">
+            <div class="flex flex-col items-center gap-3">
+                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                <p class="text-sm font-bold" id="loading-status">데이터 로딩 중...</p>
+                <div class="w-48 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div id="loading-bar" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width:0%"></div>
+                </div>
+                <p id="loading-pct" class="text-xs text-blue-400 font-mono">0 / ${ASSETS.length}</p>
+            </div>
+        </td></tr>`;
+
+        const results = [];
+        let done = 0;
+
+        for (const asset of ASSETS) {
+            const bar = document.getElementById('loading-bar');
+            const pct = document.getElementById('loading-pct');
+            const st  = document.getElementById('loading-status');
+            if (bar) bar.style.width = (done/ASSETS.length*100) + '%';
+            if (pct) pct.textContent = `${done} / ${ASSETS.length}`;
+            if (st)  st.textContent  = `${asset.name} (${asset.symbol}) 불러오는 중...`;
+
+            try {
+                let raw;
+                if (asset.symbol === 'BTC-USD') raw = await fetchBinanceBTC();
+                else raw = await fetchYahoo(asset.symbol);
+
+                if (!raw) throw new Error('no data');
+
+                const adjArr = raw.indicators?.adjclose?.[0]?.adjclose || raw.indicators?.quote?.[0]?.close;
+                if (!adjArr || !adjArr.length) throw new Error('no closes');
+
+                // null 제거
+                const closes = adjArr.filter(v => v !== null && !isNaN(v));
+                if (closes.length < 30) throw new Error('too short');
+
+                const calc = calcScore(closes);
+                if (!calc) throw new Error('calc failed');
+
+                results.push({ ...asset, ...calc, error: false });
+            } catch(e) {
+                results.push({ ...asset, score: null, error: true, lastPrice: null, ret1m: null, rsi: '--', macd: '--', ma200Pct: null, macdRaw: null });
+            }
+            done++;
+        }
+
+        // 점수 기준 정렬 (null은 맨 뒤)
+        results.sort((a,b) => {
+            if (a.score === null && b.score === null) return 0;
+            if (a.score === null) return 1;
+            if (b.score === null) return -1;
+            return b.score - a.score;
+        });
+
+        // 요약 카드 업데이트
+        const validResults = results.filter(r=>!r.error&&r.score!==null);
+        if (validResults.length > 0) {
+            const top = validResults[0];
+            document.getElementById('top1-name').textContent = `${top.emoji} ${top.symbol}`;
+            document.getElementById('top1-score').textContent = `점수: ${top.score}점`;
+
+            const avgScore = validResults.reduce((a,b)=>a+b.score,0)/validResults.length;
+            const moodEl = document.getElementById('market-mood');
+            const moodSubEl = document.getElementById('market-mood-sub');
+            if (avgScore >= 60) { moodEl.textContent = '😊 강세장'; moodEl.className = 'text-base font-black text-emerald-400 mt-1'; moodSubEl.textContent = `평균 점수 ${avgScore.toFixed(0)}`; }
+            else if (avgScore >= 48) { moodEl.textContent = '😐 중립'; moodEl.className = 'text-base font-black text-gray-300 mt-1'; moodSubEl.textContent = `평균 점수 ${avgScore.toFixed(0)}`; }
+            else { moodEl.textContent = '😨 약세장'; moodEl.className = 'text-base font-black text-red-400 mt-1'; moodSubEl.textContent = `평균 점수 ${avgScore.toFixed(0)}`; }
+
+            const buyCount  = validResults.filter(r=>r.score>=58).length;
+            const sellCount = validResults.filter(r=>r.score<43).length;
+            document.getElementById('buy-count').textContent  = `${buyCount} / ${validResults.length}`;
+            document.getElementById('sell-count').textContent = `매도: ${sellCount} 개`;
+        }
+
+        // 테이블 렌더링
+        const tagLabel = { stock:'주식', etf:'ETF', bond:'채권', gold:'금', crypto:'코인' };
+        const tagCls   = { stock:'tag-stock', etf:'tag-etf', bond:'tag-bond', gold:'tag-gold', crypto:'tag-crypto' };
+
+        tbody.innerHTML = results.map((r, i) => {
+            const rankNum = r.error || r.score===null ? '-' : (i+1);
+            const rankCls = i===0?'rank-1':(i===1?'rank-2':(i===2?'rank-3':'rank-other'));
+
+            const priceStr = r.lastPrice != null ? `$${r.lastPrice.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}` : '--';
+
+            const ret1mStr = r.ret1m!=null ? `${r.ret1m>=0?'+':''}${r.ret1m.toFixed(1)}%` : '--';
+            const ret1mCol = r.ret1m!=null?(r.ret1m>=0?'#26A69A':'#EF5350'):'#9CA3AF';
+
+            const scoreStr = r.score!=null ? r.score : '--';
+            const scorePill = r.score!=null ? (r.score>=58?'score-pill-up':(r.score<43?'score-pill-down':'score-pill-neutral')) : 'score-pill-neutral';
+            const barW = r.score!=null ? r.score : 0;
+            const barCol = r.score!=null?(r.score>=58?'#26A69A':(r.score<43?'#EF5350':'#9CA3AF')):'#374151';
+
+            const sig = r.score!=null ? scoreToSignal(r.score) : { text:'데이터 없음', cls:'signal-hold' };
+
+            const rsiVal = r.rsi || '--';
+            const rsiColor = rsiVal!='--'?(parseFloat(rsiVal)<30?'#26A69A':(parseFloat(rsiVal)>70?'#EF5350':'#9CA3AF')):'#9CA3AF';
+
+            const macdColor = r.macdRaw!=null?(r.macdRaw>0?'#26A69A':'#EF5350'):'#9CA3AF';
+
+            const ma200Str = r.ma200Pct!=null?`${r.ma200Pct>=0?'+':''}${r.ma200Pct.toFixed(1)}%`:'--';
+            const ma200Col = r.ma200Pct!=null?(r.ma200Pct>=0?'#26A69A':'#EF5350'):'#9CA3AF';
+
+            return `<tr>
+                <td class="rank-num ${rankCls} text-center">${rankNum}</td>
+                <td>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">${r.emoji}</span>
+                        <div>
+                            <div class="font-black text-white text-sm">${r.symbol}<span class="asset-tag ${tagCls[r.tag]}">${tagLabel[r.tag]}</span></div>
+                            <div class="text-xs text-gray-400 mt-0.5">${r.name}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-right font-mono text-sm font-bold text-white">${priceStr}</td>
+                <td class="text-right font-mono text-sm font-bold" style="color:${ret1mCol}">${ret1mStr}</td>
+                <td class="text-center">
+                    <span class="score-pill ${scorePill}">${scoreStr}</span>
+                    <div class="momentum-bar-wrap mt-1"><div style="width:${barW}%;background:${barCol};height:8px;border-radius:4px;transition:width 0.6s"></div></div>
+                </td>
+                <td class="text-center"><span class="${sig.cls}">${sig.text}</span></td>
+                <td class="text-center font-mono text-sm font-bold" style="color:${rsiColor}">${rsiVal}</td>
+                <td class="text-center text-sm font-bold" style="color:${macdColor}">${r.macd||'--'}</td>
+                <td class="text-center font-mono text-sm font-bold" style="color:${ma200Col}">${ma200Str}</td>
+            </tr>`;
+        }).join('');
+
+        const now = new Date();
+        document.getElementById('updated-label').textContent = `최종 업데이트: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+        if (btn) btn.classList.remove('loading');
+        if (icon) icon.classList.remove('spin');
+        isRunning = false;
+    }
+
+    // 페이지 로드 시 자동 실행
+    window.addEventListener('DOMContentLoaded', runRanking);
+</script>
+</body>
+</html>
