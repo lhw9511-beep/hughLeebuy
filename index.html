@@ -1152,11 +1152,26 @@
                 const rsiArr = Indicator.rsi(spyCloses, 14);
                 const spyRsi = rsiArr[rsiArr.length - 1] || 50;
 
-                let vixScore = Math.max(0, Math.min(100, ((35 - globalVix) / 25) * 100));
-                let rsiScore = Math.max(0, Math.min(100, ((spyRsi - 30) / 40) * 100));
-                globalFng = Math.round((vixScore + rsiScore) / 2);
-
+                // VIX는 그대로 표시
                 renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
+
+                // 주식 FNG: alternative.me API 사용 (CNN F&G와 동일한 출처)
+                try {
+                    const fngRes = await fetch(`https://api.alternative.me/fng/?_t=${Date.now()}`);
+                    const fngData = await fngRes.json();
+                    if (fngData && fngData.data && fngData.data[0]) {
+                        globalFng = parseInt(fngData.data[0].value);
+                    } else {
+                        // API 실패 시 VIX+RSI 보조 계산
+                        const vixScore = Math.max(0, Math.min(100, ((35 - globalVix) / 25) * 100));
+                        const rsiScore = Math.max(0, Math.min(100, ((spyRsi - 30) / 40) * 100));
+                        globalFng = Math.round((vixScore + rsiScore) / 2);
+                    }
+                } catch(fngErr) {
+                    const vixScore = Math.max(0, Math.min(100, ((35 - globalVix) / 25) * 100));
+                    const rsiScore = Math.max(0, Math.min(100, ((spyRsi - 30) / 40) * 100));
+                    globalFng = Math.round((vixScore + rsiScore) / 2);
+                }
                 renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
                 lastMacroFetch = Date.now();
             } catch(e) { 
