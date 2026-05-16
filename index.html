@@ -2471,6 +2471,22 @@
             const resultBox = document.getElementById('baa-live-result');
             const loadingText = document.getElementById('baa-live-loading-text');
             
+            // 월간 캐시: 같은 달 재계산 방지
+            const _cNow = new Date();
+            const _cKey = 'baaResult_' + _cNow.getFullYear() + '_' + String(_cNow.getMonth()+1).padStart(2,'0');
+            const _cHit = safeStorageGet(_cKey, null);
+            if (_cHit) {
+                try {
+                    const _cr = JSON.parse(_cHit);
+                    resultBox.innerHTML = _cr.html;
+                    resultBox.style.display = 'block';
+                    idle.style.display = 'none'; loading.style.display = 'none';
+                    const _bn = document.getElementById('baa-cache-banner');
+                    if (_bn) { _bn.style.display='flex'; _bn.querySelector('span').textContent = _cr.month + ' 월말 기준 캐시 (매월말 자동갱신)'; }
+                    return;
+                } catch(e) {}
+            }
+
             idle.style.display = 'none'; resultBox.style.display = 'none'; loading.style.display = 'flex';
 
             const canaries =['SPY', 'VEA', 'VWO', 'BND'];
@@ -2514,15 +2530,17 @@
                     }
 
                     let sortedMonths = Object.keys(monthlyData).sort();
-                    
                     const len = sortedMonths.length;
                     if(len < 13) throw new Error(`[${ticker}] 데이터 부족 (최소 13개월 필요)`);
-
-                    const M0 = monthlyData[sortedMonths[len - 1]];
-                    const M1 = monthlyData[sortedMonths[len - 2]];
-                    const M3 = monthlyData[sortedMonths[len - 4]];
-                    const M6 = monthlyData[sortedMonths[len - 7]];
-                    const M12 = monthlyData[sortedMonths[len - 13]];
+                    // BAA 원칙: 전월말 기준 고정 (이번달 미완성 데이터 제외)
+                    const _now2 = new Date();
+                    const _isEnd = _now2.getDate() >= new Date(_now2.getFullYear(), _now2.getMonth()+1, 0).getDate() - 1;
+                    const _bi = _isEnd ? len - 1 : len - 2;
+                    const M0 = monthlyData[sortedMonths[_bi]];
+                    const M1 = monthlyData[sortedMonths[_bi - 1]];
+                    const M3 = monthlyData[sortedMonths[_bi - 3]];
+                    const M6 = monthlyData[sortedMonths[_bi - 6]];
+                    const M12 = monthlyData[sortedMonths[_bi - 12]];
 
                     const P0 = M0.close; const D0 = M0.date;
                     const P1 = M1.close; const D1 = M1.date;
@@ -2752,7 +2770,15 @@
                     }
                 }
                 if(rebEl) rebEl.innerText = getNextRebalanceKST();
-                setProgress('baa-progress-bar','baa-progress-text', 100); loading.style.display = 'none'; resultBox.style.display = 'block';
+                setProgress('baa-progress-bar','baa-progress-text', 100); loading.style.display = 'none';
+                // 이번달 결과 캐시 저장
+                const _sNow = new Date();
+                const _sKey = 'baaResult_' + _sNow.getFullYear() + '_' + String(_sNow.getMonth()+1).padStart(2,'0');
+                const _prevMonth = (() => { const d = new Date(_sNow.getFullYear(), _sNow.getMonth(), 0); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); })();
+                safeStorageSet(_sKey, JSON.stringify({ html: resultBox.innerHTML, month: _prevMonth }));
+                const _bn2 = document.getElementById('baa-cache-banner');
+                if (_bn2) { _bn2.style.display='flex'; _bn2.querySelector('span').textContent = _prevMonth + ' 월말 기준 (매월말 자동갱신)'; }
+                resultBox.style.display = 'block';
 
             } catch (error) {
                 console.error("BAA Error", error);
