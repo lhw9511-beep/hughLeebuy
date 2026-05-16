@@ -2478,14 +2478,20 @@
             if (_cHit) {
                 try {
                     const _cr = JSON.parse(_cHit);
-                    resultBox.innerHTML = _cr.html;
-                    if (_cr.proofs) baaProofs = _cr.proofs;
-                    resultBox.style.display = 'block';
-                    idle.style.display = 'none'; loading.style.display = 'none';
-                    const _bn = document.getElementById('baa-cache-banner');
-                    if (_bn) { _bn.style.display='flex'; _bn.querySelector('span').textContent = _cr.month + ' 월말 기준 캐시 (매월말 자동갱신)'; }
-                    return;
+                    // proofs 없는 구버전 캐시는 무효화하고 재계산
+                    if (_cr.proofs && Object.keys(_cr.proofs).length > 0) {
+                        resultBox.innerHTML = _cr.html;
+                        baaProofs = _cr.proofs;
+                        resultBox.style.display = 'block';
+                        idle.style.display = 'none'; loading.style.display = 'none';
+                        const _bn = document.getElementById('baa-cache-banner');
+                        if (_bn) { _bn.style.display='flex'; _bn.querySelector('span').textContent = _cr.month + ' 월말 기준 캐시 (매월말 자동갱신)'; }
+                        return;
+                    }
                 } catch(e) {}
+                // 구버전 캐시 삭제
+                safeStorageSet(_cKey, null);
+                _memStore.delete(_cKey);
             }
 
             idle.style.display = 'none'; resultBox.style.display = 'none'; loading.style.display = 'flex';
@@ -2814,12 +2820,7 @@
         }
 
         function showBaaProof(ticker) {
-            const keys = Object.keys(baaProofs);
-            if(!baaProofs[ticker]) {
-                console.warn('[showBaaProof] no proof for', ticker, '| keys:', keys);
-                alert('⚠️ PROOF 없음\n\n클릭한 티커: ' + ticker + '\n저장된 키: ' + (keys.length ? keys.join(', ') : '없음 (계산을 먼저 실행하세요)'));
-                return;
-            }
+            if(!baaProofs[ticker]) { console.warn('[showBaaProof] no proof for', ticker, '| keys:', Object.keys(baaProofs)); return; }
             const label = ticker.startsWith('DEF_') ? ticker.replace('DEF_','') + ' 방어자산 모멘텀 계산' : ticker + ' 모멘텀 계산 증명';
             document.getElementById('modal-title').innerText = label;
             document.getElementById('modal-period').innerText = 'BAA 알고리즘 (13612 공식)';
