@@ -2506,20 +2506,23 @@
                 loadingText.innerHTML = `카나리아 4종 데이터 로딩 중...`;
                 setProgress('baa-progress-bar','baa-progress-text', 5);
                 let baaDone = 0;
-                const baaFetched = await Promise.all(canaries.map(async t => {
+                // 카나리아 + 방어자산 동시 병렬 fetch
+                loadingText.innerHTML = `카나리아 4종 + 방어자산 동시 로딩 중...`;
+                const [baaFetched, _defPrefetch] = await Promise.all([
+                    Promise.all(canaries.map(async t => {
                         let r;
                         try {
                             r = await fetchStockData(t, '1d', '2y');
                         } catch(e1) {
-                            console.warn(`[BAA] ${t} 1차 실패:`, e1.message, '재시도 중...');
-                            loadingText.innerHTML = `${t} 재시도 중...`;
+                            console.warn(`[BAA] ${t} 1차 실패:`, e1.message);
                             r = await fetchStockData(t, '1d', '2y');
                         }
                         baaDone++;
-                        setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*70)+5);
-                        loadingText.innerHTML = `${t} ✓ (${baaDone}/${canaries.length})`;
+                        setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*50)+5);
                         return r;
-                    }));
+                    })),
+                    Promise.all(defenseUniverse.map(dt => fetchStockData(dt, '1d', '2y').catch(() => null)))
+                ]);
                 baaFetched.forEach(d => results.push(d));
                 setProgress('baa-progress-bar','baa-progress-text', 85); loadingText.innerHTML = `점수 계산 중...`;
 
@@ -2670,8 +2673,8 @@
                         <span class="inline-block mt-2 text-[0.7rem] text-accent animate-pulse">⏳ 방어 자산 7종 모멘텀 계산 중...</span>`;
 
                     try {
-                        loadingText.innerHTML = `방어자산 7종 병렬 로딩 중...`;
-                        // ── 7종 병렬 로딩으로 속도 개선 ──
+                        loadingText.innerHTML = `방어자산 모멘텀 계산 중...`;
+                        // 이미 위에서 prefetch됨 - 서버 캐시에서 즉시 반환
                         const defRawAll = await Promise.all(
                             defenseUniverse.map(dt =>
                                 fetchStockData(dt, '1d', '2y').catch(() => null)

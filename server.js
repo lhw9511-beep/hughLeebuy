@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname)));
 
 const cache = new Map();
 const pendingRequests = new Map();
-const CACHE_TTL = 10 * 60 * 1000; // 10분 캐시 유지
+const CACHE_TTL = 60 * 60 * 1000; // 1시간 캐시 유지
 
 // 메모리 누수 방어: 1분마다 만료된 캐시 청소
 setInterval(() => {
