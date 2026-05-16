@@ -20,65 +20,62 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Update daily CNN Fear & Greed cache
-        env:
-          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
-          RAPIDAPI_HOST: ${{ secrets.RAPIDAPI_HOST }}
-          RAPIDAPI_URL: ${{ secrets.RAPIDAPI_URL }}
+      - name: Update daily CNN Fear & Greed cache from CNN page
         run: |
           python - << 'PYEOF'
-          import json, os, urllib.request
+          import json, os, re, urllib.request
           from datetime import datetime, timezone
 
-          key = os.environ.get('RAPIDAPI_KEY')
-          host = os.environ.get('RAPIDAPI_HOST')
-          url = os.environ.get('RAPIDAPI_URL')
-          if not key or not host or not url:
-              raise SystemExit('Missing RAPIDAPI_KEY / RAPIDAPI_HOST / RAPIDAPI_URL repository secrets')
+          url = 'https://www.cnn.com/markets/fear-and-greed'
+          req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+          with urllib.request.urlopen(req, timeout=30) as r:
+              html = r.read().decode('utf-8', errors='ignore')
 
-          req = urllib.request.Request(url, headers={
-              'x-rapidapi-key': key,
-              'x-rapidapi-host': host,
-              'User-Agent': 'Mozilla/5.0'
-          })
-          with urllib.request.urlopen(req, timeout=20) as r:
-              data = json.loads(r.read().decode('utf-8'))
-
-          score = None
-          rating = None
-          checks = [
-              lambda d: (d.get('fear_and_greed', {}) or {}).get('score'),
-              lambda d: (d.get('data', {}) or {}).get('score') if isinstance(d.get('data'), dict) else None,
-              lambda d: (d.get('data', {}) or {}).get('value') if isinstance(d.get('data'), dict) else None,
-              lambda d: d.get('score'),
-              lambda d: d.get('value'),
+          patterns = [
+              r'Fear & Greed Now[:\\s-]*([0-9]{1,3})',
+              r'Fear and Greed Now[:\\s-]*([0-9]{1,3})',
+              r'index\\D{0,40}([0-9]{1,3})\\D{0,40}(?:Extreme Fear|Fear|Neutral|Greed|Extreme Greed)',
+              r'(?:Extreme Fear|Fear|Neutral|Greed|Extreme Greed)\\D{0,40}([0-9]{1,3})',
           ]
-          for fn in checks:
-              try:
-                  v = fn(data)
-                  if v is not None:
-                      score = float(v)
-                      break
-              except Exception:
-                  pass
-
-          if isinstance(data.get('fear_and_greed'), dict):
-              rating = data['fear_and_greed'].get('rating') or data['fear_and_greed'].get('value_classification')
-          if rating is None and isinstance(data.get('data'), dict):
-              rating = data['data'].get('rating') or data['data'].get('value_classification')
-          if rating is None:
-              rating = data.get('rating') or data.get('value_classification') or ''
+          score = None
+          for p in patterns:
+              m = re.search(p, html, re.I | re.S)
+              if m:
+                  try:
+                      v = int(m.group(1))
+                      if 0 <= v <= 100:
+                          score = v
+                          break
+                  except Exception:
+                      pass
 
           if score is None:
-              raise SystemExit(f'Unable to parse score from response: {list(data.keys())[:20]}')
+              nums = [int(x) for x in re.findall(r'>([0-9]{1,3})<', html)]
+              nums = [x for x in nums if 0 <= x <= 100]
+              if nums:
+                  score = nums[0]
+
+          if score is None:
+              raise SystemExit('Unable to parse CNN Fear & Greed score from public page')
+
+          if score <= 24:
+              rating = 'Extreme Fear'
+          elif score <= 44:
+              rating = 'Fear'
+          elif score <= 55:
+              rating = 'Neutral'
+          elif score <= 74:
+              rating = 'Greed'
+          else:
+              rating = 'Extreme Greed'
 
           out = {
-              'score': round(score),
+              'score': score,
               'rating': rating,
               'updated_at': datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
-              'source': 'rapidapi',
-              'source_url': 'https://www.cnn.com/markets/fear-and-greed',
-              'note': 'Daily cached value. Updated by GitHub Actions once per day.'
+              'source': 'cnn-public-page',
+              'source_url': url,
+              'note': 'Daily cached value. Updated by GitHub Actions once per day from CNN public page.'
           }
 
           os.makedirs('data', exist_ok=True)
