@@ -969,8 +969,9 @@
             'baa': { title: 'BAA (Bold Asset Allocation)', type: 'dynamic', rules:[] }
         };
 
-        function safeStorageGet(k, d) { try { return localStorage.getItem(k) || d; } catch(e) { return d; } }
-        function safeStorageSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+        const _memStore = new Map();
+        function safeStorageGet(k, d) { try { const v = localStorage.getItem(k); if (v !== null) return v; } catch(e) {} return _memStore.has(k) ? _memStore.get(k) : d; }
+        function safeStorageSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} _memStore.set(k, v); }
         
         function logError(msg, err, context = "") {
             const time = new Date().toLocaleTimeString();
@@ -2813,7 +2814,7 @@
         }
 
         function showBaaProof(ticker) {
-            if(!baaProofs[ticker]) return;
+            if(!baaProofs[ticker]) { console.warn('[showBaaProof] no proof for', ticker, '| keys:', Object.keys(baaProofs)); return; }
             const label = ticker.startsWith('DEF_') ? ticker.replace('DEF_','') + ' 방어자산 모멘텀 계산' : ticker + ' 모멘텀 계산 증명';
             document.getElementById('modal-title').innerText = label;
             document.getElementById('modal-period').innerText = 'BAA 알고리즘 (13612 공식)';
