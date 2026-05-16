@@ -2,7 +2,7 @@
   "score": 67,
   "rating": "Greed",
   "updated_at": "2026-05-16T00:00:00Z",
-  "source": "rapidapi",
+  "source": "manual-cache",
   "source_url": "https://www.cnn.com/markets/fear-and-greed",
-  "note": "Daily cached value. Updated by GitHub Actions once per day."
+  "note": "Manual cached value. Edit this file directly when you want to change the CNN Fear & Greed score."
 }
