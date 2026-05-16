@@ -893,7 +893,7 @@
             crypto: { short: { VOL: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, MACD: 7, DIST: 8, BB: 6 }, mid: { VOL: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 8.5, DIST: 9, BB: 4 }, long: { VOL: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 8, DIST: 9.5, BB: 2 } }
         };
 
-        let globalVix = null, globalFng = null, globalCryptoFng = null, globalStockFngSource = 'unavailable';
+        let globalVix = null, globalFng = null, globalCryptoFng = null, globalStockFngMeta = null;
 
         const pfSimYears =["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024", "2025", "2026"];
         const pfSimData = {
@@ -1123,13 +1123,27 @@
         let lastMacroFetch = 0;
         let isFetchingMacro = false;
 
+        async function fetchStoredStockFng() {
+            const res = await fetch(`./data/cnn-fng.json?_t=${Date.now()}`);
+            if (!res.ok) throw new Error('cnn-fng.json load failed');
+            const data = await res.json();
+            if (data && typeof data.score === 'number') {
+                globalFng = Math.round(data.score);
+                globalStockFngMeta = data;
+                return data;
+            }
+            throw new Error('invalid cnn-fng.json');
+        }
+
         async function fetchMacroData() {
             if (Date.now() - lastMacroFetch < 60000) {
-                if(globalVix && globalFng) {
+                if (globalVix != null) {
                     renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
+                }
+                if (globalFng != null) {
                     renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
                 }
-                return; 
+                return;
             }
             if (isFetchingMacro) {
                 while(isFetchingMacro) await delay(100);
@@ -1139,35 +1153,31 @@
             try {
                 const macroResults = await Promise.allSettled([
                     fetchStockData('^VIX', '1d', '3mo'),
-                    fetchStockData('SPY', '1d', '3mo'),
+                    fetchStoredStockFng(),
                     fetchExchangeRate()
                 ]);
-                const vixData = macroResults[0].status === 'fulfilled' ? macroResults[0].value : await fetchStockData('^VIX', '1d', '3mo');
-                const spyData = macroResults[1].status === 'fulfilled' ? macroResults[1].value : await fetchStockData('SPY', '1d', '3mo');
-                
-                const vixCloses = extractCleanData(vixData).closes;
-                globalVix = vixCloses[vixCloses.length - 1];
 
-                const spyCloses = extractCleanData(spyData).closes;
-                const rsiArr = Indicator.rsi(spyCloses, 14);
-                const spyRsi = rsiArr[rsiArr.length - 1] || 50;                renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
+                if (macroResults[0].status === 'fulfilled') {
+                    const vixData = macroResults[0].value;
+                    const vixCloses = extractCleanData(vixData).closes;
+                    globalVix = vixCloses[vixCloses.length - 1];
+                    renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
+                }
 
-                const cnnExactFng = await fetchCnnFearGreedExact();
-                if (cnnExactFng != null) {
-                    globalFng = cnnExactFng;
-                    globalStockFngSource = 'cnn';
+                if (macroResults[1].status === 'fulfilled' && globalFng != null) {
                     renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
                 } else {
-                    globalFng = 50;
-                    globalStockFngSource = 'unavailable';
+                    globalFng = null;
+                    globalStockFngMeta = null;
                     const fngEl = document.getElementById('val-fng');
                     if (fngEl) {
-                        fngEl.innerHTML = '<span class="text-yellow-400 font-black">CNN 확인</span><span class="text-[0.55rem] text-themeMuted mt-1">원본 링크 ↗</span>';
+                        fngEl.innerHTML = '<span class="text-yellow-400 font-black">일 1회 업데이트</span><span class="text-[0.55rem] text-themeMuted mt-1">CNN 기준</span>';
                     }
                 }
+
                 lastMacroFetch = Date.now();
-            } catch(e) { 
-                logError("Macro Error", e, "fetchMacroData"); 
+            } catch(e) {
+                logError("Macro Error", e, "fetchMacroData");
             } finally {
                 isFetchingMacro = false;
             }
@@ -2518,8 +2528,8 @@
             // FNG 전용: 실시간 수치 + 근거 + 출처 링크
             if (type === 'fng') {
                 const isStock = (marketType !== 'crypto');
-                const curVal = isStock ? (globalStockFngSource === 'cnn' ? globalFng : null) : globalCryptoFng;
-                const valLabel = curVal == null ? (isStock ? '직접 확인' : '로딩중...') : curVal;
+                const curVal = isStock ? globalFng : globalCryptoFng;
+                const valLabel = curVal == null ? (isStock ? '업데이트 대기' : '로딩중...') : curVal;
                 let fngLevel = '';
                 if (curVal != null) {
                     if (curVal <= 24)      fngLevel = '😱 극도의 공포 (Extreme Fear)';
@@ -2530,19 +2540,19 @@
                 }
                 const srcName  = isStock ? 'CNN Fear & Greed Index' : 'Alternative.me Crypto F&G';
                 const srcUrl   = isStock
-                    ? 'https://edition.cnn.com/markets/fear-and-greed'
+                    ? ((globalStockFngMeta && globalStockFngMeta.source_url) ? globalStockFngMeta.source_url : 'https://edition.cnn.com/markets/fear-and-greed')
                     : 'https://alternative.me/crypto/fear-and-greed-index/';
                 const compText = isStock
                     ? '• 주가 모멘텀 (SPY vs 125일 이동평균)\n• 주가 강도 (52주 신고가 vs 신저가 비율)\n• 풋/콜 옵션 비율 (Put/Call Ratio)\n• 시장 변동성 (VIX)\n• 안전자산 수요 (국채 vs 주식 자금흐름)\n• 정크본드 수요\n• 주가 폭 (McClellan Volume Summation)'
                     : '• 변동성 (Bitcoin 30일 vs 90일 변동성)\n• 시장 모멘텀/거래량\n• SNS 감성 분석\n• 구글 트렌드 (BTC 관련 검색량)\n• 도미넌스 (Bitcoin 시장 점유율)\n• 설문조사';
                 const bodyHtml = '<div style="font-size:0.95rem;line-height:1.8">'
-                    + '<div style="font-size:1.4rem;font-weight:900;margin-bottom:4px">' + valLabel + ' / 100</div>'
-                    + '<div style="font-size:0.9rem;margin-bottom:12px;color:var(--accent)">' + fngLevel + '</div>'
+                    + '<div style="font-size:1.4rem;font-weight:900;margin-bottom:4px">' + (curVal == null ? valLabel : (valLabel + ' / 100')) + '</div>'
+                    + '<div style="font-size:0.9rem;margin-bottom:12px;color:var(--accent)">' + (fngLevel || (isStock ? 'RapidAPI로 일 1회 자동 갱신' : '')) + '</div>'
                     + '<div style="font-size:0.78rem;color:#aaa;margin-bottom:8px;font-weight:700">📊 구성 지표</div>'
                     + '<pre style="font-size:0.78rem;white-space:pre-wrap;color:var(--text-sub);margin-bottom:14px">' + compText + '</pre>'
                     + '<div style="font-size:0.78rem;color:#aaa;margin-bottom:6px;font-weight:700">🔗 출처 (직접 확인)</div>'
                     + '<a href="' + srcUrl + '" target="_blank" rel="noopener" style="color:var(--accent);font-size:0.85rem;text-decoration:underline">' + srcName + ' ↗</a>'
-                    + '<div style="font-size:0.7rem;color:#888;margin-top:10px">' + (isStock ? '※ 주식 공포탐욕은 CNN 원본값 파싱 성공 시에만 숫자를 표시합니다.<br>실패하면 숫자 대신 직접 확인 링크만 보여줍니다.' : '※ 코인 공포탐욕은 Alternative.me 기준값입니다.') + '</div>'
+                    + (isStock && globalStockFngMeta && globalStockFngMeta.updated_at ? '<div style="font-size:0.72rem;color:#999;margin-top:-4px;margin-bottom:10px">업데이트: ' + globalStockFngMeta.updated_at + '</div>' : '')+ '<div style="font-size:0.7rem;color:#888;margin-top:10px">' + (isStock ? '※ 주식 공포탐욕은 GitHub Actions가 RapidAPI에서 하루 1번만 받아 저장한 값을 표시합니다.' : '※ 코인 공포탐욕은 Alternative.me 기준값입니다.') + '</div>'
                     + '</div>';
                 document.getElementById('info-body').innerHTML = bodyHtml;
                 document.getElementById('info-modal').style.display = 'flex';
