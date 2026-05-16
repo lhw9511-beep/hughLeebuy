@@ -2500,7 +2500,20 @@
                 loadingText.innerHTML = `카나리아 4종 데이터 로딩 중...`;
                 setProgress('baa-progress-bar','baa-progress-text', 5);
                 let baaDone = 0;
-                const baaFetched = await Promise.all(canaries.map(t => fetchStockData(t, '1d', '2y').catch(() => fetchStockData(t, '1d', '2y')).then(r => { baaDone++; setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*70)+5); return r; })));
+                const baaFetched = await Promise.all(canaries.map(async t => {
+                        let r;
+                        try {
+                            r = await fetchStockData(t, '1d', '2y');
+                        } catch(e1) {
+                            console.warn(`[BAA] ${t} 1차 실패:`, e1.message, '재시도 중...');
+                            loadingText.innerHTML = `${t} 재시도 중...`;
+                            r = await fetchStockData(t, '1d', '2y');
+                        }
+                        baaDone++;
+                        setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*70)+5);
+                        loadingText.innerHTML = `${t} ✓ (${baaDone}/${canaries.length})`;
+                        return r;
+                    }));
                 baaFetched.forEach(d => results.push(d));
                 setProgress('baa-progress-bar','baa-progress-text', 85); loadingText.innerHTML = `점수 계산 중...`;
 
@@ -2786,9 +2799,14 @@
                 resultBox.style.display = 'block';
 
             } catch (error) {
-                console.error("BAA Error", error);
+                console.error("[BAA] 계산 실패:", error.name, error.message, error.stack);
                 setProgress('baa-progress-bar','baa-progress-text', 0);
-                idle.innerHTML = `<p class="text-down font-bold text-sm">데이터를 불러오지 못했습니다.<br><span class="text-xs text-gray-500 font-normal mt-1 block">${error.message}</span></p>`;
+                idle.innerHTML = `
+                    <div class="text-left space-y-2 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+                        <p class="text-down font-bold text-sm">⚠️ BAA 계산 실패</p>
+                        <p class="text-xs text-gray-300 font-mono break-all">${error.name}: ${error.message}</p>
+                        <button onclick="runBaaLiveCheck()" class="text-xs text-accent underline mt-1">다시 시도</button>
+                    </div>`;
                 idle.style.display = 'block';
             } finally {
                 loading.style.display = 'none';
