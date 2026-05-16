@@ -2814,7 +2814,12 @@
         }
 
         function showBaaProof(ticker) {
-            if(!baaProofs[ticker]) { console.warn('[showBaaProof] no proof for', ticker, '| keys:', Object.keys(baaProofs)); return; }
+            const keys = Object.keys(baaProofs);
+            if(!baaProofs[ticker]) {
+                console.warn('[showBaaProof] no proof for', ticker, '| keys:', keys);
+                alert('⚠️ PROOF 없음\n\n클릭한 티커: ' + ticker + '\n저장된 키: ' + (keys.length ? keys.join(', ') : '없음 (계산을 먼저 실행하세요)'));
+                return;
+            }
             const label = ticker.startsWith('DEF_') ? ticker.replace('DEF_','') + ' 방어자산 모멘텀 계산' : ticker + ' 모멘텀 계산 증명';
             document.getElementById('modal-title').innerText = label;
             document.getElementById('modal-period').innerText = 'BAA 알고리즘 (13612 공식)';
