@@ -1,0 +1,97 @@
+name: update-cnn-fng-daily
+
+on:
+  schedule:
+    - cron: '10 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Update daily CNN Fear & Greed cache
+        env:
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          RAPIDAPI_HOST: ${{ secrets.RAPIDAPI_HOST }}
+          RAPIDAPI_URL: ${{ secrets.RAPIDAPI_URL }}
+        run: |
+          python - << 'PYEOF'
+          import json, os, urllib.request
+          from datetime import datetime, timezone
+
+          key = os.environ.get('RAPIDAPI_KEY')
+          host = os.environ.get('RAPIDAPI_HOST')
+          url = os.environ.get('RAPIDAPI_URL')
+          if not key or not host or not url:
+              raise SystemExit('Missing RAPIDAPI_KEY / RAPIDAPI_HOST / RAPIDAPI_URL repository secrets')
+
+          req = urllib.request.Request(url, headers={
+              'x-rapidapi-key': key,
+              'x-rapidapi-host': host,
+              'User-Agent': 'Mozilla/5.0'
+          })
+          with urllib.request.urlopen(req, timeout=20) as r:
+              data = json.loads(r.read().decode('utf-8'))
+
+          score = None
+          rating = None
+          checks = [
+              lambda d: (d.get('fear_and_greed', {}) or {}).get('score'),
+              lambda d: (d.get('data', {}) or {}).get('score') if isinstance(d.get('data'), dict) else None,
+              lambda d: (d.get('data', {}) or {}).get('value') if isinstance(d.get('data'), dict) else None,
+              lambda d: d.get('score'),
+              lambda d: d.get('value'),
+          ]
+          for fn in checks:
+              try:
+                  v = fn(data)
+                  if v is not None:
+                      score = float(v)
+                      break
+              except Exception:
+                  pass
+
+          if isinstance(data.get('fear_and_greed'), dict):
+              rating = data['fear_and_greed'].get('rating') or data['fear_and_greed'].get('value_classification')
+          if rating is None and isinstance(data.get('data'), dict):
+              rating = data['data'].get('rating') or data['data'].get('value_classification')
+          if rating is None:
+              rating = data.get('rating') or data.get('value_classification') or ''
+
+          if score is None:
+              raise SystemExit(f'Unable to parse score from response: {list(data.keys())[:20]}')
+
+          out = {
+              'score': round(score),
+              'rating': rating,
+              'updated_at': datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
+              'source': 'rapidapi',
+              'source_url': 'https://www.cnn.com/markets/fear-and-greed',
+              'note': 'Daily cached value. Updated by GitHub Actions once per day.'
+          }
+
+          os.makedirs('data', exist_ok=True)
+          with open('data/cnn-fng.json', 'w', encoding='utf-8') as f:
+              json.dump(out, f, ensure_ascii=False, indent=2)
+          print(out)
+          PYEOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cnn-fng.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: daily CNN fear & greed cache update"
+          git push
