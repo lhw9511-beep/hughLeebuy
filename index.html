@@ -2508,7 +2508,11 @@
                 let baaDone = 0;
                 // 카나리아 + 방어자산 동시 병렬 fetch
                 loadingText.innerHTML = `카나리아 4종 + 방어자산 동시 로딩 중...`;
-                const [baaFetched, _defPrefetch] = await Promise.all([
+                // BAA 논문 공격 유니버스 13종 (Keller & Keuning 2018)
+                const offUniverse = ['SPY','QQQ','IWM','VGK','EWJ','EEM','VNQ','DBC','HYG','TLT','LQD','GLD','PDBC'];
+                const defenseUniversePre = ['TIP','PDBC','SGOV','IEF','TLT','LQD','BND'];
+
+                const [baaFetched, _offPrefetch, _defPrefetch] = await Promise.all([
                     Promise.all(canaries.map(async t => {
                         let r;
                         try {
@@ -2518,10 +2522,11 @@
                             r = await fetchStockData(t, '1d', '2y');
                         }
                         baaDone++;
-                        setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*50)+5);
+                        setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*40)+5);
                         return r;
                     })),
-                    Promise.all(defenseUniverse.map(dt => fetchStockData(dt, '1d', '2y').catch(() => null)))
+                    Promise.all(offUniverse.map(t => fetchStockData(t, '1d', '2y').catch(() => null))),
+                    Promise.all(defenseUniversePre.map(dt => fetchStockData(dt, '1d', '2y').catch(() => null)))
                 ]);
                 baaFetched.forEach(d => results.push(d));
                 setProgress('baa-progress-bar','baa-progress-text', 85); loadingText.innerHTML = `점수 계산 중...`;
@@ -2661,14 +2666,98 @@
                 const rebEl = document.getElementById('baa-rebalance-info');
 
                 if (minScore > 0) {
-                    titleEl.innerText = "🟢 공격 모드 (나스닥 몰빵)"; titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-up";
-                    descEl.innerHTML = "모든 카나리아 자산 생존! <strong>QQQ 100%</strong> 포지션을 유지하세요."; boxEl.style.borderColor = "#26A69A";
+                    titleEl.innerText = "🟢 공격 모드"; titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-up";
+                    boxEl.style.borderColor = "#26A69A";
+
+                    // ── BAA 원칙: 공격 유니버스 13종 중 13612W 모멘텀 1위 선택 ──
+                    setProgress('baa-progress-bar','baa-progress-text', 88); loadingText.style.display='block'; loadingText.innerHTML = `공격 유니버스 13종 모멘텀 계산 중...`;
+
+                    const calc13612 = (rawData) => {
+                        if (!rawData) return null;
+                        const ts = rawData.chart?.result?.[0]?.timestamp || [];
+                        const adj = rawData.chart?.result?.[0]?.indicators?.adjclose?.[0]?.adjclose
+                               || rawData.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+                        if (!ts.length) return null;
+                        // 월말 종가 추출
+                        let monthly = {}, lastV = 0;
+                        for (let j = 0; j < ts.length; j++) {
+                            let v = adj[j]; if (!v) v = lastV; else lastV = v;
+                            if (v) {
+                                const d = new Date(ts[j]*1000);
+                                const ym = d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0');
+                                monthly[ym] = { price: v, date: d.toISOString().slice(0,10) };
+                            }
+                        }
+                        const keys = Object.keys(monthly).sort();
+                        if (keys.length < 13) return null;
+                        const P0  = monthly[keys[keys.length-1]].price;
+                        const D0  = monthly[keys[keys.length-1]].date;
+                        const P1  = monthly[keys[keys.length-2]]?.price;
+                        const P3  = monthly[keys[keys.length-4]]?.price;
+                        const P6  = monthly[keys[keys.length-7]]?.price;
+                        const P12 = monthly[keys[keys.length-13]]?.price;
+                        if (!P1||!P3||!P6||!P12) return null;
+                        const r1=P0/P1-1, r3=P0/P3-1, r6=P0/P6-1, r12=P0/P12-1;
+                        const score = 12*r1 + 4*r3 + 2*r6 + 1*r12;
+                        return { P0, D0, P1, P3, P6, P12, r1, r3, r6, r12, score };
+                    };
+
+                    const offScores = offUniverse.map((t, i) => {
+                        const res = calc13612(_offPrefetch[i]);
+                        return res ? { t, ...res } : null;
+                    }).filter(Boolean).sort((a,b) => b.score - a.score);
+
+                    const winner = offScores[0] || { t: 'QQQ', score: 0 };
+                    const winnerName = { SPY:'S&P500', QQQ:'나스닥100', IWM:'Russell2000(소형)', VGK:'유럽주식', EWJ:'일본주식', EEM:'신흥국', VNQ:'부동산(리츠)', DBC:'원자재', HYG:'하이일드채권', TLT:'장기국채', LQD:'투자등급채권', GLD:'금', PDBC:'원자재선물' };
+
+                    descEl.innerHTML = `모든 카나리아 생존! 공격 유니버스 13종 모멘텀 1위: <strong class="text-accent text-lg">${winner.t}</strong> (${winnerName[winner.t]||winner.t}) <strong>100%</strong><br>
+                        <button onclick="showOffProof()" class="text-[0.7rem] text-accent underline mt-1 hover:text-white transition">📊 13종 전체 순위표 보기 →</button>`;
+
+                    // ── 공격 유니버스 PROOF 저장 ──
+                    const offRankRows = offScores.map((x, i) => `
+                        <tr class="${x.t===winner.t ? 'bg-accent/10 border-accent/30' : 'border-themeBorder/30'} border-b hover:bg-white/5 transition">
+                            <td class="py-2 px-3 text-center font-black ${i===0?'text-accent text-lg':'text-themeMuted'}">${i===0?'🥇':i+1}</td>
+                            <td class="py-2 font-black text-sm ${i===0?'text-accent':''}">${x.t} <span class="text-[0.6rem] text-themeMuted font-normal">${winnerName[x.t]||''}</span></td>
+                            <td class="py-2 text-right font-mono text-[0.7rem] ${x.r1>=0?'text-up':'text-down'}">${(x.r1*100).toFixed(2)}%</td>
+                            <td class="py-2 text-right font-mono text-[0.7rem] ${x.r3>=0?'text-up':'text-down'}">${(x.r3*100).toFixed(2)}%</td>
+                            <td class="py-2 text-right font-mono text-[0.7rem] ${x.r6>=0?'text-up':'text-down'}">${(x.r6*100).toFixed(2)}%</td>
+                            <td class="py-2 text-right font-mono text-[0.7rem] ${x.r12>=0?'text-up':'text-down'}">${(x.r12*100).toFixed(2)}%</td>
+                            <td class="py-2 pr-3 text-right font-black font-mono ${x.score>=0?'text-up':'text-down'}">${x.score.toFixed(2)}</td>
+                        </tr>`).join('');
+
+                    baaProofs['__OFF__'] = `
+                        <div class="space-y-4 text-sm text-themeText">
+                            <div class="bg-black/20 p-4 rounded-xl border border-themeBorder">
+                                <p class="font-black text-lg text-accent mb-1">공격 유니버스 13종 모멘텀 순위</p>
+                                <p class="text-[0.65rem] text-themeMuted">BAA 논문 (Keller &amp; Keuning 2018) 13612W 공식<br>점수 = <span class="font-mono text-accent">12×1개월 + 4×3개월 + 2×6개월 + 1×12개월</span></p>
+                            </div>
+                            <div class="overflow-x-auto custom-scroll border border-themeBorder rounded-xl bg-black/10">
+                                <table class="w-full min-w-[480px]">
+                                    <thead class="bg-black/30">
+                                        <tr class="text-[0.6rem] text-themeMuted uppercase tracking-widest border-b border-themeBorder">
+                                            <th class="py-2 px-3 text-center">#</th>
+                                            <th class="py-2 text-left">티커</th>
+                                            <th class="py-2 text-right">1개월</th>
+                                            <th class="py-2 text-right">3개월</th>
+                                            <th class="py-2 text-right">6개월</th>
+                                            <th class="py-2 text-right">12개월</th>
+                                            <th class="py-2 pr-3 text-right">13612W 점수</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${offRankRows}</tbody>
+                                </table>
+                            </div>
+                            <p class="text-[0.65rem] text-themeMuted text-center">점수 1위 <strong class="text-accent">${winner.t}</strong>에 100% 투자 (배당재투자 반영 종가 기준)</p>
+                        </div>`;
+
+                    setProgress('baa-progress-bar','baa-progress-text', 92);
+                    loadingText.style.display='none';
                 } else {
                     titleEl.innerText = "🔴 방어 모드 (안전 자산 대피)"; titleEl.className = "text-2xl md:text-3xl font-black mb-2 text-down";
                     boxEl.style.borderColor = "#EF5350";
 
                     // ── BAA 원칙: 방어 유니버스 7종 중 모멘텀 상위 3개 → 각 33.3% 균등 투자 ──
-                    const defenseUniverse = ['TIP', 'PDBC', 'SGOV', 'IEF', 'TLT', 'LQD', 'BND'];
+                    const defenseUniverse = defenseUniversePre;
                     descEl.innerHTML = `위험 감지! 즉시 모든 주식을 팔고 안전자산으로 대피하세요.<br>
                         <span class="inline-block mt-2 text-[0.7rem] text-accent animate-pulse">⏳ 방어 자산 7종 모멘텀 계산 중...</span>`;
 
@@ -2820,6 +2909,14 @@
             } finally {
                 loading.style.display = 'none';
             }
+        }
+
+        function showOffProof() {
+            if (!baaProofs['__OFF__']) return;
+            document.getElementById('modal-title').innerText = '공격 유니버스 13종 모멘텀 순위 (이번 달 선택 근거)';
+            document.getElementById('modal-period').innerText = 'BAA 13612W 공식';
+            document.getElementById('modal-body').innerHTML = baaProofs['__OFF__'];
+            document.getElementById('detail-modal').style.display = 'flex';
         }
 
         function showBaaProof(ticker) {
