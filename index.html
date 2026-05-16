@@ -581,18 +581,14 @@
                     </div>
                     
                     <div id="crypto-expert-indicators" class="expert-only grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-7 gap-2 md:gap-3 h-full mb-3 transition-all duration-300">
-                        <div class="stat-box" onclick="openStatInfo('vol', 'crypto')">
-                            <div class="weight-badge">9.0</div><p class="stat-label">변동성</p><p id="crypto-val-vol" class="stat-value text-themeText">---</p>
-                        </div>
+
                         <div class="stat-box" onclick="openStatInfo('fng', 'crypto')">
                             <div class="weight-badge">8.5</div><p class="stat-label">공포/탐욕</p><p id="crypto-val-fng" class="stat-value text-themeText">---</p>
                         </div>
                         <div class="stat-box" onclick="openStatInfo('dist', 'crypto')">
                             <div class="weight-badge">8.0</div><p class="stat-label">추세선 돌파</p><p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
-                        <div class="stat-box" onclick="openStatInfo('macd', 'crypto')">
-                            <div class="weight-badge">7.0</div><p class="stat-label">MACD</p><p id="crypto-val-macd-main" class="stat-value text-themeText">---</p>
-                        </div>
+
                         <div class="stat-box" onclick="openStatInfo('rsi', 'crypto')">
                             <div class="weight-badge">6.5</div><p class="stat-label">RSI</p><p id="crypto-val-rsi-main" class="stat-value text-themeText">---</p>
                         </div>
@@ -891,7 +887,7 @@
 
         const WEIGHT_MATRIX = {
             stock: { short: { VIX: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, MACD: 7, DIST: 8, BB: 6 }, mid: { VIX: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 8.5, DIST: 9, BB: 4 }, long: { VIX: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 8, DIST: 9.5, BB: 2 } },
-            crypto: { short: { VOL: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, MACD: 7, DIST: 8, BB: 6 }, mid: { VOL: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 8.5, DIST: 9, BB: 4 }, long: { VOL: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 8, DIST: 9.5, BB: 2 } }
+            crypto: { short: { FNG: 8.5, RSI: 6.5, STOCH: 5, DIST: 8, BB: 6 }, mid: { FNG: 5, RSI: 5, STOCH: 2, DIST: 9, BB: 4 }, long: { FNG: 3, RSI: 4, STOCH: 1, DIST: 9.5, BB: 2 } }
         };
 
         let globalVix = null, globalFng = null, globalCryptoFng = null, globalStockFngMeta = null, globalStockFngDefaultMeta = null, isManualStockFng = false;
@@ -1325,7 +1321,7 @@
             };
 
             if (marketType === 'stock') { updateBox('vix', 'VIX', false, false); updateBox('fng', 'FNG', false, false); } 
-            else { updateBox('vol', 'VOL', false, true); updateBox('fng', 'FNG', false, false); }
+            else { updateBox('fng', 'FNG', false, false); }
             
             updateBox('ma-dist', 'DIST', true, false); updateBox('macd-main', 'MACD', false, false);
             updateBox('rsi-main', 'RSI', false, false); updateBox('bb-main', 'BB', false, false); updateBox('stoch-main', 'STOCH', false, false);
@@ -1700,7 +1696,7 @@
                         macd: getIndicatorStatus('MACD', macd, marketType, timeHorizon),
                         stoch: getIndicatorStatus('STOCH', stoch, marketType, timeHorizon),
                         bb: getIndicatorStatus('BB', bbStr, marketType, timeHorizon),
-                        macro: getIndicatorStatus(marketType === 'stock' ? 'VIX' : 'VOL', macroVal, marketType, timeHorizon),
+                        macro: marketType === 'stock' ? getIndicatorStatus('VIX', macroVal, marketType, timeHorizon) : { sig: 'NEUTRAL', text: '해당없음', color: 'var(--text-muted)', weight: 0 },
                         fng: getIndicatorStatus('FNG', fngVal, marketType, timeHorizon)
                     };
 
@@ -1717,8 +1713,8 @@
                         breakdown.push({name, sig: s.sig, val: valStr, weight: s.weight, raw: s.raw, text: s.text, contribution});
                     };
 
-                    addScore(marketType === 'stock' ? 'VIX' : 'VOL', sigs.macro);
-                    addScore('FNG', sigs.fng); addScore('DIST', sigs.dist); addScore('RSI', sigs.rsi); addScore('MACD', sigs.macd); addScore('STOCH', sigs.stoch); addScore('BB', sigs.bb);
+                    if (marketType === 'stock') addScore('VIX', sigs.macro);
+                    addScore('FNG', sigs.fng); addScore('DIST', sigs.dist); addScore('RSI', sigs.rsi); if (marketType === 'stock') addScore('MACD', sigs.macd); addScore('STOCH', sigs.stoch); addScore('BB', sigs.bb);
 
                     const diff = buyScore - sellScore;
                     let st = "HOLD"; 
