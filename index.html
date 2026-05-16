@@ -2704,9 +2704,12 @@
                     };
 
                     const offScores = offUniverse.map((t, i) => {
-                        const res = calc13612(_offPrefetch[i]);
+                        const raw = _offPrefetch[i];
+                        const res = calc13612(raw);
+                        console.log(`[OFF] ${t}:`, raw ? `ts=${raw.timestamp?.length}, adj=${raw.indicators?.adjclose?.[0]?.adjclose?.length}` : 'NULL', '→ score:', res?.score);
                         return res ? { t, ...res } : null;
                     }).filter(Boolean).sort((a,b) => b.score - a.score);
+                    console.log('[OFF] offScores:', offScores.map(x=>x.t+':'+x.score.toFixed(1)));
 
                     const winner = offScores[0] || { t: 'QQQ', score: 0 };
                     const winnerName = { SPY:'S&P500', QQQ:'나스닥100', IWM:'Russell2000(소형)', VGK:'유럽주식', EWJ:'일본주식', EEM:'신흥국', VNQ:'부동산(리츠)', DBC:'원자재', HYG:'하이일드채권', TLT:'장기국채', LQD:'투자등급채권', GLD:'금', PDBC:'원자재선물' };
