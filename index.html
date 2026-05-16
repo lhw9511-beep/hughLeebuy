@@ -2674,9 +2674,10 @@
 
                     const calc13612 = (rawData) => {
                         if (!rawData) return null;
-                        const ts = rawData.chart?.result?.[0]?.timestamp || [];
-                        const adj = rawData.chart?.result?.[0]?.indicators?.adjclose?.[0]?.adjclose
-                               || rawData.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+                        // fetchStockData 는 result[0] 을 직접 반환 → { timestamp, indicators, meta }
+                        const ts = rawData.timestamp || [];
+                        const adj = rawData.indicators?.adjclose?.[0]?.adjclose
+                               || rawData.indicators?.quote?.[0]?.close || [];
                         if (!ts.length) return null;
                         // 월말 종가 추출
                         let monthly = {}, lastV = 0;
