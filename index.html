@@ -2474,7 +2474,7 @@
             
             // 월간 캐시: 같은 달 재계산 방지
             const _cNow = new Date();
-            const _cKey = 'baaResult_v3_' + _cNow.getFullYear() + '_' + String(_cNow.getMonth()+1).padStart(2,'0');
+            const _cKey = 'baaResult_v4_' + _cNow.getFullYear() + '_' + String(_cNow.getMonth()+1).padStart(2,'0');
             const _cHit = safeStorageGet(_cKey, null);
             if (_cHit) {
                 try {
@@ -2703,12 +2703,17 @@
                         }
                         const keys = Object.keys(monthly).sort();
                         if (keys.length < 13) return null;
-                        const P0  = monthly[keys[keys.length-1]].price;
-                        const D0  = monthly[keys[keys.length-1]].date;
-                        const P1  = monthly[keys[keys.length-2]]?.price;
-                        const P3  = monthly[keys[keys.length-4]]?.price;
-                        const P6  = monthly[keys[keys.length-7]]?.price;
-                        const P12 = monthly[keys[keys.length-13]]?.price;
+                        // BAA 논문 기준: 전월말 종가 (월중에는 이전달 말 기준)
+                        const _n = new Date();
+                        const _isMonthEnd = _n.getDate() >= new Date(_n.getFullYear(), _n.getMonth()+1, 0).getDate() - 1;
+                        const _bi = _isMonthEnd ? keys.length - 1 : keys.length - 2;
+                        if (_bi < 12) return null;
+                        const P0  = monthly[keys[_bi]].price;
+                        const D0  = monthly[keys[_bi]].date;
+                        const P1  = monthly[keys[_bi - 1]]?.price;
+                        const P3  = monthly[keys[_bi - 3]]?.price;
+                        const P6  = monthly[keys[_bi - 6]]?.price;
+                        const P12 = monthly[keys[_bi - 12]]?.price;
                         if (!P1||!P3||!P6||!P12) return null;
                         const r1=P0/P1-1, r3=P0/P3-1, r6=P0/P6-1, r12=P0/P12-1;
                         const score = 12*r1 + 4*r3 + 2*r6 + 1*r12;
@@ -2930,7 +2935,7 @@
                 setProgress('baa-progress-bar','baa-progress-text', 100); loading.style.display = 'none';
                 // 이번달 결과 캐시 저장
                 const _sNow = new Date();
-                const _sKey = 'baaResult_v3_' + _sNow.getFullYear() + '_' + String(_sNow.getMonth()+1).padStart(2,'0');
+                const _sKey = 'baaResult_v4_' + _sNow.getFullYear() + '_' + String(_sNow.getMonth()+1).padStart(2,'0');
                 const _prevMonth = (() => { const d = new Date(_sNow.getFullYear(), _sNow.getMonth(), 0); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); })();
                 safeStorageSet(_sKey, JSON.stringify({ html: resultBox.innerHTML, month: _prevMonth, proofs: baaProofs }));
                 const _bn2 = document.getElementById('baa-cache-banner');
