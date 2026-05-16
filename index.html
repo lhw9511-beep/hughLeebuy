@@ -2739,7 +2739,13 @@
                             <td class="py-2 text-right font-mono text-[0.7rem] ${x.r6>=0?'text-up':'text-down'}">${(x.r6*100).toFixed(2)}%</td>
                             <td class="py-2 text-right font-mono text-[0.7rem] ${x.r12>=0?'text-up':'text-down'}">${(x.r12*100).toFixed(2)}%</td>
                             <td class="py-2 pr-3 text-right font-black font-mono ${x.score>=0?'text-up':'text-down'}">${x.score.toFixed(2)}</td>
-                            <td class="py-2 pr-3 text-right font-mono text-[0.6rem] text-themeMuted whitespace-nowrap">12×${(x.r1*100).toFixed(1)}%<br>+4×${(x.r3*100).toFixed(1)}%<br>+2×${(x.r6*100).toFixed(1)}%<br>+1×${(x.r12*100).toFixed(1)}%</td>
+                            <td class="py-2 pr-3 font-mono text-[0.58rem] text-themeMuted leading-relaxed">
+                                <span class="${(12*(x.r1))>=0?'text-up':'text-down'}">12×${x.r1>=0?'+':''}${(x.r1*100).toFixed(2)}%</span><br>
+                                <span class="${(4*(x.r3))>=0?'text-up':'text-down'}">+4×${x.r3>=0?'+':''}${(x.r3*100).toFixed(2)}%</span><br>
+                                <span class="${(2*(x.r6))>=0?'text-up':'text-down'}">+2×${x.r6>=0?'+':''}${(x.r6*100).toFixed(2)}%</span><br>
+                                <span class="${(x.r12)>=0?'text-up':'text-down'}">+1×${x.r12>=0?'+':''}${(x.r12*100).toFixed(2)}%</span><br>
+                                <span class="text-themeText font-black">= ${x.score.toFixed(2)}</span>
+                            </td>
                         </tr>`).join('');
 
                     baaProofs['__OFF__'] = `
@@ -2759,7 +2765,7 @@
                                             <th class="py-2 text-right">6개월</th>
                                             <th class="py-2 text-right">12개월</th>
                                             <th class="py-2 pr-3 text-right">13612W 점수</th>
-                                            <th class="py-2 pr-3 text-right">계산 과정</th>
+                                            <th class="py-2 pr-3 text-left">계산 과정 (12×1M + 4×3M + 2×6M + 1×12M)</th>
                                         </tr>
                                     </thead>
                                     <tbody>${offRankRows}</tbody>
