@@ -2525,7 +2525,18 @@
                         setProgress('baa-progress-bar','baa-progress-text', Math.round(baaDone/canaries.length*40)+5);
                         return r;
                     })),
-                    Promise.all(offUniverse.map(t => fetchStockData(t, '1d', '2y').catch(() => null))),
+                    (async () => {
+                        const results = [];
+                        for (const t of offUniverse) {
+                            let r = null;
+                            for (let attempt = 0; attempt < 3; attempt++) {
+                                try { r = await fetchStockData(t, '1d', '2y'); break; }
+                                catch(e) { await new Promise(res => setTimeout(res, 800 * (attempt+1))); }
+                            }
+                            results.push(r);
+                        }
+                        return results;
+                    })(),
                     Promise.all(defenseUniversePre.map(dt => fetchStockData(dt, '1d', '2y').catch(() => null)))
                 ]);
                 baaFetched.forEach(d => results.push(d));
