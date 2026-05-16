@@ -1152,32 +1152,10 @@
                 const rsiArr = Indicator.rsi(spyCloses, 14);
                 const spyRsi = rsiArr[rsiArr.length - 1] || 50;
 
-                // CNN Fear & Greed 프록시 경유 (주식 전용)
-                const _cnnUrl = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
-                const _cnnProxies = [
-                    'https://api.allorigins.win/raw?url=' + encodeURIComponent(_cnnUrl),
-                    'https://corsproxy.io/?url=' + encodeURIComponent(_cnnUrl)
-                ];
-                let _cnnOk = false;
-                for (const _px of _cnnProxies) {
-                    try {
-                        const _r = await fetch(_px, { signal: AbortSignal.timeout(8000) });
-                        const _d = await _r.json();
-                        if (_d && _d.fear_and_greed && _d.fear_and_greed.score != null) {
-                            globalFng = Math.round(_d.fear_and_greed.score);
-                            _cnnOk = true;
-                            break;
-                        }
-                    } catch(e) {}
-                }
-                if (!_cnnOk) {
-                    // CNN 실패 시 보조계산: VIX(40%) + RSI(30%) + SPY모멘텀(30%)
-                    const _ma = spyCloses.length >= 125 ? spyCloses.slice(-125).reduce((a,b)=>a+b,0)/125 : spyCloses.reduce((a,b)=>a+b,0)/spyCloses.length;
-                    const _mom = Math.max(0, Math.min(100, 50 + ((spyCloses[spyCloses.length-1] - _ma) / _ma) * 500));
-                    const _vix = Math.max(0, Math.min(100, ((40 - globalVix) / 30) * 100));
-                    const _rsi = Math.max(0, Math.min(100, ((spyRsi - 30) / 40) * 100));
-                    globalFng = Math.round(_vix * 0.4 + _rsi * 0.3 + _mom * 0.3);
-                }
+                let vixScore = Math.max(0, Math.min(100, ((35 - globalVix) / 25) * 100));
+                let rsiScore = Math.max(0, Math.min(100, ((spyRsi - 30) / 40) * 100));
+                globalFng = Math.round((vixScore + rsiScore) / 2);
+
                 renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
                 renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
                 lastMacroFetch = Date.now();
@@ -2528,7 +2506,42 @@
         function openStatInfo(type, marketType) {
             const info = DESCRIPTIONS[type];
             if(!info) return;
-            document.getElementById('info-title').innerHTML = `<svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>` + (TERMS[type] ? TERMS[type].expert : type);
+            document.getElementById('info-title').innerHTML = '<svg class="icon-md mr-2 text-accent" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>' + (TERMS[type] ? TERMS[type].expert : type);
+
+            // FNG 전용: 실시간 수치 + 근거 + 출처 링크
+            if (type === 'fng') {
+                const isStock = (marketType !== 'crypto');
+                const curVal = isStock ? globalFng : globalCryptoFng;
+                const valLabel = curVal == null ? '로딩중...' : curVal;
+                let fngLevel = '';
+                if (curVal != null) {
+                    if (curVal <= 24)      fngLevel = '😱 극도의 공포 (Extreme Fear)';
+                    else if (curVal <= 44) fngLevel = '😰 공포 (Fear)';
+                    else if (curVal <= 55) fngLevel = '😐 중립 (Neutral)';
+                    else if (curVal <= 74) fngLevel = '😏 탐욕 (Greed)';
+                    else                   fngLevel = '🤑 극도의 탐욕 (Extreme Greed)';
+                }
+                const srcName  = isStock ? 'CNN Fear & Greed Index' : 'Alternative.me Crypto F&G';
+                const srcUrl   = isStock
+                    ? 'https://edition.cnn.com/markets/fear-and-greed'
+                    : 'https://alternative.me/crypto/fear-and-greed-index/';
+                const compText = isStock
+                    ? '• 주가 모멘텀 (SPY vs 125일 이동평균)\n• 주가 강도 (52주 신고가 vs 신저가 비율)\n• 풋/콜 옵션 비율 (Put/Call Ratio)\n• 시장 변동성 (VIX)\n• 안전자산 수요 (국채 vs 주식 자금흐름)\n• 정크본드 수요\n• 주가 폭 (McClellan Volume Summation)'
+                    : '• 변동성 (Bitcoin 30일 vs 90일 변동성)\n• 시장 모멘텀/거래량\n• SNS 감성 분석\n• 구글 트렌드 (BTC 관련 검색량)\n• 도미넌스 (Bitcoin 시장 점유율)\n• 설문조사';
+                const bodyHtml = '<div style="font-size:0.95rem;line-height:1.8">'
+                    + '<div style="font-size:1.4rem;font-weight:900;margin-bottom:4px">' + valLabel + ' / 100</div>'
+                    + '<div style="font-size:0.9rem;margin-bottom:12px;color:var(--accent)">' + fngLevel + '</div>'
+                    + '<div style="font-size:0.78rem;color:#aaa;margin-bottom:8px;font-weight:700">📊 구성 지표</div>'
+                    + '<pre style="font-size:0.78rem;white-space:pre-wrap;color:var(--text-sub);margin-bottom:14px">' + compText + '</pre>'
+                    + '<div style="font-size:0.78rem;color:#aaa;margin-bottom:6px;font-weight:700">🔗 출처 (직접 확인)</div>'
+                    + '<a href="' + srcUrl + '" target="_blank" rel="noopener" style="color:var(--accent);font-size:0.85rem;text-decoration:underline">' + srcName + ' ↗</a>'
+                    + '<div style="font-size:0.7rem;color:#888;margin-top:10px">※ 앱 내 수치는 API를 통해 자동 수집되며,<br>실제 지수와 최대 1-2pt 차이가 있을 수 있습니다.</div>'
+                    + '</div>';
+                document.getElementById('info-body').innerHTML = bodyHtml;
+                document.getElementById('info-modal').style.display = 'flex';
+                return;
+            }
+
             document.getElementById('info-body').innerText = isBeginnerMode ? info.beginner : info.expert;
             document.getElementById('info-modal').style.display = 'flex';
         }
@@ -2543,7 +2556,7 @@
         function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
         function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
         function closePfDetailModal() { document.getElementById('pf-detail-modal').style.display = 'none'; }
-        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; }
+        function closeInfoModal() { document.getElementById('info-modal').style.display = 'none'; document.getElementById('info-body').innerHTML = ''; }
 
         function toggleCurrency() {
             currentCurrency = currentCurrency === 'USD' ? 'KRW' : 'USD';
