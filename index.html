@@ -588,6 +588,15 @@
                         <div class="stat-box" onclick="openStatInfo('mvrv', 'crypto')">
                             <div class="weight-badge">9.0</div><p class="stat-label">MVRV Z-Score</p><p id="crypto-val-mvrv" class="stat-value text-themeText">---</p>
                         </div>
+                        <div class="stat-box" onclick="openStatInfo('nupl', 'crypto')">
+                            <div class="weight-badge">8.0</div><p class="stat-label">NUPL</p><p id="crypto-val-nupl" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="openStatInfo('puell', 'crypto')">
+                            <div class="weight-badge">7.5</div><p class="stat-label">Puell Multiple</p><p id="crypto-val-puell" class="stat-value text-themeText">---</p>
+                        </div>
+                        <div class="stat-box" onclick="openStatInfo('nvt', 'crypto')">
+                            <div class="weight-badge">7.0</div><p class="stat-label">NVT Ratio</p><p id="crypto-val-nvt" class="stat-value text-themeText">---</p>
+                        </div>
                         <div class="stat-box" onclick="openStatInfo('dist', 'crypto')">
                             <div class="weight-badge">8.0</div><p class="stat-label">추세선 돌파</p><p id="crypto-val-ma-dist" class="stat-value text-themeText">---</p>
                         </div>
@@ -885,13 +894,16 @@
             rsi: { expert: '추세의 과열 강도를 의미합니다.\n\n• 가중치 (단기 6.5 | 중기 5.0 | 장기 4.0)', beginner: '얼마나 달렸는지 체력을 보여줘요.\n너무 많이 달려서 숨이 차면 쉬어갈 확률이 높아요.' },
             bb: { expert: '가격 변동성 기반의 밴드(표준편차)입니다.\n\n• 가중치 (단기 6.0 | 중기 4.0 | 장기 2.0)', beginner: '주가가 움직이는 도로의 차선 같아요.\n천장에 부딪히면 튕겨 내려올 수 있어요.' },
             stoch: { expert: '최근 기간 중 현재 가격 위치를 나타냅니다.\n\n• 가중치 (단기 5.0 | 중기 2.0 | 장기 1.0)', beginner: '지금 가격이 단기적으로 바닥인지 꼭대기인지 알려줘요.' },
+            nupl: { expert: 'NUPL (Net Unrealized Profit/Loss)\n\n전체 비트코인 보유자의 평균 미실현 손익 비율입니다.\n\n• < 0: 항복/바닥 (역사적 매수 구간)\n• 0 ~ 0.25: 희망 구간\n• 0.25 ~ 0.5: 낙관 구간\n• 0.5 ~ 0.75: 과신 구간 (주의)\n• > 0.75: 황홀감/사이클 고점', beginner: '지금 비트코인을 갖고 있는 사람들이 평균적으로 얼마나 이익을 보고 있는지 보여줘요. 마이너스면 대부분이 손해 중이라 바닥 근처예요.' },
+            puell: { expert: 'Puell Multiple\n\n채굴자 일일 수익(USD) ÷ 365일 이동평균\n\n채굴자의 매도 압력을 측정합니다.\n\n• < 0.5: 채굴자 항복 (역사적 바닥)\n• 0.5 ~ 1.0: 저평가 구간\n• 1.0 ~ 2.0: 공정 구간\n• 2.0 ~ 4.0: 과열 주의\n• > 4.0: 버블 (사이클 고점 신호)', beginner: '비트코인을 캐는 채굴자들이 평소보다 얼마나 많이 벌고 있는지 비교해요. 너무 적게 벌면 바닥, 너무 많이 벌면 고점 근처예요.' },
+            nvt: { expert: 'NVT Ratio (Network Value to Transactions)\n\n시가총액 ÷ 일일 온체인 거래량(USD)\n\n주식의 PER과 유사한 개념으로, 네트워크 실사용 대비 가격 수준을 측정합니다.\n\n• < 50: 저평가 (거래 활발)\n• 50 ~ 100: 적정 이하\n• 100 ~ 150: 공정 구간\n• 150 ~ 250: 고평가 주의\n• > 250: 버블', beginner: '비트코인 네트워크가 실제로 얼마나 많이 쓰이는지 대비 가격이 적당한지 알려줘요. 주식의 PER처럼, 낮을수록 저평가예요.' },
             mvrv: { expert: 'MVRV Z-Score (Market Value to Realized Value Z-Score)\n\n현재 시가총액이 실현 시가총액(코인별 평균 취득원가 기반) 대비 얼마나 벗어났는지 통계적으로 측정합니다.\n\n• Z < 0: 극저평가 (역사적 매수 구간)\n• Z 0~2: 저평가\n• Z 2~5: 공정 가치\n• Z 5~7: 고평가 주의\n• Z > 7: 버블 (역사적 사이클 고점)', beginner: '비트코인이 지금 싼지 비싼지를 역사적 평균 원가와 비교해 알려줘요. 0 아래면 아주 싸고, 7 이상이면 역사적으로 거품 구간이에요.' },
             vol: { expert: '최근 30일 기준 자산의 연환산 변동성입니다.\n\n• 가중치 (단기 9.0 | 중기 5.0 | 장기 2.0)', beginner: '코인 시장이 위아래로 얼마나 미친 듯이 요동치는지 보여줘요.' }
         };
 
         const WEIGHT_MATRIX = {
             stock: { short: { VIX: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, MACD: 7, DIST: 8, BB: 6 }, mid: { VIX: 5, FNG: 5, RSI: 5, STOCH: 2, MACD: 8.5, DIST: 9, BB: 4 }, long: { VIX: 2, FNG: 3, RSI: 4, STOCH: 1, MACD: 8, DIST: 9.5, BB: 2 } },
-            crypto: { short: { MVRV: 9, FNG: 8.5, RSI: 6.5, STOCH: 5, DIST: 8, BB: 6 }, mid: { MVRV: 9, FNG: 5, RSI: 5, STOCH: 2, DIST: 9, BB: 4 }, long: { MVRV: 9, FNG: 3, RSI: 4, STOCH: 1, DIST: 9.5, BB: 2 } }
+            crypto: { short: { MVRV: 9, NUPL: 8, PUELL: 7.5, NVT: 7, FNG: 8.5, RSI: 6.5, STOCH: 5, DIST: 8, BB: 6 }, mid: { MVRV: 9, NUPL: 8, PUELL: 7.5, NVT: 7, FNG: 5, RSI: 5, STOCH: 2, DIST: 9, BB: 4 }, long: { MVRV: 9, NUPL: 8, PUELL: 7.5, NVT: 7, FNG: 3, RSI: 4, STOCH: 1, DIST: 9.5, BB: 2 } }
         };
 
         let globalVix = null, globalFng = null, globalCryptoFng = null, globalStockFngMeta = null, globalStockFngDefaultMeta = null, isManualStockFng = false;
@@ -1246,7 +1258,8 @@
             try {
                 const [fngRes] = await Promise.all([
                     fetch(`https://api.alternative.me/fng/?_t=${Date.now()}`).then(r=>r.json()),
-                    fetchMvrvZScore()
+                    fetchMvrvZScore(),
+                    fetchOnChainIndicators()
                 ]);
                 if (fngRes && fngRes.data && fngRes.data[0]) {
                     globalCryptoFng = parseInt(fngRes.data[0].value);
@@ -1297,6 +1310,62 @@
             }
         }
 
+        let globalNupl = null, globalPuell = null, globalNvt = null;
+
+        async function fetchOnChainIndicators() {
+            try {
+                const [mcRes, txRes, priceRes, bcRes] = await Promise.all([
+                    fetch('https://api.blockchain.info/charts/market-cap?timespan=365days&format=json&cors=true').then(r=>r.json()),
+                    fetch('https://api.blockchain.info/charts/estimated-transaction-volume-usd?timespan=365days&format=json&cors=true').then(r=>r.json()),
+                    fetch('https://api.blockchain.info/charts/market-price?timespan=730days&format=json&cors=true').then(r=>r.json()),
+                    fetch('https://api.blockchair.com/bitcoin/stats').then(r=>r.json())
+                ]);
+
+                const mcVals = (mcRes.values||[]).filter(v=>v.y);
+                const txDict = {};
+                (txRes.values||[]).filter(v=>v.y).forEach(v=>{ txDict[v.x]=v.y; });
+                const pVals = (priceRes.values||[]).filter(v=>v.y).map(v=>v.y);
+                const bc = bcRes.data;
+
+                if (!mcVals.length || !pVals.length) return;
+
+                const mcToday = mcVals[mcVals.length-1].y;
+                const supply = bc.circulation / 1e8;
+
+                // NUPL
+                const avg180 = pVals.slice(-180).reduce((a,b)=>a+b,0) / Math.min(180, pVals.slice(-180).length);
+                const realizedCap = avg180 * supply;
+                globalNupl = parseFloat(((mcToday - realizedCap) / mcToday).toFixed(3));
+
+                // Puell Multiple
+                const dailyIssuanceUsd = bc.inflation_usd_24h;
+                const avg365Price = pVals.slice(-365).reduce((a,b)=>a+b,0) / Math.min(365, pVals.slice(-365).length);
+                const avgDailyIssuance = 450 * avg365Price;
+                globalPuell = parseFloat((dailyIssuanceUsd / avgDailyIssuance).toFixed(3));
+
+                // NVT
+                const mcTs = mcVals[mcVals.length-1].x;
+                const txKeys = Object.keys(txDict).map(Number);
+                const closestTx = txKeys.reduce((a,b)=>Math.abs(b-mcTs)<Math.abs(a-mcTs)?b:a, txKeys[0]);
+                const txToday = txDict[closestTx];
+                globalNvt = txToday ? parseFloat((mcToday / txToday).toFixed(1)) : null;
+
+                // Render
+                const renderOnChain = (id, val, type) => {
+                    const el = document.getElementById(id);
+                    if (!el || val === null) return;
+                    const st = getIndicatorStatus(type, val, 'crypto', 'short');
+                    el.innerHTML = `<span class="text-base lg:text-lg">${val}</span><span class="text-[0.6rem] block mt-1" style="color:${st.color}">${st.text}</span>`;
+                    el.style.color = st.color;
+                };
+                renderOnChain('crypto-val-nupl', globalNupl, 'NUPL');
+                renderOnChain('crypto-val-puell', globalPuell, 'PUELL');
+                renderOnChain('crypto-val-nvt', globalNvt, 'NVT');
+            } catch(e) {
+                console.warn('OnChain indicators fetch failed', e);
+            }
+        }
+
         async function fetchExchangeRate() {
             try {
                 const data = await fetchStockData('KRW=X', '1d', '5d');
@@ -1314,6 +1383,27 @@
                 if (val >= 30) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; } else if (val <= 20) { sig = 'SELL'; text = '탐욕 (매도)'; color = 'var(--down)'; }
             } else if (type === 'FNG') {
                 if (val <= 44) { sig = 'BUY'; text = '공포 (매수)'; color = 'var(--up)'; } else if (val >= 56) { sig = 'SELL'; text = '탐욕 (매도)'; color = 'var(--down)'; }
+            } else if (type === 'NUPL') {
+                // NUPL: <0 capitulation, 0-0.25 hope, 0.25-0.5 optimism, 0.5-0.75 belief, >0.75 euphoria
+                if (val < 0) { sig = 'BUY'; text = '항복/바닥 (매수)'; color = 'var(--up)'; }
+                else if (val < 0.25) { sig = 'BUY'; text = '희망 구간 (매수)'; color = 'var(--up)'; }
+                else if (val < 0.5) { sig = 'NEUTRAL'; text = '낙관 구간'; color = 'var(--text-muted)'; }
+                else if (val < 0.75) { sig = 'SELL'; text = '과신 구간 (주의)'; color = 'var(--down)'; }
+                else { sig = 'SELL'; text = '황홀감/고점 (매도)'; color = 'var(--down)'; }
+            } else if (type === 'PUELL') {
+                // Puell Multiple: <0.5 miner capitulation (buy), >4 overheated (sell)
+                if (val < 0.5) { sig = 'BUY'; text = '채굴자 항복 (매수)'; color = 'var(--up)'; }
+                else if (val < 1.0) { sig = 'BUY'; text = '저평가 구간'; color = 'var(--up)'; }
+                else if (val < 2.0) { sig = 'NEUTRAL'; text = '공정 구간'; color = 'var(--text-muted)'; }
+                else if (val < 4.0) { sig = 'SELL'; text = '과열 (주의)'; color = 'var(--down)'; }
+                else { sig = 'SELL'; text = '버블 (매도)'; color = 'var(--down)'; }
+            } else if (type === 'NVT') {
+                // NVT: low = undervalued (high tx activity), high = overvalued
+                if (val < 50) { sig = 'BUY'; text = '저평가 (매수)'; color = 'var(--up)'; }
+                else if (val < 100) { sig = 'BUY'; text = '적정 이하'; color = 'var(--up)'; }
+                else if (val < 150) { sig = 'NEUTRAL'; text = '공정 구간'; color = 'var(--text-muted)'; }
+                else if (val < 250) { sig = 'SELL'; text = '고평가 (주의)'; color = 'var(--down)'; }
+                else { sig = 'SELL'; text = '버블 (매도)'; color = 'var(--down)'; }
             } else if (type === 'MVRV') {
                 // MVRV Z-Score: <0 = undervalued, >7 = top signal
                 if (val < 0) { sig = 'BUY'; text = '극저평가 (매수)'; color = 'var(--up)'; }
@@ -1758,11 +1848,14 @@
                         bb: getIndicatorStatus('BB', bbStr, marketType, timeHorizon),
                         macro: marketType === 'stock' ? getIndicatorStatus('VIX', macroVal, marketType, timeHorizon) : { sig: 'NEUTRAL', text: '해당없음', color: 'var(--text-muted)', weight: 0 },
                         mvrv: marketType === 'crypto' ? getIndicatorStatus('MVRV', globalMvrvZ !== null ? globalMvrvZ : 1, 'crypto', timeHorizon) : { sig: 'NEUTRAL', text: '해당없음', color: 'var(--text-muted)', weight: 0 },
+                        nupl: marketType === 'crypto' ? getIndicatorStatus('NUPL', globalNupl !== null ? globalNupl : 0.3, 'crypto', timeHorizon) : { sig: 'NEUTRAL', text: '해당없음', color: 'var(--text-muted)', weight: 0 },
+                        puell: marketType === 'crypto' ? getIndicatorStatus('PUELL', globalPuell !== null ? globalPuell : 1, 'crypto', timeHorizon) : { sig: 'NEUTRAL', text: '해당없음', color: 'var(--text-muted)', weight: 0 },
+                        nvt: marketType === 'crypto' ? getIndicatorStatus('NVT', globalNvt !== null ? globalNvt : 150, 'crypto', timeHorizon) : { sig: 'NEUTRAL', text: '해당없음', color: 'var(--text-muted)', weight: 0 },
                         fng: getIndicatorStatus('FNG', fngVal, marketType, timeHorizon)
                     };
 
                     sigs.dist.raw = dist; sigs.rsi.raw = rsi; sigs.macd.raw = macd; sigs.stoch.raw = stoch; sigs.bb.raw = bbStr;
-                    sigs.macro.raw = macroVal; sigs.fng.raw = fngVal; sigs.mvrv.raw = globalMvrvZ;
+                    sigs.macro.raw = macroVal; sigs.fng.raw = fngVal; sigs.mvrv.raw = globalMvrvZ; sigs.nupl.raw = globalNupl; sigs.puell.raw = globalPuell; sigs.nvt.raw = globalNvt;
 
                     let buyScore = 0, sellScore = 0, breakdown =[];
                     const addScore = (name, s) => {
@@ -1775,7 +1868,7 @@
                     };
 
                     if (marketType === 'stock') addScore('VIX', sigs.macro);
-                    if (marketType === 'crypto') addScore('MVRV', sigs.mvrv);
+                    if (marketType === 'crypto') { addScore('MVRV', sigs.mvrv); addScore('NUPL', sigs.nupl); addScore('PUELL', sigs.puell); addScore('NVT', sigs.nvt); }
                     addScore('FNG', sigs.fng); addScore('DIST', sigs.dist); addScore('RSI', sigs.rsi); if (marketType === 'stock') addScore('MACD', sigs.macd); addScore('STOCH', sigs.stoch); addScore('BB', sigs.bb);
 
                     const diff = buyScore - sellScore;
