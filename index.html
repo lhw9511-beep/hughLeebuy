@@ -1152,10 +1152,32 @@
                 const rsiArr = Indicator.rsi(spyCloses, 14);
                 const spyRsi = rsiArr[rsiArr.length - 1] || 50;
 
-                let vixScore = Math.max(0, Math.min(100, ((35 - globalVix) / 25) * 100));
-                let rsiScore = Math.max(0, Math.min(100, ((spyRsi - 30) / 40) * 100));
-                globalFng = Math.round((vixScore + rsiScore) / 2);
-
+                // CNN Fear & Greed 프록시 경유 (주식 전용)
+                const _cnnUrl = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
+                const _cnnProxies = [
+                    'https://api.allorigins.win/raw?url=' + encodeURIComponent(_cnnUrl),
+                    'https://corsproxy.io/?url=' + encodeURIComponent(_cnnUrl)
+                ];
+                let _cnnOk = false;
+                for (const _px of _cnnProxies) {
+                    try {
+                        const _r = await fetch(_px, { signal: AbortSignal.timeout(8000) });
+                        const _d = await _r.json();
+                        if (_d && _d.fear_and_greed && _d.fear_and_greed.score != null) {
+                            globalFng = Math.round(_d.fear_and_greed.score);
+                            _cnnOk = true;
+                            break;
+                        }
+                    } catch(e) {}
+                }
+                if (!_cnnOk) {
+                    // CNN 실패 시 보조계산: VIX(40%) + RSI(30%) + SPY모멘텀(30%)
+                    const _ma = spyCloses.length >= 125 ? spyCloses.slice(-125).reduce((a,b)=>a+b,0)/125 : spyCloses.reduce((a,b)=>a+b,0)/spyCloses.length;
+                    const _mom = Math.max(0, Math.min(100, 50 + ((spyCloses[spyCloses.length-1] - _ma) / _ma) * 500));
+                    const _vix = Math.max(0, Math.min(100, ((40 - globalVix) / 30) * 100));
+                    const _rsi = Math.max(0, Math.min(100, ((spyRsi - 30) / 40) * 100));
+                    globalFng = Math.round(_vix * 0.4 + _rsi * 0.3 + _mom * 0.3);
+                }
                 renderIndicatorUI('val-vix', globalVix.toFixed(2), 'VIX', globalVix, 'stock');
                 renderIndicatorUI('val-fng', globalFng, 'FNG', globalFng, 'stock');
                 lastMacroFetch = Date.now();
