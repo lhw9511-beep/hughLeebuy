@@ -1,4 +1,7 @@
 {
+  "version": 2,
+  "buildCommand": "",
+  "outputDirectory": ".",
   "functions": {
     "api/**/*.js": {
       "maxDuration": 30
@@ -6,8 +9,6 @@
   },
   "rewrites": [
     { "source": "/api/stock/:ticker", "destination": "/api/stock/[ticker]" },
-    { "source": "/api/fundamentals/:ticker", "destination": "/api/fundamentals/[ticker]" },
-    { "source": "/ranking.html", "destination": "/ranking.html" },
-    { "source": "/", "destination": "/index.html" }
+    { "source": "/api/fundamentals/:ticker", "destination": "/api/fundamentals/[ticker]" }
   ]
 }
