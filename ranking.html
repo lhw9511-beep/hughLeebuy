@@ -184,7 +184,7 @@
     // ── 프록시 경유 데이터 패치 ────────────────────────────────
     async function fetchYahoo(symbol) {
         const enc = encodeURIComponent(symbol);
-        const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${enc}?interval=1d&range=1y&includePrePost=false`;
+        const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${enc}?interval=1d&range=2y&includePrePost=false`;
         const proxies = [
             `https://corsproxy.io/?url=${encodeURIComponent(rawUrl)}`,
             `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`,
