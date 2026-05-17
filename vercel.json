@@ -1,6 +1,7 @@
 {
-  "rewrites": [
-    { "source": "/api/stock/:ticker", "destination": "/api/stock/[ticker]" },
-    { "source": "/api/fundamentals/:ticker", "destination": "/api/fundamentals/[ticker]" }
-  ]
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 30
+    }
+  }
 }

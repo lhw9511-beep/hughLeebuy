@@ -1,9 +1,7 @@
 const https = require('https');
 const yahooFinance = require('yahoo-finance2').default;
 
-// 메모리 캐시 (Serverless는 인스턴스 재사용 시 유효)
 const cache = new Map();
-const pendingRequests = new Map();
 const CACHE_TTL = 60 * 60 * 1000;
 
 function getPeriod1FromRange(range) {
@@ -25,7 +23,7 @@ function getPeriod1FromRange(range) {
 function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
     return new Promise((resolve, reject) => {
         const subdomain = useQuery1 ? 'query1' : 'query2';
-        const url = `https://${subdomain}.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${interval}&range=${range}`;
+        const url = `https://${subdomain}.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=${interval}&range=${range}`;
         const uas = [
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15',
@@ -37,7 +35,7 @@ function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
                 'Accept': 'application/json',
                 'Connection': 'keep-alive'
             },
-            timeout: 10000
+            timeout: 8000
         };
         const req = https.get(url, options, (res) => {
             let data = '';
@@ -69,31 +67,37 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const { ticker } = req.query;
-    const { interval = '1d', range = '1y' } = req.query;
+    // Vercel 동적 라우트: /api/stock/[ticker] -> req.query.ticker
+    const ticker = (req.query.ticker || '').toUpperCase().trim();
+    const interval = req.query.interval || '1d';
+    const range = req.query.range || '1y';
+
+    if (!ticker) {
+        return res.status(400).json({ error: 'ticker is required' });
+    }
+
     const cacheKey = `${ticker}-${interval}-${range}`;
 
     if (cache.has(cacheKey)) {
         const cached = cache.get(cacheKey);
-        if (Date.now() - cached.timestamp < CACHE_TTL) return res.json(cached.data);
+        if (Date.now() - cached.timestamp < CACHE_TTL) {
+            return res.json(cached.data);
+        }
     }
 
-    if (pendingRequests.has(cacheKey)) {
-        try { return res.json(await pendingRequests.get(cacheKey)); }
-        catch (error) { return res.status(500).json({ error: 'Failed', details: error.message }); }
-    }
-
-    const fetchPromise = (async () => {
+    try {
         let result = null;
+
         try {
             const period1 = getPeriod1FromRange(range);
             result = await yahooFinance.chart(ticker, { period1, interval });
         } catch (err1) {
+            console.warn(`[yahoo-finance2 failed] ${err1.message}, trying direct fetch...`);
             try {
                 const raw = await fetchDirectYahoo(ticker, interval, range, true);
                 result = raw.chart.result[0];
             } catch (err2) {
-                console.warn(`[Fallback] query1 failed: ${err2.message}`);
+                console.warn(`[query1 failed] ${err2.message}, trying query2...`);
                 const raw = await fetchDirectYahoo(ticker, interval, range, false);
                 result = raw.chart.result[0];
             }
@@ -104,12 +108,12 @@ module.exports = async (req, res) => {
         if (result && result.quotes && result.quotes.length > 0) {
             result.quotes.forEach(q => {
                 timestamp.push(Math.floor(new Date(q.date).getTime() / 1000));
-                open.push(q.open !== undefined ? q.open : null);
-                high.push(q.high !== undefined ? q.high : null);
-                low.push(q.low !== undefined ? q.low : null);
-                close.push(q.close !== undefined ? q.close : null);
-                volume.push(q.volume !== undefined ? q.volume : null);
-                adjclose.push(q.adjclose !== undefined ? q.adjclose : (q.close !== undefined ? q.close : null));
+                open.push(q.open != null ? q.open : null);
+                high.push(q.high != null ? q.high : null);
+                low.push(q.low != null ? q.low : null);
+                close.push(q.close != null ? q.close : null);
+                volume.push(q.volume != null ? q.volume : null);
+                adjclose.push(q.adjclose != null ? q.adjclose : (q.close != null ? q.close : null));
             });
         } else if (result && result.timestamp && result.indicators && result.indicators.quote) {
             timestamp = result.timestamp;
@@ -122,24 +126,28 @@ module.exports = async (req, res) => {
             throw new Error('Data empty or blocked');
         }
 
-        return {
+        const responseData = {
             chart: {
-                result: [{ meta: result.meta || {}, timestamp, indicators: { quote: [{ open, high, low, close, volume }], adjclose: [{ adjclose }] } }]
+                result: [{
+                    meta: result.meta || {},
+                    timestamp,
+                    indicators: {
+                        quote: [{ open, high, low, close, volume }],
+                        adjclose: [{ adjclose }]
+                    }
+                }]
             },
             error: null
         };
-    })();
 
-    pendingRequests.set(cacheKey, fetchPromise);
-
-    try {
-        const responseData = await fetchPromise;
         cache.set(cacheKey, { timestamp: Date.now(), data: responseData });
-        pendingRequests.delete(cacheKey);
-        res.json(responseData);
+        return res.json(responseData);
+
     } catch (error) {
-        pendingRequests.delete(cacheKey);
-        if (cache.has(cacheKey)) return res.json(cache.get(cacheKey).data);
-        res.status(500).json({ error: 'Chart data load failed', details: error.message });
+        console.error(`[/api/stock/${ticker}] ${error.message}`);
+        if (cache.has(cacheKey)) {
+            return res.json(cache.get(cacheKey).data);
+        }
+        return res.status(500).json({ error: 'Chart data load failed', details: error.message });
     }
 };
