@@ -23,6 +23,7 @@ function getPeriod1FromRange(range) {
 function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
     return new Promise((resolve, reject) => {
         const subdomain = useQuery1 ? 'query1' : 'query2';
+        // ticker를 다시 한번 encodeURIComponent로 감싸서 ^VIX → %5EVIX 처리
         const url = `https://${subdomain}.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=${interval}&range=${range}`;
         const uas = [
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -30,7 +31,7 @@ function fetchDirectYahoo(ticker, interval, range, useQuery1 = true) {
         ];
         const options = {
             headers: { 'User-Agent': uas[Math.floor(Math.random() * uas.length)], 'Accept': 'application/json' },
-            timeout: 8000
+            timeout: 10000
         };
         const req = https.get(url, options, (res) => {
             let data = '';
@@ -56,12 +57,14 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    // URL 직접 파싱: /api/stock/AAPL -> AAPL
-    const urlPath = req.url.split('?')[0];  // 쿼리스트링 제거
+    // URL 파싱: /api/stock/%5EVIX 또는 /api/stock/^VIX 모두 처리
+    const urlPath = req.url.split('?')[0];
     const parts = urlPath.split('/');
-    const tickerFromUrl = parts[parts.length - 1];
+    // decodeURIComponent로 %5E → ^ 복원
+    let tickerFromUrl = '';
+    try { tickerFromUrl = decodeURIComponent(parts[parts.length - 1]); }
+    catch(e) { tickerFromUrl = parts[parts.length - 1]; }
 
-    // req.query.ticker 폴백
     const ticker = (tickerFromUrl || req.query.ticker || '').toUpperCase().trim();
     const interval = req.query.interval || '1d';
     const range = req.query.range || '1y';
@@ -76,13 +79,19 @@ module.exports = async (req, res) => {
 
     try {
         let result = null;
+
+        // 1차: yahoo-finance2 라이브러리
         try {
             result = await yahooFinance.chart(ticker, { period1: getPeriod1FromRange(range), interval });
         } catch (err1) {
+            console.warn(`[yahoo-finance2 fail] ${ticker}: ${err1.message}`);
+            // 2차: query1 직접 호출
             try {
                 const raw = await fetchDirectYahoo(ticker, interval, range, true);
                 result = raw.chart.result[0];
             } catch (err2) {
+                console.warn(`[query1 fail] ${ticker}: ${err2.message}`);
+                // 3차: query2 직접 호출
                 const raw = await fetchDirectYahoo(ticker, interval, range, false);
                 result = raw.chart.result[0];
             }
