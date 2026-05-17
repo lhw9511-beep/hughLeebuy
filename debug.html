@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 디버그</title>
+<style>
+  body { font-family: sans-serif; padding: 16px; background: #111; color: #eee; font-size: 14px; }
+  h2 { color: #4fc; margin-bottom: 12px; }
+  .card { background: #222; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .ok { color: #4fc; font-weight: bold; }
+  .err { color: #f66; font-weight: bold; }
+  .label { color: #aaa; font-size: 12px; }
+  pre { white-space: pre-wrap; word-break: break-all; font-size: 11px; color: #ccc; margin-top: 6px; }
+  button { background: #4fc; color: #000; border: none; border-radius: 8px; padding: 10px 20px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<h2>🔍 API 디버그</h2>
+<button onclick="runAll()">▶ 전체 테스트 실행</button>
+<div id="results"></div>
+
+<script>
+async function test(label, url) {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.innerHTML = `<div class="label">${label}</div><div>테스트 중...</div>`;
+  document.getElementById('results').appendChild(el);
+  const t = Date.now();
+  try {
+    const res = await fetch(url);
+    const ms = Date.now() - t;
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const result = data?.chart?.result?.[0];
+    const closes = result?.indicators?.quote?.[0]?.close;
+    const lastClose = closes ? closes.filter(Boolean).slice(-1)[0] : null;
+    const count = closes ? closes.filter(Boolean).length : 0;
+    el.innerHTML = `
+      <div class="label">${label}</div>
+      <div class="ok">✅ 성공 (${ms}ms)</div>
+      <pre>데이터: ${count}개\n마지막값: ${lastClose}\n메타: ${result?.meta?.symbol || '?'} / ${result?.meta?.currency || '?'}</pre>
+    `;
+  } catch(e) {
+    el.innerHTML = `
+      <div class="label">${label}</div>
+      <div class="err">❌ 실패: ${e.message}</div>
+    `;
+  }
+}
+
+async function testJson(label, url) {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.innerHTML = `<div class="label">${label}</div><div>테스트 중...</div>`;
+  document.getElementById('results').appendChild(el);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    el.innerHTML = `<div class="label">${label}</div><div class="ok">✅ 성공</div><pre>${JSON.stringify(data, null, 2).slice(0, 200)}</pre>`;
+  } catch(e) {
+    el.innerHTML = `<div class="label">${label}</div><div class="err">❌ 실패: ${e.message}</div>`;
+  }
+}
+
+async function runAll() {
+  document.getElementById('results').innerHTML = '';
+  await test('AAPL (주식)', '/api/stock/AAPL?interval=1d&range=1y');
+  await test('^VIX (퍼센트 인코딩)', '/api/stock/%5EVIX?interval=1d&range=3mo');
+  await test('QQQ (ETF)', '/api/stock/QQQ?interval=1d&range=1y');
+  await testJson('CNN FNG (data 폴더)', '/data/cnn-fng.json');
+  await testJson('Alternative.me FNG', 'https://api.alternative.me/fng/?limit=1');
+}
+
+runAll();
+</script>
+</body>
+</html>
