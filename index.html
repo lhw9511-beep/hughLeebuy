@@ -1675,6 +1675,22 @@
             let price = closes[closes.length - 1]; 
             let finalPrice = currentCurrency === 'KRW' ? price * currentExchangeRate : price;
             document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
+            // 실시간 현재가: Yahoo Finance quote API로 별도 fetch
+            (async () => {
+                try {
+                    const yUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1d`;
+                    const yres = await fetch(yUrl);
+                    if (yres.ok) {
+                        const ydata = await yres.json();
+                        const meta = ydata?.chart?.result?.[0]?.meta;
+                        const liveP = meta?.regularMarketPrice || meta?.previousClose;
+                        if (liveP > 0) {
+                            const liveF = currentCurrency === 'KRW' ? liveP * currentExchangeRate : liveP;
+                            document.getElementById('live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(liveF)}`;
+                        }
+                    }
+                } catch(e) { /* 실패 시 klines 마지막 종가 유지 */ }
+            })();
             
             if (currentInterval === '1y') {
                 let yearly = {};
@@ -1776,9 +1792,24 @@
             }
 
             document.getElementById('crypto-display-ticker').innerText = ticker.replace('-USD', '');
-            let price = closes[closes.length - 1]; 
+            let price = closes[closes.length - 1];
             let finalPrice = currentCurrency === 'KRW' ? price * currentExchangeRate : price;
             document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(finalPrice)}`;
+            // 실시간 현재가: Binance ticker/price API로 별도 fetch (interval 무관하게 항상 최신)
+            (async () => {
+                try {
+                    const sym = ticker.replace('-USD','USDT').toUpperCase();
+                    const tres = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${sym}`);
+                    if (tres.ok) {
+                        const tdata = await tres.json();
+                        const liveP = parseFloat(tdata.price);
+                        if (liveP > 0) {
+                            const liveF = currentCurrency === 'KRW' ? liveP * currentExchangeRate : liveP;
+                            document.getElementById('crypto-live-price').innerHTML = `<span class="text-sm font-bold text-themeMuted align-top mr-1">${getCurrSymbol()}</span>${formatPriceStr(liveF)}`;
+                        }
+                    }
+                } catch(e) { /* 실패 시 klines 마지막 종가 유지 */ }
+            })();
             
             const rsiArr = Indicator.rsi(closes, 14); const rsi = rsiArr[rsiArr.length - 1] || 50;
             const ma120Arr = Indicator.sma(closes, 120); const ma120 = ma120Arr[ma120Arr.length - 1];
