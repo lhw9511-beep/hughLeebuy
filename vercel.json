@@ -9,6 +9,8 @@
   },
   "rewrites": [
     { "source": "/api/stock/:ticker", "destination": "/api/stock/[ticker]" },
-    { "source": "/api/fundamentals/:ticker", "destination": "/api/fundamentals/[ticker]" }
+    { "source": "/api/crypto/:ticker", "destination": "/api/crypto/[ticker]" },
+    { "source": "/api/fundamentals/:ticker", "destination": "/api/fundamentals/[ticker]" },
+    { "source": "/api/fng", "destination": "/api/fng" }
   ]
 }
