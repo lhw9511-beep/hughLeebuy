@@ -5,9 +5,9 @@
     }
   },
   "routes": [
-    { "src": "/api/stock/([^/]+)", "dest": "/api/stock/[ticker]?ticker=$1" },
-    { "src": "/api/fundamentals/([^/]+)", "dest": "/api/fundamentals/[ticker]?ticker=$1" },
-    { "src": "/ranking", "dest": "/ranking.html" },
+    { "src": "/api/stock/([^/?]+)(\\?.*)?$", "dest": "/api/stock/[ticker]?ticker=$1" },
+    { "src": "/api/fundamentals/([^/?]+)(\\?.*)?$", "dest": "/api/fundamentals/[ticker]?ticker=$1" },
+    { "src": "/ranking.html", "dest": "/ranking.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
