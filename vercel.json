@@ -3,5 +3,11 @@
     "api/**/*.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "routes": [
+    { "src": "/api/stock/(.*)", "dest": "/api/stock/[ticker]" },
+    { "src": "/api/fundamentals/(.*)", "dest": "/api/fundamentals/[ticker]" },
+    { "src": "/ranking", "dest": "/ranking.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
