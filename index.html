@@ -2479,9 +2479,18 @@
             const resultBox = document.getElementById('baa-live-result');
             const loadingText = document.getElementById('baa-live-loading-text');
             
+            // 구버전 캐시(v1~v5) 자동 삭제
+            (['v1','v2','v3','v4','v5']).forEach(v => {
+                const _now = new Date();
+                for (let m = 1; m <= 12; m++) {
+                    const k = 'baaResult_'+v+'_'+_now.getFullYear()+'_'+String(m).padStart(2,'0');
+                    try { localStorage.removeItem(k); } catch(e) {}
+                    if (typeof _memStore !== 'undefined') _memStore.delete(k);
+                }
+            });
             // 월간 캐시: 같은 달 재계산 방지
             const _cNow = new Date();
-            const _cKey = 'baaResult_v6_' + _cNow.getFullYear() + '_' + String(_cNow.getMonth()+1).padStart(2,'0');
+            const _cKey = 'baaResult_v7_' + _cNow.getFullYear() + '_' + String(_cNow.getMonth()+1).padStart(2,'0');
             const _cHit = safeStorageGet(_cKey, null);
             if (_cHit && !forceRecalc) {
                 try {
@@ -2564,16 +2573,15 @@
                     for (let j = 0; j < ts.length; j++) {
                         let c = adjClose[j];
                         if (c === null || c === undefined) c = quoteClose[j];
-                        if (c === null || c === undefined) c = lastValidClose; else lastValidClose = c;
-
-                        if (c !== 0 && c !== null) {
-                            let d = new Date(ts[j] * 1000);
-                            let y = d.getUTCFullYear();
-                            let m = String(d.getUTCMonth() + 1).padStart(2, '0');
-                            let day = String(d.getUTCDate()).padStart(2, '0');
-                            let ym = `${y}-${m}`;
-                            monthlyData[ym] = { date: `${y}-${m}-${day}`, close: c }; 
-                        }
+                        // null이면 skip (lastValid 대입 금지 → 잘못된 날짜에 이전 종가 오염 방지)
+                        if (!c || c === 0) continue;
+                        let d = new Date(ts[j] * 1000);
+                        let y = d.getUTCFullYear();
+                        let m = String(d.getUTCMonth() + 1).padStart(2, '0');
+                        let day = String(d.getUTCDate()).padStart(2, '0');
+                        let ym = `${y}-${m}`;
+                        // 덮어쓰기 → 같은 달의 마지막 거래일 종가가 최종 저장
+                        monthlyData[ym] = { date: `${y}-${m}-${day}`, close: c };
                     }
 
                     let sortedMonths = Object.keys(monthlyData).sort();
@@ -2693,39 +2701,39 @@
 
                     const calc13612 = (rawData) => {
                         if (!rawData) return null;
-                        // fetchStockData 는 result[0] 을 직접 반환 → { timestamp, indicators, meta }
-                        const ts = rawData.timestamp || [];
+                        // 1d interval 기준 → 월별 마지막 거래일 종가를 덮어쓰기로 정확 추출
+                        const ts  = rawData.timestamp || [];
                         const adj = rawData.indicators?.adjclose?.[0]?.adjclose
                                || rawData.indicators?.quote?.[0]?.close || [];
                         if (!ts.length) return null;
-                        // 월말 종가 추출
-                        let monthly = {}, lastV = 0;
+                        let monthly = {};
                         for (let j = 0; j < ts.length; j++) {
-                            let v = adj[j]; if (!v) v = lastV; else lastV = v;
-                            if (v) {
-                                const d = new Date(ts[j]*1000);
-                                const ym = d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0');
-                                monthly[ym] = { price: v, date: d.toISOString().slice(0,10) };
-                            }
+                            const v = adj[j];
+                            if (!v) continue;
+                            const d  = new Date(ts[j]*1000);
+                            const ym = d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0');
+                            monthly[ym] = { price: v, date: d.toISOString().slice(0,10) };
                         }
                         const keys = Object.keys(monthly).sort();
                         if (keys.length < 13) return null;
-                        // BAA 논문 기준: 전월말 종가 (월중에는 이전달 말 기준)
                         const _n = new Date();
                         const _isMonthEnd = _n.getDate() >= new Date(_n.getFullYear(), _n.getMonth()+1, 0).getDate() - 1;
                         const _bi = _isMonthEnd ? keys.length - 1 : keys.length - 2;
                         if (_bi < 12) return null;
-                        const P0  = monthly[keys[_bi]].price;
-                        const D0  = monthly[keys[_bi]].date;
-                        const P1  = monthly[keys[_bi - 1]]?.price;
-                        const P3  = monthly[keys[_bi - 3]]?.price;
-                        const P6  = monthly[keys[_bi - 6]]?.price;
-                        const P12 = monthly[keys[_bi - 12]]?.price;
-                        if (!P1||!P3||!P6||!P12) return null;
+                        const M0  = monthly[keys[_bi]];
+                        const M1  = monthly[keys[_bi-1]];
+                        const M3  = monthly[keys[_bi-3]];
+                        const M6  = monthly[keys[_bi-6]];
+                        const M12 = monthly[keys[_bi-12]];
+                        if (!M0||!M1||!M3||!M6||!M12) return null;
+                        const P0=M0.price, D0=M0.date;
+                        const P1=M1.price, D1=M1.date;
+                        const P3=M3.price, D3=M3.date;
+                        const P6=M6.price, D6=M6.date;
+                        const P12=M12.price, D12=M12.date;
                         const r1=P0/P1-1, r3=P0/P3-1, r6=P0/P6-1, r12=P0/P12-1;
-                        // BAA 논문: % 단위로 계산 (12×7.43 + 4×27.30 + ...)
                         const score = 12*(r1*100) + 4*(r3*100) + 2*(r6*100) + 1*(r12*100);
-                        return { P0, D0, P1, P3, P6, P12, r1, r3, r6, r12, score };
+                        return { P0,D0, P1,D1, P3,D3, P6,D6, P12,D12, r1,r3,r6,r12,score };
                     };
 
                     const offScores = offUniverse.map((t, i) => {
@@ -2943,7 +2951,7 @@
                 setProgress('baa-progress-bar','baa-progress-text', 100); loading.style.display = 'none';
                 // 이번달 결과 캐시 저장
                 const _sNow = new Date();
-                const _sKey = 'baaResult_v6_' + _sNow.getFullYear() + '_' + String(_sNow.getMonth()+1).padStart(2,'0');
+                const _sKey = 'baaResult_v7_' + _sNow.getFullYear() + '_' + String(_sNow.getMonth()+1).padStart(2,'0');
                 const _prevMonth = (() => { const d = new Date(_sNow.getFullYear(), _sNow.getMonth(), 0); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); })();
                 safeStorageSet(_sKey, JSON.stringify({ html: resultBox.innerHTML, month: _prevMonth, proofs: baaProofs }));
                 const _bn2 = document.getElementById('baa-cache-banner');
