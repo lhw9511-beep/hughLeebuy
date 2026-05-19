@@ -851,6 +851,13 @@
                             <span id="baa-rebalance-info" class="text-sm font-mono font-black text-themeText">---</span>
                             <span class="text-[0.6rem] bg-themeBorder/50 text-themeMuted px-2 py-0.5 rounded">유지 기간</span>
                         </div>
+
+                        <!-- 이전달 대비 포지션 변경 -->
+                        <div id="baa-position-change" class="mt-4 hidden">
+                            <div id="baa-change-badge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[0.7rem] font-black border"></div>
+                            <div id="baa-change-detail" class="mt-2 text-[0.65rem] text-themeMuted leading-relaxed"></div>
+                            <button id="baa-prev-proof-btn" onclick="showPrevMonthProof()" class="hidden mt-2 text-[0.65rem] text-accent underline hover:text-white transition">📋 지난달 계산 근거 보기 →</button>
+                        </div>
                     </div>
                 </div>
                 <div id="baa-live-idle" style="display:block" class="py-6 text-center">
@@ -2746,9 +2753,9 @@
                     // ── BAA 원칙: 공격 유니버스 13종 중 13612W 모멘텀 1위 선택 ──
                     setProgress('baa-progress-bar','baa-progress-text', 88); loadingText.style.display='block'; loadingText.innerHTML = `공격 유니버스 13종 모멘텀 계산 중...`;
 
-                    const calc13612 = (rawData) => {
+                    const calc13612 = (rawData, offset = 0) => {
                         if (!rawData) return null;
-                        // 1d interval 기준 → 월별 마지막 거래일 종가를 덮어쓰기로 정확 추출
+                        // offset=0: 이번달 기준, offset=1: 전달 기준
                         const ts  = rawData.timestamp || [];
                         const adj = rawData.indicators?.adjclose?.[0]?.adjclose
                                || rawData.indicators?.quote?.[0]?.close || [];
@@ -2762,10 +2769,10 @@
                             monthly[ym] = { price: v, date: d.toISOString().slice(0,10) };
                         }
                         const keys = Object.keys(monthly).sort();
-                        if (keys.length < 13) return null;
+                        if (keys.length < 14) return null;
                         const _n = new Date();
                         const _isMonthEnd = _n.getDate() >= new Date(_n.getFullYear(), _n.getMonth()+1, 0).getDate() - 1;
-                        const _bi = _isMonthEnd ? keys.length - 1 : keys.length - 2;
+                        const _bi = (_isMonthEnd ? keys.length - 1 : keys.length - 2) - offset;
                         if (_bi < 12) return null;
                         const M0  = monthly[keys[_bi]];
                         const M1  = monthly[keys[_bi-1]];
@@ -2995,6 +3002,181 @@
                     }
                 }
                 if(rebEl) rebEl.innerText = getNextRebalanceKST();
+
+                // ── 이전달 대비 포지션 변경 계산 ──────────────────────────
+                try {
+                    const _wName = { SPY:'S&P500', QQQ:'나스닥100', IWM:'Russell2000', VGK:'유럽주식', EWJ:'일본주식', EEM:'신흥국', VNQ:'부동산(리츠)', DBC:'원자재', HYG:'하이일드채권', TLT:'장기국채', LQD:'투자등급채권', GLD:'금', SGOV:'초단기채', IEF:'중기국채', BND:'종합채권', PDBC:'원자재선물' };
+                    const _pSign = v => v >= 0 ? `<span class="text-up">+${(v*100).toFixed(2)}%</span>` : `<span class="text-down">${(v*100).toFixed(2)}%</span>`;
+
+                    // 전달 카나리아 minScore 계산
+                    let prevMinScore = Infinity;
+                    const prevCanaryRows = [];
+                    for (let i = 0; i < canaries.length; i++) {
+                        const rawData = results[i];
+                        const ts = rawData.timestamp || [];
+                        const quoteClose = rawData.indicators?.quote?.[0]?.close || [];
+                        let adjClose = rawData.indicators?.adjclose?.[0]?.adjclose;
+                        if (!adjClose || adjClose.length === 0) adjClose = quoteClose;
+                        let monthlyData = {};
+                        for (let j = 0; j < ts.length; j++) {
+                            let c = adjClose[j]; if (!c) c = quoteClose[j]; if (!c || c === 0) continue;
+                            const d = new Date(ts[j]*1000);
+                            const ym = d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0');
+                            monthlyData[ym] = { date: d.toISOString().slice(0,10), close: c };
+                        }
+                        const sortedM = Object.keys(monthlyData).sort();
+                        const len2 = sortedM.length;
+                        if (len2 < 14) continue;
+                        const _now2 = new Date();
+                        const _isEnd2 = _now2.getDate() >= new Date(_now2.getFullYear(), _now2.getMonth()+1, 0).getDate() - 1;
+                        const _bi2 = (_isEnd2 ? len2 - 1 : len2 - 2) - 1;
+                        if (_bi2 < 12) continue;
+                        const pM0=monthlyData[sortedM[_bi2]], pM1=monthlyData[sortedM[_bi2-1]],
+                              pM3=monthlyData[sortedM[_bi2-3]], pM6=monthlyData[sortedM[_bi2-6]],
+                              pM12=monthlyData[sortedM[_bi2-12]];
+                        if (!pM0||!pM1||!pM3||!pM6||!pM12) continue;
+                        const pr1=pM0.close/pM1.close-1, pr3=pM0.close/pM3.close-1,
+                              pr6=pM0.close/pM6.close-1, pr12=pM0.close/pM12.close-1;
+                        const pScore = pr1*12*100 + pr3*4*100 + pr6*2*100 + pr12*1*100;
+                        if (pScore < prevMinScore) prevMinScore = pScore;
+                        prevCanaryRows.push(`<tr class="border-b border-themeBorder/20 hover:bg-white/5">
+                            <td class="py-1.5 px-2 font-black text-xs">${canaries[i]}</td>
+                            <td class="py-1.5 px-2 text-[0.62rem] text-themeMuted">${pM0.date}</td>
+                            <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${_pSign(pr1)}</td>
+                            <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${_pSign(pr3)}</td>
+                            <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${_pSign(pr6)}</td>
+                            <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${_pSign(pr12)}</td>
+                            <td class="py-1.5 px-2 text-right font-black font-mono text-[0.62rem] ${pScore>=0?'text-up':'text-down'}">${pScore.toFixed(1)}</td>
+                        </tr>`);
+                    }
+
+                    const _canaryTableHtml = `
+                        <div class="bg-black/20 p-3 rounded-xl border border-themeBorder mb-3">
+                            <p class="font-black mb-1 text-[0.75rem]">${prevMinScore > 0 ? '🟢 지난달 카나리아 → 전원 생존 (공격 모드)' : '🔴 지난달 카나리아 → 위험 감지 (방어 모드)'}</p>
+                            <p class="text-[0.62rem] text-themeMuted mb-2">최소 점수: <span class="font-mono ${prevMinScore>0?'text-up':'text-down'}">${prevMinScore.toFixed(1)}</span> ${prevMinScore>0?'(>0 → 공격)':'(≤0 → 방어)'}</p>
+                            <div class="overflow-x-auto"><table class="w-full min-w-[420px]">
+                                <thead><tr class="text-[0.58rem] text-themeMuted uppercase border-b border-themeBorder">
+                                    <th class="py-1 px-2 text-left">카나리아</th><th class="py-1 px-2 text-left">기준일</th>
+                                    <th class="py-1 px-2 text-right">1M</th><th class="py-1 px-2 text-right">3M</th>
+                                    <th class="py-1 px-2 text-right">6M</th><th class="py-1 px-2 text-right">12M</th>
+                                    <th class="py-1 px-2 text-right">점수</th>
+                                </tr></thead>
+                                <tbody>${prevCanaryRows.join('')}</tbody>
+                            </table></div>
+                        </div>`;
+
+                    let prevPos, prevProofHtml;
+
+                    if (prevMinScore > 0) {
+                        // 전달 공격 모드
+                        const prevOffScores = offUniverse.map((t, i) => {
+                            const res = calc13612(_offPrefetch[i], 1);
+                            return res ? { t, ...res } : null;
+                        }).filter(Boolean).sort((a,b) => b.score - a.score);
+                        const prevWinner = prevOffScores[0];
+                        prevPos = prevWinner ? `⚔️ 공격: <strong class="text-accent">${prevWinner.t}</strong> (${_wName[prevWinner.t]||prevWinner.t}) 100%` : '⚔️ 공격 모드';
+                        const prevOffRows = prevOffScores.map((x, i) => {
+                            const isW = i === 0;
+                            return `<tr class="${isW?'bg-accent/10 border-accent/30':'border-themeBorder/20'} border-b hover:bg-white/5">
+                                <td class="py-1.5 px-2 text-center font-black text-xs ${isW?'text-accent':'text-themeMuted'}">${isW?'🥇':i+1}</td>
+                                <td class="py-1.5 px-2 font-black text-xs ${isW?'text-accent':''}">${x.t} <span class="text-[0.58rem] text-themeMuted font-normal">${_wName[x.t]||''}</span></td>
+                                <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${_pSign(x.r1)}</td>
+                                <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${_pSign(x.r3)}</td>
+                                <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${_pSign(x.r6)}</td>
+                                <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${_pSign(x.r12)}</td>
+                                <td class="py-1.5 px-2 text-right font-black font-mono text-[0.62rem] ${x.score>=0?'text-up':'text-down'}">${x.score.toFixed(1)}</td>
+                            </tr>`;
+                        }).join('');
+                        prevProofHtml = `<div class="space-y-3 text-sm">${_canaryTableHtml}
+                            <div class="bg-black/20 p-3 rounded-xl border border-themeBorder">
+                                <p class="font-black text-accent mb-1 text-[0.75rem]">⚔️ 지난달 공격 유니버스 12종 순위 (13612W)</p>
+                                <p class="text-[0.62rem] text-themeMuted mb-2">점수 = 12×1M + 4×3M + 2×6M + 1×12M</p>
+                                <div class="overflow-x-auto"><table class="w-full min-w-[420px]">
+                                    <thead><tr class="text-[0.58rem] text-themeMuted uppercase border-b border-themeBorder">
+                                        <th class="py-1 px-2 text-center">#</th><th class="py-1 px-2 text-left">티커</th>
+                                        <th class="py-1 px-2 text-right">1M</th><th class="py-1 px-2 text-right">3M</th>
+                                        <th class="py-1 px-2 text-right">6M</th><th class="py-1 px-2 text-right">12M</th>
+                                        <th class="py-1 px-2 text-right">점수</th>
+                                    </tr></thead>
+                                    <tbody>${prevOffRows}</tbody>
+                                </table></div>
+                            </div></div>`;
+                    } else {
+                        // 전달 방어 모드
+                        const prevDefRaw = await Promise.all(
+                            defenseUniversePre.map(dt => fetchStockData(dt, '1d', '2y').catch(() => null))
+                        );
+                        const prevDefScores = defenseUniversePre.map((dt, idx) => {
+                            const res = calc13612(prevDefRaw[idx], 1);
+                            return res ? { t: dt, ...res } : { t: dt, score: -9999, r1:0, r3:0, r6:0, r12:0 };
+                        }).sort((a,b) => b.score - a.score);
+                        const prevTop3 = prevDefScores.slice(0,3);
+                        prevPos = `🛡️ 방어: <strong class="text-down">${prevTop3.map(x=>x.t).join(' / ')}</strong> 각 33.3%`;
+                        const prevDefRows = prevDefScores.map((x, i) => {
+                            const isTop = i < 3;
+                            const emojis = ['🥇','🥈','🥉'];
+                            return `<tr class="${isTop?'bg-down/5 border-down/20':'border-themeBorder/20'} border-b hover:bg-white/5">
+                                <td class="py-1.5 px-2 text-center text-xs">${isTop?emojis[i]:(i+1)+'위'}</td>
+                                <td class="py-1.5 px-2 font-black text-xs ${isTop?'text-down':''}">${x.t} <span class="text-[0.58rem] text-themeMuted font-normal">${_wName[x.t]||''}</span></td>
+                                <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${x.score>-9999?_pSign(x.r1):'-'}</td>
+                                <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${x.score>-9999?_pSign(x.r3):'-'}</td>
+                                <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${x.score>-9999?_pSign(x.r6):'-'}</td>
+                                <td class="py-1.5 px-2 text-right font-mono text-[0.62rem]">${x.score>-9999?_pSign(x.r12):'-'}</td>
+                                <td class="py-1.5 px-2 text-right font-black font-mono text-[0.62rem] ${x.score>=0?'text-up':'text-down'}">${x.score>-9999?x.score.toFixed(1):'N/A'}</td>
+                                <td class="py-1.5 px-2 text-center text-[0.62rem] font-black">${isTop?'<span class=\'text-down\'>33.3%</span>':'<span class=\'text-themeMuted\'>미선택</span>'}</td>
+                            </tr>`;
+                        }).join('');
+                        prevProofHtml = `<div class="space-y-3 text-sm">${_canaryTableHtml}
+                            <div class="bg-black/20 p-3 rounded-xl border border-themeBorder">
+                                <p class="font-black text-down mb-1 text-[0.75rem]">🛡️ 지난달 방어 유니버스 7종 순위</p>
+                                <p class="text-[0.62rem] text-themeMuted mb-2">점수 = 12×1M + 4×3M + 2×6M + 1×12M · 상위 3개 33.3% 균등 배분</p>
+                                <div class="overflow-x-auto"><table class="w-full min-w-[480px]">
+                                    <thead><tr class="text-[0.58rem] text-themeMuted uppercase border-b border-themeBorder">
+                                        <th class="py-1 px-2 text-center">#</th><th class="py-1 px-2 text-left">티커</th>
+                                        <th class="py-1 px-2 text-right">1M</th><th class="py-1 px-2 text-right">3M</th>
+                                        <th class="py-1 px-2 text-right">6M</th><th class="py-1 px-2 text-right">12M</th>
+                                        <th class="py-1 px-2 text-right">점수</th><th class="py-1 px-2 text-center">배분</th>
+                                    </tr></thead>
+                                    <tbody>${prevDefRows}</tbody>
+                                </table></div>
+                            </div></div>`;
+                    }
+
+                    // 현재 포지션 텍스트
+                    let currPos;
+                    if (minScore > 0) {
+                        const w = offScores[0];
+                        currPos = `⚔️ 공격: <strong class="text-accent">${w.t}</strong> (${_wName[w.t]||w.t}) 100%`;
+                    } else {
+                        const _top3 = defScores.slice(0,3);
+                        currPos = `🛡️ 방어: <strong class="text-down">${_top3.map(x=>x.t).join(' / ')}</strong> 각 33.3%`;
+                    }
+
+                    // 변경 여부 판단
+                    const _stripHtml = s => s.replace(/<[^>]+>/g,'').trim();
+                    const _changed = _stripHtml(currPos) !== _stripHtml(prevPos);
+
+                    const _wrap   = document.getElementById('baa-position-change');
+                    const _badge  = document.getElementById('baa-change-badge');
+                    const _detail = document.getElementById('baa-change-detail');
+                    const _prevBtn = document.getElementById('baa-prev-proof-btn');
+                    _wrap.classList.remove('hidden');
+
+                    if (_changed) {
+                        _badge.className = 'inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[0.7rem] font-black border bg-orange-500/10 border-orange-500/40 text-orange-400';
+                        _badge.innerHTML = '🔄 이번 달 포지션 변경됨';
+                        _detail.innerHTML = `<span class="text-themeMuted mr-1">지난달</span>${prevPos}<span class="mx-2 text-themeMuted/60">→</span><span class="text-accent">${currPos}</span>`;
+                    } else {
+                        _badge.className = 'inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[0.7rem] font-black border bg-green-500/10 border-green-500/40 text-green-400';
+                        _badge.innerHTML = '✅ 이번 달 포지션 유지';
+                        _detail.innerHTML = `<span class="text-themeMuted mr-1">지난달과 동일: </span>${currPos}`;
+                    }
+                    _prevBtn.classList.remove('hidden');
+                    baaProofs['__PREV__'] = prevProofHtml;
+
+                } catch(prevErr) {
+                    console.warn('[BAA] 이전달 포지션 계산 실패:', prevErr);
+                }
                 setProgress('baa-progress-bar','baa-progress-text', 100); loading.style.display = 'none';
                 // 이번달 결과 캐시 저장
                 const _sNow = new Date();
@@ -3018,6 +3200,14 @@
             } finally {
                 loading.style.display = 'none';
             }
+        }
+
+        function showPrevMonthProof() {
+            if (!baaProofs['__PREV__']) return;
+            document.getElementById('modal-title').innerText = '지난달 포지션 계산 근거';
+            document.getElementById('modal-period').innerText = 'BAA 전달 말일 기준 · 13612W 공식';
+            document.getElementById('modal-body').innerHTML = baaProofs['__PREV__'];
+            document.getElementById('detail-modal').style.display = 'flex';
         }
 
         function showOffProof() {
