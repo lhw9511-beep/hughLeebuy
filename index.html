@@ -669,6 +669,8 @@
                             <span class="text-xs font-bold text-themeText">최대손실 <span id="card-mdd-6040" class="text-down ml-1">--%</span></span>
                         </div>
                         <div id="card-mar-6040" class="mar-badge expert-only">가성비 --</div>
+                    
+                        <p class="text-[0.55rem] text-rose-400 font-bold mt-1">※ 실검증 백테스트 아님 (추정치)</p>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('permanent')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">영구 포트폴리오 <span class="text-[0.55rem] bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded">안전</span></h3>
@@ -678,6 +680,8 @@
                             <span class="text-xs font-bold text-themeText">최대손실 <span id="card-mdd-permanent" class="text-down ml-1">--%</span></span>
                         </div>
                         <div id="card-mar-permanent" class="mar-badge expert-only">가성비 --</div>
+                    
+                        <p class="text-[0.55rem] text-rose-400 font-bold mt-1">※ 실검증 백테스트 아님 (추정치)</p>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('allweather')">
                         <h3 class="font-black text-themeText text-sm mb-1 flex items-center justify-between">올웨더 전략 <span class="text-[0.55rem] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">유명함</span></h3>
@@ -687,6 +691,8 @@
                             <span class="text-xs font-bold text-themeText">최대손실 <span id="card-mdd-allweather" class="text-down ml-1">--%</span></span>
                         </div>
                         <div id="card-mar-allweather" class="mar-badge expert-only">가성비 --</div>
+                    
+                        <p class="text-[0.55rem] text-rose-400 font-bold mt-1">※ 실검증 백테스트 아님 (추정치)</p>
                     </div>
                 </div>
             </div>
@@ -705,6 +711,8 @@
                             <span class="text-[0.6rem] font-bold text-themeText">최대손실 <span id="card-mdd-dual" class="text-down ml-1">--%</span></span>
                         </div>
                         <div id="card-mar-dual" class="mar-badge expert-only">가성비 --</div>
+                    
+                        <p class="text-[0.55rem] text-rose-400 font-bold mt-1">※ 실검증 백테스트 아님 (추정치)</p>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('vaa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">VAA 전략</h3>
@@ -714,6 +722,8 @@
                             <span class="text-[0.6rem] font-bold text-themeText">최대손실 <span id="card-mdd-vaa" class="text-down ml-1">--%</span></span>
                         </div>
                         <div id="card-mar-vaa" class="mar-badge expert-only">가성비 --</div>
+                    
+                        <p class="text-[0.55rem] text-rose-400 font-bold mt-1">※ 실검증 백테스트 아님 (추정치)</p>
                     </div>
                     <div class="pf-card" onclick="showPfDetail('daa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">DAA 전략</h3>
@@ -723,6 +733,8 @@
                             <span class="text-[0.6rem] font-bold text-themeText">최대손실 <span id="card-mdd-daa" class="text-down ml-1">--%</span></span>
                         </div>
                         <div id="card-mar-daa" class="mar-badge expert-only">가성비 --</div>
+                    
+                        <p class="text-[0.55rem] text-rose-400 font-bold mt-1">※ 실검증 백테스트 아님 (추정치)</p>
                     </div>
                     <div class="pf-card border-accent/40 bg-accent/5" onclick="showPfDetail('baa')">
                         <h3 class="font-black text-themeText text-xs md:text-sm mb-1">BAA 전략</h3>
@@ -732,13 +744,15 @@
                             <span class="text-[0.6rem] font-bold text-themeText">최대손실 <span id="card-mdd-baa" class="text-down ml-1">--%</span></span>
                         </div>
                         <div id="card-mar-baa" class="mar-badge expert-only">가성비 --</div>
+                    
+                        <p class="text-[0.55rem] text-rose-400 font-bold mt-1">※ 실검증 백테스트 아님 (추정치)</p>
                     </div>
                 </div>
             </div>
 
             <div class="expert-only glass p-3 md:p-5 rounded-2xl shadow-xl w-full">
                 <h3 class="text-sm font-black text-themeText mb-2 uppercase tracking-widest border-b border-themeBorder pb-2">과거 모의 투자 결과 그래프 (Base 100)</h3>
-                <p class="text-[0.6rem] text-themeMuted mt-1 mb-1 text-center">※ 포트폴리오 수익 곡선은 참고용 추정치이며 실제 검증된 백테스트 결과가 아닙니다.</p>
+                <p class="text-[0.6rem] text-themeMuted mt-1 mb-1 text-center">※ 아래 수익 곡선은 실제 검증된 백테스트가 아닌 추정 시뮬레이션이며, 실제 성과와 크게 다를 수 있습니다.</p>
 <div id="chart-portfolio" class="portfolio-chart-container w-full"></div>
             </div>
         </div>
@@ -2557,7 +2571,7 @@
                 // 카나리아 + 방어자산 동시 병렬 fetch
                 loadingText.innerHTML = `카나리아 4종 + 방어자산 동시 로딩 중...`;
                 // BAA 논문 공격 유니버스 13종 (Keller & Keuning 2018)
-                const offUniverse = ['SPY','QQQ','IWM','VGK','EWJ','EEM','VNQ','DBC','HYG','TLT','LQD','GLD','PDBC'];
+                const offUniverse = ['SPY','QQQ','IWM','VGK','EWJ','EEM','VNQ','DBC','HYG','TLT','LQD','GLD'];
                 const defenseUniversePre = ['TIP','PDBC','SGOV','IEF','TLT','LQD','BND'];
 
                 const [baaFetched, _offPrefetch, _defPrefetch] = await Promise.all([
@@ -2596,7 +2610,11 @@
                     
                     const ts = rawData.timestamp ||[];
                     const quoteClose = rawData.indicators?.quote?.[0]?.close ||[];
-                    const adjClose = rawData.indicators?.adjclose?.[0]?.adjclose || quoteClose;
+                    let adjClose = rawData.indicators?.adjclose?.[0]?.adjclose;
+                    if (!adjClose || adjClose.length === 0) {
+                        console.warn(`[BAA][${ticker}] adjclose 누락 - quote.close로 대체`);
+                        adjClose = quoteClose;
+                    }
 
                     let monthlyData = {};
                     let lastValidClose = 0;
@@ -2644,8 +2662,6 @@
                     const score = s1 + s3 + s6 + s12;
                     
                     if (score < minScore) minScore = score;
-                    if (score <= 0) failureCount++;
-
                     const mkRow = (label, pastDate, pastPrice, ret, weight, wScore) => `
                         <tr class="border-b border-themeBorder/30 hover:bg-white/5 transition">
                             <td class="py-2 text-left text-xs text-themeMuted whitespace-nowrap">${label}</td>
