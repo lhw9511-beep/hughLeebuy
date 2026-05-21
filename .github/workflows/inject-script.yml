@@ -18,29 +18,20 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Insert inject-backtest.js before </body>
+      - name: Restore index.html from good commit
         run: |
-          python3 - <<'PYEOF'
-          with open('index.html', 'r', encoding='utf-8') as f:
-              content = f.read()
-          tag = '    <script src="inject-backtest.js"></script>'
-          if tag not in content:
-              content = content.replace('</body>', tag + '\n</body>')
-              with open('index.html', 'w', encoding='utf-8') as f:
-                  f.write(content)
-              print('PATCHED')
-          else:
-              print('SKIP: already present')
-          PYEOF
+          git checkout f63f63cea427a9f07a4ed672a61937c926f9d5dd -- index.html
+          echo "Restored index.html from commit f63f63c"
+          wc -c index.html
 
-      - name: Commit and push if changed
+      - name: Commit and push restored file
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           if git diff --quiet; then
-            echo 'No changes to commit'
+            echo 'No changes needed'
           else
             git add index.html
-            git commit -m 'fix: inject-backtest.js 스크립트 태그 삽입'
+            git commit -m 'fix: index.html 원본 복구 (ef75e0a 손상 파일 되돌리기)'
             git push origin HEAD:main
           fi
