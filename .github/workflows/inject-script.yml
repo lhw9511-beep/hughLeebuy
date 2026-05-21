@@ -1,0 +1,37 @@
+name: Inject backtest script tag
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/inject-script.yml'
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Insert inject-backtest.js before </body>
+        run: |
+          python3 - <<'PYEOF'
+          import re
+          with open('index.html', 'r', encoding='utf-8') as f:
+              content = f.read()
+          tag = '    <script src="inject-backtest.js"></script>'
+          if tag not in content:
+              content = content.replace('</body>', tag + '\n</body>')
+              with open('index.html', 'w', encoding='utf-8') as f:
+                  f.write(content)
+              print('PATCHED: tag inserted')
+          else:
+              print('SKIP: tag already present')
+          PYEOF
+
+      - name: Commit if changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git diff --quiet && echo 'No changes' || (git add index.html && git commit -m 'fix: inject-backtest.js 스크립트 태그 삽입' && git push)
